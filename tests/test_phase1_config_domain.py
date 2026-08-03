@@ -1,3 +1,4 @@
+from dataclasses import replace
 from datetime import UTC, date, datetime
 from pathlib import Path
 
@@ -16,12 +17,22 @@ from institutional_factor_platform.data.domain import (
     DataSource,
     DateRange,
     ListingType,
+    MappingStatus,
     SecurityId,
     SecurityRecord,
     TemporalMetadata,
 )
-from institutional_factor_platform.data.security_master import validate_security_master
-from institutional_factor_platform.exceptions import ConfigurationError, TemporalIntegrityError
+from institutional_factor_platform.data.security_master import (
+    SecurityMappingStore,
+    mapping_from_listing,
+    registrant_mapping,
+    validate_security_master,
+)
+from institutional_factor_platform.exceptions import (
+    ConfigurationError,
+    SecurityMappingError,
+    TemporalIntegrityError,
+)
 
 
 def test_phase1_configuration_is_strict_hashable_and_redacted(
@@ -76,6 +87,9 @@ def test_security_id_is_stable_and_not_ticker_only() -> None:
     assert first != SecurityId.create(DataSource.OWNER_SUPPLIED, "TEST", "XNAS", "owner-1")
     with pytest.raises(Exception, match="requires"):
         SecurityId.create(DataSource.OWNER_SUPPLIED, "", "XNYS", "owner-1")
+    canonical = SecurityId.canonical(" test ", "xnys", "xNYS")
+    assert canonical == SecurityId.canonical("TEST", "XNYS", "XNYS")
+    assert canonical != SecurityId.canonical("TEST", "XNAS", "XNAS")
 
 
 def test_temporal_and_date_range_invariants() -> None:
@@ -158,3 +172,80 @@ def test_security_master_detects_market_dates_status_and_quality() -> None:
         item.rule for item in validate_security_master((broken,), load_phase1_config().universe)
     }
     assert rules >= {"ticker", "market", "listing_dates", "active_status", "metadata_quality"}
+
+
+def test_cross_source_mapping_is_persisted_and_ambiguous_cik_is_blocked(
+    tmp_path: Path,
+) -> None:
+    now = datetime(2024, 1, 2, tzinfo=UTC)
+    yahoo = mapping_from_listing(
+        source=DataSource.YAHOO_FINANCE,
+        source_identifier=" SYNTH ",
+        ticker=" synth ",
+        exchange=" xnys ",
+        mic="xnys",
+        valid_from=date(2020, 1, 1),
+        valid_to=None,
+        provenance="owner-confirmed synthetic test evidence",
+        retrieval_timestamp=now,
+    )
+    owner = mapping_from_listing(
+        source=DataSource.OWNER_SUPPLIED,
+        source_identifier="owner-1",
+        ticker="SYNTH",
+        exchange="XNYS",
+        mic="XNYS",
+        valid_from=date(2020, 1, 1),
+        valid_to=None,
+        provenance="owner-confirmed synthetic test evidence",
+        retrieval_timestamp=now,
+    )
+    assert yahoo.security_id == owner.security_id
+    store = SecurityMappingStore(tmp_path / "mappings.json")
+    store.persist((yahoo, owner))
+    restarted = SecurityMappingStore(store.path)
+    assert restarted.resolve("yahoo_finance", "synth", date(2024, 1, 1)) == yahoo.security_id
+    ambiguous = registrant_mapping(
+        cik="1",
+        eligible_security_ids=(yahoo.security_id, SecurityId.canonical("OTHER", "XNYS")),
+        valid_from=date(2020, 1, 1),
+        provenance="synthetic registrant evidence",
+        retrieval_timestamp=now,
+    )
+    assert ambiguous.status is MappingStatus.AMBIGUOUS and ambiguous.security_id is None
+    ambiguous_store = SecurityMappingStore(tmp_path / "ambiguous.json")
+    ambiguous_store.persist((ambiguous,))
+    with pytest.raises(SecurityMappingError, match="unresolved or ambiguous"):
+        ambiguous_store.resolve("sec_edgar", "1", date(2024, 1, 1))
+
+
+def test_mapping_conflict_and_ticker_reuse_are_explicit(tmp_path: Path) -> None:
+    now = datetime(2024, 1, 2, tzinfo=UTC)
+    first = mapping_from_listing(
+        source=DataSource.OWNER_SUPPLIED,
+        source_identifier="reused",
+        ticker="OLD",
+        exchange="XNYS",
+        mic=None,
+        valid_from=date(2010, 1, 1),
+        valid_to=date(2019, 12, 31),
+        provenance="synthetic historical mapping",
+        retrieval_timestamp=now,
+    )
+    second = mapping_from_listing(
+        source=DataSource.OWNER_SUPPLIED,
+        source_identifier="reused",
+        ticker="NEW",
+        exchange="XNYS",
+        mic=None,
+        valid_from=date(2020, 1, 1),
+        valid_to=None,
+        provenance="synthetic historical mapping",
+        retrieval_timestamp=now,
+    )
+    store = SecurityMappingStore(tmp_path / "reuse.json")
+    store.persist((first, second))
+    assert store.resolve("owner_supplied", "reused", date(2015, 1, 1)) == first.security_id
+    conflicting = replace(second, valid_from=date(2019, 1, 1))
+    with pytest.raises(SecurityMappingError, match="Conflicting"):
+        SecurityMappingStore(tmp_path / "conflict.json").persist((first, conflicting))

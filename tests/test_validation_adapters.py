@@ -7,8 +7,10 @@ from pathlib import Path
 import httpx
 import pandas as pd
 import pyarrow as pa
+import pyarrow.parquet as pq
 import pytest
 
+from institutional_factor_platform.data.calendar import USEquityCalendar
 from institutional_factor_platform.data.config import load_phase1_config
 from institutional_factor_platform.data.contracts import MACRO_OBSERVATIONS
 from institutional_factor_platform.data.domain import (
@@ -29,6 +31,7 @@ from institutional_factor_platform.data.validation import (
     validate_daily_market,
     validate_french_factors,
     validate_macro,
+    validate_market_coverage,
     validate_sec_facts,
     validate_table,
     validate_temporal_order,
@@ -161,6 +164,8 @@ def test_sec_requires_contact_and_preserves_filing_metadata() -> None:
     )
     assert records[0]["filing_date"] == date(2024, 2, 1)
     assert records[0]["availability_timestamp"] >= datetime(2024, 2, 1, tzinfo=UTC)
+    assert records[0]["availability_quality"] == "INFERRED_DATE_LEVEL"
+    assert records[0]["schema_version"] == "2.0.0"
     with pytest.raises(RetrievalError, match="Invalid SEC JSON"):
         adapter.standardize(b"not json", RetrievalRequest(DataSource.SEC_EDGAR, "1"))
     with pytest.raises(RetrievalError, match="entity metadata"):
@@ -214,11 +219,24 @@ def test_yahoo_standardizes_and_reports_partial_failure() -> None:
 
 def test_owner_adapter_requires_explicit_contract(tmp_path: Path) -> None:
     path = tmp_path / "header-only.csv"
-    path.write_text("series_id,observation_date\n", encoding="utf-8")
+    path.write_text(
+        ",".join(MACRO_OBSERVATIONS.schema.names) + "\n",
+        encoding="utf-8",
+    )
+    metadata = {
+        "path": str(path),
+        "schema": "macro_observations",
+        "contract_version": "1.0.0",
+        "source_name": "owner audit fixture",
+        "source_ownership": "repository owner",
+        "units": {"value": "synthetic unit"},
+        "date_semantics": "ISO observation date",
+        "security_identifier_semantics": "not applicable",
+    }
     request = RetrievalRequest(
         DataSource.OWNER_SUPPLIED,
         "owner_test",
-        parameters={"path": str(path), "schema": "macro_observations"},
+        parameters=metadata,
     )
     adapter = OwnerSuppliedAdapter()
     assert adapter.standardize(adapter.retrieve(request), request) == ()
@@ -226,15 +244,15 @@ def test_owner_adapter_requires_explicit_contract(tmp_path: Path) -> None:
         adapter.standardize(
             path.read_bytes(),
             request.__class__(
-                request.source, request.dataset, parameters={"path": str(path), "schema": "unknown"}
+                request.source, request.dataset, parameters={**metadata, "schema": "unknown"}
             ),
         )
     missing = request.__class__(
         request.source,
         request.dataset,
         parameters={
+            **metadata,
             "path": str(tmp_path / "none.csv"),
-            "schema": "macro_observations",
         },
     )
     with pytest.raises(RetrievalError, match="does not exist"):
@@ -244,12 +262,55 @@ def test_owner_adapter_requires_explicit_contract(tmp_path: Path) -> None:
     json_request = request.__class__(
         request.source,
         request.dataset,
-        parameters={"path": str(json_path), "schema": "macro_observations"},
+        parameters={**metadata, "path": str(json_path)},
     )
-    assert (
-        adapter.standardize(adapter.retrieve(json_request), json_request)[0]["series_id"]
-        == "synthetic"
+    with pytest.raises(UnsupportedDatasetError, match="exactly match"):
+        adapter.standardize(adapter.retrieve(json_request), json_request)
+    with pytest.raises(UnsupportedDatasetError, match="metadata is incomplete"):
+        adapter.retrieve(
+            RetrievalRequest(
+                DataSource.OWNER_SUPPLIED,
+                "owner_test",
+                parameters={"path": str(path), "schema": "macro_observations"},
+            )
+        )
+    extra = tmp_path / "extra.csv"
+    extra.write_text(
+        ",".join([*MACRO_OBSERVATIONS.schema.names, "unexpected"]) + "\n",
+        encoding="utf-8",
     )
+    extra_request = request.__class__(
+        request.source, request.dataset, parameters={**metadata, "path": str(extra)}
+    )
+    before = extra.read_bytes()
+    with pytest.raises(UnsupportedDatasetError, match="extra"):
+        adapter.standardize(adapter.retrieve(extra_request), extra_request)
+    assert extra.read_bytes() == before
+    parquet_path = tmp_path / "valid.parquet"
+    pq.write_table(pa.Table.from_pylist([], schema=MACRO_OBSERVATIONS.schema), parquet_path)
+    parquet_request = request.__class__(
+        request.source, request.dataset, parameters={**metadata, "path": str(parquet_path)}
+    )
+    assert adapter.standardize(adapter.retrieve(parquet_request), parquet_request) == ()
+    corrupt = tmp_path / "corrupt.parquet"
+    corrupt.write_bytes(b"not parquet")
+    corrupt_request = request.__class__(
+        request.source, request.dataset, parameters={**metadata, "path": str(corrupt)}
+    )
+    with pytest.raises(RetrievalError, match="cannot be parsed"):
+        adapter.standardize(adapter.retrieve(corrupt_request), corrupt_request)
+    wrong_version = request.__class__(
+        request.source,
+        request.dataset,
+        parameters={**metadata, "contract_version": "9.0.0"},
+    )
+    with pytest.raises(UnsupportedDatasetError, match="unsupported"):
+        adapter.retrieve(wrong_version)
+    missing_units = request.__class__(
+        request.source, request.dataset, parameters={**metadata, "units": {}}
+    )
+    with pytest.raises(UnsupportedDatasetError, match="units"):
+        adapter.retrieve(missing_units)
 
 
 def test_common_market_and_temporal_validation() -> None:
@@ -333,6 +394,8 @@ def test_source_specific_validation_paths() -> None:
                 "period_end": date(2024, 2, 1),
                 "filing_date": date(2024, 1, 1),
                 "availability_timestamp": NOW,
+                "retrieval_timestamp": NOW,
+                "availability_quality": "INFERRED_DATE_LEVEL",
             },
             {"period_end": "invalid"},
         ]
@@ -371,3 +434,56 @@ def test_market_stale_extreme_and_invalid_values() -> None:
         ]
     )
     assert {finding.rule for finding in invalid} >= {"positive_prices", "high_low"}
+
+
+def test_market_calendar_coverage_and_listing_boundaries() -> None:
+    records = [
+        {"security_id": "sec", "trading_date": date(2024, 1, 2)},
+        {"security_id": "sec", "trading_date": date(2024, 1, 4)},
+    ]
+    findings = validate_market_coverage(
+        records,
+        calendar=USEquityCalendar(),
+        start=date(2024, 1, 1),
+        end=date(2024, 1, 5),
+        warning_ratio=0.9,
+        critical_ratio=0.5,
+        listing_periods={"sec": (date(2024, 1, 2), date(2024, 1, 4))},
+    )
+    coverage = next(item for item in findings if item.rule == "market_calendar_coverage")
+    assert coverage.affected_count == 1
+    assert coverage.representative_keys == ("2024-01-03",)
+    out_of_range = validate_market_coverage(
+        [{"security_id": "sec", "trading_date": date(2024, 1, 8)}],
+        calendar=USEquityCalendar(),
+        start=date(2024, 1, 1),
+        end=date(2024, 1, 5),
+        warning_ratio=0.9,
+        critical_ratio=0.5,
+    )
+    assert any(item.rule == "market_out_of_range" for item in out_of_range)
+
+
+def test_sec_temporal_availability_and_duration_rules() -> None:
+    base = {
+        "period_start": date(2023, 1, 1),
+        "period_end": date(2023, 12, 31),
+        "filing_date": date(2024, 2, 1),
+        "availability_timestamp": datetime(2024, 2, 1, 23, 59, tzinfo=UTC),
+        "retrieval_timestamp": datetime(2024, 2, 2, tzinfo=UTC),
+        "availability_quality": "INFERRED_DATE_LEVEL",
+    }
+    assert validate_sec_facts([base]) == ()
+    assert validate_sec_facts([{**base, "period_start": None, "form": "10-Q"}]) == ()
+    availability_before = validate_sec_facts(
+        [{**base, "availability_timestamp": datetime(2024, 1, 1, tzinfo=UTC)}]
+    )
+    assert any(item.rule == "availability_after_filing" for item in availability_before)
+    retrieval_before = validate_sec_facts(
+        [{**base, "retrieval_timestamp": datetime(2024, 1, 1, tzinfo=UTC)}]
+    )
+    assert any(item.rule == "retrieval_after_availability" for item in retrieval_before)
+    reversed_period = validate_sec_facts(
+        [{**base, "period_start": date(2024, 1, 1), "period_end": date(2023, 1, 1)}]
+    )
+    assert any(item.rule == "sec_period_order" for item in reversed_period)
