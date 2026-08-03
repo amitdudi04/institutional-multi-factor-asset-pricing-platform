@@ -229,7 +229,7 @@ def test_owner_adapter_requires_explicit_contract(tmp_path: Path) -> None:
         "contract_version": "1.0.0",
         "source_name": "owner audit fixture",
         "source_ownership": "repository owner",
-        "units": {"value": "synthetic unit"},
+        "units": {"value": "index"},
         "date_semantics": "ISO observation date",
         "security_identifier_semantics": "not applicable",
     }
@@ -311,6 +311,26 @@ def test_owner_adapter_requires_explicit_contract(tmp_path: Path) -> None:
     )
     with pytest.raises(UnsupportedDatasetError, match="units"):
         adapter.retrieve(missing_units)
+    incompatible_units = request.__class__(
+        request.source,
+        request.dataset,
+        parameters={**metadata, "units": {"value": "decimal"}},
+    )
+    assert adapter.retrieve(incompatible_units) == path.read_bytes()
+    ambiguous_percent = request.__class__(
+        request.source,
+        request.dataset,
+        parameters={**metadata, "units": {"value": "percentage_or_decimal"}},
+    )
+    with pytest.raises(UnsupportedDatasetError, match="incompatible"):
+        adapter.retrieve(ambiguous_percent)
+    wrong_field = request.__class__(
+        request.source,
+        request.dataset,
+        parameters={**metadata, "units": {"factor_value": "decimal"}},
+    )
+    with pytest.raises(UnsupportedDatasetError, match="exactly cover"):
+        adapter.retrieve(wrong_field)
 
 
 def test_common_market_and_temporal_validation() -> None:

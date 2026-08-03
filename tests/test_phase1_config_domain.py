@@ -16,14 +16,20 @@ from institutional_factor_platform.data.domain import (
     DatasetStatus,
     DataSource,
     DateRange,
+    IssuerId,
+    IssuerListingMapping,
     ListingType,
+    MappingEvidence,
     MappingStatus,
     SecurityId,
     SecurityRecord,
+    SymbolHistoryRecord,
     TemporalMetadata,
 )
 from institutional_factor_platform.data.security_master import (
+    IssuerListingMappingStore,
     SecurityMappingStore,
+    SymbolHistoryStore,
     mapping_from_listing,
     registrant_mapping,
     validate_security_master,
@@ -62,6 +68,14 @@ def test_configuration_date_unknown_field_and_paths_fail(tmp_path: Path) -> None
     data["unexpected"] = True
     with pytest.raises(ValidationError, match="Extra inputs"):
         Phase1Config.model_validate(data)
+    data = config.model_dump()
+    data["manifests"]["schema_version"] = "2.0.0"
+    with pytest.raises(ValidationError, match=r"manifests\.schema_version"):
+        Phase1Config.model_validate(data)
+    data = config.model_dump()
+    data["validation"]["schema_version"] = "3.0.0"
+    with pytest.raises(ValidationError, match=r"validation\.schema_version"):
+        Phase1Config.model_validate(data)
     paths = PathSettings(**{**config.paths.model_dump(), "raw": Path("../escape")})
     with pytest.raises(ConfigurationError, match="escapes"):
         paths.resolved(tmp_path)
@@ -87,9 +101,9 @@ def test_security_id_is_stable_and_not_ticker_only() -> None:
     assert first != SecurityId.create(DataSource.OWNER_SUPPLIED, "TEST", "XNAS", "owner-1")
     with pytest.raises(Exception, match="requires"):
         SecurityId.create(DataSource.OWNER_SUPPLIED, "", "XNYS", "owner-1")
-    canonical = SecurityId.canonical(" test ", "xnys", "xNYS")
-    assert canonical == SecurityId.canonical("TEST", "XNYS", "XNYS")
-    assert canonical != SecurityId.canonical("TEST", "XNAS", "XNAS")
+    canonical = SecurityId.canonical("listing-key-1", "xnys", "xNYS")
+    assert canonical == SecurityId.canonical("listing-key-1", "XNYS", "XNYS")
+    assert canonical != SecurityId.canonical("listing-key-1", "XNAS", "XNAS")
 
 
 def test_temporal_and_date_range_invariants() -> None:
@@ -178,6 +192,7 @@ def test_cross_source_mapping_is_persisted_and_ambiguous_cik_is_blocked(
     tmp_path: Path,
 ) -> None:
     now = datetime(2024, 1, 2, tzinfo=UTC)
+    listing_id = SecurityId.assign()
     yahoo = mapping_from_listing(
         source=DataSource.YAHOO_FINANCE,
         source_identifier=" SYNTH ",
@@ -188,6 +203,7 @@ def test_cross_source_mapping_is_persisted_and_ambiguous_cik_is_blocked(
         valid_to=None,
         provenance="owner-confirmed synthetic test evidence",
         retrieval_timestamp=now,
+        security_id=listing_id,
     )
     owner = mapping_from_listing(
         source=DataSource.OWNER_SUPPLIED,
@@ -199,6 +215,7 @@ def test_cross_source_mapping_is_persisted_and_ambiguous_cik_is_blocked(
         valid_to=None,
         provenance="owner-confirmed synthetic test evidence",
         retrieval_timestamp=now,
+        security_id=listing_id,
     )
     assert yahoo.security_id == owner.security_id
     store = SecurityMappingStore(tmp_path / "mappings.json")
@@ -207,7 +224,7 @@ def test_cross_source_mapping_is_persisted_and_ambiguous_cik_is_blocked(
     assert restarted.resolve("yahoo_finance", "synth", date(2024, 1, 1)) == yahoo.security_id
     ambiguous = registrant_mapping(
         cik="1",
-        eligible_security_ids=(yahoo.security_id, SecurityId.canonical("OTHER", "XNYS")),
+        eligible_security_ids=(yahoo.security_id, SecurityId.assign()),
         valid_from=date(2020, 1, 1),
         provenance="synthetic registrant evidence",
         retrieval_timestamp=now,
@@ -246,6 +263,79 @@ def test_mapping_conflict_and_ticker_reuse_are_explicit(tmp_path: Path) -> None:
     store = SecurityMappingStore(tmp_path / "reuse.json")
     store.persist((first, second))
     assert store.resolve("owner_supplied", "reused", date(2015, 1, 1)) == first.security_id
-    conflicting = replace(second, valid_from=date(2019, 1, 1))
+    conflicting = replace(second, valid_from=date(2019, 1, 1), security_id=SecurityId.assign())
     with pytest.raises(SecurityMappingError, match="Conflicting"):
         SecurityMappingStore(tmp_path / "conflict.json").persist((first, conflicting))
+
+
+def test_symbol_history_preserves_listing_identity_across_ticker_change(tmp_path: Path) -> None:
+    now = datetime(2024, 1, 2, tzinfo=UTC)
+    listing = SecurityId.assign()
+    old = SymbolHistoryRecord(
+        listing,
+        "OLD",
+        "XNYS",
+        "XNYS",
+        date(2010, 1, 1),
+        date(2019, 12, 31),
+        DataSource.OWNER_SUPPLIED,
+        "listing-1",
+        now,
+        "owner-approved-test-evidence",
+    )
+    new = replace(old, ticker="NEW", valid_from=date(2020, 1, 1), valid_to=None)
+    store = SymbolHistoryStore(tmp_path / "symbols.json")
+    store.persist((old, new))
+    restarted = SymbolHistoryStore(store.path)
+    assert restarted.resolve("old", "xnys", date(2015, 1, 1)) == listing
+    assert restarted.resolve("NEW", "XNYS", date(2024, 1, 1)) == listing
+    reused = replace(
+        new,
+        security_id=SecurityId.assign(),
+        ticker="OLD",
+        valid_from=date(2020, 1, 1),
+    )
+    SymbolHistoryStore(tmp_path / "reuse-symbol.json").persist((old, new, reused))
+    with pytest.raises(SecurityMappingError, match="Overlapping"):
+        SymbolHistoryStore(tmp_path / "overlap.json").persist(
+            (old, replace(new, valid_from=date(2019, 1, 1)))
+        )
+    with pytest.raises(SecurityMappingError, match="requires ticker"):
+        replace(old, ticker="")
+    with pytest.raises(SecurityMappingError, match="precedes"):
+        replace(old, valid_from=date(2020, 1, 1), valid_to=date(2019, 1, 1))
+    with pytest.raises(SecurityMappingError, match="timezone-aware"):
+        replace(old, retrieval_timestamp=datetime(2024, 1, 1))
+
+
+def test_issuer_identity_is_distinct_and_ambiguous_listing_join_blocks(tmp_path: Path) -> None:
+    now = datetime(2024, 1, 2, tzinfo=UTC)
+    issuer = IssuerId.from_cik("1")
+    first, second = SecurityId.assign(), SecurityId.assign()
+    resolved = IssuerListingMapping(
+        issuer,
+        first,
+        date(2020, 1, 1),
+        None,
+        MappingStatus.RESOLVED,
+        MappingEvidence.OWNER_CONFIRMED,
+        "owner-approved synthetic mapping evidence",
+        now,
+    )
+    store = IssuerListingMappingStore(tmp_path / "issuer-listing.json")
+    store.persist((resolved,))
+    assert IssuerListingMappingStore(store.path).resolve(issuer, date(2024, 1, 1)) == first
+    ambiguous = IssuerListingMapping(
+        issuer,
+        None,
+        date(2020, 1, 1),
+        None,
+        MappingStatus.AMBIGUOUS,
+        MappingEvidence.REGISTRANT_ONLY,
+        f"multiple eligible listings: {first.value},{second.value}",
+        now,
+    )
+    ambiguous_store = IssuerListingMappingStore(tmp_path / "ambiguous-issuer.json")
+    ambiguous_store.persist((ambiguous,))
+    with pytest.raises(SecurityMappingError, match="unresolved or ambiguous"):
+        ambiguous_store.resolve(issuer, date(2024, 1, 1))

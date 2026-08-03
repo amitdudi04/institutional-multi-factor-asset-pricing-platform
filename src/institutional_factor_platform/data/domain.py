@@ -106,12 +106,91 @@ class SecurityId:
         return cls(f"sec_{uuid.uuid5(uuid.NAMESPACE_URL, '|'.join(parts)).hex}")
 
     @classmethod
-    def canonical(cls, ticker: str, exchange: str, mic: str | None = None) -> "SecurityId":
-        """Create a source-independent listing ID from explicit listing evidence."""
-        parts = [ticker.strip().upper(), exchange.strip().upper(), (mic or "").strip().upper()]
+    def canonical(
+        cls, stable_listing_key: str, exchange: str, mic: str | None = None
+    ) -> "SecurityId":
+        """Create an ID from a stable listing key, never from a display ticker.
+
+        The first argument is retained for API compatibility but is now a stable owner-governed
+        listing key. Symbol text belongs in effective-dated symbol history.
+        """
+        parts = [
+            stable_listing_key.strip(),
+            exchange.strip().upper(),
+            (mic or "").strip().upper(),
+        ]
         if not parts[0] or not parts[1]:
-            raise SecurityMappingError("Canonical security ID requires ticker and exchange.")
-        return cls(f"sec_{uuid.uuid5(uuid.NAMESPACE_URL, 'listing|' + '|'.join(parts)).hex}")
+            raise SecurityMappingError(
+                "Canonical security ID requires stable listing key and venue."
+            )
+        return cls(f"sec_{uuid.uuid5(uuid.NAMESPACE_URL, 'listing-v2|' + '|'.join(parts)).hex}")
+
+    @classmethod
+    def assign(cls) -> "SecurityId":
+        """Assign a permanent internal listing identifier for persisted reference data."""
+        return cls(f"sec_{uuid.uuid4().hex}")
+
+
+@dataclass(frozen=True, slots=True)
+class IssuerId:
+    value: str
+
+    @classmethod
+    def from_cik(cls, cik: str) -> "IssuerId":
+        normalized = cik.zfill(10)
+        if len(normalized) != 10 or not normalized.isdigit():
+            raise SecurityMappingError("Issuer CIK must contain at most ten digits.")
+        return cls(f"issuer_{uuid.uuid5(uuid.NAMESPACE_URL, 'sec-cik|' + normalized).hex}")
+
+
+@dataclass(frozen=True, slots=True)
+class SymbolHistoryRecord:
+    security_id: SecurityId
+    ticker: str
+    exchange: str
+    mic: str | None
+    valid_from: date
+    valid_to: date | None
+    source: DataSource
+    source_identifier: str
+    retrieval_timestamp: datetime
+    evidence_reference: str
+
+    def __post_init__(self) -> None:
+        if (
+            not self.ticker.strip()
+            or not self.exchange.strip()
+            or not self.evidence_reference.strip()
+        ):
+            raise SecurityMappingError("Symbol history requires ticker, venue, and evidence.")
+        if self.valid_to is not None and self.valid_to < self.valid_from:
+            raise SecurityMappingError("Symbol history validity end precedes start.")
+        if self.retrieval_timestamp.tzinfo is None:
+            raise SecurityMappingError("Symbol history retrieval timestamp must be timezone-aware.")
+
+
+@dataclass(frozen=True, slots=True)
+class IssuerListingMapping:
+    issuer_id: IssuerId
+    security_id: SecurityId | None
+    valid_from: date
+    valid_to: date | None
+    status: MappingStatus
+    evidence: MappingEvidence
+    provenance: str
+    retrieval_timestamp: datetime
+
+    def __post_init__(self) -> None:
+        if self.valid_to is not None and self.valid_to < self.valid_from:
+            raise SecurityMappingError("Issuer-listing validity end precedes start.")
+        if self.status is MappingStatus.RESOLVED and self.security_id is None:
+            raise SecurityMappingError("Resolved issuer-listing mapping requires a listing ID.")
+        if self.status is not MappingStatus.RESOLVED and self.security_id is not None:
+            raise SecurityMappingError(
+                "Ambiguous issuer-listing mapping cannot carry a listing ID."
+            )
+        if not self.provenance.strip() or self.retrieval_timestamp.tzinfo is None:
+            raise SecurityMappingError("Issuer-listing mapping requires provenance and aware time.")
 
 
 @dataclass(frozen=True, slots=True)

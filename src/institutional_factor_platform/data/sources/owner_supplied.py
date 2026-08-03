@@ -26,6 +26,24 @@ REQUIRED_METADATA = {
     "security_identifier_semantics",
 }
 
+UNIT_RULES: dict[str, dict[str, set[str]]] = {
+    "daily_market": {
+        "open": {"USD", "currency:USD"},
+        "high": {"USD", "currency:USD"},
+        "low": {"USD", "currency:USD"},
+        "close": {"USD", "currency:USD"},
+        "adjusted_close": {"USD", "currency:USD"},
+        "volume": {"shares"},
+        "dividend": {"USD", "currency:USD"},
+        "split_factor": {"ratio"},
+    },
+    "corporate_actions": {"value": {"USD", "currency:USD", "ratio"}},
+    "macro_observations": {"value": {"percent", "percent_per_annum", "decimal", "index", "USD"}},
+    "french_factor_returns": {"factor_value": {"decimal"}},
+    "sec_financial_facts": {"value": {"xbrl_source_unit"}},
+    "security_master": {"security_id": {"not_applicable"}},
+}
+
 
 class OwnerSuppliedAdapter(SourceAdapter[bytes]):
     source = DataSource.OWNER_SUPPLIED
@@ -107,6 +125,21 @@ def _contract(request: RetrievalRequest) -> TableContract:
         raise UnsupportedDatasetError(
             "Owner metadata units must be a non-empty field-to-unit mapping."
         )
+    rules = UNIT_RULES[contract.name]
+    unknown_fields = set(units) - set(rules)
+    missing_fields = set(rules) - set(units)
+    if unknown_fields or missing_fields:
+        raise UnsupportedDatasetError(
+            "Owner unit metadata must exactly cover unit-bearing contract fields; "
+            f"missing={sorted(missing_fields)}, extra={sorted(unknown_fields)}."
+        )
+    for field, value in units.items():
+        normalized = str(value).strip()
+        if normalized not in rules[field]:
+            raise UnsupportedDatasetError(
+                f"Owner unit {value!r} is incompatible with {contract.name}.{field}; "
+                f"allowed={sorted(rules[field])}."
+            )
     return contract
 
 

@@ -10,12 +10,15 @@ from institutional_factor_platform.data.domain import (
     AssetType,
     DatasetStatus,
     DataSource,
+    IssuerId,
+    IssuerListingMapping,
     ListingType,
     MappingEvidence,
     MappingStatus,
     SecurityId,
     SecurityMapping,
     SecurityRecord,
+    SymbolHistoryRecord,
     ValidationResult,
     ValidationSeverity,
 )
@@ -142,6 +145,85 @@ class SecurityMappingStore:
         return resolved
 
 
+class SymbolHistoryStore:
+    """Immutable effective-dated symbols for stable listing identities."""
+
+    def __init__(self, path: Path) -> None:
+        self.path = path
+
+    def persist(self, records: tuple[SymbolHistoryRecord, ...]) -> None:
+        _validate_symbol_history(records)
+        content = json.dumps([_symbol_dict(item) for item in records], sort_keys=True, indent=2)
+        if self.path.exists() and self.path.read_text(encoding="utf-8") != content:
+            raise SecurityMappingError(f"Refusing to overwrite symbol history: {self.path}")
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        if not self.path.exists():
+            self.path.write_text(content, encoding="utf-8")
+
+    def load(self) -> tuple[SymbolHistoryRecord, ...]:
+        try:
+            values = json.loads(self.path.read_text(encoding="utf-8"))
+            return tuple(_symbol_from_dict(value) for value in values)
+        except (OSError, ValueError, TypeError, KeyError) as exc:
+            raise SecurityMappingError(f"Invalid symbol history {self.path}: {exc}") from exc
+
+    def resolve(self, ticker: str, exchange: str, as_of: date) -> SecurityId:
+        normalized = ticker.strip().upper()
+        matches = {
+            item.security_id
+            for item in self.load()
+            if item.ticker.strip().upper() == normalized
+            and item.exchange.strip().upper() == exchange.strip().upper()
+            and item.valid_from <= as_of
+            and (item.valid_to is None or as_of <= item.valid_to)
+        }
+        if len(matches) != 1:
+            raise SecurityMappingError("Symbol is unresolved or ambiguous for the requested date.")
+        return next(iter(matches))
+
+
+class IssuerListingMappingStore:
+    """Persist explicit issuer-to-listing relationships; ambiguity never joins."""
+
+    def __init__(self, path: Path) -> None:
+        self.path = path
+
+    def persist(self, mappings: tuple[IssuerListingMapping, ...]) -> None:
+        content = json.dumps(
+            [_issuer_listing_dict(item) for item in mappings], sort_keys=True, indent=2
+        )
+        if self.path.exists() and self.path.read_text(encoding="utf-8") != content:
+            raise SecurityMappingError(
+                f"Refusing to overwrite issuer-listing evidence: {self.path}"
+            )
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        if not self.path.exists():
+            self.path.write_text(content, encoding="utf-8")
+
+    def load(self) -> tuple[IssuerListingMapping, ...]:
+        try:
+            values = json.loads(self.path.read_text(encoding="utf-8"))
+            return tuple(_issuer_listing_from_dict(item) for item in values)
+        except (OSError, ValueError, TypeError, KeyError) as exc:
+            raise SecurityMappingError(f"Invalid issuer-listing mapping store: {exc}") from exc
+
+    def resolve(self, issuer_id: IssuerId, as_of: date) -> SecurityId:
+        matches = {
+            item.security_id
+            for item in self.load()
+            if item.issuer_id == issuer_id
+            and item.status is MappingStatus.RESOLVED
+            and item.valid_from <= as_of
+            and (item.valid_to is None or as_of <= item.valid_to)
+        }
+        if len(matches) != 1 or None in matches:
+            raise SecurityMappingError("Issuer-to-listing relationship is unresolved or ambiguous.")
+        resolved = next(iter(matches))
+        if resolved is None:
+            raise SecurityMappingError("Resolved issuer mapping unexpectedly lacks listing ID.")
+        return resolved
+
+
 def mapping_from_listing(
     *,
     source: DataSource,
@@ -155,6 +237,7 @@ def mapping_from_listing(
     retrieval_timestamp: object,
     cik: str | None = None,
     evidence: MappingEvidence = MappingEvidence.LISTING_METADATA,
+    security_id: SecurityId | None = None,
 ) -> SecurityMapping:
     from datetime import datetime
 
@@ -173,7 +256,7 @@ def mapping_from_listing(
         evidence=evidence,
         provenance=provenance,
         retrieval_timestamp=retrieval_timestamp,
-        security_id=SecurityId.canonical(ticker, exchange, mic),
+        security_id=security_id or SecurityId.canonical(source_identifier, exchange, mic),
     )
 
 
@@ -262,4 +345,84 @@ def _mapping_from_dict(value: dict[str, object]) -> SecurityMapping:
         provenance=str(value["provenance"]),
         retrieval_timestamp=datetime.fromisoformat(str(value["retrieval_timestamp"])),
         security_id=SecurityId(str(value["security_id"])) if value.get("security_id") else None,
+    )
+
+
+def _validate_symbol_history(records: tuple[SymbolHistoryRecord, ...]) -> None:
+    for index, left in enumerate(records):
+        for right in records[index + 1 :]:
+            same_listing_venue = (
+                left.security_id == right.security_id
+                and left.exchange.strip().upper() == right.exchange.strip().upper()
+            )
+            same_symbol_venue = (
+                left.ticker.strip().upper() == right.ticker.strip().upper()
+                and left.exchange.strip().upper() == right.exchange.strip().upper()
+            )
+            overlaps = (left.valid_to is None or right.valid_from <= left.valid_to) and (
+                right.valid_to is None or left.valid_from <= right.valid_to
+            )
+            if overlaps and same_listing_venue:
+                raise SecurityMappingError("Overlapping symbol periods for one listing.")
+            if overlaps and same_symbol_venue and left.security_id != right.security_id:
+                raise SecurityMappingError("Active ticker conflicts across listings.")
+
+
+def _symbol_dict(value: SymbolHistoryRecord) -> dict[str, object]:
+    return {
+        "security_id": value.security_id.value,
+        "ticker": value.ticker.strip().upper(),
+        "exchange": value.exchange.strip().upper(),
+        "mic": value.mic.strip().upper() if value.mic else None,
+        "valid_from": value.valid_from.isoformat(),
+        "valid_to": value.valid_to.isoformat() if value.valid_to else None,
+        "source": value.source.value,
+        "source_identifier": value.source_identifier,
+        "retrieval_timestamp": value.retrieval_timestamp.isoformat(),
+        "evidence_reference": value.evidence_reference,
+    }
+
+
+def _symbol_from_dict(value: dict[str, object]) -> SymbolHistoryRecord:
+    from datetime import datetime
+
+    return SymbolHistoryRecord(
+        security_id=SecurityId(str(value["security_id"])),
+        ticker=str(value["ticker"]),
+        exchange=str(value["exchange"]),
+        mic=str(value["mic"]) if value.get("mic") else None,
+        valid_from=date.fromisoformat(str(value["valid_from"])),
+        valid_to=date.fromisoformat(str(value["valid_to"])) if value.get("valid_to") else None,
+        source=DataSource(str(value["source"])),
+        source_identifier=str(value["source_identifier"]),
+        retrieval_timestamp=datetime.fromisoformat(str(value["retrieval_timestamp"])),
+        evidence_reference=str(value["evidence_reference"]),
+    )
+
+
+def _issuer_listing_dict(value: IssuerListingMapping) -> dict[str, object]:
+    return {
+        "issuer_id": value.issuer_id.value,
+        "security_id": value.security_id.value if value.security_id else None,
+        "valid_from": value.valid_from.isoformat(),
+        "valid_to": value.valid_to.isoformat() if value.valid_to else None,
+        "status": value.status.value,
+        "evidence": value.evidence.value,
+        "provenance": value.provenance,
+        "retrieval_timestamp": value.retrieval_timestamp.isoformat(),
+    }
+
+
+def _issuer_listing_from_dict(value: dict[str, object]) -> IssuerListingMapping:
+    from datetime import datetime
+
+    return IssuerListingMapping(
+        issuer_id=IssuerId(str(value["issuer_id"])),
+        security_id=SecurityId(str(value["security_id"])) if value.get("security_id") else None,
+        valid_from=date.fromisoformat(str(value["valid_from"])),
+        valid_to=date.fromisoformat(str(value["valid_to"])) if value.get("valid_to") else None,
+        status=MappingStatus(str(value["status"])),
+        evidence=MappingEvidence(str(value["evidence"])),
+        provenance=str(value["provenance"]),
+        retrieval_timestamp=datetime.fromisoformat(str(value["retrieval_timestamp"])),
     )
