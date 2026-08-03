@@ -8,7 +8,7 @@ from institutional_factor_platform.exceptions import ConfigurationError
 
 def test_loads_repository_base_configuration() -> None:
     config = load_configuration()
-    assert config["project"]["environment"] == "initialization"
+    assert config["project"]["environment"] == "research"
     assert config["logging"] == {"level": "INFO", "format": "json"}
 
 
