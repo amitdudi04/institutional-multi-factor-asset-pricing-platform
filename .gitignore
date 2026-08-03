@@ -44,11 +44,16 @@ data/raw/**
 data/interim/**
 data/processed/**
 data/factors/**
+data/features/**
+data/model_ready/**
+data/manifests/**
+data/quarantine/**
 outputs/**
 artifacts/**
 models/**
 reports/generated/**
 !data/**/.gitkeep
+!data/README.md
 !outputs/**/.gitkeep
 !artifacts/**/.gitkeep
 !models/**/.gitkeep

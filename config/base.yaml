@@ -1,6 +1,69 @@
 project:
   name: institutional-factor-platform
-  environment: initialization
+  environment: research
+  base_currency: USD
+  research_frequency: daily
+  start_date: 2010-01-01
+  end_date: null
+paths:
+  raw: data/raw
+  interim: data/interim
+  processed: data/processed
+  manifests: data/manifests
+  quarantine: data/quarantine
+  data_quality: outputs/data_quality
+  metadata: outputs/metadata
+  logs: logs
+  duckdb: data/processed/catalog.duckdb
+universe:
+  country: US
+  currency: USD
+  allowed_asset_types: [common_stock]
+  allowed_cap_bands: [large_cap, mid_cap]
+  include_financials: true
+  include_reits: false
+  primary_listings_only: true
+  excluded_listing_types: [etf, etn, closed_end_fund, adr, preferred, warrant, right, unit, spac_unit, mutual_fund, money_market, debt, option, future, crypto]
+sources:
+  allowed: [owner_supplied, yahoo_finance, fred, kenneth_french, sec_edgar]
+  yahoo:
+    enabled: true
+    interval: 1d
+    benchmark_ticker: SPY
+  fred:
+    enabled: true
+    series_ids: [DGS3MO]
+  french:
+    enabled: true
+    datasets: [F-F_Research_Data_5_Factors_2x3_daily]
+  sec:
+    enabled: true
+    application_name: institutional-factor-platform
+    contact_email: null
+storage:
+  parquet_compression: zstd
+  raw_immutable: true
+  duckdb_read_only_default: true
+manifests:
+  schema_version: "1.0.0"
+validation:
+  schema_version: "1.0.0"
+  extreme_return_threshold: 0.5
+  stale_price_sessions: 5
+calendars:
+  equity_calendar: XNYS
+  storage_timezone: UTC
+  exchange_timezone: America/New_York
+runtime:
+  timeout_seconds: 30.0
+  max_retries: 3
+  backoff_seconds: 0.5
+  jitter_seconds: 0.25
+retention:
+  raw_retention: retain_until_owner_deletion
+  local_owner_only: true
+  public_serving: false
+  redistribution: false
 logging:
   level: INFO
   format: json
