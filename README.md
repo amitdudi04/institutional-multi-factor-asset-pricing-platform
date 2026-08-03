@@ -4,9 +4,9 @@ A research-driven framework intended to support reproducible multi-factor asset 
 
 ## Current status
 
-Repository governance is complete, the [Project Specification](docs/PROJECT_SPECIFICATION.md) is owner approved, and Phase 1 is authorized. Implementation has not started. The repository currently provides only governance/specification documents, validated base-configuration loading, project-root discovery, structured logging initialization, and tests for that foundation. No financial data pipeline, analytical model, portfolio engine, backtest, API, dashboard, or empirical result has been implemented.
+Repository governance and the owner-approved [Project Specification](docs/PROJECT_SPECIFICATION.md) are complete. Phase 1, the Institutional Data Platform, is implemented with typed configuration, approved-source adapters, immutable raw storage, versioned contracts, validation and quarantine, Parquet, a DuckDB catalog, manifests, lineage, an exchange calendar, operator commands, and offline tests. No Phase 2 analytical model, portfolio engine, backtest, API, dashboard, or empirical result has been implemented.
 
-The governing standard is [docs/DEVELOPMENT_CONSTITUTION.md](docs/DEVELOPMENT_CONSTITUTION.md). The initial repository assessment is recorded in [docs/REPOSITORY_INITIALIZATION_REPORT.md](docs/REPOSITORY_INITIALIZATION_REPORT.md). Phase 1 implementation must follow the approved specification and owner decisions.
+The governing standard is [docs/DEVELOPMENT_CONSTITUTION.md](docs/DEVELOPMENT_CONSTITUTION.md). The initial repository assessment is recorded in [docs/REPOSITORY_INITIALIZATION_REPORT.md](docs/REPOSITORY_INITIALIZATION_REPORT.md), and Phase 1 evidence is recorded in [docs/PHASE1_IMPLEMENTATION_REPORT.md](docs/PHASE1_IMPLEMENTATION_REPORT.md).
 
 ## Planned phases
 
@@ -40,11 +40,18 @@ uv run ruff format --check .
 uv run mypy src
 ```
 
-The default configuration is `config/base.yaml`. It contains no investment assumptions or credentials. Copy `.env.example` to an untracked `.env` only when a future approved integration requires credentials; the current package does not automatically load `.env` files.
+The default configuration is `config/base.yaml`; secrets are supplied only through documented environment variables. Copy `.env.example` to an untracked `.env` if needed, but the package does not automatically load `.env` files. Validate configuration and create ignored local storage with:
+
+```shell
+uv run institutional-factor-platform validate-config
+uv run institutional-factor-platform init-storage
+```
+
+See [docs/DATA_SOURCE_GUIDE.md](docs/DATA_SOURCE_GUIDE.md) before any live retrieval.
 
 ## Results availability
 
-Analytical and empirical results are **not yet available**. Phase 1 is authorized but has not been implemented.
+Analytical and empirical results are **not available**. Phase 1 provides data infrastructure only; no live dataset or research output is committed.
 
 ## License
 
