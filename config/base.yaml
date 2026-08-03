@@ -1,0 +1,6 @@
+project:
+  name: institutional-factor-platform
+  environment: initialization
+logging:
+  level: INFO
+  format: json
