@@ -9,6 +9,8 @@ uv run institutional-factor-platform validate-config
 uv run institutional-factor-platform init-storage
 uv run institutional-factor-platform validate-catalog
 uv run institutional-factor-platform list-datasets --research-ready
+uv run institutional-factor-platform reconcile
+uv run institutional-factor-platform rebuild-catalog
 ```
 
 Integrity operations also include `verify-raw`, `verify-standardized`, `inspect-lineage`, `inspect-dataset-manifest`, and `reprocess-raw`. Use command help for required explicit paths/checksums/contracts. Reprocessing supports verified byte-native FRED, French, SEC, and owner artifacts without provider retrieval; Yahoo's DataFrame-derived raw representation is not accepted by that byte workflow.
@@ -25,7 +27,7 @@ The SEC example CIK is format-only and is not a valid request recommendation. Se
 
 ## Yahoo Finance
 
-The adapter uses yfinance for explicit approved tickers, dates, daily OHLCV, adjusted close, dividends, and splits. It requires internal security-ID mappings and reports empty or partial ticker failures. Yahoo is research-accessible public data, not institutionally licensed data. Adjustment revisions, currency metadata, coverage, outages, and redistribution restrictions remain limitations. Extreme observations are flagged, not removed; prices are never blindly forward-filled.
+The adapter uses yfinance for explicit approved tickers, dates, daily OHLCV, adjusted close, dividends, and splits. It requires a persisted effective-dated listing mapping; caller-supplied security IDs are prohibited. It reports empty, ambiguous, or partial ticker failures. Yahoo is research-accessible public data, not institutionally licensed data. Adjustment revisions, currency metadata, coverage, outages, and redistribution restrictions remain limitations. Extreme observations are flagged, not removed; prices are never blindly forward-filled.
 
 ## FRED
 
@@ -37,7 +39,7 @@ The initial approved dataset is `F-F_Research_Data_5_Factors_2x3_daily`; daily m
 
 ## SEC EDGAR
 
-The narrow adapter retrieves company facts for an explicit valid CIK using a compliant owner-supplied user agent. Raw JSON is preserved. When SEC provides only filing date, availability is represented conservatively as UTC end-of-filing-date with `INFERRED_DATE_LEVEL`; it does not claim intraday precision or same-day tradability. Phase 2 must decide the next-session use rule. Impossible period/filing/availability/retrieval chronology blocks promotion. Restatements/amendments remain separate facts; no ratios or factors are calculated.
+The narrow adapter retrieves company facts for an explicit valid CIK using a compliant owner-supplied user agent. Raw JSON is preserved and CIK derives issuer identity. A listing ID is emitted only through a persisted unique effective-dated issuer-to-listing mapping; caller-supplied IDs and ambiguity fail closed. When SEC provides only filing date, availability is represented conservatively as UTC end-of-filing-date with `INFERRED_DATE_LEVEL`; it does not claim intraday precision or same-day tradability. Phase 2 must decide the next-session use rule. Impossible period/filing/availability/retrieval chronology blocks promotion. Restatements/amendments remain separate facts; no ratios or factors are calculated.
 
 ## Owner-supplied data
 
@@ -49,4 +51,4 @@ Unit/integration tests are offline. Live smoke checks are optional, tiny, never 
 
 ## Publication verification and recovery
 
-Use `verify-publication <dataset-id> <dataset.json>` to authenticate one complete v3 publication bundle. `validate-catalog` verifies all promoted rows against persisted authority. A failure requires deterministic demotion or rebuild from intact authenticated registered/promoted revisions; never repair immutable evidence in place. Owner files require exact contract-aware unit metadata.
+Use `verify-publication <dataset-id> <dataset.json>` to authenticate one complete v4 publication bundle. `validate-catalog` verifies finalized rows; `list-datasets --research-ready` uses the authenticated read boundary. `reconcile` handles incomplete journal/catalog state and conservatively reports ambiguous locks. `rebuild-catalog` authenticates all promotion evidence into a temporary catalog and atomically activates it only on complete success. Never query the DuckDB file directly for research or repair immutable evidence in place. Owner files require exact contract-aware, row-consistent unit metadata.

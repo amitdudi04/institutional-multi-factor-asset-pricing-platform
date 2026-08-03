@@ -317,3 +317,7 @@ remain. Phase 2 is not authorized.
 ## W. Next Action
 
 > Resolve all blocking defects and rerun the final independent audit. Do not merge and do not authorize Phase 2.
+
+## Post-audit remediation status
+
+The findings above remain the authoritative historical audit result and have not been rewritten. Their third-remediation corrections and test evidence are documented in `docs/PHASE1_THIRD_REMEDIATION_REPORT.md`. Another independent final audit is required before merge or Phase 2 authorization.

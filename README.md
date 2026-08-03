@@ -4,9 +4,9 @@ A research-driven framework intended to support reproducible multi-factor asset 
 
 ## Current status
 
-Repository governance and the owner-approved [Project Specification](docs/PROJECT_SPECIFICATION.md) are complete. Phase 1 has completed a second focused remediation with authenticated persisted publication evidence, immutable registered/promoted manifest revisions, complete lifecycle lineage, stable listing identity and effective-dated symbol history, explicit issuer-to-listing mappings, semantic owner-unit validation, validated-only DuckDB promotion, and offline adversarial tests. Phase 1 remains pending final independent re-audit. No Phase 2 analytical model, portfolio engine, backtest, API, dashboard, or empirical result has been implemented.
+Repository governance and the owner-approved [Project Specification](docs/PROJECT_SPECIFICATION.md) are complete. Phase 1 has completed a third focused remediation with an append-only v4 lifecycle journal, crash-safe staged publication, authenticated research reads, authoritative demotion/invalidation, atomic catalog rebuild, identity-authority enforcement, and end-to-end unit reconciliation. Another independent final audit is required; Phase 1 has not passed that audit. No Phase 2 analytical model, portfolio engine, backtest, API, dashboard, or empirical result has been implemented.
 
-The governing standard is [docs/DEVELOPMENT_CONSTITUTION.md](docs/DEVELOPMENT_CONSTITUTION.md). Phase 1 evidence is recorded in the [implementation report](docs/PHASE1_IMPLEMENTATION_REPORT.md), preserved [independent audit](docs/PHASE1_AUDIT_REPORT.md), and [remediation report](docs/PHASE1_REMEDIATION_REPORT.md).
+The governing standard is [docs/DEVELOPMENT_CONSTITUTION.md](docs/DEVELOPMENT_CONSTITUTION.md). Phase 1 evidence is recorded in the [implementation report](docs/PHASE1_IMPLEMENTATION_REPORT.md), preserved [independent audit](docs/PHASE1_AUDIT_REPORT.md), [earlier remediation report](docs/PHASE1_REMEDIATION_REPORT.md), and [third remediation report](docs/PHASE1_THIRD_REMEDIATION_REPORT.md).
 
 ## Planned phases
 

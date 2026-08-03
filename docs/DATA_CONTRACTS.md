@@ -1,6 +1,6 @@
 # Phase 1 Data Contracts
 
-Tabular contracts use deterministic column order and exact PyArrow enforcement. SEC financial facts are version `2.0.0`; other table contracts remain `1.0.0`. Dataset manifests, lifecycle lineage, and DuckDB catalog state use strict schema `3.0.0`; run/source/promotion envelopes and validation reports remain `2.0.0`. Earlier runtime manifest/lineage/catalog artifacts are unsupported and must be rebuilt; none is committed.
+Tabular contracts use deterministic column order and exact PyArrow enforcement. SEC financial facts are version `3.0.0`; other table contracts remain `1.0.0`. Dataset manifests, lifecycle events/lineage, and DuckDB catalog state use strict schema `4.0.0`; promotion envelopes use `3.0.0`, while run/source envelopes and validation reports remain `2.0.0`. Earlier runtime manifest/lineage/catalog artifacts are unsupported and must be rebuilt; none is committed.
 
 | Contract | Primary key | Required content | Temporal semantics |
 |---|---|---|---|
@@ -16,19 +16,19 @@ Manifest contracts contain:
 - **Run:** ID/type/times/status, Git and package versions, configuration hash/snapshot, requests, outputs, warnings/errors.
 - **Source:** source/request/time/status, raw path/hash, rows/date coverage, partial failures, rate-limit and terms notes.
 - **Dataset:** content/config/schema-addressed ID, schema fingerprint, parents/transformation, dimensions/key/date/security/missingness/units, validation evidence, Parquet checksum/size, Git/config/temporal policy, lineage completeness and promotion eligibility.
-- **Promotion:** dataset-manifest hash, output checksum, lineage, eligible validation status, Git/config identity, and promotion time.
+- **Promotion:** dataset-manifest hash, output checksum, lineage, eligible validation status, Git/config identity, terminal lifecycle event, and promotion time.
 - **Validation report:** dataset/source/run/schema, requested/observed range, counts, deterministic findings/status/quarantine path.
 
 ## Security identity
 
-Canonical `SecurityId` is UUIDv5-derived from normalized ticker plus exchange/MIC listing evidence and is source-independent. Effective-dated provider mappings connect Yahoo/owner identifiers and CIK registrant evidence to it. Ticker alone is insufficient; an ambiguous CIK or conflicting active mapping remains unresolved. No ISIN/CUSIP is invented, and no complete commercial security master is claimed.
+Canonical `SecurityId` is UUIDv5-derived only from a stable owner-governed listing key plus exchange/MIC, or permanently assigned in persisted reference data; it is never derived from display ticker text. Effective-dated provider mappings connect Yahoo/owner listing identifiers to it. SEC CIK deterministically identifies an `IssuerId`, not a share class; an explicit unique effective-dated mapping is required before issuer facts can join a listing. Caller-supplied IDs and mixed resolved/ambiguous evidence are rejected. No ISIN/CUSIP is invented, and no complete commercial security master is claimed.
 
 ## Units and nullability
 
-Prices/yields/factor values are numeric, never formatted strings. FRED DGS3MO remains percent per annum. French source percentages are preserved in metadata and standardized to decimal return explicitly. SEC facts retain provider unit. Required keys/provenance cannot be null. Source-declared missing observations remain null with an explicit indicator; they are not interpolated.
+Prices/yields/factor values are numeric, never formatted strings. FRED DGS3MO/TB3MS remain percent per annum. French source percentages are preserved and explicitly transformed to decimal return. Market prices are USD, volume is shares, and SEC facts retain XBRL units. Request declarations, source/series authority, row units, standardized units, and persisted transformation metadata must agree; contradiction blocks publication. Required keys/provenance cannot be null. Source-declared missing observations remain null with an explicit indicator; they are not interpolated.
 
 The header-only `examples/templates/security_universe.csv` is a schema aid and contains no securities or empirical values.
 
-## Schema v3 publication and identity
+## Schema v4 publication and identity
 
-Dataset manifests, lifecycle lineage, and DuckDB catalog state use `3.0.0`; run/source/promotion envelopes and validation reports remain `2.0.0`, SEC facts remain `2.0.0`, and other tabular contracts remain `1.0.0`. Runtime dataset-manifest/lineage/catalog v1–v2 forms are rejected and rebuilt because no empirical artifacts are committed. Listing ID, issuer ID, and effective-dated symbol history are distinct. Owner-supplied units must exactly cover unit-bearing fields and use contract-specific allowed units; percent and decimal are never interchangeable.
+Dataset manifests, lifecycle events/lineage, and DuckDB catalog state use `4.0.0`; promotion envelopes and SEC facts use `3.0.0`; run/source envelopes and validation reports remain `2.0.0`; other tabular contracts remain `1.0.0`. Runtime dataset-manifest/lineage/catalog v1–v3 forms are rejected and rebuilt because no empirical artifacts are committed. Listing ID, issuer ID, and effective-dated symbol history are distinct. Owner-supplied units must exactly cover unit-bearing fields and reconcile with source and row semantics; percent and decimal are never interchangeable without an explicit transformation.

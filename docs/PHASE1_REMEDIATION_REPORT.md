@@ -62,3 +62,5 @@ The final remediation gate must record exact results in the task closeout. The d
 **Phase 1 remediated — independent re-audit required.** Do not authorize Phase 2 or merge to `main` until a fresh independent audit passes.
 
 The subsequent independent re-audit found additional promotion-authentication, identity, and lifecycle defects. Their focused correction is documented in `docs/PHASE1_SECOND_REMEDIATION_REPORT.md`; this historical verdict is not rewritten.
+
+The later final re-audit identified further crash-safety, authenticated-read, lifecycle-connectivity, identity, rebuild, and unit defects. The third correction is documented in `docs/PHASE1_THIRD_REMEDIATION_REPORT.md`; all earlier findings and verdicts remain historical evidence.

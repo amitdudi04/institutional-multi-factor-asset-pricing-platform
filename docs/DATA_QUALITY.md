@@ -16,4 +16,4 @@ Invalid schema, duplicate keys, empty-success responses, checksum mismatch, impo
 
 Each finding carries stable rule/version, dataset/source/time, severity, affected count, representative keys where safe, message, and remediation where available. Results are deterministically ordered. Reports and manifest/lineage instances are generated ignored evidence, not dashboards or research conclusions.
 
-Publication authentication verifies validation-report identity, checksum, eligible status, and absence of blocking findings. Any missing, malformed, substituted, or tampered evidence blocks promotion or fails catalog integrity verification.
+Publication authentication verifies the content-bound validation-report ID, canonical configuration identity, output and evidence checksums, exact connected lineage, legal lifecycle state, eligible status, unit metadata, and absence of blocking findings. Any missing, malformed, substituted, disconnected, or tampered evidence blocks activation. Read-time verification failure immediately removes research-ready visibility, appends invalidation authority where possible, and remains non-visible after restart.

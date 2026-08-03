@@ -4,7 +4,7 @@ This roadmap summarizes the boundaries defined in `docs/PROJECT_SPECIFICATION.md
 
 ## Phase 1 — Institutional Data Platform
 
-Implemented through a second focused remediation, pending final independent re-audit: approved adapters, immutable raw and standardized storage, authenticated v3 publication manifests, complete promotion lifecycle evidence, stable listing identity and symbol history, validated-only DuckDB promotion, calendars, fundamentals, and macro/published-factor inputs. Corporate-action fields are retained by the market adapter and a separate action contract is defined; no issuer-scale live dataset is claimed. No research model may precede a passing re-audit of validated, provenance-controlled inputs.
+Implemented through a third focused remediation, with another independent final audit required: approved adapters, immutable raw and standardized storage, authenticated v4 publication evidence, append-only connected lifecycle state, crash-safe activation/recovery, authenticated read-time isolation, stable listing/issuer identity and symbol history, atomic DuckDB rebuild, reconciled units, calendars, fundamentals, and macro/published-factor inputs. This status does not claim Phase 1 passed. Corporate-action fields are retained by the market adapter and a separate action contract is defined; no issuer-scale live dataset is claimed. No research model may precede a passing re-audit of validated, provenance-controlled inputs.
 
 ## Phase 2 — Multi-Factor Research Engine
 

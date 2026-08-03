@@ -10,12 +10,13 @@ Validated configuration
   -> PyArrow contract + quality validation
   -> quarantine on blocking failure
   -> content/config/schema-addressed immutable Zstandard Parquet on pass/warning
-  -> persisted v3 lineage and authenticated registered/promoted manifest revisions
-  -> persisted-evidence-authenticated DuckDB promotion
-  -> promotion and final run evidence + JSON/Markdown quality report
+  -> persisted v4 connected lineage and authenticated registered/published manifest revisions
+  -> registered and staged DuckDB state (not visible to research)
+  -> append-only FINALIZED lifecycle evidence and catalog activation
+  -> authenticated research-read handle
 ```
 
-Parquet, manifests, and persisted lineage are authoritative. DuckDB registration does not create research visibility; promotion rebuilds `validated_*` views only from checksum-verified `PASS` or `PASS_WITH_WARNINGS` entries. DuckDB remains a local query catalog, not competing truth.
+Parquet, manifests, connected lineage, and the append-only lifecycle journal are authoritative. Registration and staged promotion do not create research visibility; `validated_*` views require finalized authenticated evidence. The supported read repository re-authenticates the evidence bundle and checksum before returning a handle or table. DuckDB remains a replaceable local query catalog, not competing truth.
 
 ## Package responsibilities
 
@@ -27,6 +28,8 @@ Parquet, manifests, and persisted lineage are authoritative. DuckDB registration
 | `data.sources` | Approved provider retrieval and source-specific normalization only |
 | `data.validation` | Common/source checks, statuses, machine/human reports |
 | `data.storage` | Raw checksums, atomic Parquet, quarantine, DuckDB registry |
+| `data.evidence` | Canonical JSON, atomic evidence writes, and project-root path resolution |
+| `data.access` | Authenticated research reads, startup reconciliation, and atomic rebuild control |
 | `data.manifests` | Validated run/source/dataset metadata |
 | `data.lineage` | Immutable machine-readable artifact/relationship evidence and restart reconstruction |
 | `data.security_master` | Canonical listing identity, effective-dated provider mapping, and eligibility checks |
@@ -38,7 +41,7 @@ Dependencies point from CLI to services to adapters/domain/storage, then to conf
 
 ## Storage decisions
 
-Raw bytes retain provider-native form where practical. Standard tables use exact PyArrow schemas and Zstandard Parquet with atomic temporary writes, read-back verification, manifested checksums, idempotent same-content reuse, and conflict refusal. Dataset manifests use relative paths; the local DuckDB catalog resolves physical paths and can be rebuilt because no empirical catalog is committed. Dataset-manifest, lifecycle-lineage, and catalog schema v3 intentionally reject earlier uncommitted runtime artifacts.
+Raw bytes retain provider-native form where practical. Standard tables use exact PyArrow schemas and Zstandard Parquet with atomic temporary writes, read-back verification, manifested checksums, idempotent same-content reuse, and conflict refusal. Authoritative JSON uses same-directory atomic replacement and fsync. Dataset manifests use project-root-constrained paths. Catalog rebuild authenticates every candidate in a temporary DuckDB file and replaces the active catalog only after complete success. Dataset-manifest, lifecycle, and catalog schema v4 intentionally reject earlier uncommitted runtime artifacts.
 
 ## Adapter lifecycle and network policy
 
@@ -48,6 +51,6 @@ Adapters validate explicit requests, retrieve from one approved source, return n
 
 Trading dates are exchange-local session dates; storage timestamps are UTC. FRED retains source frequency and missing markers. SEC facts retain period, filing, accession, form, taxonomy, unit, and availability no earlier than filing. Phase 1 does not create factor lags, excess returns, portfolio returns, or analytical features.
 
-## V3 authenticated publication update
+## V4 authenticated publication update
 
-Dataset-manifest, lifecycle-lineage, and DuckDB catalog schema v3 replace earlier uncommitted runtime forms. Immutable registered and promoted manifest revisions cryptographically link validation report, lineage, configuration snapshot, source manifest/raw parent, and Parquet evidence. Promotion accepts only dataset ID plus persisted manifest path and reloads all authority. Registration is not visible; verified promotion is the final gate. Post-promotion failure demotes the view and journals the event. Rebuild authenticates both manifest revisions and requires no raw redownload.
+Dataset manifests, lifecycle events/lineage, and DuckDB catalog schema `4.0.0` replace earlier uncommitted runtime forms; promotion manifests use `3.0.0`. Immutable evidence binds the exact dataset, artifact, registration, manifest revision, validation report, canonical redacted configuration snapshot, lineage, catalog identity, Git commit, and predecessor event. The journal validator reconstructs only legal ordered transitions. Publication stays invisible through registration and staging; only a durable `FINALIZED` event permits activation. Startup reconciliation demotes incomplete transitions, integrity failure invalidates visibility, and ambiguous stale locks remain for manual review. No raw redownload is required for an authenticated rebuild.

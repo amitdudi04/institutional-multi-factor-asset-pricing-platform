@@ -48,3 +48,5 @@ The implemented offline suite contains 68 deterministic tests and no skipped or 
 **Phase 1 second remediation complete — independent final re-audit required**
 
 Do not merge into `main` and do not authorize Phase 2 until a final independent re-audit passes.
+
+The subsequent final re-audit failed and is preserved in `docs/PHASE1_FINAL_REAUDIT_REPORT.md`. Its blocking findings were addressed by the third remediation documented in `docs/PHASE1_THIRD_REMEDIATION_REPORT.md`; another independent final audit remains required.

@@ -79,4 +79,4 @@ The original implementation was independently audited at commit `c0b42e17524bb49
 
 **PHASE 1 REMEDIATED — INDEPENDENT RE-AUDIT REQUIRED.** This status does not authorize Phase 2 and does not claim empirical data fitness.
 
-The failed re-audit and second focused remediation are preserved in `docs/PHASE1_REAUDIT_REPORT.md` and `docs/PHASE1_SECOND_REMEDIATION_REPORT.md`. Current v3 publication, identity, lineage, recovery, and unit controls require final independent re-audit.
+The failed re-audit and subsequent focused remediations are preserved in `docs/PHASE1_REAUDIT_REPORT.md`, `docs/PHASE1_SECOND_REMEDIATION_REPORT.md`, and `docs/PHASE1_THIRD_REMEDIATION_REPORT.md`. Current v4 publication, identity, lifecycle, recovery, read-gating, and unit controls require another independent final audit.

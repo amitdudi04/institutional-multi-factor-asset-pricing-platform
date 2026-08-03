@@ -30,6 +30,8 @@ Credentials remain in environment variables or an untracked `.env`. Configuratio
 
 Runs record Git commit, package version, configuration snapshot/hash, requested source/dataset, output IDs, warnings, errors, and timestamps. Source and dataset manifests plus checksums reproduce lineage. Unknown availability metadata remains unknown; it is never replaced with period end or retrieval time without an explicit inferred flag.
 
-## Second-remediation controls
+## Third-remediation controls
 
-Research-ready promotion now reloads and authenticates all persisted evidence rather than trusting caller objects. Canonical listing IDs are assigned from stable listing evidence, never ticker text; effective-dated symbol history records changes and reuse. SEC CIK establishes a distinct issuer identity, and explicit issuer-to-listing evidence refuses ambiguous joins. Lifecycle lineage records registration and promotion, while compensating demotion is append-only journal evidence.
+The supported research boundary authenticates the complete evidence bundle at read time and returns a verified dataset handle; direct DuckDB access is operational and is not an authorized research interface. Registration and staged promotion remain invisible until durable `FINALIZED` lifecycle evidence permits activation. Verification loss immediately removes catalog visibility and appends invalidation authority.
+
+Canonical listing IDs require stable owner-governed listing evidence, Yahoo rejects caller-supplied IDs, SEC CIK establishes issuer identity, and a listing join requires a unique effective-dated issuer-to-listing mapping. Lifecycle transitions, demotion, invalidation, crash recovery, configuration/report identity, and catalog activation are append-only and content-bound. Evidence JSON uses same-directory temporary files, file synchronization, and atomic replacement; uncertain locks require manual intervention rather than unsafe deletion.
