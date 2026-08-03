@@ -108,10 +108,15 @@ Final gate results recorded for this remediation:
 - Authenticated-read, lifecycle reconstruction, startup reconciliation, atomic rebuild, atomic
   JSON, and abrupt termination probes: PASS within the main test suite.
 - Import-cycle analysis: PASS for 26 package modules.
+- Markdown local-link check: PASS.
+- Secret/private-key and credential-assignment scans: PASS; no candidates.
+- Private-path scan: PASS.
+- Tracked inventory: 62 files; zero tracked ignored files, zero files over 1 MiB, and zero
+  binary candidates.
+- One tracked delimited file is the verified header-only
+  `examples/templates/security_universe.csv`; it has no records or empirical values.
+- Git diff/whitespace check: PASS.
 - Live provider validation: not run; `LIVE INTEGRATION VALIDATION PENDING`.
-
-Repository hygiene and Markdown results are recorded after final documentation is present and are
-required to remain clean before the documentation commit.
 
 ## Data integrity and limitations
 
