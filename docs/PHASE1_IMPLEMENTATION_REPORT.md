@@ -78,3 +78,5 @@ The suite is offline and deterministic. No live provider smoke test is necessary
 The original implementation was independently audited at commit `c0b42e17524bb49dcd27ff79cc92556951246552` and failed for material integrity defects. Those findings remain preserved in `docs/PHASE1_AUDIT_REPORT.md`. A later remediation replaced the affected manifest, lineage, publication, mapping, temporal, owner-file, catalog, CLI, and test behavior; see `docs/PHASE1_REMEDIATION_REPORT.md`.
 
 **PHASE 1 REMEDIATED — INDEPENDENT RE-AUDIT REQUIRED.** This status does not authorize Phase 2 and does not claim empirical data fitness.
+
+The failed re-audit and second focused remediation are preserved in `docs/PHASE1_REAUDIT_REPORT.md` and `docs/PHASE1_SECOND_REMEDIATION_REPORT.md`. Current v3 publication, identity, lineage, recovery, and unit controls require final independent re-audit.

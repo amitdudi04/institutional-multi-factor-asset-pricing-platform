@@ -29,3 +29,7 @@ Credentials remain in environment variables or an untracked `.env`. Configuratio
 ## Reproducibility
 
 Runs record Git commit, package version, configuration snapshot/hash, requested source/dataset, output IDs, warnings, errors, and timestamps. Source and dataset manifests plus checksums reproduce lineage. Unknown availability metadata remains unknown; it is never replaced with period end or retrieval time without an explicit inferred flag.
+
+## Second-remediation controls
+
+Research-ready promotion now reloads and authenticates all persisted evidence rather than trusting caller objects. Canonical listing IDs are assigned from stable listing evidence, never ticker text; effective-dated symbol history records changes and reuse. SEC CIK establishes a distinct issuer identity, and explicit issuer-to-listing evidence refuses ambiguous joins. Lifecycle lineage records registration and promotion, while compensating demotion is append-only journal evidence.

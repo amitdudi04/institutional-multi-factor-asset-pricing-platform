@@ -26,7 +26,7 @@ Revision requires Section 50 change control. Future agents must not silently cha
 
 The platform will support a reproducible empirical equity research chain: provenance-controlled data, point-in-time factors, classical asset-pricing tests, constrained portfolios, realistic walk-forward evaluation, risk/attribution, interpretable ML, and research delivery. It joins financial economics with research engineering; it is not a model collection or dashboard demonstration.
 
-“Institutional-style” must be earned through immutable inputs, explicit rights and assumptions, temporal correctness, robust inference, reconciled accounting, model-risk controls, reproducible runs, interface/domain separation, and limitation disclosure. It does not imply licensed institutional data or fiduciary readiness. Seven gated phases produce quality reports, factors, estimates, scores, portfolios, ledgers, risk/attribution/scenario outputs, model/data cards, and reports. None exists yet. Success is regeneration of defensible answers from approved inputs without fabrication or silent substitution.
+“Institutional-style” must be earned through immutable inputs, explicit rights and assumptions, temporal correctness, robust inference, reconciled accounting, model-risk controls, reproducible runs, interface/domain separation, and limitation disclosure. It does not imply licensed institutional data or fiduciary readiness. Phase 1 data-platform infrastructure exists but remains pending final independent re-audit; no Phase 2–7 research output exists. Success is regeneration of defensible answers from approved inputs without fabrication or silent substitution.
 
 ## 3. Project Vision
 
@@ -247,7 +247,7 @@ All use explicit constraints and benchmarks and return weights, objective/status
 
 ## 25. Portfolio Constraints
 
-`PROPOSED — OWNER APPROVAL REQUIRED`: long-only, unlevered, configurable max position/sector deviation, enabled turnover/liquidity controls, explicit configurable costs. Exact bounds are `OPEN — OWNER DECISION REQUIRED`. System supports min/max, gross/net, country/factor/tracking-error, holdings count, minimum trade, cash, leverage, short availability. Units/tolerances are explicit; infeasibility fails diagnostically and never relaxes silently.
+`APPROVED BASELINE`: long-only and unlevered, with short selling and leverage disabled. Configurable maximum position/sector deviation, turnover/liquidity controls, and explicit costs remain proposed for Phase 4; exact bounds are `OPEN — OWNER DECISION REQUIRED`. System supports min/max, gross/net, country/factor/tracking-error, holdings count, minimum trade, cash, leverage, and short availability only where later authorized. Units/tolerances are explicit; infeasibility fails diagnostically and never relaxes silently.
 
 ## 26. Expected Return and Covariance Estimation
 
@@ -293,7 +293,7 @@ Direction: UI/API → application services → domain → data access/storage �
 
 ## 33. Storage Architecture
 
-`APPROVED BASELINE` for Phase 1: original raw formats; immutable content/config/schema-addressed Parquet; DuckDB local catalog/query views; YAML/TOML configuration; JSON v2 manifests and lineage; structured logs. PostgreSQL remains a later multi-user option, Redis remains deferred, and later report/model artifact formats are not authorized by this storage decision.
+`APPROVED BASELINE` for Phase 1: original raw formats; immutable content/config/schema-addressed Parquet; DuckDB local catalog/query views; YAML/TOML configuration; authenticated JSON v3 dataset manifests and lifecycle lineage; structured logs. PostgreSQL remains a later multi-user option, Redis remains deferred, and later report/model artifact formats are not authorized by this storage decision.
 
 ## 34. Configuration Architecture
 
@@ -397,11 +397,12 @@ All approved phases pass gates; no critical integrity defect or known leakage re
 | RF proxy/calendar/time | DGS3MO/FRED; XNYS; UTC timestamps and exchange-local dates | `APPROVED BASELINE` | Phase 1 |
 | Return/action convention | Simple total return, validated adjustments, raw retained | `PROPOSED — OWNER APPROVAL REQUIRED` | Phase 1 |
 | Fundamental lag | Actual availability; conservative disclosed fallback | `PROPOSED — OWNER APPROVAL REQUIRED` | Phase 1/2 |
-| Rebalancing/weights | Monthly; equal-weight factor challenger | `PROPOSED — OWNER APPROVAL REQUIRED` | Phase 2/4 |
+| Rebalancing | Monthly | `APPROVED BASELINE` | Phase 2/4 |
+| Factor challenger weights | Equal-weight candidate | `PROPOSED — OWNER APPROVAL REQUIRED` | Phase 2 |
 | Preprocessing thresholds | Decide per factor after coverage analysis | `OPEN — OWNER DECISION REQUIRED` | Phase 2 |
 | Significance | 1/5/10% report; FDR families | `PROPOSED — OWNER APPROVAL REQUIRED` | Phase 2/3 |
 | Capital and position/sector/turnover/liquidity bounds | Decide after universe/capacity analysis | `OPEN — OWNER DECISION REQUIRED` | Phase 4 |
-| Short/leverage | Disabled | `PROPOSED — OWNER APPROVAL REQUIRED` | Phase 4 |
+| Short/leverage | Disabled | `APPROVED BASELINE` | Phase 4 |
 | Cost model | Configurable bps + optional spread/slippage | `PROPOSED — OWNER APPROVAL REQUIRED` | Phase 4 |
 | ML target/horizon | Rank or outperformance probability candidate | `OPEN — OWNER DECISION REQUIRED` | Phase 5 |
 | Storage | Immutable raw + versioned Parquet + DuckDB catalog | `APPROVED BASELINE` | Phase 1 |
@@ -454,4 +455,4 @@ Every change records reason, affected questions/phases, migration/backward compa
 
 Phase 1 owner-approved baselines are: US common equities/USD; daily research frequency; 2010 onward; large/mid-cap with point-in-time inputs required for historical claims; broad S&P 500 total-return proxy; approved named sources; DGS3MO/XNYS/UTC; immutable raw plus Parquet/DuckDB; and local owner-only access with no redistribution. Later-phase methods and any item still marked proposed/open remain unauthorized until their named phase and owner decision. This clarification records prior explicit owner decisions and does not approve later-phase defaults.
 
-Phase 1 has been implemented and materially remediated under the governing documents and approved owner decisions. It remains pending independent re-audit; Phase 2 is not authorized by this status.
+Phase 1 has been implemented through a second focused remediation under the governing documents and approved owner decisions. It remains pending final independent re-audit; Phase 2 is not authorized by this status.

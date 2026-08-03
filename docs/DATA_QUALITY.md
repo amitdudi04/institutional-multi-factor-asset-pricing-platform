@@ -15,3 +15,5 @@ Invalid schema, duplicate keys, empty-success responses, checksum mismatch, impo
 ## Reports
 
 Each finding carries stable rule/version, dataset/source/time, severity, affected count, representative keys where safe, message, and remediation where available. Results are deterministically ordered. Reports and manifest/lineage instances are generated ignored evidence, not dashboards or research conclusions.
+
+Publication authentication verifies validation-report identity, checksum, eligible status, and absence of blocking findings. Any missing, malformed, substituted, or tampered evidence blocks promotion or fails catalog integrity verification.

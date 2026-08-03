@@ -1,6 +1,6 @@
 # Phase 1 Data Contracts
 
-Tabular contracts use deterministic column order and exact PyArrow enforcement. SEC financial facts are version `2.0.0` because availability quality is now required; other table contracts remain `1.0.0`. Run/source/dataset/promotion manifests and persisted lineage use strict schema `2.0.0`. Runtime v1 manifest/catalog artifacts are unsupported and must be rebuilt; none is committed.
+Tabular contracts use deterministic column order and exact PyArrow enforcement. SEC financial facts are version `2.0.0`; other table contracts remain `1.0.0`. Dataset manifests, lifecycle lineage, and DuckDB catalog state use strict schema `3.0.0`; run/source/promotion envelopes and validation reports remain `2.0.0`. Earlier runtime manifest/lineage/catalog artifacts are unsupported and must be rebuilt; none is committed.
 
 | Contract | Primary key | Required content | Temporal semantics |
 |---|---|---|---|
@@ -28,3 +28,7 @@ Canonical `SecurityId` is UUIDv5-derived from normalized ticker plus exchange/MI
 Prices/yields/factor values are numeric, never formatted strings. FRED DGS3MO remains percent per annum. French source percentages are preserved in metadata and standardized to decimal return explicitly. SEC facts retain provider unit. Required keys/provenance cannot be null. Source-declared missing observations remain null with an explicit indicator; they are not interpolated.
 
 The header-only `examples/templates/security_universe.csv` is a schema aid and contains no securities or empirical values.
+
+## Schema v3 publication and identity
+
+Dataset manifests, lifecycle lineage, and DuckDB catalog state use `3.0.0`; run/source/promotion envelopes and validation reports remain `2.0.0`, SEC facts remain `2.0.0`, and other tabular contracts remain `1.0.0`. Runtime dataset-manifest/lineage/catalog v1–v2 forms are rejected and rebuilt because no empirical artifacts are committed. Listing ID, issuer ID, and effective-dated symbol history are distinct. Owner-supplied units must exactly cover unit-bearing fields and use contract-specific allowed units; percent and decimal are never interchangeable.

@@ -46,3 +46,7 @@ CSV, Parquet, and record-list JSON require exact columns plus explicit dataset/c
 ## Live validation policy
 
 Unit/integration tests are offline. Live smoke checks are optional, tiny, never committed, and never research results. A missing SEC contact blocks only live SEC retrieval. Provider failure is reported; there is no silent fallback or date-range reduction.
+
+## Publication verification and recovery
+
+Use `verify-publication <dataset-id> <dataset.json>` to authenticate one complete v3 publication bundle. `validate-catalog` verifies all promoted rows against persisted authority. A failure requires deterministic demotion or rebuild from intact authenticated registered/promoted revisions; never repair immutable evidence in place. Owner files require exact contract-aware unit metadata.

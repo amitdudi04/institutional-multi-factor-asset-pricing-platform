@@ -175,3 +175,7 @@ The original SEC and Parquet critical defects are closed, but research-ready iso
 ## W. Next Action
 
 > Remediate all blocking defects and repeat the independent re-audit. Do not merge into main and do not authorize Phase 2.
+
+## Second remediation status
+
+The verdict above remains immutable re-audit evidence. A second focused remediation is documented in `docs/PHASE1_SECOND_REMEDIATION_REPORT.md`; implementation-team completion is not an audit pass. A final independent re-audit remains required.

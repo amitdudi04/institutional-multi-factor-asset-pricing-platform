@@ -4,7 +4,7 @@ A research-driven framework intended to support reproducible multi-factor asset 
 
 ## Current status
 
-Repository governance and the owner-approved [Project Specification](docs/PROJECT_SPECIFICATION.md) are complete. Phase 1 material defects have been remediated with typed configuration, approved-source adapters, immutable raw and standardized publication, versioned contracts, validation/quarantine, validated-only DuckDB promotion, persisted lineage, canonical mapping evidence, exchange-calendar coverage, operator integrity commands, and offline adversarial tests. Phase 1 remains pending independent re-audit. No Phase 2 analytical model, portfolio engine, backtest, API, dashboard, or empirical result has been implemented.
+Repository governance and the owner-approved [Project Specification](docs/PROJECT_SPECIFICATION.md) are complete. Phase 1 has completed a second focused remediation with authenticated persisted publication evidence, immutable registered/promoted manifest revisions, complete lifecycle lineage, stable listing identity and effective-dated symbol history, explicit issuer-to-listing mappings, semantic owner-unit validation, validated-only DuckDB promotion, and offline adversarial tests. Phase 1 remains pending final independent re-audit. No Phase 2 analytical model, portfolio engine, backtest, API, dashboard, or empirical result has been implemented.
 
 The governing standard is [docs/DEVELOPMENT_CONSTITUTION.md](docs/DEVELOPMENT_CONSTITUTION.md). Phase 1 evidence is recorded in the [implementation report](docs/PHASE1_IMPLEMENTATION_REPORT.md), preserved [independent audit](docs/PHASE1_AUDIT_REPORT.md), and [remediation report](docs/PHASE1_REMEDIATION_REPORT.md).
 
