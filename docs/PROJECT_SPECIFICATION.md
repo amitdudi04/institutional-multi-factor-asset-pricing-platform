@@ -102,7 +102,7 @@ q-factor (approved inputs); PCA (training-safe and justified); ESG (licensed tem
 
 ## 8. Research Universe
 
-`Status: PROPOSED — OWNER APPROVAL REQUIRED`: US-listed common equities; liquid large/mid-cap point-in-time transparent screen; a historically reconstructed S&P 500-related universe if lawful history exists (current constituents alone must be labeled survivorship-biased); broad-US total-return benchmark/index or disclosed ETF proxy; USD; daily prices and quarterly/annual fundamentals; 2010-01-01 through latest validated date.
+`APPROVED BASELINE`: US-listed common equities; large/mid-cap point-in-time transparent screen; broad S&P 500 total-return proxy; USD; daily research frequency; 2010-01-01 through latest validated date. A historically reconstructed membership universe remains conditional on lawful owner/licensed history; current constituents alone must be labeled survivorship-biased.
 
 The US offers accessible research inputs, mature literature, sector depth, benchmarks, and French-factor compatibility, but still has licensing, delisting, membership, and point-in-time limitations.
 
@@ -113,7 +113,7 @@ The US offers accessible research inputs, mature literature, sector depth, bench
 | US/China/India | External validity | Three mapping/legal/calendar/FX regimes | After one-market validation |
 | Developed global | Diversification | Expensive history, multi-currency/taxonomy | Later licensed phase |
 
-Security types (ADR/REIT/financial/share-class treatment) and historical membership source are `OPEN — OWNER DECISION REQUIRED` before Phase 1.
+Financial-sector primary common shares are included. ETFs, ETNs, closed-end funds, ADRs, preferred shares, REITs, warrants, rights, units, SPAC units, mutual/money-market funds, debt, options, futures, and crypto are excluded. Historical membership source remains `OPEN — OWNER DECISION REQUIRED` before an unbiased historical membership claim.
 
 ## 9. Security Master and Identifiers
 
@@ -138,13 +138,13 @@ Candidates do not authorize integration. Owner data is authoritative; public dat
 | FX | Central bank/owner / approved public | Pair/convention/rate/time | Inverse/holiday checks; no parity fallback |
 | ESG | Approved licensed/owner only | Score/pillar/method/effective date | `OPEN — OWNER DECISION REQUIRED`; remains absent if unapproved |
 
-Every adapter records source URL/ID, retrieval, request/universe/range, raw location/hash, schema, license, and partial failures. Provider priority, credentials, budget, and redistribution rights are `OPEN — OWNER DECISION REQUIRED` before Phase 1.
+Approved Phase 1 sources are Yahoo Finance, Kenneth French Data Library, FRED, SEC EDGAR, and owner-supplied data. Every adapter records request/source identity, retrieval, requested/returned range, raw location/hash, schema, terms limitation, and partial failures. Use is local-owner-only with no redistribution; any new provider, licensed budget, or broader right remains an owner decision.
 
 ## 11. Data Governance
 
 `APPROVED BASELINE`: immutable checksum-protected raw responses; append-only ingestion where feasible; manifests for request, timestamps, files/hashes, schema/license/status; versioned downstream artifacts with parent/config/code identities and validation reports; critical failures quarantined and blocked.
 
-Conceptual, not created: `data/{raw,interim,processed,features,factors,model_ready,manifests,quarantine}`. Empirical contents/databases/models/generated reports are ignored; reviewed contracts, manifest definitions, metadata, and explicitly approved isolated test fixtures may be tracked. Retention/privacy/access is `OPEN — OWNER DECISION REQUIRED`. Transformations never edit raw files.
+Operational Phase 1 paths include `data/{raw,interim,processed,manifests,quarantine}` plus ignored quality/metadata outputs. Future factor/model paths remain ignored and unimplemented. Empirical contents/databases/generated reports are ignored; reviewed contracts, metadata definitions, and isolated software fixtures may be tracked. Raw retention is until explicit owner deletion; access is local-owner-only with no public serving or redistribution. Transformations never edit raw files.
 
 ## 12. Data Contracts
 
@@ -293,7 +293,7 @@ Direction: UI/API → application services → domain → data access/storage �
 
 ## 33. Storage Architecture
 
-`PROPOSED`: original raw formats; Parquet analytical data; DuckDB local queries/metadata; YAML/TOML configuration; JSON/Parquet manifests; HTML/PDF/CSV/Parquet reports; versioned model artifacts; structured logs. PostgreSQL is a later multi-user option. Redis is deferred until measured need. Final choice depends on volume, license, collaboration, backup, deployment.
+`APPROVED BASELINE` for Phase 1: original raw formats; immutable content/config/schema-addressed Parquet; DuckDB local catalog/query views; YAML/TOML configuration; JSON v2 manifests and lineage; structured logs. PostgreSQL remains a later multi-user option, Redis remains deferred, and later report/model artifact formats are not authorized by this storage decision.
 
 ## 34. Configuration Architecture
 
@@ -388,13 +388,13 @@ All approved phases pass gates; no critical integrity defect or known leakage re
 
 | Decision | Recommendation | Status | Required before |
 |---|---|---|---|
-| Market/universe | US; liquid large/mid-cap point-in-time screen | `PROPOSED — OWNER APPROVAL REQUIRED` | Phase 1 |
-| Security types | Decide ADR/REIT/financial/share classes | `OPEN — OWNER DECISION REQUIRED` | Master schema |
-| Benchmark/base currency/start | Broad US total-return / USD / 2010-01-01 | `PROPOSED — OWNER APPROVAL REQUIRED` | Phase 1 |
+| Market/universe | US common equities; large/mid-cap; point-in-time inputs required for historical claims | `APPROVED BASELINE` | Phase 1 |
+| Security types | Primary common class; financials included; ETFs/ETNs/CEFs/ADRs/preferred/REITs/warrants/rights/units/SPAC units/funds/debt/derivatives/crypto excluded | `APPROVED BASELINE` | Master schema |
+| Benchmark/base currency/start | Broad S&P 500 total-return proxy / USD / 2010-01-01 | `APPROVED BASELINE` | Phase 1 |
 | Historical constituents | Licensed/owner source | `OPEN — OWNER DECISION REQUIRED` | Primary historical claim |
-| Provider priority/budget/licenses | Owner/licensed first; approved public sources | `OPEN — OWNER DECISION REQUIRED` | Adapters |
-| Fundamentals | SEC or approved owner/licensed provider | `OPEN — OWNER DECISION REQUIRED` | Phase 1 |
-| RF proxy/calendar/time | Treasury/FRED; exchange calendar; UTC+local metadata | `PROPOSED — OWNER APPROVAL REQUIRED` | Phase 1 |
+| Provider priority/budget/licenses | Yahoo Finance, Kenneth French, FRED, SEC EDGAR, owner-supplied; local owner use/no redistribution | `APPROVED BASELINE` | Adapters |
+| Fundamentals | SEC EDGAR or owner-supplied data | `APPROVED BASELINE` | Phase 1 |
+| RF proxy/calendar/time | DGS3MO/FRED; XNYS; UTC timestamps and exchange-local dates | `APPROVED BASELINE` | Phase 1 |
 | Return/action convention | Simple total return, validated adjustments, raw retained | `PROPOSED — OWNER APPROVAL REQUIRED` | Phase 1 |
 | Fundamental lag | Actual availability; conservative disclosed fallback | `PROPOSED — OWNER APPROVAL REQUIRED` | Phase 1/2 |
 | Rebalancing/weights | Monthly; equal-weight factor challenger | `PROPOSED — OWNER APPROVAL REQUIRED` | Phase 2/4 |
@@ -404,8 +404,8 @@ All approved phases pass gates; no critical integrity defect or known leakage re
 | Short/leverage | Disabled | `PROPOSED — OWNER APPROVAL REQUIRED` | Phase 4 |
 | Cost model | Configurable bps + optional spread/slippage | `PROPOSED — OWNER APPROVAL REQUIRED` | Phase 4 |
 | ML target/horizon | Rank or outperformance probability candidate | `OPEN — OWNER DECISION REQUIRED` | Phase 5 |
-| Storage | Raw original + Parquet/DuckDB | `PROPOSED — OWNER APPROVAL REQUIRED` | Phase 1 |
-| Retention/privacy/access | Per license/deployment | `OPEN — OWNER DECISION REQUIRED` | Phase 1/6 |
+| Storage | Immutable raw + versioned Parquet + DuckDB catalog | `APPROVED BASELINE` | Phase 1 |
+| Retention/privacy/access | Retain raw until owner deletion; local owner only; no public serving/redistribution | `APPROVED BASELINE` | Phase 1/6 |
 | Deployment | Local first; PostgreSQL later if needed | `PROPOSED — OWNER APPROVAL REQUIRED` | Phase 6 |
 | Deadline | Owner schedule | `OPEN — OWNER DECISION REQUIRED` | Planning |
 | License | MIT; copyright (c) 2026 AMIT KUMAR DUDI | `APPROVED BASELINE — MIT` | Effective baseline |
@@ -452,6 +452,6 @@ Every change records reason, affected questions/phases, migration/backward compa
 
 ## 51. Final Approved Baseline
 
-Unless marked otherwise, all are `PROPOSED — OWNER APPROVAL REQUIRED`: US equities/USD; daily prices and quarterly/annual fundamentals (`APPROVED BASELINE` frequency); 2010 onward; liquid large/mid-cap point-in-time universe; broad US total-return benchmark; monthly rebalance; long-only/unlevered/constrained portfolio with exact capital/bounds `OPEN — OWNER DECISION REQUIRED`; market, size, value, momentum, profitability, investment, quality, low volatility, liquidity factors; CAPM/FF3/Carhart/FF5; equal, inverse-vol, min-var, mean–variance, max-Sharpe, Black–Litterman, risk parity, HRP, CVaR; linear/regularized/logistic where justified, random forest/XGBoost, conditional LightGBM/CatBoost; raw + Parquet/DuckDB storage; future FastAPI/Streamlit via services; `APPROVED BASELINE` point-in-time, walk-forward, cost-aware validation.
+Phase 1 owner-approved baselines are: US common equities/USD; daily research frequency; 2010 onward; large/mid-cap with point-in-time inputs required for historical claims; broad S&P 500 total-return proxy; approved named sources; DGS3MO/XNYS/UTC; immutable raw plus Parquet/DuckDB; and local owner-only access with no redistribution. Later-phase methods and any item still marked proposed/open remain unauthorized until their named phase and owner decision. This clarification records prior explicit owner decisions and does not approve later-phase defaults.
 
-Phase 1 is authorized. Implementation has not started and must proceed only under the governing documents, approved owner decisions, and Phase 1 boundary.
+Phase 1 has been implemented and materially remediated under the governing documents and approved owner decisions. It remains pending independent re-audit; Phase 2 is not authorized by this status.

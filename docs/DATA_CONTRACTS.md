@@ -1,6 +1,6 @@
 # Phase 1 Data Contracts
 
-All tabular contracts are version `1.0.0`, use deterministic column order, and are enforced by PyArrow plus reusable semantic validators. Metadata/manifests use strict Pydantic v2 models. Unknown fields are rejected in configuration and manifests.
+Tabular contracts use deterministic column order and exact PyArrow enforcement. SEC financial facts are version `2.0.0` because availability quality is now required; other table contracts remain `1.0.0`. Run/source/dataset/promotion manifests and persisted lineage use strict schema `2.0.0`. Runtime v1 manifest/catalog artifacts are unsupported and must be rebuilt; none is committed.
 
 | Contract | Primary key | Required content | Temporal semantics |
 |---|---|---|---|
@@ -9,18 +9,19 @@ All tabular contracts are version `1.0.0`, use deterministic column order, and a
 | Corporate actions | `security_id, action_id` | type, effective date, value, source | provider effective date |
 | Macro observations | `series_id, observation_date` | value/null marker, source unit/frequency, source/retrieval | source observation; release availability only if known |
 | French factors | `dataset_identifier, factor_date, factor_name` | value, original/standard units, frequency/source | published date; percent-to-decimal transformation recorded |
-| SEC facts | CIK, taxonomy, concept, unit, period end, filing, accession | entity, value, form, fiscal metadata, source/retrieval/availability | filing after period; availability not before filing |
+| SEC facts | CIK, taxonomy, concept, unit, period end, filing, accession | entity, value, form, fiscal metadata, source/retrieval/availability and availability quality | period start ≤ end ≤ filing ≤ date-level availability ≤ retrieval |
 
 Manifest contracts contain:
 
 - **Run:** ID/type/times/status, Git and package versions, configuration hash/snapshot, requests, outputs, warnings/errors.
 - **Source:** source/request/time/status, raw path/hash, rows/date coverage, partial failures, rate-limit and terms notes.
-- **Dataset:** ID/type/schema, parents/transformation, dimensions/key/date/security/missingness, validation/quarantine, Parquet/catalog, configuration/code/lineage.
+- **Dataset:** content/config/schema-addressed ID, schema fingerprint, parents/transformation, dimensions/key/date/security/missingness/units, validation evidence, Parquet checksum/size, Git/config/temporal policy, lineage completeness and promotion eligibility.
+- **Promotion:** dataset-manifest hash, output checksum, lineage, eligible validation status, Git/config identity, and promotion time.
 - **Validation report:** dataset/source/run/schema, requested/observed range, counts, deterministic findings/status/quarantine path.
 
 ## Security identity
 
-`SecurityId` is UUIDv5-derived from normalized source, ticker, exchange, and source identifier. It is stable for identical listing metadata, distinguishes exchanges and source identities, and never invents ISIN/CUSIP. Ticker changes still require an effective-dated mapping in later owner data; ticker alone is never the permanent key.
+Canonical `SecurityId` is UUIDv5-derived from normalized ticker plus exchange/MIC listing evidence and is source-independent. Effective-dated provider mappings connect Yahoo/owner identifiers and CIK registrant evidence to it. Ticker alone is insufficient; an ambiguous CIK or conflicting active mapping remains unresolved. No ISIN/CUSIP is invented, and no complete commercial security master is claimed.
 
 ## Units and nullability
 

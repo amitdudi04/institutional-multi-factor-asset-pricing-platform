@@ -4,7 +4,7 @@ This roadmap summarizes the boundaries defined in `docs/PROJECT_SPECIFICATION.md
 
 ## Phase 1 — Institutional Data Platform
 
-Implemented: approved source adapters, immutable raw storage, schemas, validation, manifests, lineage, calendars, fundamentals and macro/factor inputs, with approved DuckDB and Parquet storage. Corporate-action fields are retained by the market adapter and a separate versioned action contract is defined; no issuer-scale live dataset is claimed. No research model may precede validated, provenance-controlled inputs.
+Implemented and materially remediated, pending independent re-audit: approved adapters, immutable raw and standardized storage, v2 manifests, persisted lineage, validated-only DuckDB promotion, canonical mapping evidence, calendars, fundamentals, and macro/published-factor inputs. Corporate-action fields are retained by the market adapter and a separate action contract is defined; no issuer-scale live dataset is claimed. No research model may precede a passing re-audit of validated, provenance-controlled inputs.
 
 ## Phase 2 — Multi-Factor Research Engine
 

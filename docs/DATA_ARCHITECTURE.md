@@ -9,12 +9,13 @@ Validated configuration
   -> source-specific standardization
   -> PyArrow contract + quality validation
   -> quarantine on blocking failure
-  -> atomic Zstandard Parquet on pass/warning
-  -> transactional DuckDB registry/view
-  -> dataset/run manifests + JSON/Markdown quality report
+  -> content/config/schema-addressed immutable Zstandard Parquet on pass/warning
+  -> persisted v2 lineage and eligible dataset manifest
+  -> checksum/lineage/status-gated DuckDB promotion
+  -> promotion and final run evidence + JSON/Markdown quality report
 ```
 
-Parquet and manifests are authoritative standardized artifacts. DuckDB is a local query catalog and does not replace them as the source of truth.
+Parquet, manifests, and persisted lineage are authoritative. DuckDB registration does not create research visibility; promotion rebuilds `validated_*` views only from checksum-verified `PASS` or `PASS_WITH_WARNINGS` entries. DuckDB remains a local query catalog, not competing truth.
 
 ## Package responsibilities
 
@@ -27,8 +28,8 @@ Parquet and manifests are authoritative standardized artifacts. DuckDB is a loca
 | `data.validation` | Common/source checks, statuses, machine/human reports |
 | `data.storage` | Raw checksums, atomic Parquet, quarantine, DuckDB registry |
 | `data.manifests` | Validated run/source/dataset metadata |
-| `data.lineage` | Acyclic parent-child relationships |
-| `data.security_master` | Stable identity and owner-approved eligibility checks |
+| `data.lineage` | Immutable machine-readable artifact/relationship evidence and restart reconstruction |
+| `data.security_master` | Canonical listing identity, effective-dated provider mapping, and eligibility checks |
 | `data.calendar` | XNYS session-date abstraction |
 | `data.services` | End-to-end orchestration and promotion control |
 | `cli` | Explicit operator commands and nonzero failure status |
@@ -37,7 +38,7 @@ Dependencies point from CLI to services to adapters/domain/storage, then to conf
 
 ## Storage decisions
 
-Raw bytes retain provider-native form where practical. Standard tables use explicit PyArrow schemas and Zstandard-compressed Parquet with atomic temporary writes and read-back verification. DuckDB stores a registry and stable validated views without copying Parquet. JSON manifests are canonical, versioned, redacted, and immutable. Local paths are represented project-relatively when possible.
+Raw bytes retain provider-native form where practical. Standard tables use exact PyArrow schemas and Zstandard Parquet with atomic temporary writes, read-back verification, manifested checksums, idempotent same-content reuse, and conflict refusal. Dataset manifests use relative paths; the local DuckDB catalog resolves physical paths and can be rebuilt because no empirical catalog is committed. Manifest/lineage schema v2 is intentionally incompatible with uncommitted v1 runtime artifacts.
 
 ## Adapter lifecycle and network policy
 

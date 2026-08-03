@@ -7,7 +7,11 @@ Validate configuration and initialize ignored local storage:
 ```shell
 uv run institutional-factor-platform validate-config
 uv run institutional-factor-platform init-storage
+uv run institutional-factor-platform validate-catalog
+uv run institutional-factor-platform list-datasets --research-ready
 ```
+
+Integrity operations also include `verify-raw`, `verify-standardized`, `inspect-lineage`, `inspect-dataset-manifest`, and `reprocess-raw`. Use command help for required explicit paths/checksums/contracts. Reprocessing supports verified byte-native FRED, French, SEC, and owner artifacts without provider retrieval; Yahoo's DataFrame-derived raw representation is not accepted by that byte workflow.
 
 Live commands require explicit arguments and may download external data into ignored raw storage:
 
@@ -33,11 +37,11 @@ The initial approved dataset is `F-F_Research_Data_5_Factors_2x3_daily`; daily m
 
 ## SEC EDGAR
 
-The narrow adapter retrieves company facts for an explicit valid CIK using a compliant owner-supplied user agent. Raw JSON is preserved. Long-format facts retain taxonomy, concept, unit, period, filing, form, accession, frame, and availability. XBRL concepts are not assumed comparable across issuers; restatements are retained rather than silently resolved. No ratios or factors are calculated.
+The narrow adapter retrieves company facts for an explicit valid CIK using a compliant owner-supplied user agent. Raw JSON is preserved. When SEC provides only filing date, availability is represented conservatively as UTC end-of-filing-date with `INFERRED_DATE_LEVEL`; it does not claim intraday precision or same-day tradability. Phase 2 must decide the next-session use rule. Impossible period/filing/availability/retrieval chronology blocks promotion. Restatements/amendments remain separate facts; no ratios or factors are calculated.
 
 ## Owner-supplied data
 
-CSV, Parquet, and record-list JSON require an explicit supported contract and provenance parameters. The original is copied into immutable raw storage, hashed, manifested, validated, and only then standardized. Column meanings are never guessed. Use the header-only universe template for required field names; it is not a universe dataset.
+CSV, Parquet, and record-list JSON require exact columns plus explicit dataset/contract version, source/ownership, units, date semantics, and identifier semantics. Unknown/extra columns, corrupt files, wrong versions/types, and ambiguous metadata fail; original bytes are never edited. Existing raw bytes may be checked and reprocessed with the explicit integrity CLI. The header-only universe template is not a universe dataset.
 
 ## Live validation policy
 

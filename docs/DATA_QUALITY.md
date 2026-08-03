@@ -6,7 +6,7 @@ Findings use `INFO`, `WARNING`, `ERROR`, and `CRITICAL`. Dataset outcomes are `P
 
 ## Validation dimensions
 
-Common checks cover schema/type/nullability, primary-key uniqueness, non-empty success, provenance, date ordering, temporal integrity, coverage, and deterministic status. Market checks cover positive finite prices, OHLC relationships, volume, duplicates, ordering, and stale-price warnings. FRED preserves missing markers/frequency and prohibits interpolation. French checks identity, header/date/factor completeness, and explicit units. SEC checks CIK/entity/fact structure, numeric values, filing/period/availability order, taxonomy/unit/form/accession metadata. Security-master checks stable IDs, source identities, primary listings, common-stock/US/USD eligibility, and listing status/dates.
+Common checks cover exact schema/type/nullability, primary-key uniqueness, non-empty success, provenance, date ordering, and deterministic status. Market checks add configured XNYS expected/observed coverage, listing boundaries, out-of-range dates, OHLC/volume/price/order/staleness/extreme-return rules without filling. FRED preserves missingness/frequency. French checks finite explicit-unit values. SEC blocks period, filing, date-level availability, and retrieval chronology violations. Mapping checks make ambiguity/conflict explicit.
 
 ## Quarantine
 
@@ -14,4 +14,4 @@ Invalid schema, duplicate keys, empty-success responses, checksum mismatch, impo
 
 ## Reports
 
-Each run writes JSON and Markdown reports with dataset/source/run/schema, requested/observed range, rows/entities, findings, final status, and quarantine location where applicable. Reports are generated evidence, are ignored by Git, and are not dashboards or research conclusions.
+Each finding carries stable rule/version, dataset/source/time, severity, affected count, representative keys where safe, message, and remediation where available. Results are deterministically ordered. Reports and manifest/lineage instances are generated ignored evidence, not dashboards or research conclusions.

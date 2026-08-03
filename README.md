@@ -4,9 +4,9 @@ A research-driven framework intended to support reproducible multi-factor asset 
 
 ## Current status
 
-Repository governance and the owner-approved [Project Specification](docs/PROJECT_SPECIFICATION.md) are complete. Phase 1, the Institutional Data Platform, is implemented with typed configuration, approved-source adapters, immutable raw storage, versioned contracts, validation and quarantine, Parquet, a DuckDB catalog, manifests, lineage, an exchange calendar, operator commands, and offline tests. No Phase 2 analytical model, portfolio engine, backtest, API, dashboard, or empirical result has been implemented.
+Repository governance and the owner-approved [Project Specification](docs/PROJECT_SPECIFICATION.md) are complete. Phase 1 material defects have been remediated with typed configuration, approved-source adapters, immutable raw and standardized publication, versioned contracts, validation/quarantine, validated-only DuckDB promotion, persisted lineage, canonical mapping evidence, exchange-calendar coverage, operator integrity commands, and offline adversarial tests. Phase 1 remains pending independent re-audit. No Phase 2 analytical model, portfolio engine, backtest, API, dashboard, or empirical result has been implemented.
 
-The governing standard is [docs/DEVELOPMENT_CONSTITUTION.md](docs/DEVELOPMENT_CONSTITUTION.md). The initial repository assessment is recorded in [docs/REPOSITORY_INITIALIZATION_REPORT.md](docs/REPOSITORY_INITIALIZATION_REPORT.md), and Phase 1 evidence is recorded in [docs/PHASE1_IMPLEMENTATION_REPORT.md](docs/PHASE1_IMPLEMENTATION_REPORT.md).
+The governing standard is [docs/DEVELOPMENT_CONSTITUTION.md](docs/DEVELOPMENT_CONSTITUTION.md). Phase 1 evidence is recorded in the [implementation report](docs/PHASE1_IMPLEMENTATION_REPORT.md), preserved [independent audit](docs/PHASE1_AUDIT_REPORT.md), and [remediation report](docs/PHASE1_REMEDIATION_REPORT.md).
 
 ## Planned phases
 

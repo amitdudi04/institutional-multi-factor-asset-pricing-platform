@@ -221,3 +221,7 @@ The passing ordinary suite does not offset demonstrated invalid-data promotion, 
 ## Q. Next Action
 
 > Resolve all blocking defects, rerun the complete Phase 1 audit, and do not authorize Phase 2.
+
+## Remediation status
+
+The original findings and verdict above are immutable audit evidence for commit `c0b42e17524bb49dcd27ff79cc92556951246552`. A subsequent focused remediation is documented in `docs/PHASE1_REMEDIATION_REPORT.md`. The audit verdict is not retroactively changed: a fresh independent re-audit must verify the remediated branch before Phase 2 can be authorized.

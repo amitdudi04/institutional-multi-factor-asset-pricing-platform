@@ -14,7 +14,9 @@ Raw, interim, processed, manifest-instance, quarantine, output, database, and lo
 
 ## Promotion, lineage, and quarantine
 
-Data flows raw → source-specific standardization → schema and quality validation → Parquet → DuckDB registration. Each dataset manifest links the raw checksum, source manifest, configuration hash, code version, schema, transformation, and validation status. Critical failures are retained with their raw bytes and report in quarantine and are not registered as research-ready. Failed artifacts are not deleted automatically and may be reprocessed from raw evidence.
+Data flows raw → exact source standardization → contract/source/temporal validation → immutable Parquet → persisted lineage/eligible manifest → DuckDB registration and structurally gated promotion. Dataset evidence records raw and output checksums, sizes, schema fingerprint/version, transformation, validation report, Git/config identity, units, and temporal policy. Critical failures preserve raw bytes and reports in quarantine and cannot enter research-ready views. Existing raw bytes can be verified and reprocessed without provider retrieval.
+
+Canonical listing IDs are source-independent and provider mappings retain source identifiers, validity dates, evidence, provenance, and explicit resolved/ambiguous/conflict outcomes. CIK identifies a registrant, not automatically a share class; ambiguous mappings cannot silently join.
 
 ## Retention, access, and deletion
 
