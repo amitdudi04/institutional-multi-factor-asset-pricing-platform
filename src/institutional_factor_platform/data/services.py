@@ -3,6 +3,7 @@
 import hashlib
 import io
 import json
+import os
 import subprocess
 import uuid
 from datetime import UTC, date, datetime
@@ -24,6 +25,8 @@ from institutional_factor_platform.data.domain import (
     RetrievalStatus,
 )
 from institutional_factor_platform.data.lineage import (
+    LifecycleEvent,
+    LifecycleEventStore,
     LineageDocument,
     LineageEdge,
     LineageStore,
@@ -54,7 +57,11 @@ from institutional_factor_platform.data.validation import (
     validate_sec_facts,
     validate_table,
 )
-from institutional_factor_platform.exceptions import DataQualityError, PartialRetrievalError
+from institutional_factor_platform.exceptions import (
+    DataQualityError,
+    EvidenceIntegrityError,
+    PartialRetrievalError,
+)
 from institutional_factor_platform.project import find_project_root
 
 TRANSFORMATION_VERSION = "2.0.0"
@@ -110,6 +117,7 @@ class DataIngestionService:
         run_root = self.paths["manifests"] / run_id
         snapshot = run_root / "configuration.json"
         self.config.write_snapshot(snapshot)
+        snapshot_checksum = sha256_file(snapshot)
         self._write_run(
             run_root / "run-started.json",
             run_id,
@@ -124,6 +132,15 @@ class DataIngestionService:
         source_id = f"source:{run_id}"
         artifact: DataArtifact | None = None
         promoted_dataset: str | None = None
+        lock_path = (
+            self.paths["metadata"]
+            / "publication-locks"
+            / (
+                hashlib.sha256(f"{request.source.value}|{request.dataset}".encode()).hexdigest()
+                + ".lock"
+            )
+        )
+        _acquire_publication_lock(lock_path)
         try:
             payload = (
                 adapter.retrieve(request) if _payload_override is _NO_PAYLOAD else _payload_override
@@ -175,6 +192,7 @@ class DataIngestionService:
                 source_id, request, artifact, table.num_rows, records, RetrievalStatus.SUCCESS
             )
             source_manifest.write_immutable(source_path)
+            source_checksum = sha256_file(source_path)
             if status in {DatasetStatus.QUARANTINED, DatasetStatus.FAIL}:
                 location = self.quarantine.quarantine(
                     artifact,
@@ -189,7 +207,8 @@ class DataIngestionService:
             self.parquet.verify(published)
             parquet_id = f"parquet:{published.checksum}"
             raw_id = f"raw:{artifact.checksum}"
-            lineage_path = run_root / "lineage.json"
+            lineage_path = run_root / "lineage-validated.json"
+            lineage_id = f"lineage:{run_id}:validated"
             lineage = _lineage_document(
                 run_id=run_id,
                 source_id=source_id,
@@ -202,6 +221,7 @@ class DataIngestionService:
                 parquet_path=_relative(published.path, self.root),
                 commit=commit,
                 config_hash=config_hash,
+                lineage_id=lineage_id,
             )
             lineage_store = LineageStore(lineage_path)
             lineage_store.persist(lineage)
@@ -209,14 +229,18 @@ class DataIngestionService:
                 (source_id, raw_id, validation_id, parquet_id, dataset_id)
             )
 
+            registered_id = f"catalog:{dataset_id}"
             manifest = DatasetManifest(
-                schema_version="2.0.0",
+                schema_version="3.0.0",
+                run_id=run_id,
                 dataset_id=dataset_id,
                 dataset_type=contract.name,
                 schema_name=contract.name,
                 schema_fingerprint=_schema_fingerprint(contract.schema),
                 parent_artifacts=(raw_id,),
                 source_manifest_id=source_id,
+                source_manifest_path=_relative(source_path, self.root),
+                source_manifest_checksum=source_checksum,
                 transformation_name=f"{request.source.value}_standardize",
                 transformation_version=TRANSFORMATION_VERSION,
                 row_count=table.num_rows,
@@ -229,34 +253,75 @@ class DataIngestionService:
                 unit_metadata=_unit_metadata(records),
                 validation_report_id=validation_id,
                 validation_report_path=_relative(validation_json, self.root),
+                validation_report_checksum=sha256_file(validation_json),
                 validation_status=status,
                 lineage_path=_relative(lineage_path, self.root),
+                lineage_id=lineage_id,
+                lineage_checksum=sha256_file(lineage_path),
                 lineage_complete=True,
                 quarantine_status=False,
                 parquet_path=_relative(published.path, self.root),
+                output_artifact_id=parquet_id,
                 output_checksum=published.checksum,
                 output_byte_size=published.byte_size,
-                catalog_registration_state="NOT_REGISTERED",
+                catalog_registration_state="REGISTERED",
                 promotion_state="ELIGIBLE",
+                catalog_registration_id=registered_id,
                 creation_time=datetime.now(UTC),
                 configuration_hash=config_hash,
+                configuration_snapshot_path=_relative(snapshot, self.root),
+                configuration_snapshot_checksum=snapshot_checksum,
                 code_version=__version__,
                 git_commit=commit,
                 temporal_policy_version=TEMPORAL_POLICY_VERSION,
             )
+            registered_path = run_root / "dataset-registered.json"
+            manifest.write_immutable(registered_path)
+            self.catalog.register_persisted(dataset_id, registered_path, self.root)
+            promotion_id = f"promotion:{run_id}:{dataset_id}"
+            final_lineage_path = run_root / "lineage.json"
+            final_lineage_id = f"lineage:{run_id}:published"
+            final_lineage = _lineage_document(
+                run_id=run_id,
+                source_id=source_id,
+                raw_id=raw_id,
+                validation_id=validation_id,
+                parquet_id=parquet_id,
+                dataset_id=dataset_id,
+                source_path=_relative(source_path, self.root),
+                validation_path=_relative(validation_json, self.root),
+                parquet_path=_relative(published.path, self.root),
+                commit=commit,
+                config_hash=config_hash,
+                lineage_id=final_lineage_id,
+                registration_id=registered_id,
+                promotion_id=promotion_id,
+            )
+            LineageStore(final_lineage_path).persist(final_lineage)
+            promoted_at = datetime.now(UTC)
+            final_manifest = manifest.model_copy(
+                update={
+                    "lineage_path": _relative(final_lineage_path, self.root),
+                    "lineage_id": final_lineage_id,
+                    "lineage_checksum": sha256_file(final_lineage_path),
+                    "promotion_state": "PUBLISHED",
+                    "promotion_event_id": promotion_id,
+                    "promotion_timestamp": promoted_at,
+                }
+            )
             dataset_path = run_root / "dataset.json"
-            manifest.write_immutable(dataset_path)
-            self.catalog.promote(manifest, dataset_path, lineage_path, published.path)
+            final_manifest.write_immutable(dataset_path)
+            self.catalog.promote_persisted(dataset_id, dataset_path, self.root)
             promoted_dataset = dataset_id
             promotion = PromotionManifest(
                 schema_version="2.0.0",
                 dataset_id=dataset_id,
                 dataset_manifest_path=_relative(dataset_path, self.root),
-                dataset_manifest_hash=manifest.content_hash(),
+                dataset_manifest_hash=final_manifest.content_hash(),
                 output_checksum=published.checksum,
-                lineage_path=_relative(lineage_path, self.root),
+                lineage_path=_relative(final_lineage_path, self.root),
                 validation_status=status,
-                promoted_at=datetime.now(UTC),
+                promoted_at=promoted_at,
                 git_commit=commit,
                 configuration_hash=config_hash,
             )
@@ -273,10 +338,27 @@ class DataIngestionService:
                 commit,
                 (dataset_id, promotion.content_hash()),
             )
-            return manifest
+            return final_manifest
         except Exception as exc:
             if promoted_dataset is not None:
                 self.catalog.demote(promoted_dataset)
+                LifecycleEventStore(run_root / "lifecycle").persist(
+                    LifecycleEvent(
+                        schema_version="3.0.0",
+                        event_id=f"demotion:{run_id}:{promoted_dataset}",
+                        dataset_id=promoted_dataset,
+                        relationship_type=RelationshipType.DEMOTED_FROM_RESEARCH_READY,
+                        prior_state="PUBLISHED",
+                        new_state="DEMOTED",
+                        catalog_identity=_relative(self.catalog.path, self.root),
+                        run_id=run_id,
+                        event_timestamp=datetime.now(UTC),
+                        code_commit=commit,
+                        configuration_hash=config_hash,
+                        reason=str(exc),
+                        supporting_evidence_ids=(promoted_dataset,),
+                    )
+                )
             if not source_path.exists():
                 retrieval_status = (
                     RetrievalStatus.PARTIAL
@@ -304,6 +386,8 @@ class DataIngestionService:
                 errors=(str(exc),),
             )
             raise
+        finally:
+            lock_path.unlink(missing_ok=True)
 
     def reprocess(
         self,
@@ -444,6 +528,18 @@ def _payload_bytes(payload: Any) -> bytes:
     return json.dumps(payload, sort_keys=True, default=str).encode()
 
 
+def _acquire_publication_lock(path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        descriptor = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+    except FileExistsError as exc:
+        raise EvidenceIntegrityError(
+            f"Publication is already active for this source/dataset: {path.name}"
+        ) from exc
+    with os.fdopen(descriptor, "w", encoding="utf-8") as handle:
+        handle.write(f"pid={os.getpid()}\n")
+
+
 def _require_exact_record_columns(
     records: tuple[dict[str, object], ...], contract: TableContract
 ) -> None:
@@ -499,29 +595,48 @@ def _lineage_document(
     parquet_path: str,
     commit: str,
     config_hash: str,
+    lineage_id: str,
+    registration_id: str | None = None,
+    promotion_id: str | None = None,
 ) -> LineageDocument:
     request_id = f"request:{run_id}"
     response_id = f"response:{run_id}"
     transform_id = f"transformation:{run_id}"
     now = datetime.now(UTC)
     artifacts = (
-        request_id,
-        response_id,
-        source_id,
-        raw_id,
-        transform_id,
-        validation_id,
-        parquet_id,
-        dataset_id,
+        (
+            request_id,
+            response_id,
+            source_id,
+            raw_id,
+            transform_id,
+            validation_id,
+            parquet_id,
+            dataset_id,
+        )
+        + ((registration_id,) if registration_id else ())
+        + ((promotion_id,) if promotion_id else ())
     )
     specs = (
-        (request_id, response_id, RelationshipType.REQUESTED, source_path),
-        (response_id, source_id, RelationshipType.RETRIEVED, source_path),
-        (source_id, raw_id, RelationshipType.PERSISTED_RAW, source_path),
-        (raw_id, transform_id, RelationshipType.STANDARDIZED, None),
-        (transform_id, validation_id, RelationshipType.VALIDATED, validation_path),
-        (validation_id, parquet_id, RelationshipType.PUBLISHED_PARQUET, parquet_path),
-        (parquet_id, dataset_id, RelationshipType.MANIFESTED, None),
+        (
+            (request_id, response_id, RelationshipType.REQUESTED, source_path),
+            (response_id, source_id, RelationshipType.RETRIEVED, source_path),
+            (source_id, raw_id, RelationshipType.PERSISTED_RAW, source_path),
+            (raw_id, transform_id, RelationshipType.STANDARDIZED, None),
+            (transform_id, validation_id, RelationshipType.VALIDATED, validation_path),
+            (validation_id, parquet_id, RelationshipType.PUBLISHED_PARQUET, parquet_path),
+            (parquet_id, dataset_id, RelationshipType.MANIFESTED, None),
+        )
+        + (
+            ((dataset_id, registration_id, RelationshipType.REGISTERED_IN_CATALOG, None),)
+            if registration_id
+            else ()
+        )
+        + (
+            ((registration_id, promotion_id, RelationshipType.PROMOTED_TO_RESEARCH_READY, None),)
+            if registration_id and promotion_id
+            else ()
+        )
     )
     edges = tuple(
         LineageEdge(
@@ -538,7 +653,13 @@ def _lineage_document(
         )
         for parent, child, relationship, evidence in specs
     )
-    return LineageDocument(schema_version="2.0.0", artifacts=artifacts, edges=edges)
+    return LineageDocument.v3(
+        lineage_id=lineage_id,
+        dataset_id=dataset_id,
+        run_id=run_id,
+        artifacts=artifacts,
+        edges=edges,
+    )
 
 
 def _json_safe(value: Any) -> Any:
@@ -580,7 +701,12 @@ def _git_commit(root: Path) -> str:
             ["git", "rev-parse", "HEAD"], cwd=root, text=True, stderr=subprocess.DEVNULL
         ).strip()
     except (OSError, subprocess.CalledProcessError):
-        return "unavailable"
+        try:
+            return subprocess.check_output(
+                ["git", "rev-parse", "HEAD"], text=True, stderr=subprocess.DEVNULL
+            ).strip()
+        except (OSError, subprocess.CalledProcessError):
+            return "unavailable"
 
 
 def _entity_count(records: tuple[dict[str, object], ...]) -> int | None:

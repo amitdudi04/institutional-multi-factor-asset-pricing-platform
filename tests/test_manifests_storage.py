@@ -2,7 +2,6 @@ import json
 from datetime import UTC, date, datetime
 from pathlib import Path
 
-import duckdb
 import pyarrow as pa
 import pytest
 from pydantic import ValidationError
@@ -10,6 +9,8 @@ from pydantic import ValidationError
 from institutional_factor_platform.data.contracts import MACRO_OBSERVATIONS
 from institutional_factor_platform.data.domain import DatasetStatus, DataSource, RetrievalStatus
 from institutional_factor_platform.data.lineage import (
+    LifecycleEvent,
+    LifecycleEventStore,
     LineageDocument,
     LineageEdge,
     LineageGraph,
@@ -30,7 +31,6 @@ from institutional_factor_platform.data.storage import (
 from institutional_factor_platform.exceptions import (
     ChecksumMismatchError,
     ManifestError,
-    PromotionError,
     PublicationConflictError,
     RawStorageError,
 )
@@ -201,13 +201,16 @@ def _dataset_manifest(
     complete: bool = True,
 ) -> DatasetManifest:
     return DatasetManifest(
-        schema_version="2.0.0",
+        schema_version="3.0.0",
+        run_id="run",
         dataset_id=dataset_id,
         dataset_type="macro_observations",
         schema_name="macro_observations",
         schema_fingerprint=HASH,
         parent_artifacts=("raw:audit",),
         source_manifest_id="source:audit",
+        source_manifest_path="source.json",
+        source_manifest_checksum=HASH,
         transformation_name="synthetic_standardize",
         transformation_version="2.0.0",
         row_count=1,
@@ -215,11 +218,15 @@ def _dataset_manifest(
         primary_key=("series_id", "observation_date"),
         validation_report_id="validation:audit",
         validation_report_path="validation.json",
+        validation_report_checksum=HASH,
         validation_status=status,
         lineage_path=str(lineage),
+        lineage_id="lineage:audit",
+        lineage_checksum=HASH,
         lineage_complete=complete,
         quarantine_status=status is DatasetStatus.QUARANTINED,
         parquet_path=str(parquet),
+        output_artifact_id=f"parquet:{checksum}",
         output_checksum=checksum,
         output_byte_size=parquet.stat().st_size,
         catalog_registration_state="NOT_REGISTERED",
@@ -230,6 +237,8 @@ def _dataset_manifest(
         ),
         creation_time=NOW,
         configuration_hash=HASH,
+        configuration_snapshot_path="configuration.json",
+        configuration_snapshot_checksum=HASH,
         code_version="test",
         git_commit="commit",
         temporal_policy_version="2.0.0",
@@ -254,67 +263,10 @@ def test_parquet_immutable_idempotent_and_conflict(tmp_path: Path) -> None:
     assert not list(first.path.parent.glob(".parquet-*.tmp"))
 
 
-def test_catalog_validated_only_promotion_and_demotion(tmp_path: Path) -> None:
-    artifact = ParquetStorage(tmp_path / "processed").publish(
-        "macro_observations", "dataset-audit", _macro_table(), MACRO_OBSERVATIONS.schema
-    )
-    lineage_path = tmp_path / "lineage.json"
-    _lineage(lineage_path, "dataset-audit")
-    manifest = _dataset_manifest(artifact.path, artifact.checksum, lineage_path)
-    manifest_path = tmp_path / "manifest.json"
-    manifest.write_immutable(manifest_path)
+def test_catalog_has_no_in_memory_promotion_interface(tmp_path: Path) -> None:
     catalog = DuckDBCatalog(tmp_path / "catalog.duckdb")
-    catalog.promote(manifest, manifest_path, lineage_path, artifact.path)
-    catalog.promote(manifest, manifest_path, lineage_path, artifact.path)
-    assert catalog.list_datasets(research_ready_only=True) == [
-        ("dataset-audit", "macro_observations", "PASS")
-    ]
-    catalog.verify_integrity()
-    catalog.demote("dataset-audit")
-    assert catalog.list_datasets(research_ready_only=True) == []
-    with duckdb.connect(str(catalog.path), read_only=True) as connection:
-        assert connection.execute(
-            "select count(*) from information_schema.views "
-            "where table_name='validated_macro_observations'"
-        ).fetchone() == (0,)
-
-
-@pytest.mark.parametrize("status", [DatasetStatus.FAIL, DatasetStatus.QUARANTINED])
-def test_failed_and_quarantined_cannot_promote(tmp_path: Path, status: DatasetStatus) -> None:
-    artifact = ParquetStorage(tmp_path / "processed").publish(
-        "macro_observations", "blocked", _macro_table(), MACRO_OBSERVATIONS.schema
-    )
-    lineage_path = tmp_path / "lineage.json"
-    _lineage(lineage_path, "blocked")
-    manifest = _dataset_manifest(
-        artifact.path, artifact.checksum, lineage_path, dataset_id="blocked", status=status
-    )
-    path = tmp_path / "manifest.json"
-    manifest.write_immutable(path)
-    catalog = DuckDBCatalog(tmp_path / "catalog.duckdb")
-    catalog.register(manifest, path)
-    with pytest.raises(PromotionError, match="not research-ready"):
-        catalog.promote(manifest, path, lineage_path, artifact.path)
-    assert catalog.list_datasets(research_ready_only=True) == []
-
-
-def test_missing_checksum_or_lineage_blocks_promotion(tmp_path: Path) -> None:
-    artifact = ParquetStorage(tmp_path / "processed").publish(
-        "macro_observations", "dataset-audit", _macro_table(), MACRO_OBSERVATIONS.schema
-    )
-    lineage_path = tmp_path / "lineage.json"
-    _lineage(lineage_path, "dataset-audit")
-    manifest = _dataset_manifest(artifact.path, "b" * 64, lineage_path)
-    path = tmp_path / "manifest.json"
-    manifest.write_immutable(path)
-    catalog = DuckDBCatalog(tmp_path / "catalog.duckdb")
-    with pytest.raises(PromotionError, match="checksum"):
-        catalog.promote(manifest, path, lineage_path, artifact.path)
-    incomplete = _dataset_manifest(artifact.path, artifact.checksum, lineage_path, complete=False)
-    incomplete_path = tmp_path / "incomplete.json"
-    incomplete.write_immutable(incomplete_path)
-    with pytest.raises(PromotionError, match="complete lineage"):
-        catalog.promote(incomplete, incomplete_path, lineage_path, artifact.path)
+    assert not hasattr(catalog, "promote")
+    assert not hasattr(catalog, "register")
 
 
 def test_parquet_rejects_incompatible_schema(tmp_path: Path) -> None:
@@ -375,3 +327,30 @@ def test_dataset_manifest_requires_complete_evidence() -> None:
                 "dataset_type": "macro_observations",
             }
         )
+
+
+def test_lifecycle_event_journal_is_restart_safe_and_immutable(tmp_path: Path) -> None:
+    event = LifecycleEvent(
+        schema_version="3.0.0",
+        event_id="demotion:run:dataset",
+        dataset_id="dataset",
+        relationship_type=RelationshipType.DEMOTED_FROM_RESEARCH_READY,
+        prior_state="PUBLISHED",
+        new_state="DEMOTED",
+        catalog_identity="catalog.duckdb",
+        run_id="run",
+        event_timestamp=NOW,
+        code_commit="commit",
+        configuration_hash=HASH,
+        reason="synthetic failure boundary",
+        supporting_evidence_ids=("dataset",),
+    )
+    store = LifecycleEventStore(tmp_path / "events")
+    path = store.persist(event)
+    assert LifecycleEventStore(store.root).load() == (event,)
+    store.persist(event)
+    path.write_text("{}", encoding="utf-8")
+    with pytest.raises(ManifestError, match="overwrite"):
+        store.persist(event)
+    with pytest.raises(ManifestError, match="Invalid lifecycle journal"):
+        store.load()

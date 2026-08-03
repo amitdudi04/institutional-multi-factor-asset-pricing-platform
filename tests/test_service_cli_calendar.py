@@ -22,10 +22,15 @@ from institutional_factor_platform.data.domain import (
 from institutional_factor_platform.data.manifests import PromotionManifest
 from institutional_factor_platform.data.services import DataIngestionService
 from institutional_factor_platform.data.sources.base import SourceAdapter
-from institutional_factor_platform.data.storage import DuckDBCatalog, sha256_file
+from institutional_factor_platform.data.storage import (
+    DuckDBCatalog,
+    authenticate_dataset_evidence,
+    sha256_file,
+)
 from institutional_factor_platform.data.validation import ValidationReport
 from institutional_factor_platform.exceptions import (
     DataQualityError,
+    EvidenceIntegrityError,
     ManifestError,
     PartialRetrievalError,
     RetrievalError,
@@ -166,7 +171,8 @@ def test_end_to_end_offline_ingestion(tmp_path: Path) -> None:
         "text/plain",
     )
     assert manifest.validation_status is DatasetStatus.PASS
-    assert manifest.promotion_state == "ELIGIBLE"
+    assert manifest.catalog_registration_state == "REGISTERED"
+    assert manifest.promotion_state == "PUBLISHED"
     assert service.catalog.list_datasets(research_ready_only=True)[0][0] == manifest.dataset_id
     assert len(service.catalog.list_datasets()) == 1
     assert list((tmp_path / "data/raw").rglob("*.txt"))
@@ -180,6 +186,204 @@ def test_end_to_end_offline_ingestion(tmp_path: Path) -> None:
         tmp_path / "rebuilt.duckdb", tmp_path / "data/manifests", tmp_path
     )
     assert rebuilt.list_datasets(research_ready_only=True)[0][0] == manifest.dataset_id
+
+
+def test_malformed_manifest_and_in_memory_pass_cannot_promote(tmp_path: Path) -> None:
+    path = tmp_path / "manifest.json"
+    path.write_text("{}", encoding="utf-8")
+    catalog = DuckDBCatalog(tmp_path / "catalog.duckdb")
+    with pytest.raises(EvidenceIntegrityError, match="Invalid persisted dataset manifest"):
+        catalog.promote_persisted("forged", path, tmp_path)
+    assert not hasattr(catalog, "promote")
+    assert catalog.list_datasets(research_ready_only=True) == []
+
+
+@pytest.mark.parametrize(
+    ("evidence_name", "error"),
+    [
+        ("validation_report_path", "validation report"),
+        ("lineage_path", "lineage"),
+        ("configuration_snapshot_path", "configuration snapshot"),
+        ("source_manifest_path", "source manifest"),
+        ("parquet_path", "Parquet"),
+    ],
+)
+def test_persisted_evidence_tampering_fails_after_restart(
+    tmp_path: Path, evidence_name: str, error: str
+) -> None:
+    service = DataIngestionService(_temp_config(tmp_path), root=tmp_path)
+    manifest = service.ingest(
+        SyntheticMacroAdapter(),
+        RetrievalRequest(DataSource.OWNER_SUPPLIED, "synthetic_macro"),
+        MACRO_OBSERVATIONS,
+        "txt",
+        "text/plain",
+    )
+    manifest_path = next((tmp_path / "data/manifests").rglob("dataset.json"))
+    evidence_path = tmp_path / Path(str(getattr(manifest, evidence_name)))
+    evidence_path.unlink()
+    restarted = DuckDBCatalog(service.catalog.path)
+    with pytest.raises(EvidenceIntegrityError, match=error):
+        authenticate_dataset_evidence(manifest.dataset_id, manifest_path, tmp_path)
+    with pytest.raises(EvidenceIntegrityError, match=error):
+        restarted.verify_integrity(tmp_path)
+
+
+def test_substituted_manifest_identity_and_persisted_fail_are_blocked(tmp_path: Path) -> None:
+    service = DataIngestionService(_temp_config(tmp_path), root=tmp_path)
+    manifest = service.ingest(
+        SyntheticMacroAdapter(),
+        RetrievalRequest(DataSource.OWNER_SUPPLIED, "synthetic_macro"),
+        MACRO_OBSERVATIONS,
+        "txt",
+        "text/plain",
+    )
+    original = next((tmp_path / "data/manifests").rglob("dataset.json"))
+    substituted = tmp_path / "substituted.json"
+    substituted.write_text(original.read_text(encoding="utf-8"), encoding="utf-8")
+    with pytest.raises(EvidenceIntegrityError, match="dataset ID"):
+        service.catalog.promote_persisted("different", substituted, tmp_path)
+    value = json.loads(original.read_text(encoding="utf-8"))
+    value["validation_status"] = "FAIL"
+    failed = tmp_path / "failed.json"
+    failed.write_text(json.dumps(value), encoding="utf-8")
+    with pytest.raises(EvidenceIntegrityError, match="Invalid persisted dataset manifest"):
+        service.catalog.promote_persisted(manifest.dataset_id, failed, tmp_path)
+
+
+def test_authenticated_evidence_cross_checks_semantics(tmp_path: Path) -> None:
+    service = DataIngestionService(_temp_config(tmp_path), root=tmp_path)
+    manifest = service.ingest(
+        SyntheticMacroAdapter(),
+        RetrievalRequest(DataSource.OWNER_SUPPLIED, "synthetic_macro"),
+        MACRO_OBSERVATIONS,
+        "txt",
+        "text/plain",
+    )
+    original_path = next((tmp_path / "data/manifests").rglob("dataset.json"))
+
+    def variant(
+        name: str,
+        *,
+        manifest_update: dict[str, object] | None = None,
+        evidence_field: str | None = None,
+        evidence_update: dict[str, object] | None = None,
+        raw_evidence: str | None = None,
+    ) -> Path:
+        value = json.loads(original_path.read_text(encoding="utf-8"))
+        if manifest_update:
+            value.update(manifest_update)
+        if evidence_field:
+            evidence = tmp_path / Path(value[evidence_field])
+            if raw_evidence is None:
+                payload = json.loads(evidence.read_text(encoding="utf-8"))
+                payload.update(evidence_update or {})
+                content = json.dumps(payload, sort_keys=True, indent=2) + "\n"
+            else:
+                content = raw_evidence
+            copy = tmp_path / f"{name}-evidence.json"
+            copy.write_text(content, encoding="utf-8")
+            value[evidence_field] = str(copy)
+            value[evidence_field.replace("_path", "_checksum")] = sha256_file(copy)
+        path = tmp_path / f"{name}.json"
+        path.write_text(json.dumps(value), encoding="utf-8")
+        return path
+
+    cases = [
+        (variant("bad-git", manifest_update={"git_commit": "unavailable"}), "Git commit"),
+        (
+            variant("bad-report-json", evidence_field="validation_report_path", raw_evidence="{"),
+            "Invalid validation report",
+        ),
+        (
+            variant(
+                "report-id",
+                evidence_field="validation_report_path",
+                evidence_update={"dataset_id": "different"},
+            ),
+            "identity",
+        ),
+        (
+            variant(
+                "report-status",
+                evidence_field="validation_report_path",
+                evidence_update={"final_status": "PASS_WITH_WARNINGS"},
+            ),
+            "Validation status",
+        ),
+        (
+            variant(
+                "report-critical",
+                evidence_field="validation_report_path",
+                evidence_update={"results": [{"severity": "CRITICAL"}]},
+            ),
+            "blocking findings",
+        ),
+        (
+            variant(
+                "lineage-id",
+                evidence_field="lineage_path",
+                evidence_update={"dataset_id": "different"},
+            ),
+            "Lineage identity",
+        ),
+        (
+            variant(
+                "lineage-artifacts",
+                evidence_field="lineage_path",
+                evidence_update={"artifacts": []},
+            ),
+            "incomplete",
+        ),
+        (
+            variant(
+                "parquet-size", manifest_update={"output_byte_size": manifest.output_byte_size + 1}
+            ),
+            "byte size",
+        ),
+        (
+            variant("schema", manifest_update={"schema_fingerprint": "0" * 64}),
+            "schema fingerprint",
+        ),
+        (
+            variant("source-json", evidence_field="source_manifest_path", raw_evidence="{"),
+            "Invalid source manifest",
+        ),
+    ]
+    for path, message in cases:
+        with pytest.raises(EvidenceIntegrityError, match=message):
+            authenticate_dataset_evidence(manifest.dataset_id, path, tmp_path)
+
+    registered_path = original_path.with_name("dataset-registered.json")
+    with pytest.raises(EvidenceIntegrityError, match="PUBLISHED"):
+        DuckDBCatalog(tmp_path / "unregistered.duckdb").promote_persisted(
+            manifest.dataset_id, registered_path, tmp_path
+        )
+    with pytest.raises(EvidenceIntegrityError, match="Catalog registration"):
+        DuckDBCatalog(tmp_path / "missing-registration.duckdb").promote_persisted(
+            manifest.dataset_id, original_path, tmp_path
+        )
+    registered_value = json.loads(registered_path.read_text(encoding="utf-8"))
+    registered_value["catalog_registration_state"] = "NOT_REGISTERED"
+    not_registered = tmp_path / "not-registered.json"
+    not_registered.write_text(json.dumps(registered_value), encoding="utf-8")
+    with pytest.raises(EvidenceIntegrityError, match="REGISTERED"):
+        DuckDBCatalog(tmp_path / "registration-state.duckdb").register_persisted(
+            manifest.dataset_id, not_registered, tmp_path
+        )
+    registered_value["catalog_registration_state"] = "REGISTERED"
+    registered_value["promotion_state"] = "NOT_ELIGIBLE"
+    not_eligible = tmp_path / "not-eligible.json"
+    not_eligible.write_text(json.dumps(registered_value), encoding="utf-8")
+    with pytest.raises(EvidenceIntegrityError, match="ELIGIBLE"):
+        DuckDBCatalog(tmp_path / "eligibility.duckdb").register_persisted(
+            manifest.dataset_id, not_eligible, tmp_path
+        )
+    service.catalog.demote("not-present")
+    existing_target = tmp_path / "existing.duckdb"
+    existing_target.touch()
+    with pytest.raises(Exception, match="already exists"):
+        DuckDBCatalog.rebuild_from_manifests(existing_target, tmp_path / "data/manifests", tmp_path)
 
 
 def test_invalid_sec_temporal_data_is_quarantined_and_not_visible(tmp_path: Path) -> None:
@@ -221,6 +425,7 @@ def test_failure_after_catalog_promotion_is_compensated(
         )
     assert service.catalog.list_datasets(research_ready_only=True) == []
     assert list((tmp_path / "data/raw").rglob("*.txt"))
+    assert list((tmp_path / "data/manifests").rglob("demotion_*.json"))
 
 
 def test_existing_raw_artifact_reprocesses_idempotently_without_retrieval(tmp_path: Path) -> None:
@@ -388,3 +593,7 @@ def test_cli_validate_config_and_errors(
     manifest_path = next((tmp_path / "data/manifests").rglob("dataset.json"))
     assert main(["inspect-lineage", str(lineage_path)]) == 0
     assert main(["inspect-dataset-manifest", str(manifest_path)]) == 0
+    dataset_id = json.loads(manifest_path.read_text(encoding="utf-8"))["dataset_id"]
+    assert main(["verify-publication", dataset_id, str(manifest_path)]) == 0
+    assert "publication evidence verified" in capsys.readouterr().out
+    assert main(["verify-publication", "different", str(manifest_path)]) == 2

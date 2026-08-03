@@ -15,11 +15,16 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from institutional_factor_platform.data.domain import DataArtifact, DatasetStatus, DataSource
-from institutional_factor_platform.data.lineage import LineageStore
-from institutional_factor_platform.data.manifests import DatasetManifest, PromotionManifest
+from institutional_factor_platform.data.lineage import LineageStore, RelationshipType
+from institutional_factor_platform.data.manifests import (
+    DatasetManifest,
+    PromotionManifest,
+    SourceManifest,
+)
 from institutional_factor_platform.exceptions import (
     CatalogError,
     ChecksumMismatchError,
+    EvidenceIntegrityError,
     PromotionError,
     PublicationConflictError,
     RawStorageError,
@@ -196,9 +201,9 @@ class DuckDBCatalog:
                    (schema_version VARCHAR PRIMARY KEY)"""
             )
             versions = connection.execute("SELECT schema_version FROM catalog_metadata").fetchall()
-            if versions and versions != [("2.0.0",)]:
+            if versions and versions != [("3.0.0",)]:
                 raise CatalogError("Unsupported DuckDB catalog schema; rebuild the local catalog.")
-            connection.execute("INSERT OR IGNORE INTO catalog_metadata VALUES ('2.0.0')")
+            connection.execute("INSERT OR IGNORE INTO catalog_metadata VALUES ('3.0.0')")
             connection.execute(
                 """CREATE TABLE IF NOT EXISTS dataset_registry (
                 dataset_id VARCHAR PRIMARY KEY, dataset_type VARCHAR NOT NULL,
@@ -209,15 +214,24 @@ class DuckDBCatalog:
                 registered_at TIMESTAMPTZ NOT NULL)"""
             )
 
-    def register(self, manifest: DatasetManifest, manifest_path: Path) -> None:
-        """Register lifecycle metadata without creating research-ready visibility."""
+    def register_persisted(
+        self, dataset_id: str, manifest_path: Path, project_root: Path
+    ) -> DatasetManifest:
+        """Register only an authenticated persisted REGISTERED manifest revision."""
+        manifest = authenticate_dataset_evidence(dataset_id, manifest_path, project_root)
+        if manifest.catalog_registration_state != "REGISTERED":
+            raise EvidenceIntegrityError("Registration requires a REGISTERED manifest revision.")
+        if manifest.promotion_state != "ELIGIBLE":
+            raise EvidenceIntegrityError("Registration requires an ELIGIBLE manifest revision.")
         self.initialize()
+        parquet_path = _resolve_evidence_path(manifest.parquet_path, project_root)
+        lineage_path = _resolve_evidence_path(manifest.lineage_path, project_root)
         values = (
             manifest.dataset_type,
-            manifest.parquet_path,
+            str(parquet_path),
             manifest.output_checksum,
             str(manifest_path),
-            manifest.lineage_path,
+            str(lineage_path),
             manifest.validation_status.value,
         )
         try:
@@ -241,38 +255,43 @@ class DuckDBCatalog:
             raise CatalogError(
                 f"DuckDB registration failed for {manifest.dataset_id}: {exc}"
             ) from exc
+        return manifest
 
-    def promote(
-        self,
-        manifest: DatasetManifest,
-        manifest_path: Path,
-        lineage_path: Path,
-        parquet_path: Path,
-    ) -> None:
-        """Promote only complete, checksum-verified, eligible evidence transactionally."""
-        if manifest.validation_status.value not in self.ELIGIBLE:
-            raise PromotionError(
-                f"Status is not research-ready: {manifest.validation_status.value}"
-            )
-        if not manifest.lineage_complete or manifest.promotion_state != "ELIGIBLE":
-            raise PromotionError("Promotion requires complete lineage and ELIGIBLE manifest state.")
-        if not manifest_path.is_file() or not lineage_path.is_file() or not parquet_path.is_file():
-            raise PromotionError("Promotion evidence file is missing.")
-        if sha256_file(parquet_path) != manifest.output_checksum:
-            raise PromotionError("Parquet checksum does not match dataset manifest.")
-        LineageStore(lineage_path).verify_complete(
-            (manifest.source_manifest_id, *manifest.parent_artifacts, manifest.dataset_id)
-        )
-        runtime_manifest = manifest.model_copy(
-            update={"parquet_path": str(parquet_path), "lineage_path": str(lineage_path)}
-        )
-        self.register(runtime_manifest, manifest_path)
+    def promote_persisted(
+        self, dataset_id: str, manifest_path: Path, project_root: Path
+    ) -> DatasetManifest:
+        """Promote by reloading a fully authenticated persisted PUBLISHED revision."""
+        manifest = authenticate_dataset_evidence(dataset_id, manifest_path, project_root)
+        if manifest.catalog_registration_state != "REGISTERED":
+            raise EvidenceIntegrityError("Promotion requires registered persisted state.")
+        if manifest.promotion_state != "PUBLISHED":
+            raise EvidenceIntegrityError("Promotion requires a PUBLISHED manifest revision.")
+        self.initialize()
         try:
             with duckdb.connect(str(self.path)) as connection:
+                existing = connection.execute(
+                    "SELECT dataset_type, output_checksum, promoted FROM dataset_registry "
+                    "WHERE dataset_id = ?",
+                    [dataset_id],
+                ).fetchone()
+                if (
+                    existing is None
+                    or str(existing[0]) != manifest.dataset_type
+                    or str(existing[1]) != manifest.output_checksum
+                ):
+                    raise EvidenceIntegrityError(
+                        "Catalog registration does not match persisted evidence."
+                    )
                 connection.execute("BEGIN TRANSACTION")
                 connection.execute(
-                    "UPDATE dataset_registry SET promoted = TRUE WHERE dataset_id = ?",
-                    [manifest.dataset_id],
+                    "UPDATE dataset_registry SET promoted = TRUE, "
+                    "manifest_path = ?, lineage_path = ? "
+                    "WHERE dataset_id = ?",
+                    [
+                        str(manifest_path),
+                        str(_resolve_evidence_path(manifest.lineage_path, project_root)),
+                        dataset_id,
+                    ],
                 )
                 self._rebuild_view(connection, manifest.dataset_type)
                 connection.execute("COMMIT")
@@ -280,6 +299,7 @@ class DuckDBCatalog:
             raise PromotionError(
                 f"DuckDB promotion failed for {manifest.dataset_id}: {exc}"
             ) from exc
+        return manifest
 
     def demote(self, dataset_id: str) -> None:
         self.initialize()
@@ -320,22 +340,36 @@ class DuckDBCatalog:
             ).fetchall()
             return [(str(row[0]), str(row[1]), str(row[2])) for row in rows]
 
-    def verify_integrity(self) -> None:
+    def verify_integrity(self, project_root: Path | None = None) -> None:
         self.initialize()
         with duckdb.connect(str(self.path), read_only=True) as connection:
             rows = connection.execute(
                 "SELECT parquet_path, output_checksum, manifest_path, lineage_path "
                 "FROM dataset_registry WHERE promoted = TRUE"
             ).fetchall()
+        root = (project_root or Path.cwd()).resolve()
         for parquet_value, checksum, manifest_value, lineage_value in rows:
-            parquet_path = Path(str(parquet_value))
-            if (
-                not parquet_path.is_file()
-                or sha256_file(parquet_path) != checksum
-                or not Path(str(manifest_value)).is_file()
-                or not Path(str(lineage_value)).is_file()
-            ):
-                raise PromotionError("Catalog contains broken promoted evidence.")
+            manifest_path = Path(str(manifest_value))
+            if not manifest_path.is_file():
+                raise EvidenceIntegrityError("Catalog references a missing dataset manifest.")
+            persisted = DatasetManifest.model_validate_json(
+                manifest_path.read_text(encoding="utf-8")
+            )
+            authenticate_dataset_evidence(persisted.dataset_id, manifest_path, root)
+            if str(_resolve_evidence_path(persisted.parquet_path, root)) != str(parquet_value):
+                raise EvidenceIntegrityError(
+                    "Catalog Parquet path differs from persisted manifest."
+                )
+            if persisted.output_checksum != checksum:
+                raise EvidenceIntegrityError("Catalog checksum differs from persisted manifest.")
+            if str(_resolve_evidence_path(persisted.lineage_path, root)) != str(lineage_value):
+                raise EvidenceIntegrityError(
+                    "Catalog lineage path differs from persisted manifest."
+                )
+            if persisted.promotion_state != "PUBLISHED":
+                raise EvidenceIntegrityError(
+                    "Promoted catalog row references stale manifest state."
+                )
 
     @classmethod
     def rebuild_from_manifests(
@@ -355,11 +389,104 @@ class DuckDBCatalog:
             )
             if manifest.content_hash() != promotion.dataset_manifest_hash:
                 raise PromotionError("Promotion references a changed dataset manifest.")
-            lineage_path = _resolve_evidence_path(manifest.lineage_path, project_root)
-            parquet_path = _resolve_evidence_path(manifest.parquet_path, project_root)
-            catalog.promote(manifest, manifest_path, lineage_path, parquet_path)
-        catalog.verify_integrity()
+            registered_path = manifest_path.with_name("dataset-registered.json")
+            catalog.register_persisted(manifest.dataset_id, registered_path, project_root)
+            catalog.promote_persisted(manifest.dataset_id, manifest_path, project_root)
+        catalog.verify_integrity(project_root)
         return catalog
+
+
+def authenticate_dataset_evidence(
+    dataset_id: str, manifest_path: Path, project_root: Path
+) -> DatasetManifest:
+    """Load and cryptographically cross-check every persisted promotion authority."""
+    try:
+        manifest = DatasetManifest.model_validate_json(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        raise EvidenceIntegrityError(f"Invalid persisted dataset manifest: {exc}") from exc
+    if manifest.dataset_id != dataset_id:
+        raise EvidenceIntegrityError("Persisted manifest dataset ID does not match request.")
+    if not manifest.git_commit.strip() or manifest.git_commit == "unavailable":
+        raise EvidenceIntegrityError("Persisted manifest lacks a verifiable Git commit.")
+    evidence = (
+        (manifest.validation_report_path, manifest.validation_report_checksum, "validation report"),
+        (manifest.lineage_path, manifest.lineage_checksum, "lineage"),
+        (manifest.parquet_path, manifest.output_checksum, "Parquet"),
+        (
+            manifest.configuration_snapshot_path,
+            manifest.configuration_snapshot_checksum,
+            "configuration snapshot",
+        ),
+        (manifest.source_manifest_path, manifest.source_manifest_checksum, "source manifest"),
+    )
+    resolved: dict[str, Path] = {}
+    for value, expected, label in evidence:
+        path = _resolve_evidence_path(value, project_root)
+        if not path.is_file() or sha256_file(path) != expected:
+            raise EvidenceIntegrityError(
+                f"Persisted {label} is missing or has a checksum mismatch."
+            )
+        resolved[label] = path
+    try:
+        report = json.loads(resolved["validation report"].read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise EvidenceIntegrityError(f"Invalid validation report: {exc}") from exc
+    if report.get("dataset_id") != dataset_id or report.get("run_id") != manifest.run_id:
+        raise EvidenceIntegrityError("Validation report identity does not match manifest.")
+    if report.get("final_status") != manifest.validation_status.value:
+        raise EvidenceIntegrityError("Validation status differs from persisted report.")
+    if any(item.get("severity") in {"ERROR", "CRITICAL"} for item in report.get("results", [])):
+        raise EvidenceIntegrityError("Validation report contains blocking findings.")
+    if manifest.validation_status.value not in DuckDBCatalog.ELIGIBLE:
+        raise EvidenceIntegrityError("Persisted validation status is not promotion eligible.")
+    lineage = LineageStore(resolved["lineage"]).load()
+    if (
+        lineage.schema_version != "3.0.0"
+        or lineage.dataset_id != dataset_id
+        or lineage.run_id != manifest.run_id
+    ):
+        raise EvidenceIntegrityError("Lineage identity does not match manifest.")
+    required = {
+        manifest.source_manifest_id,
+        *manifest.parent_artifacts,
+        manifest.output_artifact_id,
+        dataset_id,
+    }
+    if not required.issubset(set(lineage.artifacts)):
+        raise EvidenceIntegrityError("Lineage is incomplete for persisted publication evidence.")
+    if manifest.promotion_state == "PUBLISHED":
+        relationships = {edge.relationship_type for edge in lineage.edges}
+        needed = {
+            RelationshipType.REGISTERED_IN_CATALOG,
+            RelationshipType.PROMOTED_TO_RESEARCH_READY,
+        }
+        if not needed.issubset(relationships):
+            raise EvidenceIntegrityError("Published lineage lacks registration or promotion event.")
+    parquet = resolved["Parquet"]
+    if parquet.stat().st_size != manifest.output_byte_size:
+        raise EvidenceIntegrityError("Parquet byte size differs from manifest.")
+    try:
+        fingerprint = hashlib.sha256(pq.read_schema(parquet).serialize().to_pybytes()).hexdigest()
+    except (OSError, pa.ArrowException) as exc:
+        raise EvidenceIntegrityError(f"Parquet schema cannot be verified: {exc}") from exc
+    if fingerprint != manifest.schema_fingerprint:
+        raise EvidenceIntegrityError("Parquet schema fingerprint differs from manifest.")
+    try:
+        source = SourceManifest.model_validate_json(
+            resolved["source manifest"].read_text(encoding="utf-8")
+        )
+    except (OSError, ValueError) as exc:
+        raise EvidenceIntegrityError(f"Invalid source manifest: {exc}") from exc
+    if (
+        source.source_manifest_id != manifest.source_manifest_id
+        or not source.raw_artifact_path
+        or not source.checksum
+    ):
+        raise EvidenceIntegrityError("Source manifest identity or raw evidence is incomplete.")
+    raw_path = _resolve_evidence_path(source.raw_artifact_path, project_root)
+    if not raw_path.is_file() or sha256_file(raw_path) != source.checksum:
+        raise EvidenceIntegrityError("Parent raw artifact is missing or has changed.")
+    return manifest
 
 
 def _atomic_bytes(path: Path, content: bytes, prefix: str) -> None:

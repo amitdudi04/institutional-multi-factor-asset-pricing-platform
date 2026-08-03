@@ -44,8 +44,11 @@ class RelationshipType(StrEnum):
     VALIDATED = "VALIDATED"
     PUBLISHED_PARQUET = "PUBLISHED_PARQUET"
     MANIFESTED = "MANIFESTED"
-    REGISTERED = "REGISTERED"
-    PROMOTED = "PROMOTED"
+    REGISTERED_IN_CATALOG = "REGISTERED_IN_CATALOG"
+    PROMOTED_TO_RESEARCH_READY = "PROMOTED_TO_RESEARCH_READY"
+    DEMOTED_FROM_RESEARCH_READY = "DEMOTED_FROM_RESEARCH_READY"
+    INVALIDATED = "INVALIDATED"
+    SUPERSEDED = "SUPERSEDED"
 
 
 class LineageEdge(BaseModel):
@@ -65,8 +68,73 @@ class LineageEdge(BaseModel):
 class LineageDocument(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     schema_version: str = Field(pattern=r"^\d+\.\d+\.\d+$")
+    lineage_id: str = "lineage:legacy"
+    dataset_id: str = "legacy"
+    run_id: str = "legacy"
     artifacts: tuple[str, ...]
     edges: tuple[LineageEdge, ...]
+
+    @classmethod
+    def v3(
+        cls,
+        *,
+        lineage_id: str,
+        dataset_id: str,
+        run_id: str,
+        artifacts: tuple[str, ...],
+        edges: tuple[LineageEdge, ...],
+    ) -> "LineageDocument":
+        return cls(
+            schema_version="3.0.0",
+            lineage_id=lineage_id,
+            dataset_id=dataset_id,
+            run_id=run_id,
+            artifacts=artifacts,
+            edges=edges,
+        )
+
+
+class LifecycleEvent(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    schema_version: str = Field(pattern=r"^\d+\.\d+\.\d+$")
+    event_id: str
+    dataset_id: str
+    relationship_type: RelationshipType
+    prior_state: str
+    new_state: str
+    catalog_identity: str
+    run_id: str
+    event_timestamp: datetime
+    code_commit: str
+    configuration_hash: str = Field(pattern=r"^[a-f0-9]{64}$")
+    reason: str
+    supporting_evidence_ids: tuple[str, ...]
+
+
+class LifecycleEventStore:
+    """Append-only immutable publication lifecycle journal."""
+
+    def __init__(self, root: Path) -> None:
+        self.root = root
+
+    def persist(self, event: LifecycleEvent) -> Path:
+        path = self.root / f"{event.event_id.replace(':', '_')}.json"
+        content = json.dumps(event.model_dump(mode="json"), sort_keys=True, indent=2) + "\n"
+        if path.exists() and path.read_text(encoding="utf-8") != content:
+            raise ManifestError(f"Refusing to overwrite lifecycle event: {path}")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        if not path.exists():
+            path.write_text(content, encoding="utf-8")
+        return path
+
+    def load(self) -> tuple[LifecycleEvent, ...]:
+        try:
+            return tuple(
+                LifecycleEvent.model_validate_json(path.read_text(encoding="utf-8"))
+                for path in sorted(self.root.glob("*.json"))
+            )
+        except (OSError, ValueError) as exc:
+            raise ManifestError(f"Invalid lifecycle journal {self.root}: {exc}") from exc
 
 
 class LineageStore:

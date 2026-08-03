@@ -27,7 +27,11 @@ from institutional_factor_platform.data.sources.fred import FredAdapter
 from institutional_factor_platform.data.sources.french import KennethFrenchAdapter
 from institutional_factor_platform.data.sources.owner_supplied import OwnerSuppliedAdapter
 from institutional_factor_platform.data.sources.sec_edgar import SecEdgarAdapter
-from institutional_factor_platform.data.storage import RawStorage, sha256_file
+from institutional_factor_platform.data.storage import (
+    RawStorage,
+    authenticate_dataset_evidence,
+    sha256_file,
+)
 from institutional_factor_platform.exceptions import ChecksumMismatchError, PlatformError
 from institutional_factor_platform.logging import configure_logging
 
@@ -45,10 +49,15 @@ def build_parser() -> argparse.ArgumentParser:
     listing = commands.add_parser("list-datasets", help="List registered DuckDB datasets")
     listing.add_argument("--research-ready", action="store_true")
     commands.add_parser("validate-catalog", help="Verify all promoted catalog evidence")
+    publication = commands.add_parser(
+        "verify-publication", help="Authenticate one persisted publication evidence bundle"
+    )
+    publication.add_argument("dataset_id")
+    publication.add_argument("manifest", type=Path)
     lineage = commands.add_parser("inspect-lineage", help="Validate and print persisted lineage")
     lineage.add_argument("path", type=Path)
     dataset_manifest = commands.add_parser(
-        "inspect-dataset-manifest", help="Validate and print a v2 dataset manifest"
+        "inspect-dataset-manifest", help="Validate and print a v3 dataset manifest"
     )
     dataset_manifest.add_argument("path", type=Path)
     verify = commands.add_parser("verify-raw", help="Verify a raw file against a SHA-256 checksum")
@@ -109,8 +118,11 @@ def main(argv: list[str] | None = None) -> int:
             for row in service.catalog.list_datasets(research_ready_only=args.research_ready):
                 print("\t".join(row))
         elif args.command == "validate-catalog":
-            service.catalog.verify_integrity()
+            service.catalog.verify_integrity(service.root)
             print("catalog integrity verified")
+        elif args.command == "verify-publication":
+            authenticate_dataset_evidence(args.dataset_id, args.manifest, service.root)
+            print("publication evidence verified")
         elif args.command == "inspect-lineage":
             document = LineageStore(args.path).load()
             print(json.dumps(document.model_dump(mode="json"), indent=2, sort_keys=True))

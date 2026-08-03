@@ -75,3 +75,7 @@ class SecurityMappingError(DataPlatformError):
 
 class PromotionError(CatalogError):
     """A dataset failed structural research-ready promotion controls."""
+
+
+class EvidenceIntegrityError(PromotionError):
+    """Persisted publication evidence is missing, malformed, or inconsistent."""

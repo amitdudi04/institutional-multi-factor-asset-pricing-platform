@@ -14,7 +14,7 @@ from institutional_factor_platform.exceptions import ManifestError
 
 class ManifestModel(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
-    schema_version: Literal["2.0.0"]
+    schema_version: str
 
     def canonical_json(self) -> str:
         return json.dumps(self.model_dump(mode="json"), sort_keys=True, separators=(",", ":"))
@@ -33,6 +33,7 @@ class ManifestModel(BaseModel):
 
 
 class RunManifest(ManifestModel):
+    schema_version: Literal["2.0.0"]
     run_id: str
     attempt: int = Field(default=1, ge=1)
     parent_run_id: str | None = None
@@ -67,6 +68,7 @@ class RunManifest(ManifestModel):
 
 
 class SourceManifest(ManifestModel):
+    schema_version: Literal["2.0.0"]
     source_manifest_id: str
     source: str
     request: dict[str, Any]
@@ -97,12 +99,16 @@ class SourceManifest(ManifestModel):
 
 
 class DatasetManifest(ManifestModel):
+    schema_version: Literal["3.0.0"]
+    run_id: str
     dataset_id: str
     dataset_type: str
     schema_name: str
     schema_fingerprint: str = Field(pattern=r"^[a-f0-9]{64}$")
     parent_artifacts: tuple[str, ...]
     source_manifest_id: str
+    source_manifest_path: str
+    source_manifest_checksum: str = Field(pattern=r"^[a-f0-9]{64}$")
     transformation_name: str
     transformation_version: str = Field(pattern=r"^\d+\.\d+\.\d+$")
     row_count: int = Field(gt=0)
@@ -115,17 +121,26 @@ class DatasetManifest(ManifestModel):
     unit_metadata: dict[str, str] = Field(default_factory=dict)
     validation_report_id: str
     validation_report_path: str
+    validation_report_checksum: str = Field(pattern=r"^[a-f0-9]{64}$")
     validation_status: DatasetStatus
     lineage_path: str
+    lineage_id: str
+    lineage_checksum: str = Field(pattern=r"^[a-f0-9]{64}$")
     lineage_complete: bool
     quarantine_status: bool
     parquet_path: str
+    output_artifact_id: str
     output_checksum: str = Field(pattern=r"^[a-f0-9]{64}$")
     output_byte_size: int = Field(gt=0)
     catalog_registration_state: Literal["NOT_REGISTERED", "REGISTERED"]
     promotion_state: Literal["NOT_ELIGIBLE", "ELIGIBLE", "PUBLISHED"]
+    catalog_registration_id: str | None = None
+    promotion_event_id: str | None = None
+    promotion_timestamp: datetime | None = None
     creation_time: datetime
     configuration_hash: str = Field(pattern=r"^[a-f0-9]{64}$")
+    configuration_snapshot_path: str
+    configuration_snapshot_checksum: str = Field(pattern=r"^[a-f0-9]{64}$")
     code_version: str
     git_commit: str
     temporal_policy_version: str
@@ -141,12 +156,19 @@ class DatasetManifest(ManifestModel):
                 raise ValueError("promotion requires eligible validation and complete lineage")
         if self.promotion_state == "PUBLISHED" and self.catalog_registration_state != "REGISTERED":
             raise ValueError("published dataset must be registered")
+        if self.catalog_registration_state == "REGISTERED" and not self.catalog_registration_id:
+            raise ValueError("registered dataset requires catalog registration identity")
+        if self.promotion_state == "PUBLISHED" and (
+            not self.promotion_event_id or self.promotion_timestamp is None
+        ):
+            raise ValueError("published dataset requires promotion event identity and timestamp")
         if self.validation_status is DatasetStatus.QUARANTINED and not self.quarantine_status:
             raise ValueError("quarantined status requires quarantine evidence")
         return self
 
 
 class PromotionManifest(ManifestModel):
+    schema_version: Literal["2.0.0"]
     dataset_id: str
     dataset_manifest_path: str
     dataset_manifest_hash: str = Field(pattern=r"^[a-f0-9]{64}$")

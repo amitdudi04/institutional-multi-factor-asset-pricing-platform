@@ -179,6 +179,14 @@ class Phase1Config(StrictModel):
     retention: RetentionSettings
     logging: LoggingSettings
 
+    @model_validator(mode="after")
+    def runtime_schema_versions_are_supported(self) -> "Phase1Config":
+        if self.manifests.schema_version != "3.0.0":
+            raise ValueError("manifests.schema_version must be 3.0.0; rebuild older evidence")
+        if self.validation.schema_version != "2.0.0":
+            raise ValueError("validation.schema_version must be 2.0.0")
+        return self
+
     def canonical_json(self) -> str:
         return json.dumps(self.model_dump(mode="json"), sort_keys=True, separators=(",", ":"))
 
