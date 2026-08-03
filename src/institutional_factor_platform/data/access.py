@@ -223,6 +223,16 @@ def _continue_lifecycle(
 def _process_alive(process_id: int) -> bool:
     if process_id <= 0:
         return False
+    if os.name == "nt":
+        import ctypes
+
+        process_query_limited_information = 0x1000
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        handle = kernel32.OpenProcess(process_query_limited_information, False, process_id)
+        if handle:
+            kernel32.CloseHandle(handle)
+            return True
+        return ctypes.get_last_error() == 5  # Access denied still proves the process exists.
     try:
         os.kill(process_id, 0)
     except OSError:

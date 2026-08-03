@@ -601,4 +601,7 @@ def test_cli_validate_config_and_errors(
     dataset_id = json.loads(manifest_path.read_text(encoding="utf-8"))["dataset_id"]
     assert main(["verify-publication", dataset_id, str(manifest_path)]) == 0
     assert "publication evidence verified" in capsys.readouterr().out
+    assert main(["reconcile"]) == 0
+    assert main(["rebuild-catalog"]) == 0
+    assert "catalog.duckdb" in capsys.readouterr().out
     assert main(["verify-publication", "different", str(manifest_path)]) == 2
