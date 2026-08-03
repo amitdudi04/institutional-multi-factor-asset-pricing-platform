@@ -8,6 +8,7 @@ from pathlib import Path
 
 from institutional_factor_platform.data.config import load_phase1_config
 from institutional_factor_platform.data.contracts import (
+    CONTRACTS,
     FRENCH_FACTORS,
     MACRO_OBSERVATIONS,
     SEC_FACTS,
@@ -18,13 +19,16 @@ from institutional_factor_platform.data.domain import (
     DateRange,
     RetrievalRequest,
 )
+from institutional_factor_platform.data.lineage import LineageStore
+from institutional_factor_platform.data.manifests import DatasetManifest
 from institutional_factor_platform.data.services import DataIngestionService
 from institutional_factor_platform.data.sources.base import HttpTransport
 from institutional_factor_platform.data.sources.fred import FredAdapter
 from institutional_factor_platform.data.sources.french import KennethFrenchAdapter
+from institutional_factor_platform.data.sources.owner_supplied import OwnerSuppliedAdapter
 from institutional_factor_platform.data.sources.sec_edgar import SecEdgarAdapter
-from institutional_factor_platform.data.storage import RawStorage
-from institutional_factor_platform.exceptions import PlatformError
+from institutional_factor_platform.data.storage import RawStorage, sha256_file
+from institutional_factor_platform.exceptions import ChecksumMismatchError, PlatformError
 from institutional_factor_platform.logging import configure_logging
 
 
@@ -38,10 +42,35 @@ def build_parser() -> argparse.ArgumentParser:
         "inspect-manifest", help="Validate and print a local JSON manifest"
     )
     inspect.add_argument("path", type=Path)
-    commands.add_parser("list-datasets", help="List registered DuckDB datasets")
+    listing = commands.add_parser("list-datasets", help="List registered DuckDB datasets")
+    listing.add_argument("--research-ready", action="store_true")
+    commands.add_parser("validate-catalog", help="Verify all promoted catalog evidence")
+    lineage = commands.add_parser("inspect-lineage", help="Validate and print persisted lineage")
+    lineage.add_argument("path", type=Path)
+    dataset_manifest = commands.add_parser(
+        "inspect-dataset-manifest", help="Validate and print a v2 dataset manifest"
+    )
+    dataset_manifest.add_argument("path", type=Path)
     verify = commands.add_parser("verify-raw", help="Verify a raw file against a SHA-256 checksum")
     verify.add_argument("path", type=Path)
     verify.add_argument("checksum")
+    standardized = commands.add_parser(
+        "verify-standardized", help="Verify a standardized file against SHA-256"
+    )
+    standardized.add_argument("path", type=Path)
+    standardized.add_argument("checksum")
+    reprocess = commands.add_parser(
+        "reprocess-raw", help="Reprocess a verified existing raw artifact without retrieval"
+    )
+    reprocess.add_argument(
+        "source", choices=["fred", "kenneth_french", "sec_edgar", "owner_supplied"]
+    )
+    reprocess.add_argument("dataset")
+    reprocess.add_argument("contract", choices=sorted(CONTRACTS))
+    reprocess.add_argument("path", type=Path)
+    reprocess.add_argument("checksum")
+    reprocess.add_argument("--media-type", required=True)
+    reprocess.add_argument("--parameters-json", default="{}")
     fred = commands.add_parser("ingest-fred", help="Retrieve an approved FRED series")
     fred.add_argument("series", choices=["DGS3MO", "TB3MS"])
     _dates(fred)
@@ -77,8 +106,17 @@ def main(argv: list[str] | None = None) -> int:
                 )
             )
         elif args.command == "list-datasets":
-            for row in service.catalog.list_datasets():
+            for row in service.catalog.list_datasets(research_ready_only=args.research_ready):
                 print("\t".join(row))
+        elif args.command == "validate-catalog":
+            service.catalog.verify_integrity()
+            print("catalog integrity verified")
+        elif args.command == "inspect-lineage":
+            document = LineageStore(args.path).load()
+            print(json.dumps(document.model_dump(mode="json"), indent=2, sort_keys=True))
+        elif args.command == "inspect-dataset-manifest":
+            manifest = DatasetManifest.model_validate_json(args.path.read_text(encoding="utf-8"))
+            print(json.dumps(manifest.model_dump(mode="json"), indent=2, sort_keys=True))
         elif args.command == "verify-raw":
             artifact = DataArtifact(
                 args.path,
@@ -90,6 +128,38 @@ def main(argv: list[str] | None = None) -> int:
             )
             RawStorage.verify(artifact)
             print("checksum verified")
+        elif args.command == "verify-standardized":
+            if not args.path.is_file() or sha256_file(args.path) != args.checksum:
+                raise ChecksumMismatchError(
+                    f"Standardized artifact failed checksum validation: {args.path}"
+                )
+            print("standardized checksum verified")
+        elif args.command == "reprocess-raw":
+            source = DataSource(args.source)
+            parameters = json.loads(args.parameters_json)
+            if not isinstance(parameters, dict):
+                raise ValueError("--parameters-json must decode to an object")
+            request = RetrievalRequest(source, args.dataset, parameters=parameters)
+            artifact = DataArtifact(
+                args.path,
+                args.checksum,
+                args.path.stat().st_size,
+                args.media_type,
+                source,
+                datetime.fromtimestamp(args.path.stat().st_mtime, tz=UTC),
+            )
+            adapters = {
+                DataSource.FRED: FredAdapter(HttpTransport(config.runtime)),
+                DataSource.KENNETH_FRENCH: KennethFrenchAdapter(HttpTransport(config.runtime)),
+                DataSource.SEC_EDGAR: SecEdgarAdapter(
+                    config.sources.sec, HttpTransport(config.runtime)
+                ),
+                DataSource.OWNER_SUPPLIED: OwnerSuppliedAdapter(),
+            }
+            manifest = service.reprocess(
+                adapters[source], artifact, request, CONTRACTS[args.contract]
+            )
+            print(manifest.dataset_id)
         elif args.command == "ingest-fred":
             request = RetrievalRequest(
                 DataSource.FRED, args.series, DateRange(args.start, args.end)

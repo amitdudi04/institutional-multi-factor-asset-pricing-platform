@@ -45,11 +45,13 @@ storage:
   raw_immutable: true
   duckdb_read_only_default: true
 manifests:
-  schema_version: "1.0.0"
+  schema_version: "2.0.0"
 validation:
-  schema_version: "1.0.0"
+  schema_version: "2.0.0"
   extreme_return_threshold: 0.5
   stale_price_sessions: 5
+  market_coverage_warning_ratio: 0.98
+  market_coverage_critical_ratio: 0.80
 calendars:
   equity_calendar: XNYS
   storage_timezone: UTC

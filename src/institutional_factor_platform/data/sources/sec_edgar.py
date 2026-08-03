@@ -2,7 +2,7 @@
 
 import json
 from collections.abc import Callable
-from datetime import UTC, datetime
+from datetime import UTC, datetime, time
 
 from institutional_factor_platform.data.config import SecSettings
 from institutional_factor_platform.data.domain import DataSource, RetrievalRequest
@@ -58,8 +58,17 @@ class SecEdgarAdapter(SourceAdapter[bytes]):
                         filed = observation.get("filed")
                         end = observation.get("end")
                         if filed is None or end is None or observation.get("val") is None:
-                            continue
-                        filing_date = datetime.strptime(filed, "%Y-%m-%d").date()
+                            raise RetrievalError(
+                                f"SEC fact {taxonomy}:{concept}:{unit} lacks filed/end/value."
+                            )
+                        try:
+                            filing_date = datetime.strptime(filed, "%Y-%m-%d").date()
+                            period_end = datetime.strptime(end, "%Y-%m-%d").date()
+                        except (TypeError, ValueError) as exc:
+                            raise RetrievalError(
+                                f"Malformed SEC fact date for {taxonomy}:{concept}:{unit}: {exc}"
+                            ) from exc
+                        availability = datetime.combine(filing_date, time.max, tzinfo=UTC)
                         records.append(
                             {
                                 "security_id": request.parameters.get("security_id"),
@@ -75,17 +84,16 @@ class SecEdgarAdapter(SourceAdapter[bytes]):
                                 "fiscal_year": observation.get("fy"),
                                 "fiscal_period": observation.get("fp"),
                                 "period_start": _date_or_none(observation.get("start")),
-                                "period_end": datetime.strptime(end, "%Y-%m-%d").date(),
+                                "period_end": period_end,
                                 "filing_date": filing_date,
                                 "form": observation.get("form", ""),
                                 "accession_number": observation.get("accn"),
                                 "frame": observation.get("frame"),
                                 "source": self.source.value,
                                 "retrieval_timestamp": retrieved,
-                                "availability_timestamp": datetime.combine(
-                                    filing_date, datetime.min.time(), tzinfo=UTC
-                                ),
-                                "schema_version": "1.0.0",
+                                "availability_timestamp": availability,
+                                "availability_quality": "INFERRED_DATE_LEVEL",
+                                "schema_version": "2.0.0",
                             }
                         )
         if not records:

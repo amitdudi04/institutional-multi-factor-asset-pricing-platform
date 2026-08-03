@@ -37,6 +37,10 @@ class RawStorageError(DataPlatformError):
     """Raw artifact persistence or verification failed."""
 
 
+class PublicationConflictError(RawStorageError):
+    """An immutable standardized-artifact identity already has different bytes."""
+
+
 class ChecksumMismatchError(RawStorageError):
     """Stored bytes no longer match their recorded checksum."""
 
@@ -67,3 +71,7 @@ class UnsupportedDatasetError(DataPlatformError):
 
 class SecurityMappingError(DataPlatformError):
     """A security identity is invalid or ambiguous."""
+
+
+class PromotionError(CatalogError):
+    """A dataset failed structural research-ready promotion controls."""

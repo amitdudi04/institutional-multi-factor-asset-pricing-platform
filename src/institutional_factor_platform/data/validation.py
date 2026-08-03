@@ -4,15 +4,17 @@ import json
 import math
 from collections import Counter
 from collections.abc import Iterable
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
 import pyarrow as pa
 
+from institutional_factor_platform.data.calendar import USEquityCalendar
 from institutional_factor_platform.data.contracts import TableContract
 from institutional_factor_platform.data.domain import (
+    AvailabilityQuality,
     DatasetStatus,
     ValidationResult,
     ValidationSeverity,
@@ -34,6 +36,21 @@ class ValidationReport:
     results: tuple[ValidationResult, ...]
     final_status: DatasetStatus
     quarantine_path: str | None = None
+
+    def __post_init__(self) -> None:
+        ordered = tuple(
+            sorted(
+                self.results,
+                key=lambda item: (
+                    item.severity.value,
+                    item.rule,
+                    item.field or "",
+                    item.row if item.row is not None else -1,
+                    item.message,
+                ),
+            )
+        )
+        object.__setattr__(self, "results", ordered)
 
     def write(self, json_path: Path, markdown_path: Path) -> None:
         payload = asdict(self)
@@ -238,6 +255,8 @@ def validate_sec_facts(records: list[dict[str, Any]]) -> tuple[ValidationResult,
         period_end = row.get("period_end")
         filing_date = row.get("filing_date")
         availability = row.get("availability_timestamp")
+        retrieval = row.get("retrieval_timestamp")
+        period_start = row.get("period_start")
         if (
             not isinstance(period_end, date)
             or not isinstance(filing_date, date)
@@ -252,8 +271,117 @@ def validate_sec_facts(records: list[dict[str, Any]]) -> tuple[ValidationResult,
                 )
             )
             continue
+        if isinstance(period_start, date) and period_start > period_end:
+            results.append(
+                ValidationResult(
+                    "sec_period_order",
+                    ValidationSeverity.CRITICAL,
+                    "SEC period start follows period end.",
+                    row=index,
+                    remediation="Preserve the source record and quarantine it for review.",
+                )
+            )
         results.extend(validate_temporal_order(period_end, filing_date, availability))
+        if not isinstance(retrieval, datetime) or retrieval < availability:
+            results.append(
+                ValidationResult(
+                    "retrieval_after_availability",
+                    ValidationSeverity.CRITICAL,
+                    "Retrieval timestamp precedes availability or is invalid.",
+                    row=index,
+                    remediation="Verify source dates; do not alter the source value.",
+                )
+            )
+        quality = row.get("availability_quality")
+        if quality not in {item.value for item in AvailabilityQuality}:
+            results.append(
+                ValidationResult(
+                    "availability_quality",
+                    ValidationSeverity.CRITICAL,
+                    "SEC availability precision is not explicitly classified.",
+                    row=index,
+                )
+            )
     return tuple(results)
+
+
+def validate_market_coverage(
+    records: list[dict[str, Any]],
+    *,
+    calendar: USEquityCalendar,
+    start: date,
+    end: date,
+    warning_ratio: float,
+    critical_ratio: float,
+    listing_periods: dict[str, tuple[date | None, date | None]] | None = None,
+) -> tuple[ValidationResult, ...]:
+    """Compare each security with configured exchange sessions without filling data."""
+    results: list[ValidationResult] = []
+    by_security: dict[str, set[date]] = {}
+    for index, row in enumerate(records):
+        value = row.get("trading_date")
+        security_id = str(row.get("security_id"))
+        if isinstance(value, date):
+            if value < start or value > end:
+                results.append(
+                    ValidationResult(
+                        "market_out_of_range",
+                        ValidationSeverity.CRITICAL,
+                        f"Returned date {value} is outside requested range.",
+                        row=index,
+                    )
+                )
+            by_security.setdefault(security_id, set()).add(value)
+    for security_id, observed in sorted(by_security.items()):
+        listed_start, listed_end = (listing_periods or {}).get(security_id, (None, None))
+        expected_start = max(start, listed_start) if listed_start else start
+        expected_end = min(end, listed_end) if listed_end else end
+        expected = set(calendar.sessions(expected_start, expected_end))
+        if not expected:
+            continue
+        missing = tuple(sorted(expected - observed))
+        ratio = len(expected & observed) / len(expected)
+        if missing:
+            severity = (
+                ValidationSeverity.CRITICAL
+                if ratio < critical_ratio
+                else ValidationSeverity.WARNING
+            )
+            if ratio >= warning_ratio:
+                severity = ValidationSeverity.INFO
+            results.append(
+                ValidationResult(
+                    "market_calendar_coverage",
+                    severity,
+                    f"Observed {len(expected & observed)}/{len(expected)} XNYS sessions "
+                    f"({ratio:.2%}); missing {len(missing)}.",
+                    affected_count=len(missing),
+                    representative_keys=tuple(item.isoformat() for item in missing[:10]),
+                    remediation=(
+                        "Review listing dates, suspensions, and provider coverage; "
+                        "do not fill prices."
+                    ),
+                )
+            )
+    return tuple(results)
+
+
+def enrich_findings(
+    findings: Iterable[ValidationResult],
+    *,
+    dataset_id: str,
+    source: str,
+    timestamp: datetime,
+) -> tuple[ValidationResult, ...]:
+    return tuple(
+        replace(
+            finding,
+            dataset_id=finding.dataset_id or dataset_id,
+            source=finding.source or source,
+            timestamp=finding.timestamp or timestamp,
+        )
+        for finding in findings
+    )
 
 
 def _required_float(value: Any) -> float:
@@ -269,7 +397,10 @@ def validate_temporal_order(
     if filing_date < period_end:
         results.append(
             ValidationResult(
-                "filing_after_period", ValidationSeverity.CRITICAL, "Filing precedes period end."
+                "filing_after_period",
+                ValidationSeverity.CRITICAL,
+                "Filing precedes period end.",
+                remediation="Quarantine the record set and verify the SEC source chronology.",
             )
         )
     if availability.date() < filing_date:
@@ -278,6 +409,7 @@ def validate_temporal_order(
                 "availability_after_filing",
                 ValidationSeverity.CRITICAL,
                 "Availability precedes filing.",
+                remediation="Preserve the source dates and quarantine the record set.",
             )
         )
     return tuple(results)

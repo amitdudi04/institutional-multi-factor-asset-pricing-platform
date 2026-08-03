@@ -71,6 +71,27 @@ class RetrievalStatus(StrEnum):
     FAILED = "FAILED"
 
 
+class AvailabilityQuality(StrEnum):
+    SOURCE_TIMESTAMP = "SOURCE_TIMESTAMP"
+    SOURCE_DATE = "SOURCE_DATE"
+    INFERRED_DATE_LEVEL = "INFERRED_DATE_LEVEL"
+    UNKNOWN = "UNKNOWN"
+
+
+class MappingStatus(StrEnum):
+    RESOLVED = "RESOLVED"
+    UNRESOLVED = "UNRESOLVED"
+    AMBIGUOUS = "AMBIGUOUS"
+    CONFLICT = "CONFLICT"
+    EXPIRED = "EXPIRED"
+
+
+class MappingEvidence(StrEnum):
+    OWNER_CONFIRMED = "OWNER_CONFIRMED"
+    LISTING_METADATA = "LISTING_METADATA"
+    REGISTRANT_ONLY = "REGISTRANT_ONLY"
+
+
 @dataclass(frozen=True, slots=True)
 class SecurityId:
     value: str
@@ -83,6 +104,14 @@ class SecurityId:
                 "Security ID requires source, ticker, exchange, and source identifier."
             )
         return cls(f"sec_{uuid.uuid5(uuid.NAMESPACE_URL, '|'.join(parts)).hex}")
+
+    @classmethod
+    def canonical(cls, ticker: str, exchange: str, mic: str | None = None) -> "SecurityId":
+        """Create a source-independent listing ID from explicit listing evidence."""
+        parts = [ticker.strip().upper(), exchange.strip().upper(), (mic or "").strip().upper()]
+        if not parts[0] or not parts[1]:
+            raise SecurityMappingError("Canonical security ID requires ticker and exchange.")
+        return cls(f"sec_{uuid.uuid5(uuid.NAMESPACE_URL, 'listing|' + '|'.join(parts)).hex}")
 
 
 @dataclass(frozen=True, slots=True)
@@ -154,6 +183,42 @@ class ValidationResult:
     message: str
     field: str | None = None
     row: int | None = None
+    rule_version: str = "1.0.0"
+    dataset_id: str | None = None
+    affected_count: int = 1
+    representative_keys: tuple[str, ...] = ()
+    remediation: str | None = None
+    source: str | None = None
+    timestamp: datetime | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class SecurityMapping:
+    source: DataSource
+    source_identifier: str
+    ticker: str | None
+    exchange: str | None
+    mic: str | None
+    cik: str | None
+    valid_from: date
+    valid_to: date | None
+    status: MappingStatus
+    evidence: MappingEvidence
+    provenance: str
+    retrieval_timestamp: datetime
+    security_id: SecurityId | None = None
+
+    def __post_init__(self) -> None:
+        if not self.source_identifier.strip() or not self.provenance.strip():
+            raise SecurityMappingError("Mapping requires source identifier and provenance.")
+        if self.valid_to is not None and self.valid_to < self.valid_from:
+            raise SecurityMappingError("Mapping validity end precedes its start.")
+        if self.retrieval_timestamp.tzinfo is None:
+            raise SecurityMappingError("Mapping retrieval timestamp must be timezone-aware.")
+        if self.status is MappingStatus.RESOLVED and self.security_id is None:
+            raise SecurityMappingError("Resolved mapping requires a canonical security ID.")
+        if self.status is not MappingStatus.RESOLVED and self.security_id is not None:
+            raise SecurityMappingError("Unresolved mapping cannot carry a canonical security ID.")
 
 
 @dataclass(frozen=True, slots=True)

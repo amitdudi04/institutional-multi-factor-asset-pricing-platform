@@ -131,6 +131,14 @@ class VersionSettings(StrictModel):
 class ValidationSettings(VersionSettings):
     extreme_return_threshold: float = Field(gt=0)
     stale_price_sessions: int = Field(gt=0)
+    market_coverage_warning_ratio: float = Field(gt=0, le=1)
+    market_coverage_critical_ratio: float = Field(gt=0, le=1)
+
+    @model_validator(mode="after")
+    def coverage_thresholds_are_ordered(self) -> "ValidationSettings":
+        if self.market_coverage_critical_ratio > self.market_coverage_warning_ratio:
+            raise ValueError("critical coverage ratio cannot exceed warning ratio")
+        return self
 
 
 class CalendarSettings(StrictModel):

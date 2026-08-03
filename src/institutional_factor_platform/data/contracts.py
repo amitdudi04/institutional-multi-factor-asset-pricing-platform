@@ -155,7 +155,7 @@ FRENCH_FACTORS = TableContract(
 
 SEC_FACTS = TableContract(
     "sec_financial_facts",
-    "1.0.0",
+    "2.0.0",
     pa.schema(
         [
             ("security_id", pa.string()),
@@ -179,6 +179,7 @@ SEC_FACTS = TableContract(
             ("source", pa.string(), False),
             ("retrieval_timestamp", UTC_TS, False),
             ("availability_timestamp", UTC_TS, False),
+            ("availability_quality", pa.string(), False),
             ("schema_version", pa.string(), False),
         ]
     ),
