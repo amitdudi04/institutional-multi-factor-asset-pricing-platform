@@ -155,9 +155,10 @@ FRENCH_FACTORS = TableContract(
 
 SEC_FACTS = TableContract(
     "sec_financial_facts",
-    "2.0.0",
+    "3.0.0",
     pa.schema(
         [
+            ("issuer_id", pa.string(), False),
             ("security_id", pa.string()),
             ("ticker", pa.string()),
             ("cik", pa.string(), False),

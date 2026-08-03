@@ -45,7 +45,7 @@ storage:
   raw_immutable: true
   duckdb_read_only_default: true
 manifests:
-  schema_version: "3.0.0"
+  schema_version: "4.0.0"
 validation:
   schema_version: "2.0.0"
   extreme_return_threshold: 0.5

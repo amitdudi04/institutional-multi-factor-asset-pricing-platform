@@ -22,6 +22,7 @@ from institutional_factor_platform.data.domain import (
     ValidationResult,
     ValidationSeverity,
 )
+from institutional_factor_platform.data.evidence import atomic_write_json
 from institutional_factor_platform.exceptions import SecurityMappingError
 
 
@@ -108,12 +109,7 @@ class SecurityMappingStore:
 
     def persist(self, mappings: tuple[SecurityMapping, ...]) -> None:
         _validate_mappings(mappings)
-        content = json.dumps([_mapping_dict(item) for item in mappings], sort_keys=True, indent=2)
-        if self.path.exists() and self.path.read_text(encoding="utf-8") != content:
-            raise SecurityMappingError(f"Refusing to overwrite mapping evidence: {self.path}")
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        if not self.path.exists():
-            self.path.write_text(content, encoding="utf-8")
+        atomic_write_json(self.path, [_mapping_dict(item) for item in mappings])
 
     def load(self) -> tuple[SecurityMapping, ...]:
         try:
@@ -153,12 +149,7 @@ class SymbolHistoryStore:
 
     def persist(self, records: tuple[SymbolHistoryRecord, ...]) -> None:
         _validate_symbol_history(records)
-        content = json.dumps([_symbol_dict(item) for item in records], sort_keys=True, indent=2)
-        if self.path.exists() and self.path.read_text(encoding="utf-8") != content:
-            raise SecurityMappingError(f"Refusing to overwrite symbol history: {self.path}")
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        if not self.path.exists():
-            self.path.write_text(content, encoding="utf-8")
+        atomic_write_json(self.path, [_symbol_dict(item) for item in records])
 
     def load(self) -> tuple[SymbolHistoryRecord, ...]:
         try:
@@ -189,16 +180,8 @@ class IssuerListingMappingStore:
         self.path = path
 
     def persist(self, mappings: tuple[IssuerListingMapping, ...]) -> None:
-        content = json.dumps(
-            [_issuer_listing_dict(item) for item in mappings], sort_keys=True, indent=2
-        )
-        if self.path.exists() and self.path.read_text(encoding="utf-8") != content:
-            raise SecurityMappingError(
-                f"Refusing to overwrite issuer-listing evidence: {self.path}"
-            )
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        if not self.path.exists():
-            self.path.write_text(content, encoding="utf-8")
+        _validate_issuer_listing_mappings(mappings)
+        atomic_write_json(self.path, [_issuer_listing_dict(item) for item in mappings])
 
     def load(self) -> tuple[IssuerListingMapping, ...]:
         try:
@@ -208,14 +191,18 @@ class IssuerListingMappingStore:
             raise SecurityMappingError(f"Invalid issuer-listing mapping store: {exc}") from exc
 
     def resolve(self, issuer_id: IssuerId, as_of: date) -> SecurityId:
-        matches = {
-            item.security_id
+        active = [
+            item
             for item in self.load()
             if item.issuer_id == issuer_id
-            and item.status is MappingStatus.RESOLVED
             and item.valid_from <= as_of
             and (item.valid_to is None or as_of <= item.valid_to)
-        }
+        ]
+        if any(item.status is not MappingStatus.RESOLVED for item in active):
+            raise SecurityMappingError(
+                "Issuer-to-listing evidence is unresolved or ambiguous; conflict is preserved."
+            )
+        matches = {item.security_id for item in active}
         if len(matches) != 1 or None in matches:
             raise SecurityMappingError("Issuer-to-listing relationship is unresolved or ambiguous.")
         resolved = next(iter(matches))
@@ -237,7 +224,7 @@ def mapping_from_listing(
     retrieval_timestamp: object,
     cik: str | None = None,
     evidence: MappingEvidence = MappingEvidence.LISTING_METADATA,
-    security_id: SecurityId | None = None,
+    security_id: SecurityId,
 ) -> SecurityMapping:
     from datetime import datetime
 
@@ -256,38 +243,7 @@ def mapping_from_listing(
         evidence=evidence,
         provenance=provenance,
         retrieval_timestamp=retrieval_timestamp,
-        security_id=security_id or SecurityId.canonical(source_identifier, exchange, mic),
-    )
-
-
-def registrant_mapping(
-    *,
-    cik: str,
-    eligible_security_ids: tuple[SecurityId, ...],
-    valid_from: date,
-    provenance: str,
-    retrieval_timestamp: object,
-) -> SecurityMapping:
-    from datetime import datetime
-
-    if not isinstance(retrieval_timestamp, datetime):
-        raise SecurityMappingError("Mapping retrieval timestamp must be a datetime.")
-    unique = tuple(dict.fromkeys(eligible_security_ids))
-    status = MappingStatus.RESOLVED if len(unique) == 1 else MappingStatus.AMBIGUOUS
-    return SecurityMapping(
-        source=DataSource.SEC_EDGAR,
-        source_identifier=cik.zfill(10),
-        ticker=None,
-        exchange=None,
-        mic=None,
-        cik=cik.zfill(10),
-        valid_from=valid_from,
-        valid_to=None,
-        status=status,
-        evidence=MappingEvidence.REGISTRANT_ONLY,
-        provenance=provenance,
-        retrieval_timestamp=retrieval_timestamp,
-        security_id=unique[0] if status is MappingStatus.RESOLVED else None,
+        security_id=security_id,
     )
 
 
@@ -366,6 +322,23 @@ def _validate_symbol_history(records: tuple[SymbolHistoryRecord, ...]) -> None:
                 raise SecurityMappingError("Overlapping symbol periods for one listing.")
             if overlaps and same_symbol_venue and left.security_id != right.security_id:
                 raise SecurityMappingError("Active ticker conflicts across listings.")
+
+
+def _validate_issuer_listing_mappings(mappings: tuple[IssuerListingMapping, ...]) -> None:
+    for index, left in enumerate(mappings):
+        for right in mappings[index + 1 :]:
+            if left.issuer_id != right.issuer_id:
+                continue
+            overlaps = (left.valid_to is None or right.valid_from <= left.valid_to) and (
+                right.valid_to is None or left.valid_from <= right.valid_to
+            )
+            if (
+                overlaps
+                and left.status is MappingStatus.RESOLVED
+                and right.status is MappingStatus.RESOLVED
+                and left.security_id != right.security_id
+            ):
+                raise SecurityMappingError("Conflicting effective issuer-to-listing mappings.")
 
 
 def _symbol_dict(value: SymbolHistoryRecord) -> dict[str, object]:

@@ -1,6 +1,5 @@
 """Deterministic reusable and source-specific data validation."""
 
-import json
 import math
 from collections import Counter
 from collections.abc import Iterable
@@ -19,6 +18,7 @@ from institutional_factor_platform.data.domain import (
     ValidationResult,
     ValidationSeverity,
 )
+from institutional_factor_platform.data.evidence import atomic_write_bytes, atomic_write_json
 
 
 @dataclass(frozen=True, slots=True)
@@ -54,10 +54,7 @@ class ValidationReport:
 
     def write(self, json_path: Path, markdown_path: Path) -> None:
         payload = asdict(self)
-        json_path.parent.mkdir(parents=True, exist_ok=True)
-        json_path.write_text(
-            json.dumps(payload, default=str, sort_keys=True, indent=2) + "\n", encoding="utf-8"
-        )
+        atomic_write_json(json_path, payload)
         lines = [
             f"# Data Quality Report: {self.dataset_id}",
             "",
@@ -72,7 +69,7 @@ class ValidationReport:
         lines.extend(
             f"- **{item.severity.value}** `{item.rule}`: {item.message}" for item in self.results
         )
-        markdown_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        atomic_write_bytes(markdown_path, ("\n".join(lines) + "\n").encode())
 
 
 def status_from_results(results: Iterable[ValidationResult]) -> DatasetStatus:

@@ -11,6 +11,7 @@ from institutional_factor_platform.data.domain import DatasetStatus, DataSource,
 from institutional_factor_platform.data.lineage import (
     LifecycleEvent,
     LifecycleEventStore,
+    LifecycleState,
     LineageDocument,
     LineageEdge,
     LineageGraph,
@@ -330,13 +331,20 @@ def test_dataset_manifest_requires_complete_evidence() -> None:
 
 
 def test_lifecycle_event_journal_is_restart_safe_and_immutable(tmp_path: Path) -> None:
-    event = LifecycleEvent(
-        schema_version="3.0.0",
-        event_id="demotion:run:dataset",
+    event = LifecycleEvent.create(
+        sequence=1,
+        event_id="lifecycle:run:0001:created",
+        event_type="CREATED",
         dataset_id="dataset",
-        relationship_type=RelationshipType.DEMOTED_FROM_RESEARCH_READY,
-        prior_state="PUBLISHED",
-        new_state="DEMOTED",
+        artifact_id="parquet:artifact",
+        prior_event_id=None,
+        prior_state=None,
+        new_state=LifecycleState.CREATED,
+        registration_id="catalog:dataset",
+        manifest_revision_id="manifest:dataset",
+        validation_report_id="validation:report",
+        lineage_document_id="lineage:dataset",
+        configuration_snapshot_id="config:snapshot",
         catalog_identity="catalog.duckdb",
         run_id="run",
         event_timestamp=NOW,
@@ -350,7 +358,7 @@ def test_lifecycle_event_journal_is_restart_safe_and_immutable(tmp_path: Path) -
     assert LifecycleEventStore(store.root).load() == (event,)
     store.persist(event)
     path.write_text("{}", encoding="utf-8")
-    with pytest.raises(ManifestError, match="overwrite"):
+    with pytest.raises(ManifestError, match="Invalid lifecycle journal"):
         store.persist(event)
     with pytest.raises(ManifestError, match="Invalid lifecycle journal"):
         store.load()

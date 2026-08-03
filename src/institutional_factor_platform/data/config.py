@@ -11,6 +11,7 @@ import yaml
 from pydantic import BaseModel, ConfigDict, Field, SecretStr, model_validator
 
 from institutional_factor_platform.configuration import load_configuration
+from institutional_factor_platform.data.evidence import atomic_write_bytes, canonical_json_bytes
 from institutional_factor_platform.exceptions import ConfigurationError
 from institutional_factor_platform.project import find_project_root
 
@@ -181,14 +182,14 @@ class Phase1Config(StrictModel):
 
     @model_validator(mode="after")
     def runtime_schema_versions_are_supported(self) -> "Phase1Config":
-        if self.manifests.schema_version != "3.0.0":
-            raise ValueError("manifests.schema_version must be 3.0.0; rebuild older evidence")
+        if self.manifests.schema_version != "4.0.0":
+            raise ValueError("manifests.schema_version must be 4.0.0; rebuild older evidence")
         if self.validation.schema_version != "2.0.0":
             raise ValueError("validation.schema_version must be 2.0.0")
         return self
 
     def canonical_json(self) -> str:
-        return json.dumps(self.model_dump(mode="json"), sort_keys=True, separators=(",", ":"))
+        return canonical_json_bytes(self.redacted_dict()).decode()
 
     def configuration_hash(self) -> str:
         return hashlib.sha256(self.canonical_json().encode()).hexdigest()
@@ -205,12 +206,10 @@ class Phase1Config(StrictModel):
 
     def write_snapshot(self, path: Path) -> str:
         content = json.dumps(self.redacted_dict(), sort_keys=True, indent=2) + "\n"
-        if path.exists():
-            if path.read_text(encoding="utf-8") != content:
-                raise ConfigurationError(f"Configuration snapshot is immutable: {path}")
-        else:
-            path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(content, encoding="utf-8")
+        try:
+            atomic_write_bytes(path, content.encode())
+        except Exception as exc:
+            raise ConfigurationError(f"Configuration snapshot is immutable: {path}") from exc
         return hashlib.sha256(content.encode()).hexdigest()
 
 

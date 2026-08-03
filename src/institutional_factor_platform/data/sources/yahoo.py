@@ -8,6 +8,7 @@ import pandas as pd
 import yfinance as yf
 
 from institutional_factor_platform.data.domain import DataSource, RetrievalRequest
+from institutional_factor_platform.data.security_master import SecurityMappingStore
 from institutional_factor_platform.data.sources.base import SourceAdapter
 from institutional_factor_platform.exceptions import PartialRetrievalError, RetrievalError
 
@@ -20,9 +21,11 @@ class YahooFinanceAdapter(SourceAdapter[pd.DataFrame]):
     def __init__(
         self,
         download: DownloadFunction = yf.download,
+        mapping_store: SecurityMappingStore | None = None,
         now: Callable[[], datetime] = lambda: datetime.now(UTC),
     ) -> None:
         self.download = download
+        self.mapping_store = mapping_store
         self.now = now
 
     def retrieve(self, request: RetrievalRequest) -> pd.DataFrame:
@@ -61,15 +64,24 @@ class YahooFinanceAdapter(SourceAdapter[pd.DataFrame]):
             if frame.empty:
                 failures.append(ticker)
                 continue
-            security_ids = request.parameters.get("security_ids", {})
-            if not isinstance(security_ids, dict) or ticker not in security_ids:
+            if request.parameters.get("security_ids") is not None:
                 raise RetrievalError(
-                    f"Yahoo standardization requires internal security ID for {ticker}."
+                    "Yahoo caller-supplied security IDs are prohibited; use persisted mappings."
                 )
+            if self.mapping_store is None:
+                raise RetrievalError(f"Yahoo mapping authority is required for {ticker}.")
             for index, row in frame.iterrows():
+                try:
+                    security_id = self.mapping_store.resolve(
+                        self.source.value, ticker, index.date()
+                    ).value
+                except Exception as exc:
+                    raise RetrievalError(
+                        f"Yahoo listing mapping is unresolved or ambiguous for {ticker}."
+                    ) from exc
                 records.append(
                     {
-                        "security_id": str(security_ids[ticker]),
+                        "security_id": security_id,
                         "ticker": ticker,
                         "trading_date": index.date(),
                         "open": _float_or_none(row.get("Open")),

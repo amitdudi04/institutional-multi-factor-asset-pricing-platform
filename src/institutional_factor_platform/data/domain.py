@@ -97,15 +97,6 @@ class SecurityId:
     value: str
 
     @classmethod
-    def create(cls, source: DataSource, ticker: str, exchange: str, source_id: str) -> "SecurityId":
-        parts = [source.value, ticker.strip().upper(), exchange.strip().upper(), source_id.strip()]
-        if any(not part for part in parts):
-            raise SecurityMappingError(
-                "Security ID requires source, ticker, exchange, and source identifier."
-            )
-        return cls(f"sec_{uuid.uuid5(uuid.NAMESPACE_URL, '|'.join(parts)).hex}")
-
-    @classmethod
     def canonical(
         cls, stable_listing_key: str, exchange: str, mic: str | None = None
     ) -> "SecurityId":

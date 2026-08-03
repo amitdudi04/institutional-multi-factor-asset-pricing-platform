@@ -1,13 +1,15 @@
 """Persisted, deterministic Phase 1 artifact lineage."""
 
-import json
+import hashlib
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import StrEnum
 from pathlib import Path
+from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from institutional_factor_platform.data.evidence import atomic_write_json, canonical_json_bytes
 from institutional_factor_platform.exceptions import ManifestError
 
 
@@ -49,6 +51,46 @@ class RelationshipType(StrEnum):
     DEMOTED_FROM_RESEARCH_READY = "DEMOTED_FROM_RESEARCH_READY"
     INVALIDATED = "INVALIDATED"
     SUPERSEDED = "SUPERSEDED"
+
+
+class LifecycleState(StrEnum):
+    CREATED = "CREATED"
+    RAW_VERIFIED = "RAW_VERIFIED"
+    STANDARDIZED = "STANDARDIZED"
+    VALIDATED = "VALIDATED"
+    ARTIFACT_PUBLISHED = "ARTIFACT_PUBLISHED"
+    REGISTERED = "REGISTERED"
+    PROMOTION_PENDING = "PROMOTION_PENDING"
+    PROMOTED = "PROMOTED"
+    FINALIZED = "FINALIZED"
+    DEMOTION_PENDING = "DEMOTION_PENDING"
+    DEMOTED = "DEMOTED"
+    INVALIDATED = "INVALIDATED"
+    SUPERSEDED = "SUPERSEDED"
+    RECOVERY_REQUIRED = "RECOVERY_REQUIRED"
+
+
+ALLOWED_TRANSITIONS: frozenset[tuple[LifecycleState, LifecycleState]] = frozenset(
+    {
+        (LifecycleState.CREATED, LifecycleState.RAW_VERIFIED),
+        (LifecycleState.RAW_VERIFIED, LifecycleState.STANDARDIZED),
+        (LifecycleState.STANDARDIZED, LifecycleState.VALIDATED),
+        (LifecycleState.VALIDATED, LifecycleState.ARTIFACT_PUBLISHED),
+        (LifecycleState.ARTIFACT_PUBLISHED, LifecycleState.REGISTERED),
+        (LifecycleState.REGISTERED, LifecycleState.PROMOTION_PENDING),
+        (LifecycleState.PROMOTION_PENDING, LifecycleState.PROMOTED),
+        (LifecycleState.PROMOTION_PENDING, LifecycleState.RECOVERY_REQUIRED),
+        (LifecycleState.ARTIFACT_PUBLISHED, LifecycleState.RECOVERY_REQUIRED),
+        (LifecycleState.REGISTERED, LifecycleState.RECOVERY_REQUIRED),
+        (LifecycleState.PROMOTED, LifecycleState.FINALIZED),
+        (LifecycleState.FINALIZED, LifecycleState.DEMOTION_PENDING),
+        (LifecycleState.DEMOTION_PENDING, LifecycleState.DEMOTED),
+        (LifecycleState.FINALIZED, LifecycleState.INVALIDATED),
+        (LifecycleState.FINALIZED, LifecycleState.SUPERSEDED),
+        (LifecycleState.PROMOTED, LifecycleState.RECOVERY_REQUIRED),
+        (LifecycleState.RECOVERY_REQUIRED, LifecycleState.DEMOTED),
+    }
+)
 
 
 class LineageEdge(BaseModel):
@@ -96,19 +138,46 @@ class LineageDocument(BaseModel):
 
 class LifecycleEvent(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
-    schema_version: str = Field(pattern=r"^\d+\.\d+\.\d+$")
+    schema_version: str = Field(pattern=r"^4\.0\.0$")
+    sequence: int = Field(ge=1)
     event_id: str
     dataset_id: str
-    relationship_type: RelationshipType
-    prior_state: str
-    new_state: str
-    catalog_identity: str
+    event_type: str
+    artifact_id: str
     run_id: str
+    prior_event_id: str | None
+    prior_state: LifecycleState | None
+    new_state: LifecycleState
+    registration_id: str
+    manifest_revision_id: str
+    validation_report_id: str
+    lineage_document_id: str
+    configuration_snapshot_id: str
+    catalog_identity: str
     event_timestamp: datetime
     code_commit: str
     configuration_hash: str = Field(pattern=r"^[a-f0-9]{64}$")
     reason: str
     supporting_evidence_ids: tuple[str, ...]
+    actor: str = "phase1_data_service"
+    event_checksum: str = Field(pattern=r"^[a-f0-9]{64}$")
+
+    @classmethod
+    def create(cls, **values: object) -> "LifecycleEvent":
+        values.pop("schema_version", None)
+        values.pop("event_checksum", None)
+        construction_values: dict[str, Any] = dict(values)
+        construction_values.update(schema_version="4.0.0", event_checksum="0" * 64)
+        prototype = cls.model_construct(**construction_values)
+        payload = prototype.model_dump(mode="json", exclude={"event_checksum"})
+        payload["event_checksum"] = _event_checksum(payload)
+        return cls.model_validate(payload)
+
+    @model_validator(mode="after")
+    def checksum_is_authentic(self) -> "LifecycleEvent":
+        if self.event_checksum != _event_checksum(self.model_dump(mode="json")):
+            raise ValueError("lifecycle event checksum mismatch")
+        return self
 
 
 class LifecycleEventStore:
@@ -118,23 +187,38 @@ class LifecycleEventStore:
         self.root = root
 
     def persist(self, event: LifecycleEvent) -> Path:
-        path = self.root / f"{event.event_id.replace(':', '_')}.json"
-        content = json.dumps(event.model_dump(mode="json"), sort_keys=True, indent=2) + "\n"
-        if path.exists() and path.read_text(encoding="utf-8") != content:
-            raise ManifestError(f"Refusing to overwrite lifecycle event: {path}")
-        path.parent.mkdir(parents=True, exist_ok=True)
-        if not path.exists():
-            path.write_text(content, encoding="utf-8")
+        path = self.root / f"{event.sequence:04d}_{event.event_id.replace(':', '_')}.json"
+        if path.exists():
+            try:
+                persisted = LifecycleEvent.model_validate_json(path.read_text(encoding="utf-8"))
+            except (OSError, ValueError) as exc:
+                raise ManifestError(f"Invalid lifecycle journal {self.root}: {exc}") from exc
+            if persisted != event:
+                raise ManifestError(f"Refusing to overwrite lifecycle event: {path}")
+            return path
+        existing = self.load()
+        _validate_lifecycle((*existing, event))
+        atomic_write_json(path, event.model_dump(mode="json"))
         return path
 
     def load(self) -> tuple[LifecycleEvent, ...]:
         try:
-            return tuple(
+            events = tuple(
                 LifecycleEvent.model_validate_json(path.read_text(encoding="utf-8"))
                 for path in sorted(self.root.glob("*.json"))
             )
+            _validate_lifecycle(events)
+            return events
         except (OSError, ValueError) as exc:
             raise ManifestError(f"Invalid lifecycle journal {self.root}: {exc}") from exc
+
+    def current_state(self, dataset_id: str) -> LifecycleState | None:
+        events = self.load()
+        if not events:
+            return None
+        if any(event.dataset_id != dataset_id for event in events):
+            raise ManifestError("Lifecycle journal mixes dataset identities.")
+        return events[-1].new_state
 
 
 class LineageStore:
@@ -143,13 +227,7 @@ class LineageStore:
 
     def persist(self, document: LineageDocument) -> None:
         self._validate(document)
-        content = json.dumps(document.model_dump(mode="json"), sort_keys=True, indent=2) + "\n"
-        if self.path.exists():
-            if self.path.read_text(encoding="utf-8") != content:
-                raise ManifestError(f"Refusing to overwrite persisted lineage: {self.path}")
-            return
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        self.path.write_text(content, encoding="utf-8")
+        atomic_write_json(self.path, document.model_dump(mode="json"))
 
     def load(self) -> LineageDocument:
         try:
@@ -210,3 +288,51 @@ def _graph_has_cycle(graph: dict[str, set[str]]) -> bool:
     except ManifestError:
         return True
     return False
+
+
+def _event_checksum(value: dict[str, object]) -> str:
+    payload = {key: item for key, item in value.items() if key != "event_checksum"}
+    return hashlib.sha256(canonical_json_bytes(payload)).hexdigest()
+
+
+def _validate_lifecycle(events: tuple[LifecycleEvent, ...]) -> None:
+    if not events:
+        return
+    invariant_fields = (
+        "dataset_id",
+        "artifact_id",
+        "run_id",
+        "registration_id",
+        "manifest_revision_id",
+        "validation_report_id",
+        "lineage_document_id",
+        "configuration_snapshot_id",
+        "catalog_identity",
+        "code_commit",
+        "configuration_hash",
+    )
+    first = events[0]
+    if first.sequence != 1 or first.prior_event_id is not None or first.prior_state is not None:
+        raise ManifestError("Lifecycle must begin at sequence 1 without a predecessor.")
+    if first.new_state is not LifecycleState.CREATED:
+        raise ManifestError("Lifecycle must begin in CREATED state.")
+    seen = {first.event_id}
+    previous = first
+    for event in events[1:]:
+        if event.event_id in seen:
+            raise ManifestError("Duplicate lifecycle event ID.")
+        if event.sequence != previous.sequence + 1:
+            raise ManifestError("Lifecycle sequence is not contiguous.")
+        if event.prior_event_id != previous.event_id or event.prior_state is not previous.new_state:
+            raise ManifestError("Lifecycle predecessor is missing or inconsistent.")
+        if (event.prior_state, event.new_state) not in ALLOWED_TRANSITIONS:
+            raise ManifestError(
+                f"Invalid lifecycle transition {event.prior_state} -> {event.new_state}."
+            )
+        for field_name in invariant_fields:
+            if getattr(event, field_name) != getattr(first, field_name):
+                raise ManifestError(f"Lifecycle mixes {field_name} identities.")
+        if event.event_timestamp < previous.event_timestamp:
+            raise ManifestError("Lifecycle timestamps are out of order.")
+        seen.add(event.event_id)
+        previous = event

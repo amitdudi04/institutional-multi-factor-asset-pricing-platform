@@ -17,8 +17,13 @@ from institutional_factor_platform.data.domain import (
     DataSource,
     DateRange,
     RetrievalRequest,
+    SecurityId,
     ValidationResult,
     ValidationSeverity,
+)
+from institutional_factor_platform.data.security_master import (
+    SecurityMappingStore,
+    mapping_from_listing,
 )
 from institutional_factor_platform.data.sources.base import HttpTransport
 from institutional_factor_platform.data.sources.fred import FredAdapter
@@ -165,14 +170,15 @@ def test_sec_requires_contact_and_preserves_filing_metadata() -> None:
     assert records[0]["filing_date"] == date(2024, 2, 1)
     assert records[0]["availability_timestamp"] >= datetime(2024, 2, 1, tzinfo=UTC)
     assert records[0]["availability_quality"] == "INFERRED_DATE_LEVEL"
-    assert records[0]["schema_version"] == "2.0.0"
+    assert records[0]["schema_version"] == "3.0.0"
+    assert str(records[0]["issuer_id"]).startswith("issuer_")
     with pytest.raises(RetrievalError, match="Invalid SEC JSON"):
         adapter.standardize(b"not json", RetrievalRequest(DataSource.SEC_EDGAR, "1"))
     with pytest.raises(RetrievalError, match="entity metadata"):
         adapter.standardize(b"{}", RetrievalRequest(DataSource.SEC_EDGAR, "1"))
 
 
-def test_yahoo_standardizes_and_reports_partial_failure() -> None:
+def test_yahoo_standardizes_and_reports_partial_failure(tmp_path: Path) -> None:
     index = pd.to_datetime(["2024-01-02", "2024-01-03"])
     frame = pd.DataFrame(
         {
@@ -187,13 +193,34 @@ def test_yahoo_standardizes_and_reports_partial_failure() -> None:
         },
         index=index,
     )
-    adapter = YahooFinanceAdapter(download=lambda *args, **kwargs: frame, now=lambda: NOW)
+    mapping_store = SecurityMappingStore(tmp_path / "security-mappings.json")
+    mapping_store.persist(
+        (
+            mapping_from_listing(
+                source=DataSource.YAHOO_FINANCE,
+                source_identifier="SYNTH",
+                ticker="SYNTH",
+                exchange="XNYS",
+                mic="XNYS",
+                valid_from=date(2020, 1, 1),
+                valid_to=None,
+                provenance="owner-confirmed synthetic fixture",
+                retrieval_timestamp=NOW,
+                security_id=SecurityId.canonical("synthetic-listing", "XNYS", "XNYS"),
+            ),
+        )
+    )
+    adapter = YahooFinanceAdapter(
+        download=lambda *args, **kwargs: frame,
+        mapping_store=mapping_store,
+        now=lambda: NOW,
+    )
     request = RetrievalRequest(
         DataSource.YAHOO_FINANCE,
         "daily_market",
         DateRange(date(2024, 1, 1), date(2024, 1, 4)),
         ("SYNTH",),
-        {"security_ids": {"SYNTH": "sec_synthetic"}, "currency": "USD"},
+        {"currency": "USD"},
     )
     assert len(adapter.standardize(adapter.retrieve(request), request)) == 2
     columns = pd.MultiIndex.from_product([["SYNTH"], frame.columns])
@@ -207,10 +234,21 @@ def test_yahoo_standardizes_and_reports_partial_failure() -> None:
     )
     with pytest.raises(PartialRetrievalError):
         adapter.standardize(multi, partial)
-    with pytest.raises(RetrievalError, match="security ID"):
-        adapter.standardize(
+    with pytest.raises(RetrievalError, match="mapping authority"):
+        YahooFinanceAdapter(download=lambda *args, **kwargs: frame).standardize(
             frame,
             request.__class__(request.source, request.dataset, request.date_range, ("SYNTH",)),
+        )
+    with pytest.raises(RetrievalError, match="caller-supplied"):
+        adapter.standardize(
+            frame,
+            request.__class__(
+                request.source,
+                request.dataset,
+                request.date_range,
+                ("SYNTH",),
+                {"security_ids": {"SYNTH": "sec_untrusted"}},
+            ),
         )
     empty_adapter = YahooFinanceAdapter(download=lambda *args, **kwargs: pd.DataFrame())
     with pytest.raises(RetrievalError, match="empty"):

@@ -4,8 +4,10 @@ import hashlib
 import io
 import json
 import os
+import socket
 import subprocess
 import uuid
+from collections.abc import Callable
 from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Any, Literal
@@ -15,18 +17,21 @@ import pyarrow as pa
 import pyarrow.ipc as ipc
 
 from institutional_factor_platform import __version__
+from institutional_factor_platform.data.access import RecoveryService, ResearchDatasetRepository
 from institutional_factor_platform.data.calendar import USEquityCalendar
 from institutional_factor_platform.data.config import Phase1Config
 from institutional_factor_platform.data.contracts import TableContract
 from institutional_factor_platform.data.domain import (
     DataArtifact,
     DatasetStatus,
+    DataSource,
     RetrievalRequest,
     RetrievalStatus,
 )
 from institutional_factor_platform.data.lineage import (
     LifecycleEvent,
     LifecycleEventStore,
+    LifecycleState,
     LineageDocument,
     LineageEdge,
     LineageStore,
@@ -70,14 +75,29 @@ _NO_PAYLOAD = object()
 
 
 class DataIngestionService:
-    def __init__(self, config: Phase1Config, root: Path | None = None) -> None:
+    def __init__(
+        self,
+        config: Phase1Config,
+        root: Path | None = None,
+        failure_hook: Callable[[str], None] | None = None,
+    ) -> None:
         self.config = config
         self.root = (root or find_project_root()).resolve()
         self.paths = config.paths.resolved(self.root)
         self.raw = RawStorage(self.paths["raw"])
         self.parquet = ParquetStorage(self.paths["processed"], config.storage.parquet_compression)
         self.quarantine = QuarantineStorage(self.paths["quarantine"])
-        self.catalog = DuckDBCatalog(self.paths["duckdb"])
+        self.catalog = DuckDBCatalog(self.paths["duckdb"], self.root)
+        self.failure_hook = failure_hook
+        self.recovery = RecoveryService(self.catalog, self.root, self.paths["manifests"])
+        self.research = ResearchDatasetRepository(self.catalog, self.root)
+        if self.catalog.path.exists():
+            self.recovery.reconcile_startup()
+        self.recovery.reconcile_locks(self.paths["metadata"] / "publication-locks")
+
+    def _boundary(self, name: str) -> None:
+        if self.failure_hook is not None:
+            self.failure_hook(name)
 
     def initialize_storage(self) -> tuple[Path, ...]:
         directories = tuple(
@@ -140,7 +160,7 @@ class DataIngestionService:
                 + ".lock"
             )
         )
-        _acquire_publication_lock(lock_path)
+        _acquire_publication_lock(lock_path, run_id, request.dataset)
         try:
             payload = (
                 adapter.retrieve(request) if _payload_override is _NO_PAYLOAD else _payload_override
@@ -155,6 +175,7 @@ class DataIngestionService:
             )
             RawStorage.verify(artifact)
             records = adapter.standardize(payload, request)
+            unit_metadata = _reconcile_units(records, request, contract)
             _require_exact_record_columns(records, contract)
             table = pa.Table.from_pylist(list(records), schema=contract.schema)
             findings = self._validate(records, table, contract, request)
@@ -205,79 +226,10 @@ class DataIngestionService:
 
             published = self.parquet.publish(contract.name, dataset_id, table, contract.schema)
             self.parquet.verify(published)
+            self._boundary("artifact_publication")
             parquet_id = f"parquet:{published.checksum}"
             raw_id = f"raw:{artifact.checksum}"
-            lineage_path = run_root / "lineage-validated.json"
-            lineage_id = f"lineage:{run_id}:validated"
-            lineage = _lineage_document(
-                run_id=run_id,
-                source_id=source_id,
-                raw_id=raw_id,
-                validation_id=validation_id,
-                parquet_id=parquet_id,
-                dataset_id=dataset_id,
-                source_path=_relative(source_path, self.root),
-                validation_path=_relative(validation_json, self.root),
-                parquet_path=_relative(published.path, self.root),
-                commit=commit,
-                config_hash=config_hash,
-                lineage_id=lineage_id,
-            )
-            lineage_store = LineageStore(lineage_path)
-            lineage_store.persist(lineage)
-            lineage_store.verify_complete(
-                (source_id, raw_id, validation_id, parquet_id, dataset_id)
-            )
-
             registered_id = f"catalog:{dataset_id}"
-            manifest = DatasetManifest(
-                schema_version="3.0.0",
-                run_id=run_id,
-                dataset_id=dataset_id,
-                dataset_type=contract.name,
-                schema_name=contract.name,
-                schema_fingerprint=_schema_fingerprint(contract.schema),
-                parent_artifacts=(raw_id,),
-                source_manifest_id=source_id,
-                source_manifest_path=_relative(source_path, self.root),
-                source_manifest_checksum=source_checksum,
-                transformation_name=f"{request.source.value}_standardize",
-                transformation_version=TRANSFORMATION_VERSION,
-                row_count=table.num_rows,
-                column_count=table.num_columns,
-                primary_key=contract.primary_key,
-                date_start=report.observed_start,
-                date_end=report.observed_end,
-                security_count=report.entity_count,
-                missingness_summary={name: table[name].null_count for name in table.column_names},
-                unit_metadata=_unit_metadata(records),
-                validation_report_id=validation_id,
-                validation_report_path=_relative(validation_json, self.root),
-                validation_report_checksum=sha256_file(validation_json),
-                validation_status=status,
-                lineage_path=_relative(lineage_path, self.root),
-                lineage_id=lineage_id,
-                lineage_checksum=sha256_file(lineage_path),
-                lineage_complete=True,
-                quarantine_status=False,
-                parquet_path=_relative(published.path, self.root),
-                output_artifact_id=parquet_id,
-                output_checksum=published.checksum,
-                output_byte_size=published.byte_size,
-                catalog_registration_state="REGISTERED",
-                promotion_state="ELIGIBLE",
-                catalog_registration_id=registered_id,
-                creation_time=datetime.now(UTC),
-                configuration_hash=config_hash,
-                configuration_snapshot_path=_relative(snapshot, self.root),
-                configuration_snapshot_checksum=snapshot_checksum,
-                code_version=__version__,
-                git_commit=commit,
-                temporal_policy_version=TEMPORAL_POLICY_VERSION,
-            )
-            registered_path = run_root / "dataset-registered.json"
-            manifest.write_immutable(registered_path)
-            self.catalog.register_persisted(dataset_id, registered_path, self.root)
             promotion_id = f"promotion:{run_id}:{dataset_id}"
             final_lineage_path = run_root / "lineage.json"
             final_lineage_id = f"lineage:{run_id}:published"
@@ -298,23 +250,117 @@ class DataIngestionService:
                 promotion_id=promotion_id,
             )
             LineageStore(final_lineage_path).persist(final_lineage)
+            journal = LifecycleEventStore(run_root / "lifecycle")
+            manifest_revision_id = f"manifest:{run_id}:{dataset_id}:published"
+            snapshot_id = f"config:{config_hash}"
+            lifecycle_context = {
+                "dataset_id": dataset_id,
+                "artifact_id": parquet_id,
+                "run_id": run_id,
+                "registration_id": registered_id,
+                "manifest_revision_id": manifest_revision_id,
+                "validation_report_id": validation_id,
+                "lineage_document_id": final_lineage_id,
+                "configuration_snapshot_id": snapshot_id,
+                "catalog_identity": _relative(self.catalog.path, self.root),
+                "code_commit": commit,
+                "configuration_hash": config_hash,
+            }
+            previous: LifecycleEvent | None = None
+            for state in (
+                LifecycleState.CREATED,
+                LifecycleState.RAW_VERIFIED,
+                LifecycleState.STANDARDIZED,
+                LifecycleState.VALIDATED,
+                LifecycleState.ARTIFACT_PUBLISHED,
+            ):
+                previous = _append_lifecycle(journal, lifecycle_context, state, previous)
+            if previous is None:
+                raise EvidenceIntegrityError("Lifecycle initialization failed.")
+            manifest = DatasetManifest(
+                schema_version="4.0.0",
+                manifest_revision_id=f"manifest:{run_id}:{dataset_id}:registered",
+                run_id=run_id,
+                dataset_id=dataset_id,
+                dataset_type=contract.name,
+                schema_name=contract.name,
+                schema_fingerprint=_schema_fingerprint(contract.schema),
+                parent_artifacts=(raw_id,),
+                source_manifest_id=source_id,
+                source_manifest_path=_relative(source_path, self.root),
+                source_manifest_checksum=source_checksum,
+                transformation_name=f"{request.source.value}_standardize",
+                transformation_version=TRANSFORMATION_VERSION,
+                row_count=table.num_rows,
+                column_count=table.num_columns,
+                primary_key=contract.primary_key,
+                date_start=report.observed_start,
+                date_end=report.observed_end,
+                security_count=report.entity_count,
+                missingness_summary={name: table[name].null_count for name in table.column_names},
+                unit_metadata=unit_metadata,
+                validation_report_id=validation_id,
+                validation_report_path=_relative(validation_json, self.root),
+                validation_report_checksum=sha256_file(validation_json),
+                validation_status=status,
+                lineage_path=_relative(final_lineage_path, self.root),
+                lineage_id=final_lineage_id,
+                lineage_checksum=sha256_file(final_lineage_path),
+                lineage_complete=True,
+                quarantine_status=False,
+                parquet_path=_relative(published.path, self.root),
+                output_artifact_id=parquet_id,
+                output_checksum=published.checksum,
+                output_byte_size=published.byte_size,
+                catalog_registration_state="REGISTERED",
+                promotion_state="ELIGIBLE",
+                catalog_registration_id=registered_id,
+                creation_time=datetime.now(UTC),
+                configuration_hash=config_hash,
+                configuration_snapshot_path=_relative(snapshot, self.root),
+                configuration_snapshot_checksum=snapshot_checksum,
+                configuration_snapshot_id=snapshot_id,
+                lifecycle_journal_path=_relative(journal.root, self.root),
+                lifecycle_head_event_id=previous.event_id,
+                code_version=__version__,
+                git_commit=commit,
+                temporal_policy_version=TEMPORAL_POLICY_VERSION,
+            )
+            registered_path = run_root / "dataset-registered.json"
+            manifest.write_immutable(registered_path)
+            self.catalog.register_persisted(dataset_id, registered_path, self.root)
+            self._boundary("catalog_registration")
+            previous = _append_lifecycle(
+                journal, lifecycle_context, LifecycleState.REGISTERED, previous
+            )
+            previous = _append_lifecycle(
+                journal, lifecycle_context, LifecycleState.PROMOTION_PENDING, previous
+            )
             promoted_at = datetime.now(UTC)
             final_manifest = manifest.model_copy(
                 update={
-                    "lineage_path": _relative(final_lineage_path, self.root),
-                    "lineage_id": final_lineage_id,
-                    "lineage_checksum": sha256_file(final_lineage_path),
+                    "manifest_revision_id": manifest_revision_id,
                     "promotion_state": "PUBLISHED",
                     "promotion_event_id": promotion_id,
                     "promotion_timestamp": promoted_at,
+                    "lifecycle_head_event_id": previous.event_id,
                 }
             )
             dataset_path = run_root / "dataset.json"
             final_manifest.write_immutable(dataset_path)
-            self.catalog.promote_persisted(dataset_id, dataset_path, self.root)
+            self._boundary("final_manifest_persistence")
+            self.catalog.stage_promotion(dataset_id, dataset_path, self.root)
             promoted_dataset = dataset_id
+            self._boundary("catalog_promotion")
+            previous = _append_lifecycle(
+                journal, lifecycle_context, LifecycleState.PROMOTED, previous
+            )
+            self._boundary("promotion_event_persistence")
+            final_event_id = _lifecycle_event_id(
+                run_id, previous.sequence + 1, LifecycleState.FINALIZED
+            )
             promotion = PromotionManifest(
-                schema_version="2.0.0",
+                schema_version="3.0.0",
                 dataset_id=dataset_id,
                 dataset_manifest_path=_relative(dataset_path, self.root),
                 dataset_manifest_hash=final_manifest.content_hash(),
@@ -324,9 +370,11 @@ class DataIngestionService:
                 promoted_at=promoted_at,
                 git_commit=commit,
                 configuration_hash=config_hash,
+                lifecycle_final_event_id=final_event_id,
             )
             promotion_path = run_root / "promotion.json"
             promotion.write_immutable(promotion_path)
+            self._boundary("promotion_manifest_persistence")
             self._write_run(
                 run_root / "run.json",
                 run_id,
@@ -338,27 +386,37 @@ class DataIngestionService:
                 commit,
                 (dataset_id, promotion.content_hash()),
             )
+            self._boundary("run_completion")
+            previous = _append_lifecycle(
+                journal, lifecycle_context, LifecycleState.FINALIZED, previous
+            )
+            if previous.event_id != final_event_id:
+                raise EvidenceIntegrityError("Final lifecycle event identity is inconsistent.")
+            self._boundary("journal_finalization")
+            self.catalog.promote_persisted(dataset_id, dataset_path, self.root)
+            self._boundary("catalog_activation")
             return final_manifest
         except Exception as exc:
             if promoted_dataset is not None:
                 self.catalog.demote(promoted_dataset)
-                LifecycleEventStore(run_root / "lifecycle").persist(
-                    LifecycleEvent(
-                        schema_version="3.0.0",
-                        event_id=f"demotion:{run_id}:{promoted_dataset}",
-                        dataset_id=promoted_dataset,
-                        relationship_type=RelationshipType.DEMOTED_FROM_RESEARCH_READY,
-                        prior_state="PUBLISHED",
-                        new_state="DEMOTED",
-                        catalog_identity=_relative(self.catalog.path, self.root),
-                        run_id=run_id,
-                        event_timestamp=datetime.now(UTC),
-                        code_commit=commit,
-                        configuration_hash=config_hash,
-                        reason=str(exc),
-                        supporting_evidence_ids=(promoted_dataset,),
+                events = journal.load()
+                if events:
+                    last = events[-1]
+                    pending_state = (
+                        LifecycleState.DEMOTION_PENDING
+                        if last.new_state is LifecycleState.FINALIZED
+                        else LifecycleState.RECOVERY_REQUIRED
                     )
-                )
+                    last = _append_lifecycle(
+                        journal, lifecycle_context, pending_state, last, reason=str(exc)
+                    )
+                    _append_lifecycle(
+                        journal,
+                        lifecycle_context,
+                        LifecycleState.DEMOTED,
+                        last,
+                        reason=str(exc),
+                    )
             if not source_path.exists():
                 retrieval_status = (
                     RetrievalStatus.PARTIAL
@@ -374,17 +432,18 @@ class DataIngestionService:
                     retrieval_status,
                     (str(exc),),
                 ).write_immutable(source_path)
-            self._write_run(
-                run_root / "run.json",
-                run_id,
-                started,
-                "FAILED",
-                config_hash,
-                snapshot,
-                request,
-                commit,
-                errors=(str(exc),),
-            )
+            if not (run_root / "run.json").exists():
+                self._write_run(
+                    run_root / "run.json",
+                    run_id,
+                    started,
+                    "FAILED",
+                    config_hash,
+                    snapshot,
+                    request,
+                    commit,
+                    errors=(str(exc),),
+                )
             raise
         finally:
             lock_path.unlink(missing_ok=True)
@@ -528,16 +587,30 @@ def _payload_bytes(payload: Any) -> bytes:
     return json.dumps(payload, sort_keys=True, default=str).encode()
 
 
-def _acquire_publication_lock(path: Path) -> None:
+def _acquire_publication_lock(path: Path, run_id: str, dataset: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     try:
         descriptor = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
     except FileExistsError as exc:
         raise EvidenceIntegrityError(
-            f"Publication is already active for this source/dataset: {path.name}"
+            "Publication lock exists. Verify process ownership and lifecycle evidence; "
+            f"automatic stale-lock deletion is prohibited: {path.name}"
         ) from exc
     with os.fdopen(descriptor, "w", encoding="utf-8") as handle:
-        handle.write(f"pid={os.getpid()}\n")
+        json.dump(
+            {
+                "lock_id": f"publication:{run_id}",
+                "process_id": os.getpid(),
+                "host": socket.gethostname(),
+                "acquired_at": datetime.now(UTC).isoformat(),
+                "operation": "phase1_publication",
+                "dataset_id": dataset,
+            },
+            handle,
+            sort_keys=True,
+        )
+        handle.flush()
+        os.fsync(handle.fileno())
 
 
 def _require_exact_record_columns(
@@ -653,7 +726,8 @@ def _lineage_document(
         )
         for parent, child, relationship, evidence in specs
     )
-    return LineageDocument.v3(
+    return LineageDocument(
+        schema_version="4.0.0",
         lineage_id=lineage_id,
         dataset_id=dataset_id,
         run_id=run_id,
@@ -686,6 +760,132 @@ def _unit_metadata(records: tuple[dict[str, object], ...]) -> dict[str, str]:
         for key in keys
         if any(row.get(key) is not None for row in records)
     }
+
+
+def _reconcile_units(
+    records: tuple[dict[str, object], ...],
+    request: RetrievalRequest,
+    contract: TableContract,
+) -> dict[str, str]:
+    """Bind request, row, source, contract, output, and transformation unit evidence."""
+    declared_raw = request.parameters.get("units", {})
+    declared = (
+        {str(key): str(value).strip() for key, value in declared_raw.items()}
+        if isinstance(declared_raw, dict)
+        else {}
+    )
+    observed = _unit_metadata(records)
+    metadata = {f"request.{key}": value for key, value in sorted(declared.items())}
+    metadata.update({f"row.{key}": value for key, value in sorted(observed.items())})
+    metadata.update(observed)
+
+    if contract.name == "macro_observations":
+        row_units = {
+            str(row.get("source_unit", "")).strip().lower().replace(" ", "_") for row in records
+        }
+        if "" in row_units or len(row_units) != 1:
+            raise DataQualityError("Macro series requires one explicit homogeneous source unit.")
+        row_unit = next(iter(row_units))
+        declared_unit = declared.get("value", "").lower().replace(" ", "_")
+        if declared and declared_unit != row_unit:
+            raise DataQualityError(
+                f"Owner request unit {declared.get('value')!r} contradicts row unit {row_unit!r}."
+            )
+        if request.source is DataSource.FRED and request.dataset in {"DGS3MO", "TB3MS"}:
+            if row_unit != "percent_per_annum":
+                raise DataQualityError("Approved Treasury series must remain percent_per_annum.")
+        metadata.update(
+            {
+                "contract.value": row_unit,
+                "standardized.value": row_unit,
+                "transformation.value": "identity@1.0.0",
+            }
+        )
+    elif contract.name == "french_factor_returns":
+        source_units = {str(row.get("source_unit", "")).strip() for row in records}
+        output_units = {str(row.get("standardized_unit", "")).strip() for row in records}
+        if source_units != {"percent"} or output_units != {"decimal_return"}:
+            raise DataQualityError("French factors require percent to decimal_return evidence.")
+        if declared and declared.get("factor_value") not in {"decimal", "decimal_return"}:
+            raise DataQualityError("Owner factor output unit must be decimal_return.")
+        metadata.update(
+            {
+                "contract.factor_value": "decimal_return",
+                "standardized.factor_value": "decimal_return",
+                "transformation.factor_value": "percent_to_decimal@1.0.0",
+            }
+        )
+    elif contract.name == "daily_market":
+        currencies = {str(row.get("currency", "")).strip() for row in records}
+        if currencies != {"USD"}:
+            raise DataQualityError(
+                "Daily-market currency requires USD or an explicit FX transform."
+            )
+        if declared:
+            for field in ("open", "high", "low", "close", "adjusted_close", "dividend"):
+                if declared.get(field) not in {"USD", "currency:USD"}:
+                    raise DataQualityError(f"Owner price unit is incompatible for {field}.")
+            if declared.get("volume") != "shares" or declared.get("split_factor") != "ratio":
+                raise DataQualityError("Owner volume/split units are incompatible.")
+        metadata.update(
+            {
+                "contract.price": "USD",
+                "contract.volume": "shares",
+                "standardized.price": "USD",
+                "standardized.volume": "shares",
+                "transformation.market": "identity@1.0.0",
+            }
+        )
+    elif contract.name == "sec_financial_facts":
+        row_units = {str(row.get("unit", "")).strip() for row in records}
+        if "" in row_units:
+            raise DataQualityError("SEC XBRL units must be preserved explicitly.")
+        if declared and declared.get("value") != "xbrl_source_unit":
+            raise DataQualityError("SEC owner metadata must declare xbrl_source_unit.")
+        metadata.update(
+            {
+                "contract.value": "xbrl_source_unit",
+                "standardized.value": "xbrl_source_unit",
+                "transformation.value": "identity@1.0.0",
+            }
+        )
+    elif declared:
+        metadata.update({f"contract.{key}": value for key, value in sorted(declared.items())})
+        metadata["transformation"] = "identity@1.0.0"
+    return metadata
+
+
+def _lifecycle_event_id(run_id: str, sequence: int, state: LifecycleState) -> str:
+    return f"lifecycle:{run_id}:{sequence:04d}:{state.value.lower()}"
+
+
+def _append_lifecycle(
+    store: LifecycleEventStore,
+    context: dict[str, str],
+    state: LifecycleState,
+    previous: LifecycleEvent | None,
+    *,
+    reason: str = "controlled Phase 1 publication",
+) -> LifecycleEvent:
+    sequence = 1 if previous is None else previous.sequence + 1
+    event = LifecycleEvent.create(
+        sequence=sequence,
+        event_id=_lifecycle_event_id(context["run_id"], sequence, state),
+        event_type=state.value,
+        prior_event_id=previous.event_id if previous else None,
+        prior_state=previous.new_state if previous else None,
+        new_state=state,
+        event_timestamp=datetime.now(UTC),
+        reason=reason,
+        supporting_evidence_ids=(
+            context["artifact_id"],
+            context["validation_report_id"],
+            context["lineage_document_id"],
+        ),
+        **context,
+    )
+    store.persist(event)
+    return event
 
 
 def _relative(path: Path, root: Path) -> str:

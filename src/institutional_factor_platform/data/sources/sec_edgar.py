@@ -5,7 +5,8 @@ from collections.abc import Callable
 from datetime import UTC, datetime, time
 
 from institutional_factor_platform.data.config import SecSettings
-from institutional_factor_platform.data.domain import DataSource, RetrievalRequest
+from institutional_factor_platform.data.domain import DataSource, IssuerId, RetrievalRequest
+from institutional_factor_platform.data.security_master import IssuerListingMappingStore
 from institutional_factor_platform.data.sources.base import HttpTransport, SourceAdapter
 from institutional_factor_platform.exceptions import RetrievalError
 
@@ -17,10 +18,12 @@ class SecEdgarAdapter(SourceAdapter[bytes]):
         self,
         settings: SecSettings,
         transport: HttpTransport,
+        mapping_store: IssuerListingMappingStore | None = None,
         now: Callable[[], datetime] = lambda: datetime.now(UTC),
     ) -> None:
         self.settings = settings
         self.transport = transport
+        self.mapping_store = mapping_store
         self.now = now
 
     def retrieve(self, request: RetrievalRequest) -> bytes:
@@ -46,6 +49,11 @@ class SecEdgarAdapter(SourceAdapter[bytes]):
         if not cik.isdigit() or not entity or not isinstance(facts, dict):
             raise RetrievalError("SEC company facts lacks required entity metadata.")
         retrieved = self.now()
+        issuer_id = IssuerId.from_cik(cik)
+        if request.parameters.get("security_id") is not None:
+            raise RetrievalError(
+                "SEC caller-supplied listing IDs are prohibited; use persisted issuer mapping."
+            )
         records: list[dict[str, object]] = []
         for taxonomy, concepts in facts.items():
             if not isinstance(concepts, dict):
@@ -69,9 +77,20 @@ class SecEdgarAdapter(SourceAdapter[bytes]):
                                 f"Malformed SEC fact date for {taxonomy}:{concept}:{unit}: {exc}"
                             ) from exc
                         availability = datetime.combine(filing_date, time.max, tzinfo=UTC)
+                        security_id = None
+                        if self.mapping_store is not None:
+                            try:
+                                security_id = self.mapping_store.resolve(
+                                    issuer_id, filing_date
+                                ).value
+                            except Exception as exc:
+                                raise RetrievalError(
+                                    "SEC issuer-to-listing mapping is unresolved or ambiguous."
+                                ) from exc
                         records.append(
                             {
-                                "security_id": request.parameters.get("security_id"),
+                                "issuer_id": issuer_id.value,
+                                "security_id": security_id,
                                 "ticker": request.parameters.get("ticker"),
                                 "cik": cik,
                                 "entity_name": entity,
@@ -93,7 +112,7 @@ class SecEdgarAdapter(SourceAdapter[bytes]):
                                 "retrieval_timestamp": retrieved,
                                 "availability_timestamp": availability,
                                 "availability_quality": "INFERRED_DATE_LEVEL",
-                                "schema_version": "2.0.0",
+                                "schema_version": "3.0.0",
                             }
                         )
         if not records:

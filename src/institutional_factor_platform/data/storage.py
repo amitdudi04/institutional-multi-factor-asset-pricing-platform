@@ -15,7 +15,14 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from institutional_factor_platform.data.domain import DataArtifact, DatasetStatus, DataSource
-from institutional_factor_platform.data.lineage import LineageStore, RelationshipType
+from institutional_factor_platform.data.evidence import canonical_json_bytes, resolve_project_path
+from institutional_factor_platform.data.lineage import (
+    LifecycleEvent,
+    LifecycleEventStore,
+    LifecycleState,
+    LineageStore,
+    RelationshipType,
+)
 from institutional_factor_platform.data.manifests import (
     DatasetManifest,
     PromotionManifest,
@@ -190,8 +197,9 @@ class DuckDBCatalog:
         DatasetStatus.PASS_WITH_WARNINGS.value,
     }
 
-    def __init__(self, path: Path) -> None:
+    def __init__(self, path: Path, project_root: Path | None = None) -> None:
         self.path = path
+        self.project_root = project_root.resolve() if project_root else None
 
     def initialize(self) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)
@@ -201,16 +209,18 @@ class DuckDBCatalog:
                    (schema_version VARCHAR PRIMARY KEY)"""
             )
             versions = connection.execute("SELECT schema_version FROM catalog_metadata").fetchall()
-            if versions and versions != [("3.0.0",)]:
+            if versions and versions != [("4.0.0",)]:
                 raise CatalogError("Unsupported DuckDB catalog schema; rebuild the local catalog.")
-            connection.execute("INSERT OR IGNORE INTO catalog_metadata VALUES ('3.0.0')")
+            connection.execute("INSERT OR IGNORE INTO catalog_metadata VALUES ('4.0.0')")
             connection.execute(
                 """CREATE TABLE IF NOT EXISTS dataset_registry (
                 dataset_id VARCHAR PRIMARY KEY, dataset_type VARCHAR NOT NULL,
                 parquet_path VARCHAR NOT NULL, output_checksum VARCHAR NOT NULL,
                 manifest_path VARCHAR NOT NULL, lineage_path VARCHAR NOT NULL,
+                lifecycle_journal_path VARCHAR NOT NULL,
                 validation_status VARCHAR NOT NULL,
                 promoted BOOLEAN NOT NULL DEFAULT FALSE,
+                finalized BOOLEAN NOT NULL DEFAULT FALSE,
                 registered_at TIMESTAMPTZ NOT NULL)"""
             )
 
@@ -218,7 +228,12 @@ class DuckDBCatalog:
         self, dataset_id: str, manifest_path: Path, project_root: Path
     ) -> DatasetManifest:
         """Register only an authenticated persisted REGISTERED manifest revision."""
-        manifest = authenticate_dataset_evidence(dataset_id, manifest_path, project_root)
+        manifest = authenticate_dataset_evidence(
+            dataset_id,
+            manifest_path,
+            project_root,
+            required_state=LifecycleState.ARTIFACT_PUBLISHED,
+        )
         if manifest.catalog_registration_state != "REGISTERED":
             raise EvidenceIntegrityError("Registration requires a REGISTERED manifest revision.")
         if manifest.promotion_state != "ELIGIBLE":
@@ -232,6 +247,7 @@ class DuckDBCatalog:
             manifest.output_checksum,
             str(manifest_path),
             str(lineage_path),
+            str(_resolve_evidence_path(manifest.lifecycle_journal_path, project_root)),
             manifest.validation_status.value,
         )
         try:
@@ -241,14 +257,15 @@ class DuckDBCatalog:
                     "FROM dataset_registry WHERE dataset_id = ?",
                     [manifest.dataset_id],
                 ).fetchone()
-                immutable_values = (values[0], values[1], values[2], values[5])
+                immutable_values = (values[0], values[1], values[2], values[6])
                 if existing is not None and tuple(existing) != immutable_values:
                     raise CatalogError(
                         f"Dataset ID already maps to different evidence: {manifest.dataset_id}"
                     )
                 if existing is None:
                     connection.execute(
-                        "INSERT INTO dataset_registry VALUES (?, ?, ?, ?, ?, ?, ?, FALSE, ?)",
+                        "INSERT INTO dataset_registry VALUES "
+                        "(?, ?, ?, ?, ?, ?, ?, ?, FALSE, FALSE, ?)",
                         [manifest.dataset_id, *values, datetime.now(UTC)],
                     )
         except duckdb.Error as exc:
@@ -257,11 +274,16 @@ class DuckDBCatalog:
             ) from exc
         return manifest
 
-    def promote_persisted(
+    def stage_promotion(
         self, dataset_id: str, manifest_path: Path, project_root: Path
     ) -> DatasetManifest:
-        """Promote by reloading a fully authenticated persisted PUBLISHED revision."""
-        manifest = authenticate_dataset_evidence(dataset_id, manifest_path, project_root)
+        """Persist promotion state without exposing it to research-ready views."""
+        manifest = authenticate_dataset_evidence(
+            dataset_id,
+            manifest_path,
+            project_root,
+            required_state=LifecycleState.PROMOTION_PENDING,
+        )
         if manifest.catalog_registration_state != "REGISTERED":
             raise EvidenceIntegrityError("Promotion requires registered persisted state.")
         if manifest.promotion_state != "PUBLISHED":
@@ -284,21 +306,61 @@ class DuckDBCatalog:
                     )
                 connection.execute("BEGIN TRANSACTION")
                 connection.execute(
-                    "UPDATE dataset_registry SET promoted = TRUE, "
-                    "manifest_path = ?, lineage_path = ? "
+                    "UPDATE dataset_registry SET promoted = TRUE, finalized = FALSE, "
+                    "manifest_path = ?, lineage_path = ?, lifecycle_journal_path = ? "
                     "WHERE dataset_id = ?",
                     [
                         str(manifest_path),
                         str(_resolve_evidence_path(manifest.lineage_path, project_root)),
+                        str(_resolve_evidence_path(manifest.lifecycle_journal_path, project_root)),
                         dataset_id,
                     ],
                 )
-                self._rebuild_view(connection, manifest.dataset_type)
                 connection.execute("COMMIT")
         except duckdb.Error as exc:
             raise PromotionError(
                 f"DuckDB promotion failed for {manifest.dataset_id}: {exc}"
             ) from exc
+        return manifest
+
+    def promote_persisted(
+        self, dataset_id: str, manifest_path: Path, project_root: Path
+    ) -> DatasetManifest:
+        """Finalize only a fully authenticated current FINALIZED lifecycle."""
+        manifest = authenticate_dataset_evidence(
+            dataset_id, manifest_path, project_root, required_state=LifecycleState.FINALIZED
+        )
+        if manifest.promotion_state != "PUBLISHED":
+            raise EvidenceIntegrityError("Finalization requires a PUBLISHED manifest revision.")
+        self.initialize()
+        with duckdb.connect(str(self.path)) as connection:
+            existing = connection.execute(
+                "SELECT dataset_type, output_checksum, promoted FROM dataset_registry "
+                "WHERE dataset_id = ?",
+                [dataset_id],
+            ).fetchone()
+            if (
+                existing is None
+                or str(existing[0]) != manifest.dataset_type
+                or str(existing[1]) != manifest.output_checksum
+                or not bool(existing[2])
+            ):
+                raise EvidenceIntegrityError(
+                    "Catalog registration/promotion stage is missing or inconsistent."
+                )
+            connection.execute("BEGIN TRANSACTION")
+            connection.execute(
+                "UPDATE dataset_registry SET finalized = TRUE, manifest_path = ?, "
+                "lineage_path = ?, lifecycle_journal_path = ? WHERE dataset_id = ?",
+                [
+                    str(manifest_path),
+                    str(_resolve_evidence_path(manifest.lineage_path, project_root)),
+                    str(_resolve_evidence_path(manifest.lifecycle_journal_path, project_root)),
+                    dataset_id,
+                ],
+            )
+            self._rebuild_view(connection, manifest.dataset_type)
+            connection.execute("COMMIT")
         return manifest
 
     def demote(self, dataset_id: str) -> None:
@@ -311,7 +373,9 @@ class DuckDBCatalog:
                 return
             connection.execute("BEGIN TRANSACTION")
             connection.execute(
-                "UPDATE dataset_registry SET promoted = FALSE WHERE dataset_id = ?", [dataset_id]
+                "UPDATE dataset_registry SET promoted = FALSE, finalized = FALSE "
+                "WHERE dataset_id = ?",
+                [dataset_id],
             )
             self._rebuild_view(connection, str(row[0]))
             connection.execute("COMMIT")
@@ -320,7 +384,8 @@ class DuckDBCatalog:
         view = _safe_identifier(f"validated_{dataset_type}")
         rows = connection.execute(
             "SELECT parquet_path FROM dataset_registry WHERE dataset_type = ? "
-            "AND promoted = TRUE AND validation_status IN ('PASS', 'PASS_WITH_WARNINGS') "
+            "AND promoted = TRUE AND finalized = TRUE "
+            "AND validation_status IN ('PASS', 'PASS_WITH_WARNINGS') "
             "ORDER BY dataset_id",
             [dataset_type],
         ).fetchall()
@@ -331,7 +396,12 @@ class DuckDBCatalog:
 
     def list_datasets(self, *, research_ready_only: bool = False) -> list[tuple[str, str, str]]:
         self.initialize()
-        clause = " WHERE promoted = TRUE" if research_ready_only else ""
+        if research_ready_only and self.project_root is not None:
+            try:
+                self.verify_integrity(self.project_root)
+            except EvidenceIntegrityError:
+                pass
+        clause = " WHERE promoted = TRUE AND finalized = TRUE" if research_ready_only else ""
         with duckdb.connect(str(self.path), read_only=True) as connection:
             rows = connection.execute(
                 "SELECT dataset_id, dataset_type, validation_status FROM dataset_registry"
@@ -344,60 +414,91 @@ class DuckDBCatalog:
         self.initialize()
         with duckdb.connect(str(self.path), read_only=True) as connection:
             rows = connection.execute(
-                "SELECT parquet_path, output_checksum, manifest_path, lineage_path "
-                "FROM dataset_registry WHERE promoted = TRUE"
+                "SELECT dataset_id, dataset_type, parquet_path, output_checksum, "
+                "manifest_path, lineage_path, lifecycle_journal_path "
+                "FROM dataset_registry WHERE finalized = TRUE"
             ).fetchall()
         root = (project_root or Path.cwd()).resolve()
-        for parquet_value, checksum, manifest_value, lineage_value in rows:
-            manifest_path = Path(str(manifest_value))
-            if not manifest_path.is_file():
-                raise EvidenceIntegrityError("Catalog references a missing dataset manifest.")
-            persisted = DatasetManifest.model_validate_json(
-                manifest_path.read_text(encoding="utf-8")
-            )
-            authenticate_dataset_evidence(persisted.dataset_id, manifest_path, root)
-            if str(_resolve_evidence_path(persisted.parquet_path, root)) != str(parquet_value):
-                raise EvidenceIntegrityError(
-                    "Catalog Parquet path differs from persisted manifest."
+        failures: list[str] = []
+        for (
+            dataset_id,
+            _dataset_type,
+            parquet_value,
+            checksum,
+            manifest_value,
+            lineage_value,
+            journal_value,
+        ) in rows:
+            try:
+                manifest_path = Path(str(manifest_value))
+                persisted = authenticate_dataset_evidence(
+                    str(dataset_id), manifest_path, root, required_state=LifecycleState.FINALIZED
                 )
-            if persisted.output_checksum != checksum:
-                raise EvidenceIntegrityError("Catalog checksum differs from persisted manifest.")
-            if str(_resolve_evidence_path(persisted.lineage_path, root)) != str(lineage_value):
-                raise EvidenceIntegrityError(
-                    "Catalog lineage path differs from persisted manifest."
-                )
-            if persisted.promotion_state != "PUBLISHED":
-                raise EvidenceIntegrityError(
-                    "Promoted catalog row references stale manifest state."
-                )
+                if str(_resolve_evidence_path(persisted.parquet_path, root)) != str(parquet_value):
+                    raise EvidenceIntegrityError("Catalog Parquet path differs from manifest.")
+                if persisted.output_checksum != checksum:
+                    raise EvidenceIntegrityError("Catalog checksum differs from manifest.")
+                if str(_resolve_evidence_path(persisted.lineage_path, root)) != str(lineage_value):
+                    raise EvidenceIntegrityError("Catalog lineage path differs from manifest.")
+            except Exception as exc:
+                self.demote(str(dataset_id))
+                _append_catalog_invalidation(Path(str(journal_value)), str(exc))
+                failures.append(f"{dataset_id}: {exc}")
+        if failures:
+            raise EvidenceIntegrityError("; ".join(failures))
 
     @classmethod
     def rebuild_from_manifests(
         cls, target: Path, manifests_root: Path, project_root: Path
     ) -> "DuckDBCatalog":
-        """Explicitly rebuild a new disposable catalog from v2 promotion evidence."""
-        if target.exists():
-            raise CatalogError(f"Catalog rebuild target already exists: {target}")
-        catalog = cls(target)
-        for promotion_path in sorted(manifests_root.rglob("promotion.json")):
-            promotion = PromotionManifest.model_validate_json(
-                promotion_path.read_text(encoding="utf-8")
-            )
-            manifest_path = _resolve_evidence_path(promotion.dataset_manifest_path, project_root)
-            manifest = DatasetManifest.model_validate_json(
-                manifest_path.read_text(encoding="utf-8")
-            )
-            if manifest.content_hash() != promotion.dataset_manifest_hash:
-                raise PromotionError("Promotion references a changed dataset manifest.")
-            registered_path = manifest_path.with_name("dataset-registered.json")
-            catalog.register_persisted(manifest.dataset_id, registered_path, project_root)
-            catalog.promote_persisted(manifest.dataset_id, manifest_path, project_root)
-        catalog.verify_integrity(project_root)
-        return catalog
+        """Build a complete isolated catalog and atomically activate it on success."""
+        target.parent.mkdir(parents=True, exist_ok=True)
+        descriptor, temporary_name = tempfile.mkstemp(
+            dir=target.parent, prefix=f".{target.name}-rebuild-", suffix=".duckdb"
+        )
+        os.close(descriptor)
+        temporary = Path(temporary_name)
+        temporary.unlink()
+        try:
+            catalog = cls(temporary, project_root)
+            for promotion_path in sorted(manifests_root.rglob("promotion.json")):
+                promotion = PromotionManifest.model_validate_json(
+                    promotion_path.read_text(encoding="utf-8")
+                )
+                manifest_path = _resolve_evidence_path(
+                    promotion.dataset_manifest_path, project_root
+                )
+                manifest = authenticate_dataset_evidence(
+                    promotion.dataset_id,
+                    manifest_path,
+                    project_root,
+                    required_state=LifecycleState.FINALIZED,
+                )
+                if manifest.content_hash() != promotion.dataset_manifest_hash:
+                    raise PromotionError("Promotion references a changed dataset manifest.")
+                if promotion.lifecycle_final_event_id != _current_lifecycle_event(
+                    manifest, project_root
+                ):
+                    raise PromotionError("Promotion references the wrong lifecycle finalization.")
+                registered_path = manifest_path.with_name("dataset-registered.json")
+                catalog.register_persisted(manifest.dataset_id, registered_path, project_root)
+                catalog.stage_promotion(manifest.dataset_id, manifest_path, project_root)
+                catalog.promote_persisted(manifest.dataset_id, manifest_path, project_root)
+            catalog.verify_integrity(project_root)
+            os.replace(temporary, target)
+            return cls(target, project_root)
+        except Exception:
+            temporary.unlink(missing_ok=True)
+            Path(f"{temporary}.wal").unlink(missing_ok=True)
+            raise
 
 
 def authenticate_dataset_evidence(
-    dataset_id: str, manifest_path: Path, project_root: Path
+    dataset_id: str,
+    manifest_path: Path,
+    project_root: Path,
+    *,
+    required_state: LifecycleState | None = None,
 ) -> DatasetManifest:
     """Load and cryptographically cross-check every persisted promotion authority."""
     try:
@@ -433,6 +534,9 @@ def authenticate_dataset_evidence(
         raise EvidenceIntegrityError(f"Invalid validation report: {exc}") from exc
     if report.get("dataset_id") != dataset_id or report.get("run_id") != manifest.run_id:
         raise EvidenceIntegrityError("Validation report identity does not match manifest.")
+    expected_report_id = f"validation:{manifest.validation_report_checksum}"
+    if manifest.validation_report_id != expected_report_id:
+        raise EvidenceIntegrityError("Validation report ID is not content-bound.")
     if report.get("final_status") != manifest.validation_status.value:
         raise EvidenceIntegrityError("Validation status differs from persisted report.")
     if any(item.get("severity") in {"ERROR", "CRITICAL"} for item in report.get("results", [])):
@@ -441,7 +545,7 @@ def authenticate_dataset_evidence(
         raise EvidenceIntegrityError("Persisted validation status is not promotion eligible.")
     lineage = LineageStore(resolved["lineage"]).load()
     if (
-        lineage.schema_version != "3.0.0"
+        lineage.schema_version != "4.0.0"
         or lineage.dataset_id != dataset_id
         or lineage.run_id != manifest.run_id
     ):
@@ -455,13 +559,19 @@ def authenticate_dataset_evidence(
     if not required.issubset(set(lineage.artifacts)):
         raise EvidenceIntegrityError("Lineage is incomplete for persisted publication evidence.")
     if manifest.promotion_state == "PUBLISHED":
-        relationships = {edge.relationship_type for edge in lineage.edges}
-        needed = {
-            RelationshipType.REGISTERED_IN_CATALOG,
-            RelationshipType.PROMOTED_TO_RESEARCH_READY,
+        registration_id = manifest.catalog_registration_id
+        promotion_id = manifest.promotion_event_id
+        exact_edges = {
+            (edge.parent_artifact_id, edge.child_artifact_id, edge.relationship_type)
+            for edge in lineage.edges
         }
-        if not needed.issubset(relationships):
-            raise EvidenceIntegrityError("Published lineage lacks registration or promotion event.")
+        needed = {
+            (manifest.output_artifact_id, dataset_id, RelationshipType.MANIFESTED),
+            (dataset_id, registration_id, RelationshipType.REGISTERED_IN_CATALOG),
+            (registration_id, promotion_id, RelationshipType.PROMOTED_TO_RESEARCH_READY),
+        }
+        if not needed.issubset(exact_edges):
+            raise EvidenceIntegrityError("Published lineage lacks the exact connected lifecycle.")
     parquet = resolved["Parquet"]
     if parquet.stat().st_size != manifest.output_byte_size:
         raise EvidenceIntegrityError("Parquet byte size differs from manifest.")
@@ -486,6 +596,35 @@ def authenticate_dataset_evidence(
     raw_path = _resolve_evidence_path(source.raw_artifact_path, project_root)
     if not raw_path.is_file() or sha256_file(raw_path) != source.checksum:
         raise EvidenceIntegrityError("Parent raw artifact is missing or has changed.")
+    try:
+        snapshot_value = json.loads(resolved["configuration snapshot"].read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise EvidenceIntegrityError(f"Invalid configuration snapshot: {exc}") from exc
+    if not isinstance(snapshot_value, dict) or not snapshot_value:
+        raise EvidenceIntegrityError("Configuration snapshot must be a non-empty object.")
+    computed_config_hash = hashlib.sha256(canonical_json_bytes(snapshot_value)).hexdigest()
+    if (
+        computed_config_hash != manifest.configuration_hash
+        or manifest.configuration_snapshot_id != f"config:{computed_config_hash}"
+    ):
+        raise EvidenceIntegrityError("Configuration snapshot identity does not match manifest.")
+    journal = LifecycleEventStore(
+        _resolve_evidence_path(manifest.lifecycle_journal_path, project_root)
+    )
+    events = journal.load()
+    if not events or events[-1].dataset_id != dataset_id:
+        raise EvidenceIntegrityError("Lifecycle journal is missing or has the wrong dataset.")
+    if manifest.lifecycle_head_event_id not in {event.event_id for event in events}:
+        raise EvidenceIntegrityError("Manifest lifecycle head is absent from the journal.")
+    if required_state is not None:
+        states = {event.new_state for event in events}
+        if required_state not in states:
+            raise EvidenceIntegrityError(f"Lifecycle has not reached {required_state.value}.")
+        if (
+            required_state is LifecycleState.FINALIZED
+            and events[-1].new_state is not required_state
+        ):
+            raise EvidenceIntegrityError("Current lifecycle state is not FINALIZED.")
     return manifest
 
 
@@ -509,5 +648,42 @@ def _safe_identifier(value: str) -> str:
 
 
 def _resolve_evidence_path(value: str, project_root: Path) -> Path:
-    path = Path(value)
-    return path.resolve() if path.is_absolute() else (project_root / path).resolve()
+    try:
+        return resolve_project_path(value, project_root)
+    except Exception as exc:
+        raise EvidenceIntegrityError(str(exc)) from exc
+
+
+def _current_lifecycle_event(manifest: DatasetManifest, project_root: Path) -> str:
+    events = LifecycleEventStore(
+        _resolve_evidence_path(manifest.lifecycle_journal_path, project_root)
+    ).load()
+    if not events or events[-1].new_state is not LifecycleState.FINALIZED:
+        raise EvidenceIntegrityError("Lifecycle is not finalized.")
+    return events[-1].event_id
+
+
+def _append_catalog_invalidation(journal_path: Path, reason: str) -> None:
+    try:
+        store = LifecycleEventStore(journal_path)
+        events = store.load()
+        if not events or events[-1].new_state is not LifecycleState.FINALIZED:
+            return
+        previous = events[-1]
+        values = previous.model_dump(mode="python", exclude={"event_checksum"})
+        values.update(
+            {
+                "sequence": previous.sequence + 1,
+                "event_id": f"lifecycle:{previous.run_id}:{previous.sequence + 1:04d}:invalidated",
+                "event_type": LifecycleState.INVALIDATED.value,
+                "prior_event_id": previous.event_id,
+                "prior_state": previous.new_state,
+                "new_state": LifecycleState.INVALIDATED,
+                "event_timestamp": datetime.now(UTC),
+                "reason": reason,
+            }
+        )
+        store.persist(LifecycleEvent.create(**values))
+    except Exception:
+        # Visibility has already been removed; a corrupt journal requires manual recovery.
+        return

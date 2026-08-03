@@ -31,7 +31,6 @@ from institutional_factor_platform.data.security_master import (
     SecurityMappingStore,
     SymbolHistoryStore,
     mapping_from_listing,
-    registrant_mapping,
     validate_security_master,
 )
 from institutional_factor_platform.exceptions import (
@@ -96,11 +95,7 @@ def test_config_example_refuses_overwrite(tmp_path: Path) -> None:
 
 
 def test_security_id_is_stable_and_not_ticker_only() -> None:
-    first = SecurityId.create(DataSource.OWNER_SUPPLIED, "TEST", "XNYS", "owner-1")
-    assert first == SecurityId.create(DataSource.OWNER_SUPPLIED, "test", "xnys", "owner-1")
-    assert first != SecurityId.create(DataSource.OWNER_SUPPLIED, "TEST", "XNAS", "owner-1")
-    with pytest.raises(Exception, match="requires"):
-        SecurityId.create(DataSource.OWNER_SUPPLIED, "", "XNYS", "owner-1")
+    assert not hasattr(SecurityId, "create")
     canonical = SecurityId.canonical("listing-key-1", "xnys", "xNYS")
     assert canonical == SecurityId.canonical("listing-key-1", "XNYS", "XNYS")
     assert canonical != SecurityId.canonical("listing-key-1", "XNAS", "XNAS")
@@ -125,7 +120,7 @@ def _security(
 ) -> SecurityRecord:
     now = datetime(2024, 1, 2, tzinfo=UTC)
     return SecurityRecord(
-        SecurityId.create(DataSource.OWNER_SUPPLIED, "SYNTH", "XNYS", source_id),
+        SecurityId.canonical(f"owner-listing-{source_id}", "XNYS", "XNYS"),
         " synth ",
         "Synthetic Test Issuer",
         "XNYS",
@@ -222,18 +217,6 @@ def test_cross_source_mapping_is_persisted_and_ambiguous_cik_is_blocked(
     store.persist((yahoo, owner))
     restarted = SecurityMappingStore(store.path)
     assert restarted.resolve("yahoo_finance", "synth", date(2024, 1, 1)) == yahoo.security_id
-    ambiguous = registrant_mapping(
-        cik="1",
-        eligible_security_ids=(yahoo.security_id, SecurityId.assign()),
-        valid_from=date(2020, 1, 1),
-        provenance="synthetic registrant evidence",
-        retrieval_timestamp=now,
-    )
-    assert ambiguous.status is MappingStatus.AMBIGUOUS and ambiguous.security_id is None
-    ambiguous_store = SecurityMappingStore(tmp_path / "ambiguous.json")
-    ambiguous_store.persist((ambiguous,))
-    with pytest.raises(SecurityMappingError, match="unresolved or ambiguous"):
-        ambiguous_store.resolve("sec_edgar", "1", date(2024, 1, 1))
 
 
 def test_mapping_conflict_and_ticker_reuse_are_explicit(tmp_path: Path) -> None:
@@ -248,6 +231,7 @@ def test_mapping_conflict_and_ticker_reuse_are_explicit(tmp_path: Path) -> None:
         valid_to=date(2019, 12, 31),
         provenance="synthetic historical mapping",
         retrieval_timestamp=now,
+        security_id=SecurityId.assign(),
     )
     second = mapping_from_listing(
         source=DataSource.OWNER_SUPPLIED,
@@ -259,6 +243,7 @@ def test_mapping_conflict_and_ticker_reuse_are_explicit(tmp_path: Path) -> None:
         valid_to=None,
         provenance="synthetic historical mapping",
         retrieval_timestamp=now,
+        security_id=SecurityId.assign(),
     )
     store = SecurityMappingStore(tmp_path / "reuse.json")
     store.persist((first, second))

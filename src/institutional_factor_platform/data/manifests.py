@@ -9,7 +9,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from institutional_factor_platform.data.domain import DatasetStatus, RetrievalStatus
-from institutional_factor_platform.exceptions import ManifestError
+from institutional_factor_platform.data.evidence import atomic_write_json
 
 
 class ManifestModel(BaseModel):
@@ -23,13 +23,7 @@ class ManifestModel(BaseModel):
         return hashlib.sha256(self.canonical_json().encode()).hexdigest()
 
     def write_immutable(self, path: Path) -> None:
-        content = json.dumps(self.model_dump(mode="json"), sort_keys=True, indent=2) + "\n"
-        if path.exists():
-            if path.read_text(encoding="utf-8") != content:
-                raise ManifestError(f"Refusing to overwrite immutable manifest: {path}")
-            return
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(content, encoding="utf-8")
+        atomic_write_json(path, self.model_dump(mode="json"))
 
 
 class RunManifest(ManifestModel):
@@ -99,7 +93,8 @@ class SourceManifest(ManifestModel):
 
 
 class DatasetManifest(ManifestModel):
-    schema_version: Literal["3.0.0"]
+    schema_version: Literal["4.0.0"]
+    manifest_revision_id: str
     run_id: str
     dataset_id: str
     dataset_type: str
@@ -141,6 +136,9 @@ class DatasetManifest(ManifestModel):
     configuration_hash: str = Field(pattern=r"^[a-f0-9]{64}$")
     configuration_snapshot_path: str
     configuration_snapshot_checksum: str = Field(pattern=r"^[a-f0-9]{64}$")
+    configuration_snapshot_id: str
+    lifecycle_journal_path: str
+    lifecycle_head_event_id: str
     code_version: str
     git_commit: str
     temporal_policy_version: str
@@ -168,7 +166,7 @@ class DatasetManifest(ManifestModel):
 
 
 class PromotionManifest(ManifestModel):
-    schema_version: Literal["2.0.0"]
+    schema_version: Literal["3.0.0"]
     dataset_id: str
     dataset_manifest_path: str
     dataset_manifest_hash: str = Field(pattern=r"^[a-f0-9]{64}$")
@@ -178,3 +176,4 @@ class PromotionManifest(ManifestModel):
     promoted_at: datetime
     git_commit: str
     configuration_hash: str = Field(pattern=r"^[a-f0-9]{64}$")
+    lifecycle_final_event_id: str

@@ -75,6 +75,7 @@ class InvalidSyntheticSecAdapter(SourceAdapter[bytes]):
     ) -> tuple[dict[str, object], ...]:
         return (
             {
+                "issuer_id": "issuer_synthetic",
                 "security_id": "sec_synthetic",
                 "ticker": "SYNTH",
                 "cik": "0000000001",
@@ -97,7 +98,7 @@ class InvalidSyntheticSecAdapter(SourceAdapter[bytes]):
                 "retrieval_timestamp": datetime(2025, 1, 2, tzinfo=UTC),
                 "availability_timestamp": datetime(2024, 1, 1, 23, 59, tzinfo=UTC),
                 "availability_quality": "INFERRED_DATE_LEVEL",
-                "schema_version": "2.0.0",
+                "schema_version": "3.0.0",
             },
         )
 
@@ -285,6 +286,8 @@ def test_authenticated_evidence_cross_checks_semantics(tmp_path: Path) -> None:
             copy.write_text(content, encoding="utf-8")
             value[evidence_field] = str(copy)
             value[evidence_field.replace("_path", "_checksum")] = sha256_file(copy)
+            if evidence_field == "validation_report_path":
+                value["validation_report_id"] = f"validation:{sha256_file(copy)}"
         path = tmp_path / f"{name}.json"
         path.write_text(json.dumps(value), encoding="utf-8")
         return path
@@ -382,8 +385,10 @@ def test_authenticated_evidence_cross_checks_semantics(tmp_path: Path) -> None:
     service.catalog.demote("not-present")
     existing_target = tmp_path / "existing.duckdb"
     existing_target.touch()
-    with pytest.raises(Exception, match="already exists"):
-        DuckDBCatalog.rebuild_from_manifests(existing_target, tmp_path / "data/manifests", tmp_path)
+    rebuilt = DuckDBCatalog.rebuild_from_manifests(
+        existing_target, tmp_path / "data/manifests", tmp_path
+    )
+    assert rebuilt.list_datasets(research_ready_only=True)[0][0] == manifest.dataset_id
 
 
 def test_invalid_sec_temporal_data_is_quarantined_and_not_visible(tmp_path: Path) -> None:
@@ -425,7 +430,7 @@ def test_failure_after_catalog_promotion_is_compensated(
         )
     assert service.catalog.list_datasets(research_ready_only=True) == []
     assert list((tmp_path / "data/raw").rglob("*.txt"))
-    assert list((tmp_path / "data/manifests").rglob("demotion_*.json"))
+    assert list((tmp_path / "data/manifests").rglob("*demoted.json"))
 
 
 def test_existing_raw_artifact_reprocesses_idempotently_without_retrieval(tmp_path: Path) -> None:
