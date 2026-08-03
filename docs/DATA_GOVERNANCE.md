@@ -16,7 +16,7 @@ Raw, interim, processed, manifest-instance, quarantine, output, database, and lo
 
 Data flows raw → exact source standardization → contract/source/temporal validation → immutable Parquet → persisted lineage/eligible manifest → DuckDB registration and structurally gated promotion. Dataset evidence records raw and output checksums, sizes, schema fingerprint/version, transformation, validation report, Git/config identity, units, and temporal policy. Critical failures preserve raw bytes and reports in quarantine and cannot enter research-ready views. Existing raw bytes can be verified and reprocessed without provider retrieval.
 
-Canonical listing IDs are source-independent and provider mappings retain source identifiers, validity dates, evidence, provenance, and explicit resolved/ambiguous/conflict outcomes. CIK identifies a registrant, not automatically a share class; ambiguous mappings cannot silently join.
+Canonical listing IDs are source-independent assigned identifiers and provider mappings retain source identifiers, inclusive validity dates, evidence, provenance, and explicit resolved/ambiguous/conflict outcomes. Direct caller-derived canonical construction is prohibited. CIK identifies a registrant, not automatically a share class; ambiguous mappings cannot silently join.
 
 ## Retention, access, and deletion
 
@@ -32,6 +32,8 @@ Runs record Git commit, package version, configuration snapshot/hash, requested 
 
 ## Third-remediation controls
 
-The supported research boundary authenticates the complete evidence bundle at read time and returns a verified dataset handle; direct DuckDB access is operational and is not an authorized research interface. Registration and staged promotion remain invisible until durable `FINALIZED` lifecycle evidence permits activation. Verification loss immediately removes catalog visibility and appends invalidation authority.
+The supported research boundary authenticates the schema-v5 manifest, lifecycle-head checkpoint, lifecycle invariants, promotion-envelope hash, successful terminal run, complete validation report, configuration, lineage, units, mapping authority, source/raw evidence, and Parquet artifact at read time and returns a verified dataset handle. Direct DuckDB access is operational and is not an authorized research interface. Registration and staged promotion remain invisible until durable `FINALIZED` lifecycle evidence permits activation. Verification loss immediately removes catalog visibility and appends invalidation authority.
 
 Canonical listing IDs require stable owner-governed listing evidence, Yahoo rejects caller-supplied IDs, SEC CIK establishes issuer identity, and a listing join requires a unique effective-dated issuer-to-listing mapping. Lifecycle transitions, demotion, invalidation, crash recovery, configuration/report identity, and catalog activation are append-only and content-bound. Evidence JSON uses same-directory temporary files, file synchronization, and atomic replacement; uncertain locks require manual intervention rather than unsafe deletion.
+
+Stale-lock recovery is deliberately conservative. The `reconcile` command removes a lock only when its linked lifecycle is terminal (`FINALIZED`, `DEMOTED`, `INVALIDATED`, or `SUPERSEDED`) and the recorded local process is not active. Active, malformed, unlinked, or otherwise ambiguous locks remain `MANUAL_INTERVENTION_REQUIRED`; an operator must inspect the recorded host, process, run, journal head, catalog state, and terminal evidence before removing one. This availability tradeoff must never be bypassed by automatic age-based deletion.

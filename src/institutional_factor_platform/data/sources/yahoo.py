@@ -2,6 +2,7 @@
 
 from collections.abc import Callable
 from datetime import UTC, datetime
+from pathlib import Path
 from typing import Any
 
 import pandas as pd
@@ -27,6 +28,9 @@ class YahooFinanceAdapter(SourceAdapter[pd.DataFrame]):
         self.download = download
         self.mapping_store = mapping_store
         self.now = now
+
+    def mapping_authority_path(self) -> Path | None:
+        return self.mapping_store.path if self.mapping_store is not None else None
 
     def retrieve(self, request: RetrievalRequest) -> pd.DataFrame:
         if not request.identifiers or request.date_range is None:

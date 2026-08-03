@@ -10,7 +10,7 @@ Validated configuration
   -> PyArrow contract + quality validation
   -> quarantine on blocking failure
   -> content/config/schema-addressed immutable Zstandard Parquet on pass/warning
-  -> persisted v4 connected lineage and authenticated registered/published manifest revisions
+  -> persisted v4 connected lineage and authenticated schema-v5 registered/published manifests
   -> registered and staged DuckDB state (not visible to research)
   -> append-only FINALIZED lifecycle evidence and catalog activation
   -> authenticated research-read handle
@@ -41,7 +41,7 @@ Dependencies point from CLI to services to adapters/domain/storage, then to conf
 
 ## Storage decisions
 
-Raw bytes retain provider-native form where practical. Standard tables use exact PyArrow schemas and Zstandard Parquet with atomic temporary writes, read-back verification, manifested checksums, idempotent same-content reuse, and conflict refusal. Authoritative JSON uses same-directory atomic replacement and fsync. Dataset manifests use project-root-constrained paths. Catalog rebuild authenticates every candidate in a temporary DuckDB file and replaces the active catalog only after complete success. Dataset-manifest, lifecycle, and catalog schema v4 intentionally reject earlier uncommitted runtime artifacts.
+Raw bytes retain provider-native form where practical. Standard tables use exact PyArrow schemas and Zstandard Parquet with atomic temporary writes, read-back verification, manifested checksums, idempotent same-content reuse, and conflict refusal. Authoritative JSON uses same-directory atomic replacement and fsync. Dataset manifests use project-root-constrained paths. Catalog rebuild authenticates every candidate in a temporary DuckDB file and replaces the active catalog only after complete success. Dataset-manifest/catalog schema v5 and lifecycle/promotion schema v4 intentionally reject earlier uncommitted runtime artifacts.
 
 ## Adapter lifecycle and network policy
 
@@ -53,4 +53,4 @@ Trading dates are exchange-local session dates; storage timestamps are UTC. FRED
 
 ## V4 authenticated publication update
 
-Dataset manifests, lifecycle events/lineage, and DuckDB catalog schema `4.0.0` replace earlier uncommitted runtime forms; promotion manifests use `3.0.0`. Immutable evidence binds the exact dataset, artifact, registration, manifest revision, validation report, canonical redacted configuration snapshot, lineage, catalog identity, Git commit, and predecessor event. The journal validator reconstructs only legal ordered transitions. Publication stays invisible through registration and staging; only a durable `FINALIZED` event permits activation. Startup reconciliation demotes incomplete transitions, integrity failure invalidates visibility, and ambiguous stale locks remain for manual review. No raw redownload is required for an authenticated rebuild.
+Dataset manifests and DuckDB catalog schema `5.0.0` replace earlier uncommitted runtime forms; lifecycle/lineage and promotion manifests use `4.0.0`. Immutable evidence binds the exact dataset, artifact, registration, manifest revision, complete validation report, canonical redacted configuration snapshot, lineage, units, mapping authority, catalog identity, Git commit, promotion-envelope hash, terminal run, and predecessor event. A separately persisted lifecycle-head checkpoint detects tail deletion. The journal validator reconstructs only legal ordered transitions. Publication stays invisible through registration and staging; only a durable `FINALIZED` event plus successful terminal run permits supported reads. Startup reconciliation demotes incomplete transitions, integrity failure invalidates visibility, and ambiguous stale locks remain for manual review. No raw redownload is required for an authenticated rebuild.

@@ -3,6 +3,7 @@
 import json
 from collections.abc import Callable
 from datetime import UTC, datetime, time
+from pathlib import Path
 
 from institutional_factor_platform.data.config import SecSettings
 from institutional_factor_platform.data.domain import DataSource, IssuerId, RetrievalRequest
@@ -25,6 +26,9 @@ class SecEdgarAdapter(SourceAdapter[bytes]):
         self.transport = transport
         self.mapping_store = mapping_store
         self.now = now
+
+    def mapping_authority_path(self) -> Path | None:
+        return self.mapping_store.path if self.mapping_store is not None else None
 
     def retrieve(self, request: RetrievalRequest) -> bytes:
         cik = request.dataset.zfill(10)

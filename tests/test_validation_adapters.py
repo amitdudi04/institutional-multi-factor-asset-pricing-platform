@@ -206,7 +206,7 @@ def test_yahoo_standardizes_and_reports_partial_failure(tmp_path: Path) -> None:
                 valid_to=None,
                 provenance="owner-confirmed synthetic fixture",
                 retrieval_timestamp=NOW,
-                security_id=SecurityId.canonical("synthetic-listing", "XNYS", "XNYS"),
+                security_id=SecurityId.assign(),
             ),
         )
     )

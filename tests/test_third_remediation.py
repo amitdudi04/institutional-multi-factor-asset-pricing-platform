@@ -148,6 +148,7 @@ def test_startup_integrity_loss_is_invalidated_before_any_read(tmp_path: Path) -
         "promotion_event_persistence",
         "run_completion",
         "journal_finalization",
+        "catalog_activation",
     ],
 )
 def test_abrupt_subprocess_termination_never_exposes_incomplete_data(

@@ -25,6 +25,7 @@ from institutional_factor_platform.data.domain import (
     DataArtifact,
     DatasetStatus,
     DataSource,
+    IssuerId,
     RetrievalRequest,
     RetrievalStatus,
 )
@@ -42,6 +43,10 @@ from institutional_factor_platform.data.manifests import (
     PromotionManifest,
     RunManifest,
     SourceManifest,
+)
+from institutional_factor_platform.data.security_master import (
+    IssuerListingMappingStore,
+    SecurityMappingStore,
 )
 from institutional_factor_platform.data.sources.base import SourceAdapter
 from institutional_factor_platform.data.storage import (
@@ -176,6 +181,9 @@ class DataIngestionService:
             RawStorage.verify(artifact)
             records = adapter.standardize(payload, request)
             unit_metadata = _reconcile_units(records, request, contract)
+            mapping = _authenticate_mapping_authority(
+                adapter, records, request, contract, self.root
+            )
             _require_exact_record_columns(records, contract)
             table = pa.Table.from_pylist(list(records), schema=contract.schema)
             findings = self._validate(records, table, contract, request)
@@ -278,7 +286,7 @@ class DataIngestionService:
             if previous is None:
                 raise EvidenceIntegrityError("Lifecycle initialization failed.")
             manifest = DatasetManifest(
-                schema_version="4.0.0",
+                schema_version="5.0.0",
                 manifest_revision_id=f"manifest:{run_id}:{dataset_id}:registered",
                 run_id=run_id,
                 dataset_id=dataset_id,
@@ -299,6 +307,10 @@ class DataIngestionService:
                 security_count=report.entity_count,
                 missingness_summary={name: table[name].null_count for name in table.column_names},
                 unit_metadata=unit_metadata,
+                mapping_status=mapping[0],
+                mapping_evidence_path=mapping[1],
+                mapping_evidence_checksum=mapping[2],
+                mapping_evidence_id=mapping[3],
                 validation_report_id=validation_id,
                 validation_report_path=_relative(validation_json, self.root),
                 validation_report_checksum=sha256_file(validation_json),
@@ -360,7 +372,9 @@ class DataIngestionService:
                 run_id, previous.sequence + 1, LifecycleState.FINALIZED
             )
             promotion = PromotionManifest(
-                schema_version="3.0.0",
+                schema_version="4.0.0",
+                promotion_manifest_id=promotion_id,
+                run_id=run_id,
                 dataset_id=dataset_id,
                 dataset_manifest_path=_relative(dataset_path, self.root),
                 dataset_manifest_hash=final_manifest.content_hash(),
@@ -371,10 +385,27 @@ class DataIngestionService:
                 git_commit=commit,
                 configuration_hash=config_hash,
                 lifecycle_final_event_id=final_event_id,
+                run_manifest_path=_relative(run_root / "run.json", self.root),
             )
             promotion_path = run_root / "promotion.json"
             promotion.write_immutable(promotion_path)
             self._boundary("promotion_manifest_persistence")
+            self._boundary("run_completion")
+            previous = _append_lifecycle(
+                journal,
+                lifecycle_context,
+                LifecycleState.FINALIZED,
+                previous,
+                additional_supporting_evidence=(
+                    f"promotion-envelope:{promotion.content_hash()}",
+                    f"run-terminal:{run_id}",
+                ),
+            )
+            if previous.event_id != final_event_id:
+                raise EvidenceIntegrityError("Final lifecycle event identity is inconsistent.")
+            self._boundary("journal_finalization")
+            self.catalog.promote_persisted(dataset_id, dataset_path, self.root)
+            self._boundary("catalog_activation")
             self._write_run(
                 run_root / "run.json",
                 run_id,
@@ -384,21 +415,12 @@ class DataIngestionService:
                 snapshot,
                 request,
                 commit,
-                (dataset_id, promotion.content_hash()),
+                (dataset_id, promotion.promotion_manifest_id),
             )
-            self._boundary("run_completion")
-            previous = _append_lifecycle(
-                journal, lifecycle_context, LifecycleState.FINALIZED, previous
-            )
-            if previous.event_id != final_event_id:
-                raise EvidenceIntegrityError("Final lifecycle event identity is inconsistent.")
-            self._boundary("journal_finalization")
-            self.catalog.promote_persisted(dataset_id, dataset_path, self.root)
-            self._boundary("catalog_activation")
             return final_manifest
         except Exception as exc:
             if promoted_dataset is not None:
-                self.catalog.demote(promoted_dataset)
+                self.catalog.demote(promoted_dataset, record_lifecycle=False)
                 events = journal.load()
                 if events:
                     last = events[-1]
@@ -753,6 +775,70 @@ def _listing_periods(parameters: dict[str, Any]) -> dict[str, tuple[date | None,
     return result
 
 
+def _authenticate_mapping_authority(
+    adapter: SourceAdapter[Any],
+    records: tuple[dict[str, object], ...],
+    request: RetrievalRequest,
+    contract: TableContract,
+    project_root: Path,
+) -> tuple[
+    Literal["NOT_APPLICABLE", "RESOLVED", "AUTHORITY_DATASET"],
+    str | None,
+    str | None,
+    str | None,
+]:
+    """Verify canonical IDs centrally and return content-bound mapping evidence."""
+    if contract.name == "security_master":
+        return ("AUTHORITY_DATASET", None, None, None)
+    identified = tuple(row for row in records if row.get("security_id") is not None)
+    if not identified:
+        return ("NOT_APPLICABLE", None, None, None)
+    if len(identified) != len(records):
+        raise DataQualityError("A dataset cannot mix mapped and unmapped security identities.")
+    authority = adapter.mapping_authority_path()
+    if authority is None:
+        raise DataQualityError("Canonical security IDs require persisted mapping authority.")
+    authority = authority.resolve()
+    try:
+        relative = authority.relative_to(project_root.resolve()).as_posix()
+    except ValueError as exc:
+        raise DataQualityError("Mapping authority must be inside the project data root.") from exc
+    if not authority.is_file():
+        raise DataQualityError("Persisted mapping authority is missing.")
+    try:
+        if request.source is DataSource.YAHOO_FINANCE:
+            security_store = SecurityMappingStore(authority)
+            for row in identified:
+                observed = str(row["security_id"])
+                expected = security_store.resolve(
+                    request.source.value,
+                    str(row["ticker"]),
+                    row["trading_date"],  # type: ignore[arg-type]
+                ).value
+                if observed != expected:
+                    raise DataQualityError("Market record identity differs from mapping authority.")
+        elif request.source is DataSource.SEC_EDGAR:
+            issuer_store = IssuerListingMappingStore(authority)
+            for row in identified:
+                observed = str(row["security_id"])
+                expected = issuer_store.resolve(
+                    IssuerId(str(row["issuer_id"])),
+                    row["filing_date"],  # type: ignore[arg-type]
+                ).value
+                if observed != expected:
+                    raise DataQualityError("SEC record identity differs from mapping authority.")
+        else:
+            raise DataQualityError(
+                f"Security identity authority is not defined for source {request.source.value}."
+            )
+    except DataQualityError:
+        raise
+    except Exception as exc:
+        raise DataQualityError(f"Mapping authority validation failed: {exc}") from exc
+    checksum = sha256_file(authority)
+    return ("RESOLVED", relative, checksum, f"mapping:{checksum}")
+
+
 def _unit_metadata(records: tuple[dict[str, object], ...]) -> dict[str, str]:
     keys = ("source_unit", "standardized_unit", "unit", "currency")
     return {
@@ -866,6 +952,7 @@ def _append_lifecycle(
     previous: LifecycleEvent | None,
     *,
     reason: str = "controlled Phase 1 publication",
+    additional_supporting_evidence: tuple[str, ...] = (),
 ) -> LifecycleEvent:
     sequence = 1 if previous is None else previous.sequence + 1
     event = LifecycleEvent.create(
@@ -881,6 +968,7 @@ def _append_lifecycle(
             context["artifact_id"],
             context["validation_report_id"],
             context["lineage_document_id"],
+            *additional_supporting_evidence,
         ),
         **context,
     )

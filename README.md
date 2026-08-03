@@ -4,9 +4,9 @@ A research-driven framework intended to support reproducible multi-factor asset 
 
 ## Current status
 
-Repository governance and the owner-approved [Project Specification](docs/PROJECT_SPECIFICATION.md) are complete. Phase 1 has completed a third focused remediation with an append-only v4 lifecycle journal, crash-safe staged publication, authenticated research reads, authoritative demotion/invalidation, atomic catalog rebuild, identity-authority enforcement, and end-to-end unit reconciliation. Another independent final audit is required; Phase 1 has not passed that audit. No Phase 2 analytical model, portfolio engine, backtest, API, dashboard, or empirical result has been implemented.
+Repository governance and the owner-approved [Project Specification](docs/PROJECT_SPECIFICATION.md) are complete. Phase 1 is complete and independently assured: schema-v5 publication envelopes bind manifests, terminal runs, lifecycle heads, configuration, validation, lineage, units, mapping authority, artifacts, and catalog state at every supported research read. Phase 2 is authorized as the next phase but has not started. No Phase 2 analytical model, portfolio engine, backtest, API, dashboard, or empirical result has been implemented.
 
-The governing standard is [docs/DEVELOPMENT_CONSTITUTION.md](docs/DEVELOPMENT_CONSTITUTION.md). Phase 1 evidence is recorded in the [implementation report](docs/PHASE1_IMPLEMENTATION_REPORT.md), preserved [independent audit](docs/PHASE1_AUDIT_REPORT.md), [earlier remediation report](docs/PHASE1_REMEDIATION_REPORT.md), and [third remediation report](docs/PHASE1_THIRD_REMEDIATION_REPORT.md).
+The governing standard is [docs/DEVELOPMENT_CONSTITUTION.md](docs/DEVELOPMENT_CONSTITUTION.md). Current closure evidence is recorded in the [final remediation implementation report](docs/PHASE1_FINAL_REMEDIATION_IMPLEMENTATION_REPORT.md) and [post-remediation assurance report](docs/PHASE1_POST_REMEDIATION_ASSURANCE_REPORT.md). All earlier [audit](docs/PHASE1_FINAL_ASSURANCE_REPORT.md), remediation, and re-audit reports remain preserved as historical evidence.
 
 ## Planned phases
 

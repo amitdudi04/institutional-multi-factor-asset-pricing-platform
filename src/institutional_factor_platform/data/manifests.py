@@ -93,7 +93,7 @@ class SourceManifest(ManifestModel):
 
 
 class DatasetManifest(ManifestModel):
-    schema_version: Literal["4.0.0"]
+    schema_version: Literal["5.0.0"]
     manifest_revision_id: str
     run_id: str
     dataset_id: str
@@ -114,6 +114,10 @@ class DatasetManifest(ManifestModel):
     security_count: int | None = Field(default=None, ge=0)
     missingness_summary: dict[str, int] = Field(default_factory=dict)
     unit_metadata: dict[str, str] = Field(default_factory=dict)
+    mapping_status: Literal["NOT_APPLICABLE", "RESOLVED", "AUTHORITY_DATASET"]
+    mapping_evidence_path: str | None = None
+    mapping_evidence_checksum: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
+    mapping_evidence_id: str | None = None
     validation_report_id: str
     validation_report_path: str
     validation_report_checksum: str = Field(pattern=r"^[a-f0-9]{64}$")
@@ -162,11 +166,22 @@ class DatasetManifest(ManifestModel):
             raise ValueError("published dataset requires promotion event identity and timestamp")
         if self.validation_status is DatasetStatus.QUARANTINED and not self.quarantine_status:
             raise ValueError("quarantined status requires quarantine evidence")
+        mapping_values = (
+            self.mapping_evidence_path,
+            self.mapping_evidence_checksum,
+            self.mapping_evidence_id,
+        )
+        if self.mapping_status == "RESOLVED" and any(value is None for value in mapping_values):
+            raise ValueError("resolved identity requires complete mapping evidence")
+        if self.mapping_status != "RESOLVED" and any(value is not None for value in mapping_values):
+            raise ValueError("mapping evidence is only valid for resolved identity")
         return self
 
 
 class PromotionManifest(ManifestModel):
-    schema_version: Literal["3.0.0"]
+    schema_version: Literal["4.0.0"]
+    promotion_manifest_id: str
+    run_id: str
     dataset_id: str
     dataset_manifest_path: str
     dataset_manifest_hash: str = Field(pattern=r"^[a-f0-9]{64}$")
@@ -177,3 +192,4 @@ class PromotionManifest(ManifestModel):
     git_commit: str
     configuration_hash: str = Field(pattern=r"^[a-f0-9]{64}$")
     lifecycle_final_event_id: str
+    run_manifest_path: str

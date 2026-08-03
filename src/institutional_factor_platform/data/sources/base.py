@@ -4,6 +4,7 @@ import random
 import time
 from abc import ABC, abstractmethod
 from collections.abc import Callable
+from pathlib import Path
 from typing import Generic, TypeVar
 
 import httpx
@@ -25,6 +26,10 @@ class SourceAdapter(ABC, Generic[T]):
     @abstractmethod
     def standardize(self, payload: T, request: RetrievalRequest) -> tuple[dict[str, object], ...]:
         """Convert a provider payload into its source-specific contract."""
+
+    def mapping_authority_path(self) -> Path | None:
+        """Return the persisted identity authority used by this adapter, if any."""
+        return None
 
 
 class HttpTransport:

@@ -96,25 +96,20 @@ class MappingEvidence(StrEnum):
 class SecurityId:
     value: str
 
+    def __post_init__(self) -> None:
+        if not re.fullmatch(r"sec_[a-f0-9]{32}", self.value):
+            raise SecurityMappingError("Security ID must be a canonical 128-bit internal ID.")
+
     @classmethod
     def canonical(
         cls, stable_listing_key: str, exchange: str, mic: str | None = None
     ) -> "SecurityId":
-        """Create an ID from a stable listing key, never from a display ticker.
-
-        The first argument is retained for API compatibility but is now a stable owner-governed
-        listing key. Symbol text belongs in effective-dated symbol history.
-        """
-        parts = [
-            stable_listing_key.strip(),
-            exchange.strip().upper(),
-            (mic or "").strip().upper(),
-        ]
-        if not parts[0] or not parts[1]:
-            raise SecurityMappingError(
-                "Canonical security ID requires stable listing key and venue."
-            )
-        return cls(f"sec_{uuid.uuid5(uuid.NAMESPACE_URL, 'listing-v2|' + '|'.join(parts)).hex}")
+        """Reject caller-derived identity; canonical IDs must be assigned and persisted."""
+        del stable_listing_key, exchange, mic
+        raise SecurityMappingError(
+            "Direct canonical construction is prohibited; assign an ID and persist "
+            "mapping authority."
+        )
 
     @classmethod
     def assign(cls) -> "SecurityId":

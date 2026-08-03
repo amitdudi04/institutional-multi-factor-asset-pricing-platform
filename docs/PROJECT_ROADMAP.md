@@ -4,11 +4,11 @@ This roadmap summarizes the boundaries defined in `docs/PROJECT_SPECIFICATION.md
 
 ## Phase 1 — Institutional Data Platform
 
-Implemented through a third focused remediation, with another independent final audit required: approved adapters, immutable raw and standardized storage, authenticated v4 publication evidence, append-only connected lifecycle state, crash-safe activation/recovery, authenticated read-time isolation, stable listing/issuer identity and symbol history, atomic DuckDB rebuild, reconciled units, calendars, fundamentals, and macro/published-factor inputs. This status does not claim Phase 1 passed. Corporate-action fields are retained by the market adapter and a separate action contract is defined; no issuer-scale live dataset is claimed. No research model may precede a passing re-audit of validated, provenance-controlled inputs.
+Complete and independently assured: approved adapters, immutable raw and standardized storage, authenticated schema-v5 publication evidence, checkpointed append-only lifecycle state, crash-safe activation/recovery, authenticated read-time isolation, centrally enforced listing/issuer mapping authority, atomic DuckDB rebuild, reconciled units, calendars, fundamentals, and macro/published-factor inputs. Corporate-action fields are retained by the market adapter and a separate action contract is defined; no issuer-scale live dataset or empirical fitness claim is made. Phase 1 acceptance criteria pass with live integration validation retained as a disclosed operational limitation.
 
 ## Phase 2 — Multi-Factor Research Engine
 
-Implement financially motivated observable factors, standardization and neutralization, factor portfolios and diagnostics, latent PCA factors, and validation. Factor definitions, universe, timing, weighting, and bias controls must be explicit.
+Authorized as the next phase but not started. Implement financially motivated observable factors, standardization and neutralization, factor portfolios and diagnostics, latent PCA factors, and validation. Factor definitions, universe, timing, weighting, and bias controls must be explicit, and all still-proposed/open Phase 2 decisions require owner resolution before their affected functionality.
 
 ## Phase 3 — Asset-Pricing Research Platform
 

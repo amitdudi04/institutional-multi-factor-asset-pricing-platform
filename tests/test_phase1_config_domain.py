@@ -96,9 +96,12 @@ def test_config_example_refuses_overwrite(tmp_path: Path) -> None:
 
 def test_security_id_is_stable_and_not_ticker_only() -> None:
     assert not hasattr(SecurityId, "create")
-    canonical = SecurityId.canonical("listing-key-1", "xnys", "xNYS")
-    assert canonical == SecurityId.canonical("listing-key-1", "XNYS", "XNYS")
-    assert canonical != SecurityId.canonical("listing-key-1", "XNAS", "XNAS")
+    with pytest.raises(SecurityMappingError, match="Direct canonical construction"):
+        SecurityId.canonical("AAPL", "XNYS", "XNYS")
+    assigned = SecurityId.assign()
+    assert assigned.value.startswith("sec_")
+    with pytest.raises(SecurityMappingError, match="canonical 128-bit"):
+        SecurityId("sec_caller_injected")
 
 
 def test_temporal_and_date_range_invariants() -> None:
@@ -120,7 +123,7 @@ def _security(
 ) -> SecurityRecord:
     now = datetime(2024, 1, 2, tzinfo=UTC)
     return SecurityRecord(
-        SecurityId.canonical(f"owner-listing-{source_id}", "XNYS", "XNYS"),
+        SecurityId.assign(),
         " synth ",
         "Synthetic Test Issuer",
         "XNYS",

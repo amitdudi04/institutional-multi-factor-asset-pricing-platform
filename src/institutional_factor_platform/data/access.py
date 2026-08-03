@@ -36,7 +36,13 @@ class VerifiedDatasetHandle:
     git_commit: str
     validation_status: DatasetStatus
     mapping_status: str
+    mapping_evidence_id: str | None
+    lifecycle_state: str
+    lineage_id: str
+    promotion_id: str
+    run_id: str
     temporal_policy: str
+    limitations: tuple[str, ...]
 
 
 class ResearchDatasetRepository:
@@ -85,8 +91,14 @@ class ResearchDatasetRepository:
             configuration_hash=manifest.configuration_hash,
             git_commit=manifest.git_commit,
             validation_status=manifest.validation_status,
-            mapping_status="RESOLVED_OR_NOT_APPLICABLE",
+            mapping_status=manifest.mapping_status,
+            mapping_evidence_id=manifest.mapping_evidence_id,
+            lifecycle_state=LifecycleState.FINALIZED.value,
+            lineage_id=manifest.lineage_id,
+            promotion_id=str(manifest.promotion_event_id),
+            run_id=manifest.run_id,
             temporal_policy=manifest.temporal_policy_version,
+            limitations=("LIVE INTEGRATION VALIDATION PENDING",),
         )
 
     def read_table(self, dataset_id: str) -> pa.Table:
@@ -125,7 +137,7 @@ class RecoveryService:
                     )
                     outcomes[last.dataset_id] = "DEMOTED"
                     if self.catalog.path.exists():
-                        self.catalog.demote(last.dataset_id)
+                        self.catalog.demote(last.dataset_id, record_lifecycle=False)
             except Exception as exc:
                 outcomes[str(journal_path)] = f"MANUAL_INTERVENTION_REQUIRED: {exc}"
         if self.catalog.path.exists():
@@ -153,7 +165,7 @@ class RecoveryService:
                             "incomplete catalog activation",
                         )
                         outcomes[str(dataset_id)] = "DEMOTED"
-                    self.catalog.demote(str(dataset_id))
+                    self.catalog.demote(str(dataset_id), record_lifecycle=False)
                 except Exception as exc:
                     outcomes[str(dataset_id)] = f"MANUAL_INTERVENTION_REQUIRED: {exc}"
             try:

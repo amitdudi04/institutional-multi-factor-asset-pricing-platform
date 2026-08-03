@@ -15,11 +15,17 @@ from institutional_factor_platform.data.domain import (
     DatasetStatus,
     DataSource,
     DateRange,
+    MappingEvidence,
     RetrievalRequest,
+    SecurityId,
     ValidationResult,
     ValidationSeverity,
 )
 from institutional_factor_platform.data.manifests import PromotionManifest
+from institutional_factor_platform.data.security_master import (
+    SecurityMappingStore,
+    mapping_from_listing,
+)
 from institutional_factor_platform.data.services import DataIngestionService
 from institutional_factor_platform.data.sources.base import SourceAdapter
 from institutional_factor_platform.data.storage import (
@@ -76,7 +82,7 @@ class InvalidSyntheticSecAdapter(SourceAdapter[bytes]):
         return (
             {
                 "issuer_id": "issuer_synthetic",
-                "security_id": "sec_synthetic",
+                "security_id": None,
                 "ticker": "SYNTH",
                 "cik": "0000000001",
                 "entity_name": "Synthetic Test Issuer",
@@ -118,6 +124,13 @@ class PartialStandardizationAdapter(SyntheticMacroAdapter):
 class SyntheticMarketAdapter(SourceAdapter[bytes]):
     source = DataSource.YAHOO_FINANCE
 
+    def __init__(self, mapping_store: SecurityMappingStore, security_id: SecurityId) -> None:
+        self.mapping_store = mapping_store
+        self.security_id = security_id
+
+    def mapping_authority_path(self) -> Path:
+        return self.mapping_store.path
+
     def retrieve(self, request: RetrievalRequest) -> bytes:
         return b"synthetic market software fixture"
 
@@ -126,7 +139,7 @@ class SyntheticMarketAdapter(SourceAdapter[bytes]):
     ) -> tuple[dict[str, object], ...]:
         return tuple(
             {
-                "security_id": "sec_synthetic",
+                "security_id": self.security_id.value,
                 "ticker": "SYNTH",
                 "trading_date": value,
                 "open": 10.0,
@@ -318,7 +331,24 @@ def test_authenticated_evidence_cross_checks_semantics(tmp_path: Path) -> None:
             variant(
                 "report-critical",
                 evidence_field="validation_report_path",
-                evidence_update={"results": [{"severity": "CRITICAL"}]},
+                evidence_update={
+                    "results": [
+                        {
+                            "rule": "synthetic_blocker",
+                            "severity": "CRITICAL",
+                            "message": "synthetic blocking result",
+                            "field": None,
+                            "row": None,
+                            "rule_version": "1.0.0",
+                            "dataset_id": manifest.dataset_id,
+                            "affected_count": 1,
+                            "representative_keys": [],
+                            "remediation": "reject synthetic blocker",
+                            "source": "owner_supplied",
+                            "timestamp": datetime(2024, 1, 3, tzinfo=UTC).isoformat(),
+                        }
+                    ]
+                },
             ),
             "blocking findings",
         ),
@@ -493,14 +523,33 @@ def test_failed_and_partial_sources_remain_manifested(
 
 def test_market_ingestion_applies_exchange_calendar_coverage(tmp_path: Path) -> None:
     service = DataIngestionService(_temp_config(tmp_path), root=tmp_path)
+    security_id = SecurityId.assign()
+    mapping_store = SecurityMappingStore(tmp_path / "data/metadata/security-mappings.json")
+    mapping_store.persist(
+        (
+            mapping_from_listing(
+                source=DataSource.YAHOO_FINANCE,
+                source_identifier="SYNTH",
+                ticker="SYNTH",
+                exchange="XNYS",
+                mic="XNYS",
+                valid_from=date(2020, 1, 1),
+                valid_to=None,
+                provenance="synthetic test mapping",
+                retrieval_timestamp=datetime(2024, 1, 1, tzinfo=UTC),
+                evidence=MappingEvidence.OWNER_CONFIRMED,
+                security_id=security_id,
+            ),
+        )
+    )
     manifest = service.ingest(
-        SyntheticMarketAdapter(),
+        SyntheticMarketAdapter(mapping_store, security_id),
         RetrievalRequest(
             DataSource.YAHOO_FINANCE,
             "daily_market",
             DateRange(date(2024, 1, 1), date(2024, 1, 3)),
             ("SYNTH",),
-            {"listing_periods": {"sec_synthetic": {"start": "2024-01-02", "end": "2024-01-03"}}},
+            {"listing_periods": {security_id.value: {"start": "2024-01-02", "end": "2024-01-03"}}},
         ),
         DAILY_MARKET,
         "csv",

@@ -19,7 +19,7 @@ from institutional_factor_platform.data.domain import (
     DateRange,
     RetrievalRequest,
 )
-from institutional_factor_platform.data.lineage import LineageStore
+from institutional_factor_platform.data.lineage import LifecycleState, LineageStore
 from institutional_factor_platform.data.manifests import DatasetManifest
 from institutional_factor_platform.data.services import DataIngestionService
 from institutional_factor_platform.data.sources.base import HttpTransport
@@ -59,7 +59,7 @@ def build_parser() -> argparse.ArgumentParser:
     lineage = commands.add_parser("inspect-lineage", help="Validate and print persisted lineage")
     lineage.add_argument("path", type=Path)
     dataset_manifest = commands.add_parser(
-        "inspect-dataset-manifest", help="Validate and print a v4 dataset manifest"
+        "inspect-dataset-manifest", help="Validate and print a v5 dataset manifest"
     )
     dataset_manifest.add_argument("path", type=Path)
     verify = commands.add_parser("verify-raw", help="Verify a raw file against a SHA-256 checksum")
@@ -133,7 +133,12 @@ def main(argv: list[str] | None = None) -> int:
             rebuilt = service.recovery.rebuild_catalog()
             print(rebuilt.path)
         elif args.command == "verify-publication":
-            authenticate_dataset_evidence(args.dataset_id, args.manifest, service.root)
+            authenticate_dataset_evidence(
+                args.dataset_id,
+                args.manifest,
+                service.root,
+                required_state=LifecycleState.FINALIZED,
+            )
             print("publication evidence verified")
         elif args.command == "inspect-lineage":
             document = LineageStore(args.path).load()

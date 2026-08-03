@@ -1,6 +1,7 @@
 """Persisted, deterministic Phase 1 artifact lineage."""
 
 import hashlib
+import json
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import StrEnum
@@ -199,6 +200,17 @@ class LifecycleEventStore:
         existing = self.load()
         _validate_lifecycle((*existing, event))
         atomic_write_json(path, event.model_dump(mode="json"))
+        atomic_write_json(
+            self.head_path,
+            {
+                "schema_version": "1.0.0",
+                "dataset_id": event.dataset_id,
+                "sequence": event.sequence,
+                "event_id": event.event_id,
+                "event_checksum": event.event_checksum,
+            },
+            immutable=False,
+        )
         return path
 
     def load(self) -> tuple[LifecycleEvent, ...]:
@@ -208,9 +220,23 @@ class LifecycleEventStore:
                 for path in sorted(self.root.glob("*.json"))
             )
             _validate_lifecycle(events)
+            if self.head_path.exists():
+                head = json.loads(self.head_path.read_text(encoding="utf-8"))
+                if not events or head != {
+                    "schema_version": "1.0.0",
+                    "dataset_id": events[-1].dataset_id,
+                    "sequence": events[-1].sequence,
+                    "event_id": events[-1].event_id,
+                    "event_checksum": events[-1].event_checksum,
+                }:
+                    raise ManifestError("Lifecycle head checkpoint does not match journal tail.")
             return events
         except (OSError, ValueError) as exc:
             raise ManifestError(f"Invalid lifecycle journal {self.root}: {exc}") from exc
+
+    @property
+    def head_path(self) -> Path:
+        return self.root.parent / f"{self.root.name}-head.json"
 
     def current_state(self, dataset_id: str) -> LifecycleState | None:
         events = self.load()

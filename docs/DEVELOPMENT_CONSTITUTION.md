@@ -66,6 +66,8 @@ Documentation is part of the product and must match implemented behavior, method
 
 Only the owner-designated phase may be implemented. No temporary future engine, placeholder model, invented demo, or empty package is permitted. Every phase begins by reading this constitution, the project and phase specifications, current code/tests, Git state, prior risks, and active boundaries. Every phase ends with executed validation, updated documentation, a change and risk summary, acceptance evidence, and a non-fabrication confirmation.
 
+Current owner-authorized phase status: Phase 1 is complete following independent post-remediation assurance. Phase 2 is authorized as the next phase but has not started; its proposed/open decisions remain gated until explicitly resolved for the affected work.
+
 ## Definition of done
 
 Work is complete only when applicable requirements and acceptance criteria are met; architecture is coherent; imports, tests, lint, formatting, and types are validated; errors are meaningful; configuration is externalized; provenance and temporal controls are preserved; outputs are reproducible; documentation is accurate; no fabricated input or output, silent scientific fallback, unapproved placeholder, or unresolved critical defect remains. Failed or unavailable checks must be disclosed exactly.
