@@ -1,21 +1,19 @@
 """Orchestration for reproducible, immutable Phase 2 factor research publications."""
 
 import hashlib
-import json
 import os
 import subprocess
 import tempfile
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import cast
 
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 
 from institutional_factor_platform.data.access import VerifiedDatasetHandle
-from institutional_factor_platform.data.evidence import atomic_write_json
+from institutional_factor_platform.data.evidence import atomic_write_json, canonical_json_bytes
 from institutional_factor_platform.data.storage import sha256_file
 from institutional_factor_platform.exceptions import DataQualityError, EvidenceIntegrityError
 from institutional_factor_platform.factors.config import FactorConfig
@@ -82,6 +80,13 @@ class FactorResearchService:
         """Read the exact authenticated parent artifacts; callers cannot inject data frames."""
         _authenticate_parents(parents)
         by_id = {parent.dataset_id: parent for parent in parents}
+        if market_dataset_id == fundamental_dataset_id or set(by_id) != {
+            market_dataset_id,
+            fundamental_dataset_id,
+        }:
+            raise EvidenceIntegrityError(
+                "Factor publication requires exactly its market and fundamental parent artifacts."
+            )
         try:
             market_parent = by_id[market_dataset_id]
             fundamental_parent = by_id[fundamental_dataset_id]
@@ -91,10 +96,12 @@ class FactorResearchService:
             ) from exc
         return self._compute_and_publish(
             parents,
-            pq.read_table(market_parent.artifact_path).to_pandas(),
-            pq.read_table(fundamental_parent.artifact_path).to_pandas(),
+            _read_parent_table(market_parent).to_pandas(),
+            _read_parent_table(fundamental_parent).to_pandas(),
             market_units=market_parent.unit_metadata,
             fundamental_units=fundamental_parent.unit_metadata,
+            market_dataset_id=market_dataset_id,
+            fundamental_dataset_id=fundamental_dataset_id,
         )
 
     def _compute_and_publish(
@@ -105,12 +112,16 @@ class FactorResearchService:
         *,
         market_units: dict[str, str],
         fundamental_units: dict[str, str],
+        market_dataset_id: str,
+        fundamental_dataset_id: str,
     ) -> FactorRunResult:
         parent_evidence = _authenticate_parents(parents)
         parent_ids = {parent.dataset_id for parent in parents}
         _validate_units(market_units, fundamentals, fundamental_units)
-        market_value = validate_market_input(market, parent_ids)
-        fundamental_value = validate_fundamental_input(fundamentals, parent_ids)
+        market_value = validate_market_input(market, self.config.plausibility)
+        fundamental_value = validate_fundamental_input(fundamentals)
+        market_source_ids = (market_dataset_id,)
+        fundamental_source_ids = (fundamental_dataset_id,)
         eligible_market = market_value.loc[market_value["eligible"]].copy()
         if eligible_market.empty:
             raise DataQualityError(
@@ -120,14 +131,22 @@ class FactorResearchService:
         characteristics = compute_characteristics(panel, self.config)
         factor_ids = tuple(item.factor_id for item in FACTOR_DEFINITIONS)
         output = preprocess_characteristics(characteristics, factor_ids, self.config.preprocessing)
-        portfolios = compute_factor_portfolios(output, characteristics, eligible_market)
-        validate_factor_portfolios(portfolios)
-        diagnostics = build_factor_diagnostics(output, portfolios, self.config.windows.short)
+        portfolios = compute_factor_portfolios(
+            output,
+            characteristics,
+            eligible_market,
+            quantiles=self.config.portfolios.quantiles,
+            rebalancing=self.config.rebalancing,
+        )
+        validate_factor_portfolios(portfolios, self.config.portfolios.quantiles)
+        diagnostics = build_factor_diagnostics(
+            output, portfolios, self.config.portfolios.rolling_periods
+        )
+        git_commit = _git_commit(self.root)
         publication_id = _publication_id(
             parent_evidence,
-            market_value,
-            fundamental_value,
             self.config.canonical_hash(),
+            git_commit,
         )
         diagnostics["publication_id"] = publication_id
         existing_publication = self.manifest_root / publication_id / "factor-publication.json"
@@ -178,6 +197,8 @@ class FactorResearchService:
             "schema_version": "1.0.0",
             "publication_id": publication_id,
             "parent_dataset_ids": sorted(parent_ids),
+            "market_source_dataset_ids": market_source_ids,
+            "fundamental_source_dataset_ids": fundamental_source_ids,
             "parent_artifact_checksums": sorted(
                 parent.artifact_checksum for parent in parent_evidence
             ),
@@ -188,7 +209,7 @@ class FactorResearchService:
             "universe_policy": "explicit_point_in_time_eligibility_only",
             "excluded_ineligible_rows": int((~market_value["eligible"]).sum()),
             "configuration_hash": self.config.canonical_hash(),
-            "git_commit": _git_commit(self.root),
+            "git_commit": git_commit,
             "created_at": created_at.isoformat(),
         }
         atomic_write_json(staged_lineage, lineage)
@@ -206,6 +227,8 @@ class FactorResearchService:
                     f"winsorize@{self.config.preprocessing.winsor_lower:.4f}/"
                     f"{self.config.preprocessing.winsor_upper:.4f}",
                     f"{self.config.preprocessing.method}@1.0.0",
+                    f"neutralize:{self.config.preprocessing.neutralize_by}@1.0.0",
+                    f"direction:{item.direction:+d}@1.0.0",
                 ),
                 dependencies=tuple(parent.dataset_id for parent in parent_evidence),
                 version=FACTOR_VERSION,
@@ -234,6 +257,8 @@ class FactorResearchService:
             date_end=dates.max().date().isoformat(),
             factor_ids=factor_ids,
             parents=parent_evidence,
+            market_source_dataset_ids=market_source_ids,
+            fundamental_source_dataset_ids=fundamental_source_ids,
             configuration_hash=self.config.canonical_hash(),
             configuration_snapshot_path=_relative(snapshot_path, self.root),
             configuration_snapshot_checksum=sha256_file(staged_snapshot),
@@ -244,7 +269,7 @@ class FactorResearchService:
             diagnostics_checksum=sha256_file(staged_diagnostics),
             lineage_path=_relative(lineage_path, self.root),
             lineage_checksum=sha256_file(staged_lineage),
-            git_commit=_git_commit(self.root),
+            git_commit=git_commit,
             metadata=metadata,
         )
         atomic_write_json(staged_manifest, manifest.model_dump(mode="json"))
@@ -295,9 +320,33 @@ def _authenticate_parents(
                 promotion_id=parent.promotion_id,
                 run_id=parent.run_id,
                 validation_status=parent.validation_status.value,
+                schema_version=parent.schema_version,
+                unit_metadata=parent.unit_metadata,
+                configuration_hash=parent.configuration_hash,
+                git_commit=parent.git_commit,
+                mapping_status=parent.mapping_status,
+                mapping_evidence_id=parent.mapping_evidence_id,
+                temporal_policy=parent.temporal_policy,
             )
         )
     return tuple(sorted(evidence, key=lambda item: item.dataset_id))
+
+
+def _read_parent_table(parent: VerifiedDatasetHandle) -> pa.Table:
+    try:
+        content = parent.artifact_path.read_bytes()
+    except OSError as exc:
+        raise EvidenceIntegrityError(f"Factor parent cannot be read: {parent.dataset_id}") from exc
+    if hashlib.sha256(content).hexdigest() != parent.checksum:
+        raise EvidenceIntegrityError(
+            f"Factor parent changed before authenticated parsing: {parent.dataset_id}"
+        )
+    try:
+        return pq.read_table(pa.BufferReader(content))
+    except pa.ArrowException as exc:
+        raise EvidenceIntegrityError(
+            f"Factor parent is not a readable Parquet artifact: {parent.dataset_id}"
+        ) from exc
 
 
 def _validate_units(
@@ -305,7 +354,8 @@ def _validate_units(
     fundamentals: pd.DataFrame,
     fundamental_units: dict[str, str],
 ) -> None:
-    if market_units != MARKET_REQUIRED_UNITS:
+    normalized_market_units = _extract_units(market_units, set(MARKET_REQUIRED_UNITS))
+    if normalized_market_units != MARKET_REQUIRED_UNITS:
         raise DataQualityError(
             "Market units must exactly match the approved Phase 2 decimal/USD/share contract."
         )
@@ -314,9 +364,10 @@ def _validate_units(
         raise DataQualityError(
             "Fundamental inputs must exactly cover the complete Phase 2 accounting field set."
         )
-    if set(fundamental_units) != fields:
+    normalized_fundamental_units = _extract_units(fundamental_units, fields)
+    if set(normalized_fundamental_units) != fields:
         raise DataQualityError("Fundamental unit declarations must exactly cover observed fields.")
-    for field_name, declared in fundamental_units.items():
+    for field_name, declared in normalized_fundamental_units.items():
         if declared != "USD":
             raise DataQualityError(f"Fundamental field {field_name} must use the USD contract.")
         observed = set(fundamentals.loc[fundamentals["field"].eq(field_name), "unit"])
@@ -324,31 +375,38 @@ def _validate_units(
             raise DataQualityError(f"Fundamental unit contradiction for {field_name}.")
 
 
+def _extract_units(metadata: dict[str, str], fields: set[str]) -> dict[str, str]:
+    extracted: dict[str, str] = {}
+    for field_name in fields:
+        values = {
+            metadata[key]
+            for key in (
+                field_name,
+                f"request.{field_name}",
+                f"contract.{field_name}",
+                f"standardized.{field_name}",
+            )
+            if key in metadata
+        }
+        if len(values) == 1:
+            extracted[field_name] = values.pop()
+        elif len(values) > 1:
+            raise DataQualityError(f"Contradictory unit evidence for {field_name}.")
+    return extracted
+
+
 def _publication_id(
     parents: tuple[ParentDatasetEvidence, ...],
-    market: pd.DataFrame,
-    fundamentals: pd.DataFrame,
     configuration_hash: str,
+    git_commit: str,
 ) -> str:
-    def records(frame: pd.DataFrame) -> list[dict[str, object]]:
-        value = frame.copy()
-        for column in value.select_dtypes(include=["datetime", "datetimetz"]).columns:
-            value[column] = value[column].astype(str)
-        decoded = json.loads(value.to_json(orient="records", date_format="iso"))
-        if not isinstance(decoded, list):
-            raise DataQualityError("Unable to canonicalize factor inputs.")
-        return cast(list[dict[str, object]], decoded)
-
     payload = {
         "parents": [parent.model_dump(mode="json") for parent in parents],
-        "market": records(market.sort_values(["security_id", "date"])),
-        "fundamentals": records(fundamentals.sort_values(["security_id", "available_at", "field"])),
         "configuration_hash": configuration_hash,
         "factor_version": FACTOR_VERSION,
+        "git_commit": git_commit,
     }
-    digest = hashlib.sha256(
-        json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
-    ).hexdigest()
+    digest = hashlib.sha256(canonical_json_bytes(payload)).hexdigest()
     return f"factor-{digest[:32]}"
 
 

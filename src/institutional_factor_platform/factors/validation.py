@@ -48,6 +48,7 @@ INDICATORS = {"size_small", "size_mid", "size_large"}
 RETURN_FACTORS = {
     "market_return",
     "excess_return",
+    "risk_free_rate",
     "momentum_1m",
     "momentum_3m",
     "momentum_6m",
@@ -66,6 +67,7 @@ def validate_factor_output(frame: pd.DataFrame, publication_id: str) -> FactorVa
         "raw_value",
         "winsorized_value",
         "normalized_value",
+        "score_value",
         "normalization_method",
         "available_at",
         "factor_version",
@@ -84,12 +86,15 @@ def validate_factor_output(frame: pd.DataFrame, publication_id: str) -> FactorVa
     available = pd.to_datetime(frame["available_at"], utc=True)
     if (available > cutoffs).any():
         raise TemporalIntegrityError("factor output uses evidence unavailable at computation time")
-    for column in ("raw_value", "winsorized_value", "normalized_value"):
+    for column in ("raw_value", "winsorized_value", "normalized_value", "score_value"):
         observed = frame[column].dropna()
         if not observed.map(isfinite).all():
             raise DataQualityError(f"factor output {column} contains non-finite values")
     if (
-        frame.loc[frame["raw_value"].isna(), ["winsorized_value", "normalized_value"]]
+        frame.loc[
+            frame["raw_value"].isna(),
+            ["winsorized_value", "normalized_value", "score_value"],
+        ]
         .notna()
         .any()
         .any()

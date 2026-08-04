@@ -6,6 +6,7 @@ import pandas as pd
 
 from institutional_factor_platform.exceptions import DataQualityError
 from institutional_factor_platform.factors.config import PreprocessingConfig
+from institutional_factor_platform.factors.definitions import DEFINITION_BY_ID
 
 
 def winsorize(series: pd.Series, lower: float, upper: float) -> pd.Series:
@@ -62,6 +63,9 @@ def preprocess_characteristics(
                         "raw_value": raw.to_numpy(),
                         "winsorized_value": clipped.to_numpy(),
                         "normalized_value": transformed.to_numpy(),
+                        "score_value": (
+                            transformed * DEFINITION_BY_ID[factor_id].direction
+                        ).to_numpy(),
                         "normalization_method": (
                             config.method
                             if config.neutralize_by == "none"

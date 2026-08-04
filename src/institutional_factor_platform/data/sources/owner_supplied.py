@@ -42,11 +42,54 @@ UNIT_RULES: dict[str, dict[str, set[str]]] = {
     "french_factor_returns": {"factor_value": {"decimal"}},
     "sec_financial_facts": {"value": {"xbrl_source_unit"}},
     "security_master": {"security_id": {"not_applicable"}},
+    "factor_market_input": {
+        "price_basis": {"split_adjusted"},
+        "return_basis": {"total_return"},
+        "return": {"decimal_return"},
+        "price": {"USD"},
+        "high": {"USD"},
+        "low": {"USD"},
+        "volume": {"shares"},
+        "shares_outstanding": {"shares"},
+        "market_return": {"decimal_return"},
+        "risk_free": {"decimal_return"},
+        "benchmark_return": {"decimal_return"},
+    },
+    "factor_fundamental_input": {
+        field: {"USD"}
+        for field in (
+            "book_equity",
+            "net_income",
+            "operating_cash_flow",
+            "dividends",
+            "shareholder_equity",
+            "total_assets",
+            "gross_profit",
+            "operating_income",
+            "revenue",
+            "average_assets",
+            "total_accruals",
+            "total_debt",
+            "interest_expense",
+            "prior_total_assets",
+            "capex",
+            "prior_capex",
+            "net_equity_issuance",
+            "working_capital",
+            "prior_working_capital",
+        )
+    },
 }
 
 
 class OwnerSuppliedAdapter(SourceAdapter[bytes]):
     source = DataSource.OWNER_SUPPLIED
+
+    def __init__(self) -> None:
+        self._mapping_authority: Path | None = None
+
+    def mapping_authority_path(self) -> Path | None:
+        return self._mapping_authority
 
     def retrieve(self, request: RetrievalRequest) -> bytes:
         _contract(request)
@@ -61,6 +104,8 @@ class OwnerSuppliedAdapter(SourceAdapter[bytes]):
         self, payload: bytes, request: RetrievalRequest
     ) -> tuple[dict[str, object], ...]:
         contract = _contract(request)
+        mapping_value = request.parameters.get("mapping_authority_path")
+        self._mapping_authority = Path(str(mapping_value)).resolve() if mapping_value else None
         suffix = Path(str(request.parameters["path"])).suffix.lower()
         try:
             if suffix == ".csv":
@@ -107,6 +152,13 @@ def _contract(request: RetrievalRequest) -> TableContract:
     if schema not in CONTRACTS:
         raise UnsupportedDatasetError(f"Explicit approved schema required; got {schema!r}.")
     contract = CONTRACTS[schema]
+    if (
+        contract.name in {"factor_market_input", "factor_fundamental_input"}
+        and not str(request.parameters.get("mapping_authority_path", "")).strip()
+    ):
+        raise UnsupportedDatasetError(
+            "Phase 2 owner inputs require an explicit persisted mapping_authority_path."
+        )
     if request.parameters["contract_version"] != contract.version:
         raise UnsupportedDatasetError(
             f"Owner contract version {request.parameters['contract_version']!r} is unsupported; "

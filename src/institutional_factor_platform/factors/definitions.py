@@ -46,9 +46,16 @@ FACTOR_DEFINITIONS: tuple[FactorDefinition, ...] = (
     ),
     _definition(
         "excess_return",
-        "security return - risk-free return",
-        "Return above cash",
-        ("return", "risk_free"),
+        "market total return - risk-free return",
+        "Broad-market return above cash",
+        ("market_return", "risk_free"),
+        "decimal_return",
+    ),
+    _definition(
+        "risk_free_rate",
+        "frequency-matched approved risk-free simple return",
+        "Cash return and excess-return reference",
+        ("risk_free",),
         "decimal_return",
     ),
     _definition(
@@ -63,6 +70,7 @@ FACTOR_DEFINITIONS: tuple[FactorDefinition, ...] = (
         "Equity scale",
         ("price", "shares_outstanding"),
         "USD",
+        -1,
     ),
     _definition(
         "log_market_cap",
@@ -70,6 +78,7 @@ FACTOR_DEFINITIONS: tuple[FactorDefinition, ...] = (
         "Compressed firm scale",
         ("price", "shares_outstanding"),
         "log_USD",
+        -1,
     ),
     _definition(
         "size_small",
@@ -376,7 +385,8 @@ def compute_characteristics(panel: pd.DataFrame, config: FactorConfig) -> pd.Dat
     minimum = windows.minimum_observations
     result = frame[["security_id", "date", "available_at", "sector", "industry"]].copy()
     result["market_return"] = frame["market_return"]
-    result["excess_return"] = frame["return"] - frame["risk_free"]
+    result["excess_return"] = frame["market_return"] - frame["risk_free"]
+    result["risk_free_rate"] = frame["risk_free"]
     rolling_cov = (
         group.apply(
             lambda part: (

@@ -6,21 +6,37 @@ from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
 import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
 import pytest
 from pydantic import ValidationError
 
+from institutional_factor_platform.data import services as data_services_module
 from institutional_factor_platform.data.access import VerifiedDatasetHandle
-from institutional_factor_platform.data.domain import DatasetStatus
+from institutional_factor_platform.data.contracts import CONTRACTS
+from institutional_factor_platform.data.domain import (
+    DatasetStatus,
+    DataSource,
+    RetrievalRequest,
+    SecurityId,
+)
+from institutional_factor_platform.data.security_master import (
+    SecurityMappingStore,
+    mapping_from_listing,
+)
+from institutional_factor_platform.data.sources.owner_supplied import OwnerSuppliedAdapter
 from institutional_factor_platform.data.storage import sha256_file
 from institutional_factor_platform.exceptions import (
     ConfigurationError,
     DataQualityError,
     EvidenceIntegrityError,
+    PublicationConflictError,
     TemporalIntegrityError,
 )
 from institutional_factor_platform.factors import service as factor_service_module
+from institutional_factor_platform.factors import storage as factor_storage_module
 from institutional_factor_platform.factors.config import FactorConfig, load_factor_config
-from institutional_factor_platform.factors.contracts import MARKET_REQUIRED_UNITS
+from institutional_factor_platform.factors.contracts import MARKET_REQUIRED_UNITS, MARKET_SCHEMA
 from institutional_factor_platform.factors.definitions import FACTOR_DEFINITIONS
 from institutional_factor_platform.factors.portfolio import validate_factor_portfolios
 from institutional_factor_platform.factors.preprocessing import normalize, winsorize
@@ -112,7 +128,7 @@ def _inputs() -> tuple[pd.DataFrame, pd.DataFrame, dict[str, str]]:
     securities = ("sec_" + "1" * 32, "sec_" + "2" * 32, "sec_" + "3" * 32)
     for security_number, security_id in enumerate(securities, start=1):
         for offset in range(8):
-            current = start + timedelta(days=offset)
+            current = start + timedelta(days=offset * 15)
             market_rows.append(
                 {
                     "security_id": security_id,
@@ -137,7 +153,6 @@ def _inputs() -> tuple[pd.DataFrame, pd.DataFrame, dict[str, str]]:
                     "market_return": ((offset % 4) - 1) * 0.003,
                     "risk_free": 0.0001,
                     "benchmark_return": ((offset % 4) - 1) * 0.0025,
-                    "source_dataset_id": "market-parent",
                 }
             )
     fundamental_rows: list[dict[str, object]] = []
@@ -151,7 +166,6 @@ def _inputs() -> tuple[pd.DataFrame, pd.DataFrame, dict[str, str]]:
                     "field": field_name,
                     "value": float(100 + field_number + security_number),
                     "unit": "USD",
-                    "source_dataset_id": "fundamental-parent",
                 }
             )
     fundamentals = pd.DataFrame(fundamental_rows)
@@ -172,6 +186,57 @@ def test_configuration_is_strict_and_reproducible(tmp_path: Path) -> None:
     broken.write_text("unknown: true\n", encoding="utf-8")
     with pytest.raises(ConfigurationError):
         load_factor_config(broken)
+    with pytest.raises(ValidationError):
+        config.publication.__class__(output_root="../escape", manifest_root="data/manifests")
+
+
+def test_owner_factor_input_uses_registered_exact_contract(tmp_path: Path) -> None:
+    market, _, _ = _inputs()
+    source = tmp_path / "market.parquet"
+    pq.write_table(pa.Table.from_pandas(market, schema=MARKET_SCHEMA, preserve_index=False), source)
+    mapping_path = tmp_path / "mapping.json"
+    SecurityMappingStore(mapping_path).persist(
+        tuple(
+            mapping_from_listing(
+                source=DataSource.OWNER_SUPPLIED,
+                source_identifier=f"fixture-{index}",
+                ticker=f"F{index}",
+                exchange="XNYS",
+                mic="XNYS",
+                valid_from=date(2019, 1, 1),
+                valid_to=None,
+                provenance="isolated software fixture",
+                retrieval_timestamp=datetime(2020, 1, 1, tzinfo=UTC),
+                security_id=SecurityId(security_id),
+            )
+            for index, security_id in enumerate(sorted(set(market["security_id"])), start=1)
+        )
+    )
+    parameters = {
+        "path": str(source),
+        "schema": "factor_market_input",
+        "contract_version": "1.0.0",
+        "source_name": "isolated software fixture",
+        "source_ownership": "test only",
+        "units": MARKET_REQUIRED_UNITS,
+        "date_semantics": "fixture point-in-time dates",
+        "security_identifier_semantics": "fixture canonical mappings",
+        "mapping_authority_path": str(mapping_path),
+    }
+    request = RetrievalRequest(
+        DataSource.OWNER_SUPPLIED, "factor-market-fixture", parameters=parameters
+    )
+    adapter = OwnerSuppliedAdapter()
+    rows = adapter.standardize(source.read_bytes(), request)
+    assert len(rows) == len(market)
+    mapping = data_services_module._authenticate_mapping_authority(
+        adapter,
+        rows,
+        request,
+        CONTRACTS["factor_market_input"],
+        tmp_path,
+    )
+    assert mapping[0] == "RESOLVED"
 
 
 @pytest.mark.parametrize(
@@ -187,20 +252,15 @@ def test_preprocessing_methods_preserve_missing(method: str) -> None:
 
 def test_temporal_contract_blocks_leakage_and_bad_lineage() -> None:
     market, fundamentals, _ = _inputs()
-    parents = {"market-parent", "fundamental-parent"}
-    validated_market = validate_market_input(market, parents)
-    validated_fundamentals = validate_fundamental_input(fundamentals, parents)
+    validated_market = validate_market_input(market, _config().plausibility)
+    validated_fundamentals = validate_fundamental_input(fundamentals)
     panel = point_in_time_panel(validated_market, validated_fundamentals)
     assert (pd.to_datetime(panel["available_at"], utc=True) <= panel["computation_cutoff"]).all()
 
     future = market.copy()
     future.loc[0, "eligibility_available_at"] = datetime(2030, 1, 1, tzinfo=UTC)
     with pytest.raises(TemporalIntegrityError):
-        validate_market_input(future, parents)
-    unauthenticated = fundamentals.copy()
-    unauthenticated.loc[0, "source_dataset_id"] = "forged"
-    with pytest.raises(DataQualityError):
-        validate_fundamental_input(unauthenticated, parents)
+        validate_market_input(future, _config().plausibility)
 
 
 def test_full_catalog_publishes_authenticates_and_is_reproducible(tmp_path: Path) -> None:
@@ -223,9 +283,15 @@ def test_full_catalog_publishes_authenticates_and_is_reproducible(tmp_path: Path
     assert first.publication_id == second.publication_id
     manifest = authenticate_factor_publication(first.publication_path, tmp_path)
     assert set(manifest.factor_ids) == {definition.factor_id for definition in FACTOR_DEFINITIONS}
+    assert len(manifest.factor_ids) == 48
     assert manifest.security_count == 3
     table = service.repository.read_table(first.publication_id)
     assert table.num_rows == first.row_count
+    factor_frame = table.to_pandas()
+    size_score = factor_frame.loc[
+        factor_frame["factor_id"].eq("market_cap") & factor_frame["normalized_value"].notna()
+    ]
+    assert (size_score["score_value"] == -size_score["normalized_value"]).all()
     portfolios = service.repository.read_portfolios(first.publication_id).to_pandas()
     assert len(portfolios) == manifest.portfolio_row_count
     assert (portfolios["date"] > portfolios["formation_date"]).all()
@@ -285,6 +351,17 @@ def test_publication_rejects_forged_parent_and_unit_contract(tmp_path: Path) -> 
             market_dataset_id="market-parent",
             fundamental_dataset_id="fundamental-parent",
         )
+    ineligible = market.copy()
+    ineligible["eligible"] = False
+    with pytest.raises(DataQualityError, match="No securities"):
+        service.compute_and_publish(
+            (
+                _parent(tmp_path, "market-parent", ineligible),
+                _parent(tmp_path, "fundamental-parent", fundamentals),
+            ),
+            market_dataset_id="market-parent",
+            fundamental_dataset_id="fundamental-parent",
+        )
 
 
 def test_crash_before_activation_is_not_discoverable_and_retry_succeeds(
@@ -327,6 +404,7 @@ def test_factor_output_validator_rejects_invalid_values() -> None:
             "raw_value": [-1.0],
             "winsorized_value": [-1.0],
             "normalized_value": [0.0],
+            "score_value": [0.0],
             "normalization_method": ["zscore"],
             "available_at": [datetime(2020, 1, 2, tzinfo=UTC)],
             "factor_version": ["1.0.0"],
@@ -406,47 +484,131 @@ def test_portfolio_validator_rejects_temporal_and_numeric_defects() -> None:
 
 def test_input_contract_adversarial_failures() -> None:
     market, fundamentals, _ = _inputs()
-    parents = {"market-parent", "fundamental-parent"}
-
     with pytest.raises(DataQualityError):
-        validate_market_input(market.drop(columns="price"), parents)
+        validate_market_input(market.drop(columns="price"), _config().plausibility)
     with pytest.raises(DataQualityError):
-        validate_market_input(market.iloc[0:0], parents)
+        validate_market_input(market.iloc[0:0], _config().plausibility)
     duplicate = pd.concat([market, market.iloc[[0]]], ignore_index=True)
     with pytest.raises(DataQualityError):
-        validate_market_input(duplicate, parents)
+        validate_market_input(duplicate, _config().plausibility)
     invalid_id = market.copy()
     invalid_id.loc[0, "security_id"] = "ticker:AAPL"
     with pytest.raises(DataQualityError):
-        validate_market_input(invalid_id, parents)
+        validate_market_input(invalid_id, _config().plausibility)
     bad_return = market.copy()
     bad_return.loc[0, "return"] = -1.0
     with pytest.raises(DataQualityError):
-        validate_market_input(bad_return, parents)
+        validate_market_input(bad_return, _config().plausibility)
+    implausible_rf = market.copy()
+    implausible_rf.loc[0, "risk_free"] = 0.1
+    with pytest.raises(DataQualityError):
+        validate_market_input(implausible_rf, _config().plausibility)
     negative_price = market.copy()
     negative_price.loc[0, "price"] = -1.0
     with pytest.raises(DataQualityError):
-        validate_market_input(negative_price, parents)
+        validate_market_input(negative_price, _config().plausibility)
     inverted_range = market.copy()
     inverted_range.loc[0, "high"] = inverted_range.loc[0, "low"] - 1
     with pytest.raises(DataQualityError):
-        validate_market_input(inverted_range, parents)
+        validate_market_input(inverted_range, _config().plausibility)
 
     duplicate_fundamental = pd.concat([fundamentals, fundamentals.iloc[[0]]], ignore_index=True)
     with pytest.raises(DataQualityError):
-        validate_fundamental_input(duplicate_fundamental, parents)
+        validate_fundamental_input(duplicate_fundamental)
     future_period = fundamentals.copy()
     future_period.loc[0, "period_end"] = date(2030, 1, 1)
     with pytest.raises(TemporalIntegrityError):
-        validate_fundamental_input(future_period, parents)
+        validate_fundamental_input(future_period)
     nonfinite = fundamentals.copy()
     nonfinite.loc[0, "value"] = float("inf")
     with pytest.raises(DataQualityError):
-        validate_fundamental_input(nonfinite, parents)
+        validate_fundamental_input(nonfinite)
     missing_unit = fundamentals.copy()
     missing_unit.loc[0, "unit"] = None
     with pytest.raises(DataQualityError):
-        validate_fundamental_input(missing_unit, parents)
+        validate_fundamental_input(missing_unit)
 
     with pytest.raises(DataQualityError):
         normalize(pd.Series([1.0, 2.0]), "unsupported", 1)
+
+
+def test_additional_fail_closed_boundaries(tmp_path: Path) -> None:
+    market, fundamentals, _ = _inputs()
+    config = _config()
+
+    for column in ("security_id", "available_at", "eligible", "sector"):
+        broken = market.copy()
+        if column == "eligible":
+            broken[column] = broken[column].astype("object")
+        broken.loc[0, column] = None
+        with pytest.raises(DataQualityError):
+            validate_market_input(broken, config.plausibility)
+    zero = market.copy()
+    zero.loc[0, "shares_outstanding"] = 0.0
+    with pytest.raises(DataQualityError):
+        validate_market_input(zero, config.plausibility)
+    missing_period = fundamentals.copy()
+    missing_period.loc[0, "period_end"] = None
+    with pytest.raises(DataQualityError):
+        validate_fundamental_input(missing_period)
+
+    assert factor_service_module._authenticate_parents
+    with pytest.raises(EvidenceIntegrityError):
+        factor_service_module._authenticate_parents(())
+    market_parent = _parent(tmp_path, "market-parent", market)
+    with pytest.raises(EvidenceIntegrityError):
+        factor_service_module._authenticate_parents((market_parent, market_parent))
+    missing_parent = replace(market_parent, artifact_path=tmp_path / "missing.parquet")
+    with pytest.raises(EvidenceIntegrityError, match="cannot be read"):
+        factor_service_module._read_parent_table(missing_parent)
+    with pytest.raises(EvidenceIntegrityError):
+        factor_service_module._relative(tmp_path.parent / "escape", tmp_path)
+
+    service = FactorResearchService(config, tmp_path)
+    fundamental_parent = _parent(tmp_path, "fundamental-parent", fundamentals)
+    with pytest.raises(EvidenceIntegrityError):
+        service.compute_and_publish(
+            (market_parent, fundamental_parent),
+            market_dataset_id="missing-role",
+            fundamental_dataset_id="fundamental-parent",
+        )
+    unreadable = _parent(tmp_path, "market-parent")
+    with pytest.raises(EvidenceIntegrityError, match="readable Parquet"):
+        service.compute_and_publish(
+            (unreadable, fundamental_parent),
+            market_dataset_id="market-parent",
+            fundamental_dataset_id="fundamental-parent",
+        )
+    no_units = replace(fundamental_parent, unit_metadata={})
+    with pytest.raises(DataQualityError):
+        service.compute_and_publish(
+            (_parent(tmp_path, "market-parent", market), no_units),
+            market_dataset_id="market-parent",
+            fundamental_dataset_id="fundamental-parent",
+        )
+    non_usd = replace(
+        fundamental_parent,
+        unit_metadata={field: ("EUR" if field == "book_equity" else "USD") for field in FIELDS},
+    )
+    with pytest.raises(DataQualityError):
+        service.compute_and_publish(
+            (_parent(tmp_path, "market-parent", market), non_usd),
+            market_dataset_id="market-parent",
+            fundamental_dataset_id="fundamental-parent",
+        )
+    with pytest.raises(EvidenceIntegrityError):
+        service.repository.authenticate("factor-does-not-exist")
+    invalid_publication = tmp_path / "invalid-publication.json"
+    invalid_publication.write_text("{}", encoding="utf-8")
+    with pytest.raises(EvidenceIntegrityError):
+        authenticate_factor_publication(invalid_publication, tmp_path)
+    with pytest.raises(EvidenceIntegrityError, match="unavailable"):
+        factor_storage_module._read_manifest_parquet("missing.parquet", "0" * 64, tmp_path)
+    changed = tmp_path / "changed.parquet"
+    changed.write_bytes(b"not-the-bound-content")
+    with pytest.raises(EvidenceIntegrityError, match="changed"):
+        factor_storage_module._read_manifest_parquet("changed.parquet", "0" * 64, tmp_path)
+    with pytest.raises(PublicationConflictError, match="factor table"):
+        factor_storage_module.publish_factor_parquet(
+            tmp_path / "wrong.parquet", pa.table({"wrong": [1]})
+        )

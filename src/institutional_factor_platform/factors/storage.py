@@ -38,6 +38,13 @@ class ParentDatasetEvidence(ImmutableModel):
     promotion_id: str
     run_id: str
     validation_status: str
+    schema_version: str
+    unit_metadata: dict[str, str]
+    configuration_hash: str = Field(pattern=r"^[a-f0-9]{64}$")
+    git_commit: str
+    mapping_status: str
+    mapping_evidence_id: str | None
+    temporal_policy: str
 
 
 class FactorMetadata(ImmutableModel):
@@ -74,6 +81,8 @@ class FactorManifest(ImmutableModel):
     date_end: str
     factor_ids: tuple[str, ...]
     parents: tuple[ParentDatasetEvidence, ...]
+    market_source_dataset_ids: tuple[str, ...]
+    fundamental_source_dataset_ids: tuple[str, ...]
     configuration_hash: str = Field(pattern=r"^[a-f0-9]{64}$")
     configuration_snapshot_path: str
     configuration_snapshot_checksum: str = Field(pattern=r"^[a-f0-9]{64}$")
@@ -173,48 +182,59 @@ def authenticate_factor_publication(publication_path: Path, project_root: Path) 
         (manifest.diagnostics_path, manifest.diagnostics_checksum, "factor diagnostics"),
         (manifest.lineage_path, manifest.lineage_checksum, "factor lineage"),
     )
-    resolved: dict[str, Path] = {}
+    bound_content: dict[str, bytes] = {}
     for value, checksum, label in evidence:
         path = resolve_project_path(value, root)
-        if not path.is_file() or sha256_file(path) != checksum:
+        try:
+            content = path.read_bytes()
+        except OSError as exc:
+            raise EvidenceIntegrityError(f"Persisted {label} is missing or changed.") from exc
+        if hashlib.sha256(content).hexdigest() != checksum:
             raise EvidenceIntegrityError(f"Persisted {label} is missing or changed.")
-        resolved[label] = path
-    artifact = resolved["factor artifact"]
-    if artifact.stat().st_size != manifest.artifact_byte_size:
+        bound_content[label] = content
+    if len(bound_content["factor artifact"]) != manifest.artifact_byte_size:
         raise EvidenceIntegrityError("Factor artifact byte size differs from manifest.")
-    if schema_fingerprint(pq.read_schema(artifact)) != manifest.schema_fingerprint:
+    if (
+        schema_fingerprint(pq.read_schema(pa.BufferReader(bound_content["factor artifact"])))
+        != manifest.schema_fingerprint
+    ):
         raise EvidenceIntegrityError("Factor artifact schema differs from manifest.")
-    portfolio_artifact = resolved["factor portfolio artifact"]
-    if portfolio_artifact.stat().st_size != manifest.portfolio_artifact_byte_size:
+    if len(bound_content["factor portfolio artifact"]) != manifest.portfolio_artifact_byte_size:
         raise EvidenceIntegrityError("Factor portfolio byte size differs from manifest.")
     if (
-        schema_fingerprint(pq.read_schema(portfolio_artifact))
+        schema_fingerprint(
+            pq.read_schema(pa.BufferReader(bound_content["factor portfolio artifact"]))
+        )
         != manifest.portfolio_schema_fingerprint
     ):
         raise EvidenceIntegrityError("Factor portfolio schema differs from manifest.")
-    config_value = json.loads(resolved["factor configuration"].read_text(encoding="utf-8"))
+    config_value = json.loads(bound_content["factor configuration"].decode())
     config_hash = hashlib.sha256(
         json.dumps(config_value, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
     if config_hash != manifest.configuration_hash:
         raise EvidenceIntegrityError("Factor configuration identity differs from manifest.")
-    validation = json.loads(resolved["factor validation"].read_text(encoding="utf-8"))
+    validation = json.loads(bound_content["factor validation"].decode())
     if (
         validation.get("publication_id") != manifest.publication_id
         or validation.get("status") != manifest.validation_status
         or validation.get("row_count") != manifest.row_count
     ):
         raise EvidenceIntegrityError("Factor validation identity differs from manifest.")
-    diagnostics = json.loads(resolved["factor diagnostics"].read_text(encoding="utf-8"))
+    diagnostics = json.loads(bound_content["factor diagnostics"].decode())
     if diagnostics.get("publication_id") != manifest.publication_id:
         raise EvidenceIntegrityError("Factor diagnostics identity differs from manifest.")
-    lineage = json.loads(resolved["factor lineage"].read_text(encoding="utf-8"))
+    lineage = json.loads(bound_content["factor lineage"].decode())
     if (
         lineage.get("publication_id") != manifest.publication_id
         or set(lineage.get("parent_dataset_ids", []))
         != {parent.dataset_id for parent in manifest.parents}
         or lineage.get("artifact_checksum") != manifest.artifact_checksum
         or lineage.get("portfolio_artifact_checksum") != manifest.portfolio_artifact_checksum
+        or set(lineage.get("market_source_dataset_ids", []))
+        != set(manifest.market_source_dataset_ids)
+        or set(lineage.get("fundamental_source_dataset_ids", []))
+        != set(manifest.fundamental_source_dataset_ids)
     ):
         raise EvidenceIntegrityError("Factor lineage identity differs from manifest.")
     return manifest
@@ -238,12 +258,16 @@ class FactorRepository:
 
     def read_table(self, publication_id: str) -> pa.Table:
         manifest = self.authenticate(publication_id)
-        return pq.read_table(resolve_project_path(manifest.artifact_path, self.project_root))
+        return _read_manifest_parquet(
+            manifest.artifact_path, manifest.artifact_checksum, self.project_root
+        )
 
     def read_portfolios(self, publication_id: str) -> pa.Table:
         manifest = self.authenticate(publication_id)
-        return pq.read_table(
-            resolve_project_path(manifest.portfolio_artifact_path, self.project_root)
+        return _read_manifest_parquet(
+            manifest.portfolio_artifact_path,
+            manifest.portfolio_artifact_checksum,
+            self.project_root,
         )
 
     def authenticate(self, publication_id: str) -> FactorManifest:
@@ -254,3 +278,14 @@ class FactorRepository:
         if manifest.publication_id != publication_id:
             raise EvidenceIntegrityError("Factor publication path and identity differ.")
         return manifest
+
+
+def _read_manifest_parquet(relative_path: str, checksum: str, project_root: Path) -> pa.Table:
+    path = resolve_project_path(relative_path, project_root)
+    try:
+        content = path.read_bytes()
+    except OSError as exc:
+        raise EvidenceIntegrityError("Authenticated factor artifact became unavailable.") from exc
+    if hashlib.sha256(content).hexdigest() != checksum:
+        raise EvidenceIntegrityError("Factor artifact changed during authenticated read.")
+    return pq.read_table(pa.BufferReader(content))

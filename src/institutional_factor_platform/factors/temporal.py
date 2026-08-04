@@ -8,6 +8,7 @@ import pandas as pd
 import pyarrow as pa
 
 from institutional_factor_platform.exceptions import DataQualityError, TemporalIntegrityError
+from institutional_factor_platform.factors.config import ReturnPlausibilityConfig
 from institutional_factor_platform.factors.contracts import FUNDAMENTAL_SCHEMA, MARKET_SCHEMA
 
 
@@ -21,7 +22,10 @@ def _require_columns(frame: pd.DataFrame, schema: pa.Schema, label: str) -> None
         )
 
 
-def validate_market_input(frame: pd.DataFrame, parent_ids: set[str]) -> pd.DataFrame:
+def validate_market_input(
+    frame: pd.DataFrame,
+    plausibility: ReturnPlausibilityConfig,
+) -> pd.DataFrame:
     _require_columns(frame, MARKET_SCHEMA, "market input")
     value = frame.copy()
     value["date"] = pd.to_datetime(value["date"]).dt.date
@@ -41,6 +45,13 @@ def validate_market_input(frame: pd.DataFrame, parent_ids: set[str]) -> pd.DataF
     if value["security_id"].isna().any() or value["date"].isna().any():
         raise DataQualityError("market input has null primary keys")
     if (
+        value[["available_at", "eligibility_available_at", "classification_available_at"]]
+        .isna()
+        .any()
+        .any()
+    ):
+        raise DataQualityError("market availability timestamps are required")
+    if (
         not value["security_id"]
         .map(lambda item: bool(re.fullmatch(r"sec_[a-f0-9]{32}", item)))
         .all()
@@ -59,31 +70,44 @@ def validate_market_input(frame: pd.DataFrame, parent_ids: set[str]) -> pd.DataF
         raise DataQualityError("point-in-time universe eligibility is required")
     if value[["sector", "industry"]].isna().any().any():
         raise DataQualityError("point-in-time sector and industry classifications are required")
-    if not set(value["source_dataset_id"]).issubset(parent_ids):
-        raise DataQualityError("market input references an unauthenticated parent dataset")
     for column in ("return", "market_return", "risk_free", "benchmark_return"):
         finite = value[column].dropna()
         if not finite.map(isfinite).all() or (finite <= -1.0).any():
             raise DataQualityError(f"{column} contains invalid decimal returns")
+    limits = {
+        "return": plausibility.max_abs_security_return,
+        "market_return": plausibility.max_abs_market_return,
+        "benchmark_return": plausibility.max_abs_market_return,
+        "risk_free": plausibility.max_abs_risk_free,
+    }
+    for column, limit in limits.items():
+        if (value[column].dropna().abs() > limit).any():
+            raise DataQualityError(f"{column} exceeds its configured daily plausibility range")
     for column in ("price", "high", "low", "volume", "shares_outstanding"):
-        if (value[column].dropna() < 0).any():
-            raise DataQualityError(f"{column} contains negative values")
-    if (value["high"].dropna() < value["low"].dropna()).any():
+        observed = value[column].dropna()
+        if not observed.map(isfinite).all() or (observed < 0).any():
+            raise DataQualityError(f"{column} contains non-finite or negative values")
+    eligible = value["eligible"]
+    if (value.loc[eligible, "price"] <= 0).any() or (
+        value.loc[eligible, "shares_outstanding"] <= 0
+    ).any():
+        raise DataQualityError("eligible securities require positive price and shares")
+    if (value["high"] < value["low"]).fillna(False).any():
         raise DataQualityError("market high is below low")
     return value.sort_values(["security_id", "date"]).reset_index(drop=True)
 
 
-def validate_fundamental_input(frame: pd.DataFrame, parent_ids: set[str]) -> pd.DataFrame:
+def validate_fundamental_input(frame: pd.DataFrame) -> pd.DataFrame:
     _require_columns(frame, FUNDAMENTAL_SCHEMA, "fundamental input")
     value = frame.copy()
     value["period_end"] = pd.to_datetime(value["period_end"]).dt.date
     value["available_at"] = pd.to_datetime(value["available_at"], utc=True).astype(
         "datetime64[ns, UTC]"
     )
+    if value[["period_end", "available_at"]].isna().any().any():
+        raise DataQualityError("fundamental period and availability are required")
     if value.duplicated(["security_id", "available_at", "field"]).any():
         raise DataQualityError("fundamental input has duplicate point-in-time keys")
-    if not set(value["source_dataset_id"]).issubset(parent_ids):
-        raise DataQualityError("fundamental input references an unauthenticated parent dataset")
     availability_dates = value["available_at"].dt.date
     if (value["period_end"] > availability_dates).any():
         raise TemporalIntegrityError("fundamental period ends after its availability")

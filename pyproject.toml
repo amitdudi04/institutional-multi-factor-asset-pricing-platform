@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "institutional-factor-platform"
-version = "0.1.0"
-description = "Governance and configuration foundation for an institutional quantitative research platform"
+version = "0.2.0"
+description = "Authenticated institutional data and point-in-time multi-factor research platform"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"

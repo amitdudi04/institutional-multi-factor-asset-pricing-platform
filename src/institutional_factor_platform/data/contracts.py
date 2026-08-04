@@ -188,6 +188,56 @@ SEC_FACTS = TableContract(
     {"filing_date": "SEC filing date", "availability_timestamp": "not before filing"},
 )
 
+FACTOR_MARKET_INPUT = TableContract(
+    "factor_market_input",
+    "1.0.0",
+    pa.schema(
+        [
+            ("security_id", pa.string(), False),
+            ("date", DATE, False),
+            ("available_at", UTC_TS, False),
+            ("eligible", pa.bool_(), False),
+            ("eligibility_available_at", UTC_TS, False),
+            ("sector", pa.string(), False),
+            ("industry", pa.string(), False),
+            ("classification_available_at", UTC_TS, False),
+            ("return", pa.float64()),
+            ("price", pa.float64()),
+            ("high", pa.float64()),
+            ("low", pa.float64()),
+            ("volume", pa.float64()),
+            ("shares_outstanding", pa.float64()),
+            ("exchange", pa.string(), False),
+            ("market_return", pa.float64()),
+            ("risk_free", pa.float64()),
+            ("benchmark_return", pa.float64()),
+        ]
+    ),
+    ("security_id", "date"),
+    {
+        "available_at": "market observation availability",
+        "eligibility_available_at": "point-in-time universe membership availability",
+        "classification_available_at": "point-in-time classification availability",
+    },
+)
+
+FACTOR_FUNDAMENTAL_INPUT = TableContract(
+    "factor_fundamental_input",
+    "1.0.0",
+    pa.schema(
+        [
+            ("security_id", pa.string(), False),
+            ("period_end", DATE, False),
+            ("available_at", UTC_TS, False),
+            ("field", pa.string(), False),
+            ("value", pa.float64(), False),
+            ("unit", pa.string(), False),
+        ]
+    ),
+    ("security_id", "available_at", "field"),
+    {"available_at": "actual filing or owner-evidenced public availability"},
+)
+
 CONTRACTS = {
     contract.name: contract
     for contract in [
@@ -197,5 +247,7 @@ CONTRACTS = {
         MACRO_OBSERVATIONS,
         FRENCH_FACTORS,
         SEC_FACTS,
+        FACTOR_MARKET_INPUT,
+        FACTOR_FUNDAMENTAL_INPUT,
     ]
 }

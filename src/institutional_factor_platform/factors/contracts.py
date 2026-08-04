@@ -2,41 +2,14 @@
 
 import pyarrow as pa
 
-MARKET_SCHEMA = pa.schema(
-    [
-        pa.field("security_id", pa.string(), nullable=False),
-        pa.field("date", pa.date32(), nullable=False),
-        pa.field("available_at", pa.timestamp("us", tz="UTC"), nullable=False),
-        pa.field("eligible", pa.bool_(), nullable=False),
-        pa.field("eligibility_available_at", pa.timestamp("us", tz="UTC"), nullable=False),
-        pa.field("sector", pa.string(), nullable=False),
-        pa.field("industry", pa.string(), nullable=False),
-        pa.field("classification_available_at", pa.timestamp("us", tz="UTC"), nullable=False),
-        pa.field("return", pa.float64()),
-        pa.field("price", pa.float64()),
-        pa.field("high", pa.float64()),
-        pa.field("low", pa.float64()),
-        pa.field("volume", pa.float64()),
-        pa.field("shares_outstanding", pa.float64()),
-        pa.field("exchange", pa.string(), nullable=False),
-        pa.field("market_return", pa.float64()),
-        pa.field("risk_free", pa.float64()),
-        pa.field("benchmark_return", pa.float64()),
-        pa.field("source_dataset_id", pa.string(), nullable=False),
-    ]
+from institutional_factor_platform.data.contracts import (
+    FACTOR_FUNDAMENTAL_INPUT,
+    FACTOR_MARKET_INPUT,
 )
 
-FUNDAMENTAL_SCHEMA = pa.schema(
-    [
-        pa.field("security_id", pa.string(), nullable=False),
-        pa.field("period_end", pa.date32(), nullable=False),
-        pa.field("available_at", pa.timestamp("us", tz="UTC"), nullable=False),
-        pa.field("field", pa.string(), nullable=False),
-        pa.field("value", pa.float64(), nullable=False),
-        pa.field("unit", pa.string(), nullable=False),
-        pa.field("source_dataset_id", pa.string(), nullable=False),
-    ]
-)
+MARKET_SCHEMA = FACTOR_MARKET_INPUT.schema
+
+FUNDAMENTAL_SCHEMA = FACTOR_FUNDAMENTAL_INPUT.schema
 
 FACTOR_SCHEMA = pa.schema(
     [
@@ -46,6 +19,7 @@ FACTOR_SCHEMA = pa.schema(
         pa.field("raw_value", pa.float64()),
         pa.field("winsorized_value", pa.float64()),
         pa.field("normalized_value", pa.float64()),
+        pa.field("score_value", pa.float64()),
         pa.field("normalization_method", pa.string(), nullable=False),
         pa.field("available_at", pa.timestamp("us", tz="UTC"), nullable=False),
         pa.field("factor_version", pa.string(), nullable=False),

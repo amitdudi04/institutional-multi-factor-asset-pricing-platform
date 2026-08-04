@@ -56,6 +56,18 @@ class BreakpointConfig(StrictModel):
     large_quantile: float = Field(gt=0.5, lt=1.0)
 
 
+class ReturnPlausibilityConfig(StrictModel):
+    max_abs_security_return: float = Field(gt=0.0)
+    max_abs_market_return: float = Field(gt=0.0)
+    max_abs_risk_free: float = Field(gt=0.0)
+
+
+class PortfolioConfig(StrictModel):
+    quantiles: int = Field(ge=2, le=10)
+    weighting: Literal["value_weighted"]
+    rolling_periods: int = Field(ge=2)
+
+
 class FactorPublicationConfig(StrictModel):
     output_root: Path
     manifest_root: Path
@@ -64,16 +76,21 @@ class FactorPublicationConfig(StrictModel):
     def paths_are_relative(self) -> "FactorPublicationConfig":
         if self.output_root.is_absolute() or self.manifest_root.is_absolute():
             raise ValueError("factor publication paths must be project-relative")
+        if ".." in self.output_root.parts or ".." in self.manifest_root.parts:
+            raise ValueError("factor publication paths cannot escape the project root")
         return self
 
 
 class FactorConfig(StrictModel):
     schema_version: Literal["1.0.0"]
     frequency: Literal["daily"]
+    rebalancing: Literal["monthly"]
     annualization_periods: int = Field(gt=0)
+    plausibility: ReturnPlausibilityConfig
     windows: WindowConfig
     preprocessing: PreprocessingConfig
     breakpoints: BreakpointConfig
+    portfolios: PortfolioConfig
     publication: FactorPublicationConfig
 
     def canonical_hash(self) -> str:

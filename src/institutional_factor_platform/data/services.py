@@ -26,6 +26,7 @@ from institutional_factor_platform.data.domain import (
     DatasetStatus,
     DataSource,
     IssuerId,
+    MappingStatus,
     RetrievalRequest,
     RetrievalStatus,
 )
@@ -827,6 +828,27 @@ def _authenticate_mapping_authority(
                 ).value
                 if observed != expected:
                     raise DataQualityError("SEC record identity differs from mapping authority.")
+        elif request.source is DataSource.OWNER_SUPPLIED and contract.name in {
+            "factor_market_input",
+            "factor_fundamental_input",
+        }:
+            mappings = SecurityMappingStore(authority).load()
+            for row in identified:
+                as_of = row.get("date") or row.get("period_end")
+                if not isinstance(as_of, date):
+                    raise DataQualityError("Owner Phase 2 mapping date is missing or invalid.")
+                matches = {
+                    item.security_id.value
+                    for item in mappings
+                    if item.security_id is not None
+                    and item.status is MappingStatus.RESOLVED
+                    and item.valid_from <= as_of
+                    and (item.valid_to is None or as_of <= item.valid_to)
+                }
+                if str(row["security_id"]) not in matches:
+                    raise DataQualityError(
+                        "Owner Phase 2 record identity differs from mapping authority."
+                    )
         else:
             raise DataQualityError(
                 f"Security identity authority is not defined for source {request.source.value}."

@@ -110,6 +110,13 @@ def build_parser() -> argparse.ArgumentParser:
     french.add_argument("dataset", choices=sorted(KennethFrenchAdapter.approved))
     sec = commands.add_parser("ingest-sec", help="Retrieve SEC company facts for one explicit CIK")
     sec.add_argument("cik")
+    owner = commands.add_parser(
+        "ingest-owner-factor-input", help="Ingest an owner Phase 2 input under a strict contract"
+    )
+    owner.add_argument("dataset")
+    owner.add_argument("contract", choices=["factor_market_input", "factor_fundamental_input"])
+    owner.add_argument("path", type=Path)
+    owner.add_argument("--metadata-json", type=Path, required=True)
     return parser
 
 
@@ -261,6 +268,32 @@ def main(argv: list[str] | None = None) -> int:
                 SEC_FACTS,
                 "json",
                 "application/json",
+            )
+        elif args.command == "ingest-owner-factor-input":
+            metadata = json.loads(args.metadata_json.read_text(encoding="utf-8"))
+            if not isinstance(metadata, dict):
+                raise ValueError("--metadata-json must contain an object")
+            contract = CONTRACTS[args.contract]
+            parameters = {
+                **metadata,
+                "path": str(args.path.resolve()),
+                "schema": contract.name,
+                "contract_version": contract.version,
+            }
+            media_types = {
+                ".csv": ("csv", "text/csv"),
+                ".json": ("json", "application/json"),
+                ".parquet": ("parquet", "application/vnd.apache.parquet"),
+            }
+            if args.path.suffix.lower() not in media_types:
+                raise ValueError("Owner factor input must be CSV, JSON, or Parquet")
+            extension, media_type = media_types[args.path.suffix.lower()]
+            service.ingest(
+                OwnerSuppliedAdapter(),
+                RetrievalRequest(DataSource.OWNER_SUPPLIED, args.dataset, parameters=parameters),
+                contract,
+                extension,
+                media_type,
             )
         else:  # pragma: no cover - argparse enforces command choices
             raise AssertionError(args.command)

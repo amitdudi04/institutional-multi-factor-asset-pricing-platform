@@ -1,6 +1,11 @@
 schema_version: "1.0.0"
 frequency: daily
+rebalancing: monthly
 annualization_periods: 252
+plausibility:
+  max_abs_security_return: 10.0
+  max_abs_market_return: 0.5
+  max_abs_risk_free: 0.05
 windows:
   short: 21
   medium: 63
@@ -19,6 +24,10 @@ breakpoints:
   exchange: XNYS
   small_quantile: 0.30
   large_quantile: 0.70
+portfolios:
+  quantiles: 3
+  weighting: value_weighted
+  rolling_periods: 12
 publication:
   output_root: data/factors
   manifest_root: data/factor_manifests

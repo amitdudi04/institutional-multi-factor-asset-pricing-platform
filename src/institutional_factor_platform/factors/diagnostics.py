@@ -4,6 +4,8 @@ from math import sqrt
 
 import pandas as pd
 
+from institutional_factor_platform.factors.portfolio import NON_PORTFOLIO_FACTORS
+
 
 def build_factor_diagnostics(
     factors: pd.DataFrame, portfolios: pd.DataFrame, rolling_window: int
@@ -28,8 +30,13 @@ def build_factor_diagnostics(
     )
     correlation = matrix.corr(min_periods=2)
 
-    memberships = factors.dropna(subset=["raw_value"]).copy()
-    memberships["percentile"] = memberships.groupby(["factor_id", "date"])["raw_value"].rank(
+    memberships = factors.dropna(subset=["score_value"]).copy()
+    memberships = memberships.loc[~memberships["factor_id"].isin(NON_PORTFOLIO_FACTORS)]
+    memberships["month"] = pd.to_datetime(memberships["date"]).dt.to_period("M")
+    memberships = memberships.loc[
+        memberships["date"].eq(memberships.groupby("month")["date"].transform("max"))
+    ].drop(columns="month")
+    memberships["percentile"] = memberships.groupby(["factor_id", "date"])["score_value"].rank(
         method="first", pct=True
     )
     memberships["top"] = memberships["percentile"] > 2 / 3
