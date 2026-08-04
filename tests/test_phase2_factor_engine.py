@@ -1,6 +1,7 @@
 """Phase 2 factor definitions, temporal controls, and immutable publication tests."""
 
 import json
+from dataclasses import replace
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
@@ -73,15 +74,24 @@ def _config() -> FactorConfig:
     )
 
 
-def _parent(tmp_path: Path, dataset_id: str) -> VerifiedDatasetHandle:
+def _parent(
+    tmp_path: Path, dataset_id: str, frame: pd.DataFrame | None = None
+) -> VerifiedDatasetHandle:
     artifact = tmp_path / f"{dataset_id}.parquet"
-    artifact.write_bytes(dataset_id.encode())
+    if frame is None:
+        artifact.write_bytes(dataset_id.encode())
+    else:
+        frame.to_parquet(artifact, index=False)
     return VerifiedDatasetHandle(
         dataset_id=dataset_id,
         artifact_path=artifact,
         checksum=sha256_file(artifact),
         schema_version="1.0.0",
-        unit_metadata={},
+        unit_metadata=(
+            dict(MARKET_REQUIRED_UNITS)
+            if dataset_id == "market-parent"
+            else {field: "USD" for field in FIELDS}
+        ),
         configuration_hash="a" * 64,
         git_commit="deadbeef",
         validation_status=DatasetStatus.PASS,
@@ -194,22 +204,21 @@ def test_temporal_contract_blocks_leakage_and_bad_lineage() -> None:
 
 
 def test_full_catalog_publishes_authenticates_and_is_reproducible(tmp_path: Path) -> None:
-    market, fundamentals, fundamental_units = _inputs()
-    parents = (_parent(tmp_path, "market-parent"), _parent(tmp_path, "fundamental-parent"))
+    market, fundamentals, _ = _inputs()
+    parents = (
+        _parent(tmp_path, "market-parent", market),
+        _parent(tmp_path, "fundamental-parent", fundamentals),
+    )
     service = FactorResearchService(_config(), tmp_path)
     first = service.compute_and_publish(
         parents,
-        market,
-        fundamentals,
-        market_units=MARKET_REQUIRED_UNITS,
-        fundamental_units=fundamental_units,
+        market_dataset_id="market-parent",
+        fundamental_dataset_id="fundamental-parent",
     )
     second = service.compute_and_publish(
         parents,
-        market,
-        fundamentals,
-        market_units=MARKET_REQUIRED_UNITS,
-        fundamental_units=fundamental_units,
+        market_dataset_id="market-parent",
+        fundamental_dataset_id="fundamental-parent",
     )
     assert first.publication_id == second.publication_id
     manifest = authenticate_factor_publication(first.publication_path, tmp_path)
@@ -255,34 +264,37 @@ def test_full_catalog_publishes_authenticates_and_is_reproducible(tmp_path: Path
 
 
 def test_publication_rejects_forged_parent_and_unit_contract(tmp_path: Path) -> None:
-    market, fundamentals, units = _inputs()
-    valid = _parent(tmp_path, "market-parent")
-    forged = _parent(tmp_path, "fundamental-parent")
+    market, fundamentals, _ = _inputs()
+    valid = _parent(tmp_path, "market-parent", market)
+    forged = _parent(tmp_path, "fundamental-parent", fundamentals)
     forged.artifact_path.write_bytes(b"changed")
     service = FactorResearchService(_config(), tmp_path)
     with pytest.raises(EvidenceIntegrityError):
         service.compute_and_publish(
             (valid, forged),
-            market,
-            fundamentals,
-            market_units=MARKET_REQUIRED_UNITS,
-            fundamental_units=units,
+            market_dataset_id="market-parent",
+            fundamental_dataset_id="fundamental-parent",
         )
+    invalid_unit_parent = replace(
+        _parent(tmp_path, "market-parent", market),
+        unit_metadata={**MARKET_REQUIRED_UNITS, "return_basis": "price_return"},
+    )
     with pytest.raises(DataQualityError):
         service.compute_and_publish(
-            (valid, _parent(tmp_path, "fundamental-parent")),
-            market,
-            fundamentals,
-            market_units={**MARKET_REQUIRED_UNITS, "return_basis": "price_return"},
-            fundamental_units=units,
+            (invalid_unit_parent, _parent(tmp_path, "fundamental-parent", fundamentals)),
+            market_dataset_id="market-parent",
+            fundamental_dataset_id="fundamental-parent",
         )
 
 
 def test_crash_before_activation_is_not_discoverable_and_retry_succeeds(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    market, fundamentals, units = _inputs()
-    parents = (_parent(tmp_path, "market-parent"), _parent(tmp_path, "fundamental-parent"))
+    market, fundamentals, _ = _inputs()
+    parents = (
+        _parent(tmp_path, "market-parent", market),
+        _parent(tmp_path, "fundamental-parent", fundamentals),
+    )
     service = FactorResearchService(_config(), tmp_path)
 
     def crash(*_args: object) -> None:
@@ -293,19 +305,15 @@ def test_crash_before_activation_is_not_discoverable_and_retry_succeeds(
     with pytest.raises(RuntimeError, match="injected"):
         service.compute_and_publish(
             parents,
-            market,
-            fundamentals,
-            market_units=MARKET_REQUIRED_UNITS,
-            fundamental_units=units,
+            market_dataset_id="market-parent",
+            fundamental_dataset_id="fundamental-parent",
         )
     assert service.repository.list_authenticated() == ()
     monkeypatch.setattr(factor_service_module, "_activate_publication", original)
     result = service.compute_and_publish(
         parents,
-        market,
-        fundamentals,
-        market_units=MARKET_REQUIRED_UNITS,
-        fundamental_units=units,
+        market_dataset_id="market-parent",
+        fundamental_dataset_id="fundamental-parent",
     )
     assert service.repository.list_authenticated() == (result.publication_id,)
 

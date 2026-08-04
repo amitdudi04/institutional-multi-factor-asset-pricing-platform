@@ -6,8 +6,6 @@ import sys
 from datetime import UTC, date, datetime
 from pathlib import Path
 
-import pyarrow.parquet as pq
-
 from institutional_factor_platform.data.config import load_phase1_config
 from institutional_factor_platform.data.contracts import (
     CONTRACTS,
@@ -69,10 +67,8 @@ def build_parser() -> argparse.ArgumentParser:
         "compute-factors", help="Build an immutable Phase 2 publication from authenticated parents"
     )
     compute_factors.add_argument("--parent", action="append", required=True)
-    compute_factors.add_argument("--market", type=Path, required=True)
-    compute_factors.add_argument("--fundamentals", type=Path, required=True)
-    compute_factors.add_argument("--market-units-json", type=Path, required=True)
-    compute_factors.add_argument("--fundamental-units-json", type=Path, required=True)
+    compute_factors.add_argument("--market-dataset", required=True)
+    compute_factors.add_argument("--fundamental-dataset", required=True)
     compute_factors.add_argument("--factor-config", type=Path, default=None)
     publication = commands.add_parser(
         "verify-publication", help="Authenticate one persisted publication evidence bundle"
@@ -174,12 +170,8 @@ def main(argv: list[str] | None = None) -> int:
             )
             result = factor_service.compute_and_publish(
                 tuple(service.research.get(dataset_id) for dataset_id in args.parent),
-                pq.read_table(args.market).to_pandas(),
-                pq.read_table(args.fundamentals).to_pandas(),
-                market_units=json.loads(args.market_units_json.read_text(encoding="utf-8")),
-                fundamental_units=json.loads(
-                    args.fundamental_units_json.read_text(encoding="utf-8")
-                ),
+                market_dataset_id=args.market_dataset,
+                fundamental_dataset_id=args.fundamental_dataset,
             )
             print(result.publication_id)
         elif args.command == "verify-publication":

@@ -12,6 +12,7 @@ from typing import cast
 
 import pandas as pd
 import pyarrow as pa
+import pyarrow.parquet as pq
 
 from institutional_factor_platform.data.access import VerifiedDatasetHandle
 from institutional_factor_platform.data.evidence import atomic_write_json
@@ -72,6 +73,31 @@ class FactorResearchService:
         self.repository = FactorRepository(self.root, self.manifest_root)
 
     def compute_and_publish(
+        self,
+        parents: tuple[VerifiedDatasetHandle, ...],
+        *,
+        market_dataset_id: str,
+        fundamental_dataset_id: str,
+    ) -> FactorRunResult:
+        """Read the exact authenticated parent artifacts; callers cannot inject data frames."""
+        _authenticate_parents(parents)
+        by_id = {parent.dataset_id: parent for parent in parents}
+        try:
+            market_parent = by_id[market_dataset_id]
+            fundamental_parent = by_id[fundamental_dataset_id]
+        except KeyError as exc:
+            raise EvidenceIntegrityError(
+                "Factor input roles must identify supplied authenticated parents."
+            ) from exc
+        return self._compute_and_publish(
+            parents,
+            pq.read_table(market_parent.artifact_path).to_pandas(),
+            pq.read_table(fundamental_parent.artifact_path).to_pandas(),
+            market_units=market_parent.unit_metadata,
+            fundamental_units=fundamental_parent.unit_metadata,
+        )
+
+    def _compute_and_publish(
         self,
         parents: tuple[VerifiedDatasetHandle, ...],
         market: pd.DataFrame,
