@@ -12,11 +12,11 @@ Complete and internally assured: versioned observable characteristics across mar
 
 ## Phase 3 — Asset-Pricing Research Platform
 
-Authorized as the next phase but not started. Implement approved CAPM and multifactor specifications, rolling estimation, robust inference, diagnostics, and cross-model comparison. Models are conditional on data availability and documented identification assumptions.
+Complete and internally assured: authenticated Phase 2 inputs feed CAPM, Fama-French 3/5, Carhart 4, Hou-Xue-Zhang q-factor, and custom specifications; OLS/WLS, rolling, expanding, panel, and Fama-MacBeth estimators; classical/heteroskedasticity/HAC inference; assumption, influence, covariance, and stability diagnostics; and immutable checksum-bound research publications. Software validation uses isolated fixtures and makes no empirical pricing claim.
 
 ## Phase 4 — Portfolio Construction and Institutional Backtesting
 
-Implement approved benchmark portfolios and optimizers with realistic constraints, execution lags, transaction costs, and walk-forward evaluation. Infeasibility and missing inputs must never trigger silent constraint relaxation.
+Authorized as the next phase but not started. Implement approved benchmark portfolios and optimizers with realistic constraints, execution lags, transaction costs, and walk-forward evaluation. Infeasibility and missing inputs must never trigger silent constraint relaxation.
 
 ## Phase 5 — Risk Analytics and Explainable Machine Learning
 

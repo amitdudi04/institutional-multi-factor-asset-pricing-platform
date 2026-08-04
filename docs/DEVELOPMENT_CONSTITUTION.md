@@ -66,7 +66,7 @@ Documentation is part of the product and must match implemented behavior, method
 
 Only the owner-designated phase may be implemented. No temporary future engine, placeholder model, invented demo, or empty package is permitted. Every phase begins by reading this constitution, the project and phase specifications, current code/tests, Git state, prior risks, and active boundaries. Every phase ends with executed validation, updated documentation, a change and risk summary, acceptance evidence, and a non-fabrication confirmation.
 
-Current owner-authorized phase status: Phases 1 and 2 are complete following their applicable assurance gates. Phase 3 is authorized as the next phase but has not started; proposed/open decisions remain gated until explicitly resolved for the affected work.
+Current owner-authorized phase status: Phases 1, 2, and 3 are complete following their applicable assurance gates. Phase 4 is authorized as the next phase but has not started; proposed/open decisions remain gated until explicitly resolved for the affected work.
 
 ## Definition of done
 
