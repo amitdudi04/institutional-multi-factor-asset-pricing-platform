@@ -6,6 +6,8 @@ import sys
 from datetime import UTC, date, datetime
 from pathlib import Path
 
+from institutional_factor_platform.asset_pricing.config import load_asset_pricing_config
+from institutional_factor_platform.asset_pricing.service import AssetPricingResearchService
 from institutional_factor_platform.data.config import load_phase1_config
 from institutional_factor_platform.data.contracts import (
     CONTRACTS,
@@ -40,6 +42,10 @@ from institutional_factor_platform.factors.storage import (
     authenticate_factor_publication,
 )
 from institutional_factor_platform.logging import configure_logging
+from institutional_factor_platform.research_outputs.storage import (
+    AssetPricingRepository,
+    authenticate_asset_pricing_publication,
+)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -70,6 +76,21 @@ def build_parser() -> argparse.ArgumentParser:
     compute_factors.add_argument("--market-dataset", required=True)
     compute_factors.add_argument("--fundamental-dataset", required=True)
     compute_factors.add_argument("--factor-config", type=Path, default=None)
+    commands.add_parser("validate-asset-pricing-config", help="Validate Phase 3 configuration")
+    commands.add_parser(
+        "list-asset-pricing-publications", help="List authenticated Phase 3 publications"
+    )
+    verify_asset_pricing = commands.add_parser(
+        "verify-asset-pricing-publication", help="Authenticate one Phase 3 publication"
+    )
+    verify_asset_pricing.add_argument("path", type=Path)
+    compute_asset_pricing = commands.add_parser(
+        "compute-asset-pricing",
+        help="Build Phase 3 research from one authenticated Phase 2 publication",
+    )
+    compute_asset_pricing.add_argument("factor_publication_id")
+    compute_asset_pricing.add_argument("--model", action="append", default=None)
+    compute_asset_pricing.add_argument("--asset-pricing-config", type=Path, default=None)
     publication = commands.add_parser(
         "verify-publication", help="Authenticate one persisted publication evidence bundle"
     )
@@ -181,6 +202,33 @@ def main(argv: list[str] | None = None) -> int:
                 fundamental_dataset_id=args.fundamental_dataset,
             )
             print(result.publication_id)
+        elif args.command == "validate-asset-pricing-config":
+            print(load_asset_pricing_config().canonical_hash())
+        elif args.command == "list-asset-pricing-publications":
+            pricing_config = load_asset_pricing_config()
+            pricing_repository = AssetPricingRepository(
+                service.root, service.root / pricing_config.publication.manifest_root
+            )
+            for publication_id in pricing_repository.list_authenticated():
+                print(publication_id)
+        elif args.command == "verify-asset-pricing-publication":
+            manifest = authenticate_asset_pricing_publication(args.path, service.root)
+            print(manifest.publication_id)
+        elif args.command == "compute-asset-pricing":
+            factor_config = load_factor_config()
+            factor_repository = FactorRepository(
+                service.root, service.root / factor_config.publication.manifest_root
+            )
+            pricing_service = AssetPricingResearchService(
+                load_asset_pricing_config(args.asset_pricing_config),
+                service.root,
+                factor_repository,
+            )
+            manifest = pricing_service.compute_and_publish(
+                args.factor_publication_id,
+                tuple(args.model) if args.model else None,
+            )
+            print(manifest.publication_id)
         elif args.command == "verify-publication":
             authenticate_dataset_evidence(
                 args.dataset_id,

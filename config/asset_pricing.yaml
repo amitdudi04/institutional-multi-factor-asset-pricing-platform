@@ -1,0 +1,26 @@
+schema_version: "1.0.0"
+frequency: monthly
+annualization_periods: 12
+minimum_observations: 24
+confidence_level: 0.95
+hac_lags: 3
+rolling_window: 36
+expanding_minimum: 24
+models:
+  capm: [market_excess]
+  fama_french_3: [market_excess, SMB, HML]
+  carhart_4: [market_excess, SMB, HML, MOM]
+  fama_french_5: [market_excess, SMB, HML, RMW, CMA]
+  hou_xue_zhang_q: [market_excess, ME, IA, ROE]
+factor_mappings:
+  SMB: log_market_cap
+  HML: book_to_market
+  MOM: momentum_12_1
+  RMW: gross_profitability
+  CMA: asset_growth
+  ME: log_market_cap
+  IA: asset_growth
+  ROE: earnings_yield
+publication:
+  output_root: data/asset_pricing
+  manifest_root: data/asset_pricing_manifests
