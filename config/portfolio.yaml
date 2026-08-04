@@ -1,0 +1,24 @@
+schema_version: "1.0.0"
+frequency: monthly
+annualization_periods: 12
+estimation_window: 36
+minimum_observations: 12
+covariance_method: ledoit_wolf
+constraints:
+  long_only: true
+  leverage_limit: 1.0
+  minimum_weight: 0.0
+  maximum_weight: null
+  turnover_limit: null
+  transaction_cost_limit: null
+  sector_limits: {}
+  exposure_limits: {}
+  liquidity_trade_limits: {}
+costs:
+  commission_bps: null
+  spread_bps: null
+  slippage_bps: null
+  market_impact_coefficient: null
+publication:
+  output_root: data/portfolios
+  manifest_root: data/portfolio_manifests

@@ -42,6 +42,12 @@ from institutional_factor_platform.factors.storage import (
     authenticate_factor_publication,
 )
 from institutional_factor_platform.logging import configure_logging
+from institutional_factor_platform.portfolio.config import load_portfolio_config
+from institutional_factor_platform.portfolio.service import PortfolioResearchService
+from institutional_factor_platform.research_outputs.portfolio_storage import (
+    PortfolioRepository,
+    authenticate_portfolio_publication,
+)
 from institutional_factor_platform.research_outputs.storage import (
     AssetPricingRepository,
     authenticate_asset_pricing_publication,
@@ -91,6 +97,34 @@ def build_parser() -> argparse.ArgumentParser:
     compute_asset_pricing.add_argument("factor_publication_id")
     compute_asset_pricing.add_argument("--model", action="append", default=None)
     compute_asset_pricing.add_argument("--asset-pricing-config", type=Path, default=None)
+    commands.add_parser(
+        "validate-portfolio-config", help="Validate Phase 4 portfolio configuration"
+    )
+    commands.add_parser(
+        "list-portfolio-publications", help="List authenticated Phase 4 publications"
+    )
+    verify_portfolio = commands.add_parser(
+        "verify-portfolio-publication", help="Authenticate one Phase 4 publication"
+    )
+    verify_portfolio.add_argument("path", type=Path)
+    compute_portfolio = commands.add_parser(
+        "compute-portfolio", help="Run Phase 4 from connected authenticated Phase 2/3 evidence"
+    )
+    compute_portfolio.add_argument("asset_pricing_publication_id")
+    compute_portfolio.add_argument(
+        "method",
+        choices=[
+            "equal_weight",
+            "minimum_variance",
+            "mean_variance",
+            "maximum_sharpe",
+            "maximum_diversification",
+            "risk_parity",
+            "hrp",
+            "cvar",
+        ],
+    )
+    compute_portfolio.add_argument("--portfolio-config", type=Path, default=None)
     publication = commands.add_parser(
         "verify-publication", help="Authenticate one persisted publication evidence bundle"
     )
@@ -229,6 +263,36 @@ def main(argv: list[str] | None = None) -> int:
                 tuple(args.model) if args.model else None,
             )
             print(manifest.publication_id)
+        elif args.command == "validate-portfolio-config":
+            print(load_portfolio_config().canonical_hash())
+        elif args.command == "list-portfolio-publications":
+            portfolio_config = load_portfolio_config()
+            portfolio_repository = PortfolioRepository(
+                service.root, service.root / portfolio_config.publication.manifest_root
+            )
+            for publication_id in portfolio_repository.list_authenticated():
+                print(publication_id)
+        elif args.command == "verify-portfolio-publication":
+            portfolio_manifest = authenticate_portfolio_publication(args.path, service.root)
+            print(portfolio_manifest.publication_id)
+        elif args.command == "compute-portfolio":
+            factor_config = load_factor_config()
+            pricing_config = load_asset_pricing_config()
+            portfolio_config = load_portfolio_config(args.portfolio_config)
+            portfolio_service = PortfolioResearchService(
+                portfolio_config,
+                service.root,
+                FactorRepository(
+                    service.root, service.root / factor_config.publication.manifest_root
+                ),
+                AssetPricingRepository(
+                    service.root, service.root / pricing_config.publication.manifest_root
+                ),
+            )
+            portfolio_result = portfolio_service.compute_and_publish(
+                args.asset_pricing_publication_id, args.method
+            )
+            print(portfolio_result.publication_id)
         elif args.command == "verify-publication":
             authenticate_dataset_evidence(
                 args.dataset_id,

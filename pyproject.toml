@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "institutional-factor-platform"
-version = "0.3.0"
-description = "Authenticated institutional data, factor, and empirical asset-pricing platform"
+version = "0.4.0"
+description = "Authenticated institutional quantitative research and portfolio-risk platform"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"
@@ -21,6 +21,7 @@ dependencies = [
   "pyarrow>=20,<22",
   "PyYAML>=6.0.2,<7",
   "scipy>=1.15,<2",
+  "scikit-learn>=1.6,<2",
   "statsmodels>=0.14.4,<1",
   "yfinance>=0.2.65,<1",
 ]
@@ -60,6 +61,17 @@ strict = true
 packages = ["institutional_factor_platform"]
 
 [[tool.mypy.overrides]]
-module = ["duckdb.*", "exchange_calendars.*", "numpy.*", "pandas.*", "pyarrow.*", "scipy.*", "statsmodels.*", "yfinance.*"]
+module = ["duckdb.*", "exchange_calendars.*", "numpy.*", "pandas.*", "pyarrow.*", "scipy.*", "sklearn.*", "statsmodels.*", "yfinance.*"]
 ignore_missing_imports = true
 follow_imports = "skip"
+
+[[tool.mypy.overrides]]
+module = [
+  "institutional_factor_platform.backtest.*",
+  "institutional_factor_platform.constraints.*",
+  "institutional_factor_platform.optimization.*",
+  "institutional_factor_platform.portfolio.allocations",
+  "institutional_factor_platform.risk.*",
+  "institutional_factor_platform.scenarios.*",
+]
+disable_error_code = ["type-arg", "no-any-return"]
