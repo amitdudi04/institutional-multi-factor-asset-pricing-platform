@@ -6,9 +6,9 @@
 |---|---|
 | Document | Project Specification (“Project Bible”) |
 | Project | Institutional Multi-Factor Asset Pricing & Portfolio Analytics Platform |
-| Status/version | Owner Approved; Phases 1–3 Complete; Phase 4 Authorized / 0.4.0 |
+| Status/version | Owner Approved; Phases 1–4 Complete; Phase 5 Authorized / 0.5.0 |
 | Updated/owner | 2026-08-04 / Repository Owner |
-| Approval | Owner Approved; Phases 1–3 Assured; Phase 4 Authorized |
+| Approval | Owner Approved; Phases 1–4 Assured; Phase 5 Authorized |
 | Audience | Owner, researchers, engineers, validators, reviewers, future agents |
 | Authority | Owner instructions; `DEVELOPMENT_CONSTITUTION.md`; this document; approved phase specifications; validated configuration |
 
@@ -26,7 +26,7 @@ Revision requires Section 50 change control. Future agents must not silently cha
 
 The platform will support a reproducible empirical equity research chain: provenance-controlled data, point-in-time factors, classical asset-pricing tests, constrained portfolios, realistic walk-forward evaluation, risk/attribution, interpretable ML, and research delivery. It joins financial economics with research engineering; it is not a model collection or dashboard demonstration.
 
-“Institutional-style” must be earned through immutable inputs, explicit rights and assumptions, temporal correctness, robust inference, reconciled accounting, model-risk controls, reproducible runs, interface/domain separation, and limitation disclosure. It does not imply licensed institutional data or fiduciary readiness. Phase 1 passed post-remediation independent assurance; Phase 2 factor software and Phase 3 asset-pricing software passed their internal assurance gates without producing live empirical results. Phase 4 is authorized, but no Phase 4–7 output exists. Success is regeneration of defensible answers from approved inputs without fabrication or silent substitution.
+“Institutional-style” must be earned through immutable inputs, explicit rights and assumptions, temporal correctness, robust inference, reconciled accounting, model-risk controls, reproducible runs, interface/domain separation, and limitation disclosure. It does not imply licensed institutional data or fiduciary readiness. Phase 1 passed post-remediation independent assurance; Phase 2 factor software, Phase 3 asset-pricing software, and Phase 4 portfolio-risk software passed their internal assurance gates without producing live empirical results. Phase 5 is authorized, but no Phase 5–7 output exists. Success is regeneration of defensible answers from approved inputs without fabrication or silent substitution.
 
 ## 3. Project Vision
 
@@ -455,4 +455,4 @@ Every change records reason, affected questions/phases, migration/backward compa
 
 Phase 1 owner-approved baselines are: US common equities/USD; daily research frequency; 2010 onward; large/mid-cap with point-in-time inputs required for historical claims; broad S&P 500 total-return proxy; approved named sources; DGS3MO/XNYS/UTC; immutable raw plus Parquet/DuckDB; and local owner-only access with no redistribution. Later-phase methods and any item still marked proposed/open remain unauthorized until their named phase and owner decision. This clarification records prior explicit owner decisions and does not approve later-phase defaults.
 
-Phases 1, 2, and 3 are implemented, assured, and complete under the governing documents and applicable owner instructions. Phase 4 is formally authorized as the next phase but has not started. Proposed/open choices in the Owner Decision Register remain unchanged and unauthorized until their affected use requires explicit owner resolution.
+Phases 1–4 are implemented, assured, and complete under the governing documents and applicable owner instructions. Phase 5 is formally authorized as the next phase but has not started. Proposed/open choices in the Owner Decision Register remain unchanged and unauthorized until their affected use requires explicit owner resolution.

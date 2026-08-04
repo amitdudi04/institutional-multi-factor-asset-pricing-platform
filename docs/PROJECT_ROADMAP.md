@@ -16,11 +16,11 @@ Complete and internally assured: authenticated Phase 2 inputs feed CAPM, Fama-Fr
 
 ## Phase 4 — Portfolio Construction and Institutional Backtesting
 
-Authorized as the next phase but not started. Implement approved benchmark portfolios and optimizers with realistic constraints, execution lags, transaction costs, and walk-forward evaluation. Infeasibility and missing inputs must never trigger silent constraint relaxation.
+Complete and internally assured: transparent and optimized allocation methods, Black-Litterman/Bayesian inputs, covariance estimation, long-only unlevered constraints, portfolio and tail-risk analytics, non-forecasting scenarios, explicit transaction costs, past-only rolling/expanding infrastructure, reconciled gross/net/benchmark accounting, and authenticated immutable publications. Open numeric bounds and costs remain explicit run inputs rather than approved defaults. No empirical performance claim is made.
 
 ## Phase 5 — Risk Analytics and Explainable Machine Learning
 
-Implement approved risk, scenario, stress, simulation, and interpretable predictive or ranking methods with time-aware validation. Machine learning must answer a defined investment-research question and expose limitations.
+Authorized as the next phase but not started. Implement approved advanced risk, attribution, simulation, and interpretable predictive or ranking methods with time-aware validation. Machine learning must answer a defined investment-research question and expose limitations.
 
 ## Phase 6 — API, Dashboard, and Research Workspace
 
