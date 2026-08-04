@@ -6,6 +6,8 @@ import sys
 from datetime import UTC, date, datetime
 from pathlib import Path
 
+import pyarrow.parquet as pq
+
 from institutional_factor_platform.data.config import load_phase1_config
 from institutional_factor_platform.data.contracts import (
     CONTRACTS,
@@ -33,6 +35,12 @@ from institutional_factor_platform.data.storage import (
     sha256_file,
 )
 from institutional_factor_platform.exceptions import ChecksumMismatchError, PlatformError
+from institutional_factor_platform.factors.config import load_factor_config
+from institutional_factor_platform.factors.service import FactorResearchService
+from institutional_factor_platform.factors.storage import (
+    FactorRepository,
+    authenticate_factor_publication,
+)
 from institutional_factor_platform.logging import configure_logging
 
 
@@ -51,6 +59,21 @@ def build_parser() -> argparse.ArgumentParser:
     commands.add_parser("validate-catalog", help="Verify all promoted catalog evidence")
     commands.add_parser("reconcile", help="Reconcile publication lifecycle and catalog state")
     commands.add_parser("rebuild-catalog", help="Atomically rebuild the authenticated catalog")
+    commands.add_parser("validate-factor-config", help="Validate Phase 2 factor configuration")
+    commands.add_parser("list-factor-publications", help="List authenticated factor publications")
+    verify_factor = commands.add_parser(
+        "verify-factor-publication", help="Authenticate one Phase 2 factor publication"
+    )
+    verify_factor.add_argument("path", type=Path)
+    compute_factors = commands.add_parser(
+        "compute-factors", help="Build an immutable Phase 2 publication from authenticated parents"
+    )
+    compute_factors.add_argument("--parent", action="append", required=True)
+    compute_factors.add_argument("--market", type=Path, required=True)
+    compute_factors.add_argument("--fundamentals", type=Path, required=True)
+    compute_factors.add_argument("--market-units-json", type=Path, required=True)
+    compute_factors.add_argument("--fundamental-units-json", type=Path, required=True)
+    compute_factors.add_argument("--factor-config", type=Path, default=None)
     publication = commands.add_parser(
         "verify-publication", help="Authenticate one persisted publication evidence bundle"
     )
@@ -132,6 +155,33 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "rebuild-catalog":
             rebuilt = service.recovery.rebuild_catalog()
             print(rebuilt.path)
+        elif args.command == "validate-factor-config":
+            print(load_factor_config().canonical_hash())
+        elif args.command == "list-factor-publications":
+            factor_config = load_factor_config()
+            repository = FactorRepository(
+                service.root,
+                service.root / factor_config.publication.manifest_root,
+            )
+            for publication_id in repository.list_authenticated():
+                print(publication_id)
+        elif args.command == "verify-factor-publication":
+            factor_manifest = authenticate_factor_publication(args.path, service.root)
+            print(factor_manifest.publication_id)
+        elif args.command == "compute-factors":
+            factor_service = FactorResearchService(
+                load_factor_config(args.factor_config), service.root
+            )
+            result = factor_service.compute_and_publish(
+                tuple(service.research.get(dataset_id) for dataset_id in args.parent),
+                pq.read_table(args.market).to_pandas(),
+                pq.read_table(args.fundamentals).to_pandas(),
+                market_units=json.loads(args.market_units_json.read_text(encoding="utf-8")),
+                fundamental_units=json.loads(
+                    args.fundamental_units_json.read_text(encoding="utf-8")
+                ),
+            )
+            print(result.publication_id)
         elif args.command == "verify-publication":
             authenticate_dataset_evidence(
                 args.dataset_id,
@@ -144,8 +194,10 @@ def main(argv: list[str] | None = None) -> int:
             document = LineageStore(args.path).load()
             print(json.dumps(document.model_dump(mode="json"), indent=2, sort_keys=True))
         elif args.command == "inspect-dataset-manifest":
-            manifest = DatasetManifest.model_validate_json(args.path.read_text(encoding="utf-8"))
-            print(json.dumps(manifest.model_dump(mode="json"), indent=2, sort_keys=True))
+            dataset_manifest = DatasetManifest.model_validate_json(
+                args.path.read_text(encoding="utf-8")
+            )
+            print(json.dumps(dataset_manifest.model_dump(mode="json"), indent=2, sort_keys=True))
         elif args.command == "verify-raw":
             artifact = DataArtifact(
                 args.path,
@@ -185,10 +237,10 @@ def main(argv: list[str] | None = None) -> int:
                 ),
                 DataSource.OWNER_SUPPLIED: OwnerSuppliedAdapter(),
             }
-            manifest = service.reprocess(
+            reprocessed_manifest = service.reprocess(
                 adapters[source], artifact, request, CONTRACTS[args.contract]
             )
-            print(manifest.dataset_id)
+            print(reprocessed_manifest.dataset_id)
         elif args.command == "ingest-fred":
             request = RetrievalRequest(
                 DataSource.FRED, args.series, DateRange(args.start, args.end)

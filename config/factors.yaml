@@ -1,0 +1,24 @@
+schema_version: "1.0.0"
+frequency: daily
+annualization_periods: 252
+windows:
+  short: 21
+  medium: 63
+  half_year: 126
+  one_year: 252
+  two_year: 504
+  minimum_observations: 20
+preprocessing:
+  method: robust_zscore
+  neutralize_by: none
+  winsor_lower: 0.01
+  winsor_upper: 0.99
+  minimum_cross_section: 3
+  ddof: 1
+breakpoints:
+  exchange: XNYS
+  small_quantile: 0.30
+  large_quantile: 0.70
+publication:
+  output_root: data/factors
+  manifest_root: data/factor_manifests
