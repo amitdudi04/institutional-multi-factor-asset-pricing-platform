@@ -8,11 +8,11 @@ Complete and independently assured: approved adapters, immutable raw and standar
 
 ## Phase 2 — Multi-Factor Research Engine
 
-Authorized as the next phase but not started. Implement financially motivated observable factors, standardization and neutralization, factor portfolios and diagnostics, latent PCA factors, and validation. Factor definitions, universe, timing, weighting, and bias controls must be explicit, and all still-proposed/open Phase 2 decisions require owner resolution before their affected functionality.
+Complete and internally assured: versioned observable characteristics across market, size, value, momentum, quality, investment, low-volatility, liquidity, and risk families; point-in-time universe/classification/accounting controls; configurable date-local preprocessing and optional neutralization; next-period factor-quantile diagnostics; and authenticated immutable publications. PCA remains deferred under the Project Specification. Open/proposed owner decisions were not relabeled as approved, and no empirical factor claim is made.
 
 ## Phase 3 — Asset-Pricing Research Platform
 
-Implement approved CAPM and multifactor specifications, rolling estimation, robust inference, diagnostics, and cross-model comparison. Models are conditional on data availability and documented identification assumptions.
+Authorized as the next phase but not started. Implement approved CAPM and multifactor specifications, rolling estimation, robust inference, diagnostics, and cross-model comparison. Models are conditional on data availability and documented identification assumptions.
 
 ## Phase 4 — Portfolio Construction and Institutional Backtesting
 

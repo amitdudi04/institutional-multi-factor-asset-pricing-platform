@@ -6,9 +6,9 @@
 |---|---|
 | Document | Project Specification (“Project Bible”) |
 | Project | Institutional Multi-Factor Asset Pricing & Portfolio Analytics Platform |
-| Status/version | Owner Approved; Phase 1 Complete; Phase 2 Authorized / 0.2.0 |
+| Status/version | Owner Approved; Phases 1–2 Complete; Phase 3 Authorized / 0.3.0 |
 | Updated/owner | 2026-08-04 / Repository Owner |
-| Approval | Owner Approved; Phase 1 Assured; Phase 2 Authorized |
+| Approval | Owner Approved; Phases 1–2 Assured; Phase 3 Authorized |
 | Audience | Owner, researchers, engineers, validators, reviewers, future agents |
 | Authority | Owner instructions; `DEVELOPMENT_CONSTITUTION.md`; this document; approved phase specifications; validated configuration |
 
@@ -26,7 +26,7 @@ Revision requires Section 50 change control. Future agents must not silently cha
 
 The platform will support a reproducible empirical equity research chain: provenance-controlled data, point-in-time factors, classical asset-pricing tests, constrained portfolios, realistic walk-forward evaluation, risk/attribution, interpretable ML, and research delivery. It joins financial economics with research engineering; it is not a model collection or dashboard demonstration.
 
-“Institutional-style” must be earned through immutable inputs, explicit rights and assumptions, temporal correctness, robust inference, reconciled accounting, model-risk controls, reproducible runs, interface/domain separation, and limitation disclosure. It does not imply licensed institutional data or fiduciary readiness. Phase 1 data-platform infrastructure has passed post-remediation independent assurance; Phase 2 is authorized but no Phase 2–7 research output exists. Success is regeneration of defensible answers from approved inputs without fabrication or silent substitution.
+“Institutional-style” must be earned through immutable inputs, explicit rights and assumptions, temporal correctness, robust inference, reconciled accounting, model-risk controls, reproducible runs, interface/domain separation, and limitation disclosure. It does not imply licensed institutional data or fiduciary readiness. Phase 1 data infrastructure passed post-remediation independent assurance; Phase 2 factor software passed its internal assurance gate without producing live empirical results. Phase 3 is authorized but no Phase 3–7 research output exists. Success is regeneration of defensible answers from approved inputs without fabrication or silent substitution.
 
 ## 3. Project Vision
 
@@ -144,7 +144,7 @@ Approved Phase 1 sources are Yahoo Finance, Kenneth French Data Library, FRED, S
 
 `APPROVED BASELINE`: immutable checksum-protected raw responses; append-only ingestion where feasible; manifests for request, timestamps, files/hashes, schema/license/status; versioned downstream artifacts with parent/config/code identities and validation reports; critical failures quarantined and blocked.
 
-Operational Phase 1 paths include `data/{raw,interim,processed,manifests,quarantine}` plus ignored quality/metadata outputs. Future factor/model paths remain ignored and unimplemented. Empirical contents/databases/generated reports are ignored; reviewed contracts, metadata definitions, and isolated software fixtures may be tracked. Raw retention is until explicit owner deletion; access is local-owner-only with no public serving or redistribution. Transformations never edit raw files.
+Operational paths include Phase 1 `data/{raw,interim,processed,manifests,quarantine}` and ignored Phase 2 `data/{factors,factor_manifests}` outputs. Future model paths remain unimplemented. Empirical contents/databases/generated reports are ignored; reviewed contracts, metadata definitions, and isolated software fixtures may be tracked. Raw retention is until explicit owner deletion; access is local-owner-only with no public serving or redistribution. Transformations never edit raw files.
 
 ## 12. Data Contracts
 
@@ -455,4 +455,4 @@ Every change records reason, affected questions/phases, migration/backward compa
 
 Phase 1 owner-approved baselines are: US common equities/USD; daily research frequency; 2010 onward; large/mid-cap with point-in-time inputs required for historical claims; broad S&P 500 total-return proxy; approved named sources; DGS3MO/XNYS/UTC; immutable raw plus Parquet/DuckDB; and local owner-only access with no redistribution. Later-phase methods and any item still marked proposed/open remain unauthorized until their named phase and owner decision. This clarification records prior explicit owner decisions and does not approve later-phase defaults.
 
-Phase 1 is implemented, independently assured, and complete under the governing documents and approved owner decisions. Phase 2 is formally authorized as the next phase but has not started. Proposed/open choices in the Owner Decision Register remain unauthorized until their named Phase 2 use requires explicit owner resolution.
+Phases 1 and 2 are implemented, assured, and complete under the governing documents and applicable owner instructions. Phase 3 is formally authorized as the next phase but has not started. Proposed/open choices in the Owner Decision Register remain unchanged and unauthorized until their affected use requires explicit owner resolution.
