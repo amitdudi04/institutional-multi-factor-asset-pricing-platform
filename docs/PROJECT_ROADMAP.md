@@ -4,23 +4,23 @@ This roadmap summarizes the boundaries defined in `docs/PROJECT_SPECIFICATION.md
 
 ## Phase 1 — Institutional Data Platform
 
-Establish approved source adapters, immutable raw storage, schemas, validation, manifests, lineage, calendars, corporate actions, fundamentals, macroeconomic inputs, and point-in-time alignment. DuckDB and Parquet may be selected only where justified. No research model should precede validated, provenance-controlled inputs.
+Complete and independently assured: approved adapters, immutable raw and standardized storage, authenticated schema-v5 publication evidence, checkpointed append-only lifecycle state, crash-safe activation/recovery, authenticated read-time isolation, centrally enforced listing/issuer mapping authority, atomic DuckDB rebuild, reconciled units, calendars, fundamentals, and macro/published-factor inputs. Corporate-action fields are retained by the market adapter and a separate action contract is defined; no issuer-scale live dataset or empirical fitness claim is made. Phase 1 acceptance criteria pass with live integration validation retained as a disclosed operational limitation.
 
 ## Phase 2 — Multi-Factor Research Engine
 
-Implement financially motivated observable factors, standardization and neutralization, factor portfolios and diagnostics, latent PCA factors, and validation. Factor definitions, universe, timing, weighting, and bias controls must be explicit.
+Complete and internally assured: versioned observable characteristics across market, size, value, momentum, quality, investment, low-volatility, liquidity, and risk families; point-in-time universe/classification/accounting controls; configurable date-local preprocessing and optional neutralization; next-period factor-quantile diagnostics; and authenticated immutable publications. PCA remains deferred under the Project Specification. Open/proposed owner decisions were not relabeled as approved, and no empirical factor claim is made.
 
 ## Phase 3 — Asset-Pricing Research Platform
 
-Implement approved CAPM and multifactor specifications, rolling estimation, robust inference, diagnostics, and cross-model comparison. Models are conditional on data availability and documented identification assumptions.
+Complete and internally assured: authenticated Phase 2 inputs feed CAPM, Fama-French 3/5, Carhart 4, Hou-Xue-Zhang q-factor, and custom specifications; OLS/WLS, rolling, expanding, panel, and Fama-MacBeth estimators; classical/heteroskedasticity/HAC inference; assumption, influence, covariance, and stability diagnostics; and immutable checksum-bound research publications. Software validation uses isolated fixtures and makes no empirical pricing claim.
 
 ## Phase 4 — Portfolio Construction and Institutional Backtesting
 
-Implement approved benchmark portfolios and optimizers with realistic constraints, execution lags, transaction costs, and walk-forward evaluation. Infeasibility and missing inputs must never trigger silent constraint relaxation.
+Complete and internally assured: transparent and optimized allocation methods, Black-Litterman/Bayesian inputs, covariance estimation, long-only unlevered constraints, portfolio and tail-risk analytics, non-forecasting scenarios, explicit transaction costs, past-only rolling/expanding infrastructure, reconciled gross/net/benchmark accounting, and authenticated immutable publications. Open numeric bounds and costs remain explicit run inputs rather than approved defaults. No empirical performance claim is made.
 
 ## Phase 5 — Risk Analytics and Explainable Machine Learning
 
-Implement approved risk, scenario, stress, simulation, and interpretable predictive or ranking methods with time-aware validation. Machine learning must answer a defined investment-research question and expose limitations.
+Authorized as the next phase but not started. Implement approved advanced risk, attribution, simulation, and interpretable predictive or ranking methods with time-aware validation. Machine learning must answer a defined investment-research question and expose limitations.
 
 ## Phase 6 — API, Dashboard, and Research Workspace
 

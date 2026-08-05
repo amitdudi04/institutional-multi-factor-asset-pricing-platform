@@ -4,9 +4,9 @@ A research-driven framework intended to support reproducible multi-factor asset 
 
 ## Current status
 
-Repository governance is complete, the [Project Specification](docs/PROJECT_SPECIFICATION.md) is owner approved, and Phase 1 is authorized. Implementation has not started. The repository currently provides only governance/specification documents, validated base-configuration loading, project-root discovery, structured logging initialization, and tests for that foundation. No financial data pipeline, analytical model, portfolio engine, backtest, API, dashboard, or empirical result has been implemented.
+Repository governance and the owner-approved [Project Specification](docs/PROJECT_SPECIFICATION.md) are complete. Phase 1 is independently assured. Phases 2–4 are implemented and internally assured. Phase 4 adds constrained allocation and optimization, covariance estimation, portfolio/risk/performance analytics, non-forecasting scenarios, transaction costs, past-only backtest infrastructure, and authenticated immutable publications. Phase 5 is authorized as the next phase but has not started. No machine-learning model, API, dashboard, or empirical investment claim has been implemented.
 
-The governing standard is [docs/DEVELOPMENT_CONSTITUTION.md](docs/DEVELOPMENT_CONSTITUTION.md). The initial repository assessment is recorded in [docs/REPOSITORY_INITIALIZATION_REPORT.md](docs/REPOSITORY_INITIALIZATION_REPORT.md). Phase 1 implementation must follow the approved specification and owner decisions.
+The governing standard is [docs/DEVELOPMENT_CONSTITUTION.md](docs/DEVELOPMENT_CONSTITUTION.md). Phase 4 architecture and methods are documented in [docs/PHASE4_ARCHITECTURE.md](docs/PHASE4_ARCHITECTURE.md) and [docs/PHASE4_METHODOLOGY.md](docs/PHASE4_METHODOLOGY.md). Implementation, validation, and internal-audit evidence is retained in the corresponding Phase 4 reports. Historical Phase 1–3 evidence remains unchanged.
 
 ## Planned phases
 
@@ -26,7 +26,7 @@ The platform will not fabricate financial data, model outputs, portfolio results
 
 ## Intended architecture
 
-Future work will use a layered core package separating configuration, data contracts, ingestion, validation, transformations, research models, portfolios, risk, backtesting, reporting, and delivery interfaces. Analytical logic will remain independent of notebooks, APIs, and dashboards. Only the configuration and cross-cutting foundations needed at this stage exist today.
+The package separates configuration, authenticated data access, factors, asset pricing, constraints, optimization, portfolios, risk, scenarios, costs, backtesting, performance, immutable research outputs, and CLI orchestration. Analytical logic remains independent of notebooks, APIs, and dashboards. Later-phase machine-learning and delivery layers do not exist.
 
 ## Development setup
 
@@ -40,11 +40,24 @@ uv run ruff format --check .
 uv run mypy src
 ```
 
-The default configuration is `config/base.yaml`. It contains no investment assumptions or credentials. Copy `.env.example` to an untracked `.env` only when a future approved integration requires credentials; the current package does not automatically load `.env` files.
+The default configuration is `config/base.yaml`; secrets are supplied only through documented environment variables. Copy `.env.example` to an untracked `.env` if needed, but the package does not automatically load `.env` files. Validate configuration and create ignored local storage with:
+
+```shell
+uv run institutional-factor-platform validate-config
+uv run institutional-factor-platform init-storage
+uv run institutional-factor-platform validate-factor-config
+uv run institutional-factor-platform list-factor-publications
+uv run institutional-factor-platform validate-asset-pricing-config
+uv run institutional-factor-platform list-asset-pricing-publications
+uv run institutional-factor-platform validate-portfolio-config
+uv run institutional-factor-platform list-portfolio-publications
+```
+
+See [docs/DATA_SOURCE_GUIDE.md](docs/DATA_SOURCE_GUIDE.md) before any live retrieval and [docs/PHASE2_INPUT_GUIDE.md](docs/PHASE2_INPUT_GUIDE.md) before preparing factor inputs.
 
 ## Results availability
 
-Analytical and empirical results are **not yet available**. Phase 1 is authorized but has not been implemented.
+Empirical results are **not available**. Phase 2–4 tests use isolated synthetic software fixtures only; no live dataset, factor return, regression result, portfolio result, chart, or investment conclusion is committed. Runtime Phase 4 outputs are ignored local artifacts and require connected authenticated Phase 2 and Phase 3 publications plus explicit open-decision inputs.
 
 ## License
 
