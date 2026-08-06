@@ -20,11 +20,11 @@ Complete and internally assured: transparent and optimized allocation methods, B
 
 ## Phase 5 — Risk Analytics and Explainable Machine Learning
 
-Authorized as the next phase but not started. Implement approved advanced risk, attribution, simulation, and interpretable predictive or ranking methods with time-aware validation. Machine learning must answer a defined investment-research question and expose limitations.
+Complete and internally assured: authenticated feature/target construction; holdout, rolling, expanding, walk-forward, purge and embargo controls; baseline, regularized-linear, Random Forest and XGBoost research models; calibration, comparison, ablation, uncertainty, SHAP/permutation explanations, drift, model cards, immutable publications, and Phase 4 economic-evaluation delegation. The empirical target/horizon remains an explicit owner decision for each live study. No empirical alpha claim is made.
 
 ## Phase 6 — API, Dashboard, and Research Workspace
 
-Expose stable core services through approved API and dashboard interfaces, with provenance, freshness, and downloadable research artifacts. User interfaces must not duplicate or bypass core analytical logic.
+Authorized as the next phase but not started. Expose stable core services through approved API and dashboard interfaces, with provenance, freshness, and downloadable research artifacts. User interfaces must not duplicate or bypass core analytical logic.
 
 ## Phase 7 — Production Hardening and Research Publication
 
