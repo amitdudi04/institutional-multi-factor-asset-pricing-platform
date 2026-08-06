@@ -42,6 +42,9 @@ from institutional_factor_platform.factors.storage import (
     authenticate_factor_publication,
 )
 from institutional_factor_platform.logging import configure_logging
+from institutional_factor_platform.ml.config import load_ml_config
+from institutional_factor_platform.ml.publication import MLRepository
+from institutional_factor_platform.ml.service import MLResearchService
 from institutional_factor_platform.portfolio.config import load_portfolio_config
 from institutional_factor_platform.portfolio.service import PortfolioResearchService
 from institutional_factor_platform.research_outputs.portfolio_storage import (
@@ -125,6 +128,26 @@ def build_parser() -> argparse.ArgumentParser:
         ],
     )
     compute_portfolio.add_argument("--portfolio-config", type=Path, default=None)
+    validate_ml = commands.add_parser(
+        "validate-ml-config", help="Validate Phase 5 ML configuration"
+    )
+    validate_ml.add_argument("--ml-config", type=Path, default=None)
+    build_ml = commands.add_parser(
+        "build-ml-dataset", help="Validate an authenticated Phase 5 feature/target assembly"
+    )
+    build_ml.add_argument("asset_pricing_publication_id")
+    build_ml.add_argument("--ml-config", type=Path, default=None)
+    train_ml = commands.add_parser(
+        "train-ml-model", help="Train and publish one authenticated Phase 5 research model"
+    )
+    train_ml.add_argument("asset_pricing_publication_id")
+    train_ml.add_argument("family")
+    train_ml.add_argument("--ml-config", type=Path, default=None)
+    commands.add_parser("list-ml-publications", help="List authenticated Phase 5 publications")
+    verify_ml = commands.add_parser(
+        "verify-ml-publication", help="Authenticate one immutable Phase 5 publication"
+    )
+    verify_ml.add_argument("publication_id")
     publication = commands.add_parser(
         "verify-publication", help="Authenticate one persisted publication evidence bundle"
     )
@@ -293,6 +316,41 @@ def main(argv: list[str] | None = None) -> int:
                 args.asset_pricing_publication_id, args.method
             )
             print(portfolio_result.publication_id)
+        elif args.command == "validate-ml-config":
+            print(load_ml_config(args.ml_config).canonical_hash())
+        elif args.command in {
+            "build-ml-dataset",
+            "train-ml-model",
+            "list-ml-publications",
+            "verify-ml-publication",
+        }:
+            ml_config = load_ml_config(getattr(args, "ml_config", None))
+            factor_config = load_factor_config()
+            pricing_config = load_asset_pricing_config()
+            factor_repository = FactorRepository(
+                service.root, service.root / factor_config.publication.manifest_root
+            )
+            pricing_repository = AssetPricingRepository(
+                service.root, service.root / pricing_config.publication.manifest_root
+            )
+            ml_repository = MLRepository(
+                service.root, service.root / ml_config.publication.manifest_root
+            )
+            if args.command == "list-ml-publications":
+                for publication_id in ml_repository.list_authenticated():
+                    print(publication_id)
+            elif args.command == "verify-ml-publication":
+                print(ml_repository.authenticate(args.publication_id).publication_id)
+            elif args.command == "build-ml-dataset":
+                dataset, metadata = MLResearchService(
+                    ml_config, service.root, factor_repository, pricing_repository
+                ).build_authenticated_dataset(args.asset_pricing_publication_id)
+                print(json.dumps({**metadata, "rows": len(dataset)}, sort_keys=True))
+            else:
+                ml_manifest = MLResearchService(
+                    ml_config, service.root, factor_repository, pricing_repository
+                ).train_evaluate_publish(args.asset_pricing_publication_id, args.family)
+                print(ml_manifest.publication_id)
         elif args.command == "verify-publication":
             authenticate_dataset_evidence(
                 args.dataset_id,

@@ -1,0 +1,59 @@
+schema_version: "1.0.0"
+inputs:
+  phase2_publication_id: null
+  phase3_publication_id: null
+  phase4_publication_id: null
+features:
+  families: []
+  value_column: score_value
+  interactions: []
+  minimum_coverage: 0.8
+target:
+  kind: null
+  horizon: null
+  benchmark_id: null
+  threshold: null
+  quantiles: 5
+missing:
+  policy: reject
+  add_indicators: false
+preprocessing:
+  scaling: standard
+  winsor_lower: null
+  winsor_upper: null
+split:
+  method: expanding
+  train_periods: 36
+  validation_periods: 12
+  test_periods: 12
+  rolling_periods: null
+  purge_overlaps: true
+  embargo_periods: 1
+  retrain_every: 1
+models:
+  enabled: [zero, historical_mean, linear, ridge, lasso, elastic_net, random_forest, xgboost]
+  random_seed: 17
+  thread_limit: 1
+search:
+  method: grid
+  maximum_trials: 20
+  selection_metric: spearman
+  tie_break: simpler
+calibration:
+  method: none
+  minimum_samples: 100
+explainability:
+  enabled: true
+  sample_size: 500
+  background_size: 100
+  random_seed: 17
+drift:
+  psi_bins: 10
+  warning_threshold: 0.2
+economic_evaluation:
+  enabled: false
+  portfolio_method: equal_weight
+  selection_quantile: null
+publication:
+  output_root: data/ml
+  manifest_root: data/ml_manifests
