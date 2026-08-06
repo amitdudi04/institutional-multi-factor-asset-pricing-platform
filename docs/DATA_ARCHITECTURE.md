@@ -64,3 +64,6 @@ Model definitions, regression estimators, statistical tests, diagnostics, valida
 ## Phase 4 portfolio-risk architecture
 
 Phase 4 authenticates a Phase 3 publication and its exact Phase 2 parent before reading return, benchmark, or risk-free evidence. Past-only estimators feed explicit constraints and optimizers; next-period accounting retains gross, cost, net, benchmark, active return, trades, and self-financing drift. Publications bind both parent hashes, canonical configuration, Git commit, method, exact artifact inventory, schemas, checksums, sizes, validation, and lineage. Open owner-decision numbers remain absent until explicitly supplied for a run.
+## Phase 5 authenticated model publications
+
+Phase 5 consumes Phase 2/3 evidence only through authenticated repositories. A complete ML publication binds feature matrix, target, split assignment, fitted preprocessor, model, tuning, predictions, evaluation, calibration, explanations, drift, comparison, economic evaluation, model card, configuration, lineage, and validation. Checksums and exact Parquet column order are revalidated on every supported read; trusted-local Joblib deserialization occurs only after authentication.

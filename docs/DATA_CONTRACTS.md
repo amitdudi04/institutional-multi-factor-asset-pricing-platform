@@ -42,3 +42,6 @@ Each immutable Phase 3 publication contains exact-schema Parquet tables for coef
 ## Phase 4 portfolio contracts
 
 Phase 4 inputs are connected authenticated Phase 2 portfolio/characteristic artifacts and their Phase 3 child manifest. Returns and costs are decimal simple returns; weights and turnover are fractions; basis-point inputs divide by 10,000; half-spread divides by 20,000; VaR/ES are positive losses. Output tables contain allocations, transactions, returns, and optimizer diagnostics. JSON reports contain constraints, performance, risk, benchmark reconciliation, scenario status, configuration, lineage, and validation. The manifest binds exact columns and every artifact checksum/size; the publication pointer binds the manifest hash.
+## Phase 5 contracts
+
+Phase 5 defines versioned feature-schema, target, split-assignment, prediction, explanation, model-card, artifact, manifest, and publication-authority contracts. They bind canonical security/date identity, source publication hashes, availability, units, deterministic feature order, preprocessor/model/target identities, configuration, Git commit, dependency versions, seeds, and complete artifact inventory. Unknown, reordered, late, missing, or substituted critical evidence fails closed.
