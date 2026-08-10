@@ -50,7 +50,7 @@ def test_ci_has_required_read_only_gates() -> None:
         "mypy src",
         "validate-delivery-config",
         "verify-delivery-platform",
-        "pip-audit --locked",
+        "pip-audit --path",
     ):
         assert gate in commands
     docker_step = workflow["jobs"]["docker"]["steps"][-1]
