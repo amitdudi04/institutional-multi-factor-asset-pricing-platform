@@ -92,10 +92,14 @@ def test_fred_standardizes_missing_without_interpolation() -> None:
     records = adapter.standardize(b"DATE,DGS3MO\n2024-01-01,5.40\n2024-01-02,.\n", request)
     assert records[0]["value"] == 5.4
     assert records[1]["value"] is None and records[1]["missing_value"] is True
+    current_records = adapter.standardize(b"observation_date,DGS3MO\n2024-01-01,5.40\n", request)
+    assert current_records[0]["observation_date"] == date(2024, 1, 1)
     with pytest.raises(RetrievalError, match="Unapproved"):
         adapter.retrieve(RetrievalRequest(DataSource.FRED, "UNAPPROVED"))
     with pytest.raises(RetrievalError, match="expected column"):
         adapter.standardize(b"DATE,OTHER\n2024-01-01,1\n", request)
+    with pytest.raises(RetrievalError, match="observation-date"):
+        adapter.standardize(b"not_a_date,DGS3MO\n2024-01-01,1\n", request)
     with pytest.raises(RetrievalError, match="empty"):
         adapter.standardize(b"DATE,DGS3MO\n", request)
 
