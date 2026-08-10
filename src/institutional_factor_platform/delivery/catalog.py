@@ -31,7 +31,7 @@ class DeliveryCatalog:
 
     def __init__(self, root: Path) -> None:
         self.root = root.resolve()
-        phase1 = DataIngestionService(load_phase1_config())
+        phase1 = DataIngestionService(load_phase1_config(), root=self.root)
         factors = load_factor_config()
         pricing = load_asset_pricing_config()
         portfolio = load_portfolio_config()

@@ -54,6 +54,12 @@ class TargetSpecification(FrozenModel):
     unit: str
     transformation: str
     quantiles: int | None = Field(default=None, ge=2)
+    source_publication_id: str | None = None
+    source_artifact_checksum: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
+    source_unit: str = "decimal_return"
+    annualization_periods: int | None = Field(default=None, ge=1)
+    minimum_acceptable_return: float | None = None
+    risk_quantile_alpha: float | None = Field(default=None, gt=0, lt=1)
 
 
 class SplitAssignment(FrozenModel):
@@ -116,6 +122,7 @@ class ModelCard(FrozenModel):
     training_period: tuple[str, str]
     validation_period: tuple[str, str]
     test_period: tuple[str, str]
+    folds: tuple[dict[str, object], ...] = ()
     features: tuple[str, ...]
     preprocessing_hash: str = Field(pattern=r"^[a-f0-9]{64}$")
     hyperparameters: dict[str, object]
@@ -128,6 +135,8 @@ class ModelCard(FrozenModel):
     known_failure_modes: tuple[str, ...]
     data_dependencies: tuple[str, ...]
     artifact_checksums: dict[str, str]
+    dependency_versions: dict[str, str] = Field(default_factory=dict)
+    selection_rationale: str = ""
     configuration_hash: str = Field(pattern=r"^[a-f0-9]{64}$")
     git_commit: str
     status: Literal["EXPERIMENTAL", "VALIDATED_RESEARCH", "CHALLENGER", "REJECTED", "DEPRECATED"]

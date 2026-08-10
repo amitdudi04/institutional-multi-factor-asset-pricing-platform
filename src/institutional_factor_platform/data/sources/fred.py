@@ -43,6 +43,12 @@ class FredAdapter(SourceAdapter[bytes]):
         reader = csv.DictReader(StringIO(text))
         if not reader.fieldnames or request.dataset not in reader.fieldnames:
             raise RetrievalError(f"FRED response missing expected column {request.dataset}")
+        date_column = next(
+            (name for name in ("observation_date", "DATE") if name in reader.fieldnames),
+            None,
+        )
+        if date_column is None:
+            raise RetrievalError("FRED response missing expected observation-date column")
         unit, frequency = self.approved_series[request.dataset]
         retrieved = self.now()
         records: list[dict[str, object]] = []
@@ -52,7 +58,7 @@ class FredAdapter(SourceAdapter[bytes]):
             records.append(
                 {
                     "series_id": request.dataset,
-                    "observation_date": datetime.strptime(row["DATE"], "%Y-%m-%d").date(),
+                    "observation_date": datetime.strptime(row[date_column], "%Y-%m-%d").date(),
                     "value": None if missing else float(raw),
                     "source_unit": unit,
                     "frequency": frequency,

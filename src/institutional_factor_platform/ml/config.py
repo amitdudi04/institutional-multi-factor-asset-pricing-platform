@@ -49,6 +49,9 @@ class TargetConfig(StrictModel):
     benchmark_id: str | None = None
     threshold: float | None = None
     quantiles: int = Field(default=5, ge=2, le=20)
+    annualization_periods: int = Field(default=252, ge=1)
+    minimum_acceptable_return: float = 0.0
+    risk_quantile_alpha: float = Field(default=0.05, gt=0, lt=1)
 
     def require_explicit(self) -> tuple[str, int]:
         if self.kind is None or self.horizon is None:
@@ -115,6 +118,7 @@ class SearchConfig(StrictModel):
     maximum_trials: int = Field(ge=1, le=100)
     selection_metric: str
     tie_break: Literal["simpler", "first"] = "simpler"
+    spaces: dict[str, dict[str, tuple[object, ...]]] = Field(default_factory=dict)
 
 
 class CalibrationConfig(StrictModel):

@@ -4,7 +4,7 @@ An authenticated, reproducible institutional-style quantitative research platfor
 
 ## Status
 
-Phases 1-6 are implemented and assured. The planned v1.0.0 architecture is complete: immutable evidence flows through authenticated analytical publications into a versioned FastAPI service, institutional Streamlit workspace, deterministic reporting, secure local Docker foundation, and CI gates.
+Phases 1-6 are implemented and post-remediation assured in v1.0.1. Immutable Phase 1 evidence flows through connected Phase 2-5 publications into the versioned FastAPI service, institutional Streamlit workspace, deterministic reporting, secure local Docker foundation, and CI gates. An authentic synthetic Phase 1-to-6 regression proves the complete software path, restart authentication, and parent-tamper rejection.
 
 No empirical dataset, factor premium, regression result, portfolio performance, model output, or investment conclusion is committed. Live empirical validation remains pending until lawful authenticated inputs and explicit study decisions are supplied.
 
@@ -77,7 +77,7 @@ uv run mypy src
 uv lock --check
 ```
 
-The final recorded gate is 224 tests passing at 90.49% branch-aware coverage. CI repeats the suite, configuration/import smoke checks, dependency audit, and Docker build.
+The post-remediation gate is 233 tests passing at 90.51% branch-aware coverage. CI repeats the suite, configuration/import smoke checks, dependency audit, and Docker build.
 
 ## Security and data policy
 
@@ -98,6 +98,7 @@ The platform includes point-in-time factor construction; CAPM and multifactor re
 - Local bearer protection is not enterprise identity management.
 - No brokerage, live execution, streaming prices, automatic retraining, or cloud SLA exists.
 - Docker was unavailable on the final local audit host; static validation passed and CI contains an image-build gate.
+- Lawful live US-equity universe/mapping evidence, owner SEC contact identity, and owner-supplied empirical data remain external blockers. FRED and Kenneth French connectivity do not remove those blockers. No live empirical validation is claimed.
 
 ## Reproducibility and academic use
 

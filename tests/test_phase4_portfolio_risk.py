@@ -1,5 +1,6 @@
 """Phase 4 optimization, risk, accounting, temporal, and evidence tests."""
 
+import json
 from datetime import date, timedelta
 from pathlib import Path
 from types import SimpleNamespace
@@ -505,3 +506,44 @@ def test_authenticated_service_runs_optimized_method(
         item for item in manifest.artifacts if item.name == "optimization_diagnostics"
     )
     assert diagnostics.columns
+
+
+def test_phase2_benchmark_reconciliation_tolerates_only_numeric_roundoff() -> None:
+    frame = _factor_portfolios()
+    frame.loc[frame.index[0], "benchmark_return"] += 1e-14
+    _returns_frame, benchmark = service_module._return_matrix(frame)
+    assert not benchmark.empty
+    frame.loc[frame.index[0], "benchmark_return"] += 1e-5
+    with pytest.raises(DataQualityError, match="Benchmark returns conflict"):
+        service_module._return_matrix(frame)
+
+
+def test_authenticated_service_executes_requested_scenarios_and_binds_identity(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(service_module, "_git_commit", lambda root: "deadbeef")
+    service = PortfolioResearchService(
+        _service_config(),
+        tmp_path,
+        _Factors(),
+        _Pricing(),  # type: ignore[arg-type]
+    )
+    baseline = service.compute_and_publish("phase3", "equal_weight")
+    scenarios = (
+        Scenario("value shock", {"value": -0.2}, "market_crash"),
+        Scenario("rates", {"rates": 0.01}, "interest_rate"),
+        Scenario("volatility", {"momentum": -0.1}, "volatility"),
+        Scenario("inflation", {"value": -0.05}, "inflation"),
+        Scenario("liquidity", {"momentum": -0.03}, "liquidity"),
+        Scenario("custom", {"value": 0.02}, "custom"),
+    )
+    manifest = service.compute_and_publish("phase3", "equal_weight", scenarios)
+    assert manifest.publication_id != baseline.publication_id
+    report_artifact = next(item for item in manifest.artifacts if item.name == "scenario_report")
+    report = json.loads((tmp_path / report_artifact.path).read_text("utf-8"))
+    assert len(report["scenarios"]) == 6
+    assert report["status"] == "PASS_WITH_UNMAPPED_EXPOSURES"
+    mapped = report["scenarios"][0]
+    assert mapped["mapping_status"] == "PASS"
+    assert mapped["exposure_source_publication_id"] == "phase2"
+    assert report["scenarios"][1]["unmapped_shocks"] == ["rates"]
