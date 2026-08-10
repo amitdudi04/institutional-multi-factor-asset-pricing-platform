@@ -9,6 +9,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Literal, cast
 
+import numpy as np
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
@@ -33,6 +34,7 @@ from institutional_factor_platform.research_outputs.portfolio_storage import (
     PortfolioRepository,
 )
 from institutional_factor_platform.research_outputs.storage import AssetPricingRepository
+from institutional_factor_platform.scenarios.engine import Scenario, apply_scenario
 
 
 class PortfolioResearchService:
@@ -55,6 +57,7 @@ class PortfolioResearchService:
         self,
         phase3_publication_id: str,
         method: Method | Literal["equal_weight"],
+        scenarios: tuple[Scenario, ...] = (),
     ) -> PortfolioManifest:
         phase3 = self.pricing.authenticate(phase3_publication_id)
         phase2 = self.factors.authenticate(phase3.phase2_publication_id)
@@ -121,6 +124,12 @@ class PortfolioResearchService:
             risk_free=backtest.returns["date"].map(risk_free),
             annualization=self.config.annualization_periods,
         )
+        scenario_results = _evaluate_scenarios(
+            scenarios,
+            backtest.allocations,
+            tuple(str(value) for value in returns.columns),
+            phase2.publication_id,
+        )
         git_commit = _git_commit(self.root)
         publication_id = _publication_id(
             phase2.content_hash(),
@@ -128,6 +137,7 @@ class PortfolioResearchService:
             self.config.canonical_hash(),
             git_commit,
             method,
+            scenarios,
         )
         existing = self.manifest_root / publication_id / "portfolio-publication.json"
         if existing.is_file():
@@ -144,6 +154,7 @@ class PortfolioResearchService:
             backtest.returns,
             pd.DataFrame(optimization_rows),
             summary,
+            scenario_results,
             git_commit,
         )
 
@@ -160,6 +171,7 @@ class PortfolioResearchService:
         returns: pd.DataFrame,
         diagnostics: pd.DataFrame,
         summary: dict[str, object],
+        scenario_results: dict[str, object],
         git_commit: str,
     ) -> PortfolioManifest:
         output = self.output_root / publication_id
@@ -218,8 +230,7 @@ class PortfolioResearchService:
                 },
                 "scenario_report": {
                     "publication_id": publication_id,
-                    "scenarios": [],
-                    "status": "FRAMEWORK_AVAILABLE_NOT_RUN",
+                    **scenario_results,
                 },
                 "configuration": {
                     "publication_id": publication_id,
@@ -298,9 +309,10 @@ def _return_matrix(frame: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
         .dropna()
     )
     grouped = values.groupby("date")["benchmark_return"]
-    if (grouped.nunique() > 1).any():
+    spread = grouped.max() - grouped.min()
+    if (spread > 1e-12).any():
         raise DataQualityError("Benchmark returns conflict across Phase 2 portfolios")
-    benchmark = grouped.first().reindex(returns.index)
+    benchmark = grouped.mean().reindex(returns.index)
     return returns, benchmark
 
 
@@ -330,7 +342,12 @@ def _relative(path: Path, root: Path) -> str:
 
 
 def _publication_id(
-    phase2_hash: str, phase3_hash: str, config_hash: str, git_commit: str, method: str
+    phase2_hash: str,
+    phase3_hash: str,
+    config_hash: str,
+    git_commit: str,
+    method: str,
+    scenarios: tuple[Scenario, ...],
 ) -> str:
     digest = hashlib.sha256(
         canonical_json_bytes(
@@ -340,11 +357,63 @@ def _publication_id(
                 "configuration": config_hash,
                 "git_commit": git_commit,
                 "method": method,
+                "scenarios": [
+                    {"name": item.name, "kind": item.kind, "shocks": item.shocks}
+                    for item in scenarios
+                ],
                 "engine": "1.0.0",
             }
         )
     ).hexdigest()
     return f"portfolio-{digest[:32]}"
+
+
+def _evaluate_scenarios(
+    scenarios: tuple[Scenario, ...],
+    allocations: pd.DataFrame,
+    asset_ids: tuple[str, ...],
+    exposure_source_publication_id: str,
+) -> dict[str, object]:
+    if not scenarios:
+        return {
+            "scenarios": [],
+            "status": "NOT_REQUESTED",
+            "exposure_source_publication_id": exposure_source_publication_id,
+        }
+    if allocations.empty:
+        raise DataQualityError("Scenario evaluation requires an authenticated allocation")
+    latest_date = allocations["date"].max()
+    latest = allocations.loc[allocations["date"].eq(latest_date)].set_index("asset_id")
+    if set(latest.index) != set(asset_ids):
+        raise EvidenceIntegrityError("Scenario allocation identity differs from return assets")
+    weights = latest.reindex(asset_ids)["weight"].to_numpy(float)
+    factor_ids = tuple(asset.split(":Q", maxsplit=1)[0] for asset in asset_ids)
+    exposure_keys = sorted({key for scenario in scenarios for key in scenario.shocks})
+    exposures = {
+        key: np.asarray([1.0 if factor == key else 0.0 for factor in factor_ids], dtype=float)
+        for key in exposure_keys
+        if key in set(factor_ids)
+    }
+    results = []
+    for scenario in scenarios:
+        result = apply_scenario(scenario, weights, exposures)
+        result.update(
+            {
+                "as_of_date": str(latest_date),
+                "exposure_source_publication_id": exposure_source_publication_id,
+                "exposure_method": "authenticated_phase2_factor_portfolio_identity",
+                "mapping_status": "PASS" if not result["unmapped_shocks"] else "PARTIAL",
+            }
+        )
+        results.append(result)
+    partial = any(item["unmapped_shocks"] for item in results)
+    return {
+        "scenarios": results,
+        "status": "PASS_WITH_UNMAPPED_EXPOSURES" if partial else "PASS",
+        "limitations": (
+            ["Unmapped shocks contribute zero and are disclosed explicitly"] if partial else []
+        ),
+    }
 
 
 def _git_commit(root: Path) -> str:

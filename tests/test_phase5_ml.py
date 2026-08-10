@@ -249,6 +249,46 @@ def test_target_rejects_bad_identity_and_benchmark() -> None:
         build_targets(invalid, kind="future_return", horizon=1)
 
 
+def test_risk_targets_match_hand_calculations_and_preserve_source_identity() -> None:
+    dates = pd.date_range("2024-01-01", periods=4, tz="UTC")
+    frame = pd.DataFrame(
+        {
+            "security_id": ["security"] * 4,
+            "date": dates,
+            "return": [0.01, -0.02, 0.03, -0.01],
+            "available_at": dates + pd.Timedelta(hours=12),
+        }
+    )
+    checksum = "c" * 64
+    volatility, vol_spec = build_targets(
+        frame,
+        kind="future_volatility",
+        horizon=3,
+        annualization_periods=252,
+        source_publication_id="market-source",
+        source_artifact_checksum=checksum,
+    )
+    window = np.array([-0.02, 0.03, -0.01])
+    assert volatility.loc[0, "target"] == pytest.approx(window.std(ddof=1) * np.sqrt(252))
+    assert vol_spec.source_publication_id == "market-source"
+    assert vol_spec.source_artifact_checksum == checksum
+
+    downside, _ = build_targets(
+        frame, kind="future_downside_volatility", horizon=3, annualization_periods=252
+    )
+    assert downside.loc[0, "target"] == pytest.approx(
+        np.sqrt(np.mean(np.minimum(window, 0.0) ** 2)) * np.sqrt(252)
+    )
+    drawdown, _ = build_targets(frame, kind="future_drawdown", horizon=3)
+    wealth = np.cumprod(1 + window)
+    prior_peaks = np.maximum.accumulate(np.r_[1.0, wealth])[:-1]
+    assert drawdown.loc[0, "target"] == pytest.approx(np.min(wealth / prior_peaks - 1))
+    risk_quantile, _ = build_targets(
+        frame, kind="future_risk_quantile", horizon=3, risk_quantile_alpha=0.05
+    )
+    assert risk_quantile.loc[0, "target"] == pytest.approx(max(0.0, -np.quantile(window, 0.05)))
+
+
 def _dataset() -> pd.DataFrame:
     features, _, _ = assemble_factor_features(
         _factor_frame(),
@@ -461,6 +501,15 @@ def test_calibration_explainability_and_future_background_rejection() -> None:
         test_start=pd.Timestamp("2020-03-01"),
     )
     assert calibrated.predict_proba(x[100:])[:, 1].shape == (20,)
+    isotonic = calibrate_classifier(
+        classifier,
+        x[80:100],
+        binary[80:100],
+        method="isotonic",
+        validation_end=pd.Timestamp("2020-02-01"),
+        test_start=pd.Timestamp("2020-03-01"),
+    )
+    assert isotonic.predict_proba(x[100:])[:, 1].shape == (20,)
     with pytest.raises(TemporalIntegrityError):
         calibrate_classifier(
             classifier,
@@ -705,7 +754,12 @@ class _Factors:
 
     def authenticate(self, publication_id: str) -> SimpleNamespace:
         assert publication_id == "phase2"
-        return SimpleNamespace(publication_id="phase2", content_hash=lambda: "a" * 64)
+        return SimpleNamespace(
+            publication_id="phase2",
+            content_hash=lambda: "a" * 64,
+            market_source_dataset_ids=("market-source",),
+            parents=(SimpleNamespace(dataset_id="market-source", artifact_checksum="c" * 64),),
+        )
 
     def read_table(self, publication_id: str) -> pa.Table:
         self.authenticate(publication_id)
@@ -723,15 +777,67 @@ class _Pricing:
         )
 
 
+class _Phase1:
+    values = _returns().assign(benchmark_return=0.0)
+    frame = pa.Table.from_pandas(values, preserve_index=False)
+
+    def get(self, dataset_id: str) -> SimpleNamespace:
+        assert dataset_id == "market-source"
+        return SimpleNamespace(
+            dataset_id=dataset_id,
+            checksum="c" * 64,
+            unit_metadata={"return": "decimal_return"},
+        )
+
+    def read_table(self, dataset_id: str) -> pa.Table:
+        self.get(dataset_id)
+        return self.frame
+
+
+class _Portfolios:
+    def __init__(self, root: Path) -> None:
+        self.path = root / "phase4-configuration.json"
+        self.path.write_text(
+            json.dumps(
+                {
+                    "configuration": {
+                        "costs": {
+                            "commission_bps": 1.0,
+                            "spread_bps": 2.0,
+                            "slippage_bps": 1.0,
+                            "market_impact_coefficient": 0.0,
+                        }
+                    }
+                }
+            ),
+            "utf-8",
+        )
+
+    def authenticate(self, publication_id: str) -> SimpleNamespace:
+        assert publication_id == "phase4"
+        return SimpleNamespace(
+            publication_id="phase4",
+            phase2_publication_id="phase2",
+            phase2_manifest_hash="a" * 64,
+            phase3_publication_id="phase3",
+            phase3_manifest_hash="b" * 64,
+            configuration_hash="e" * 64,
+            artifacts=(SimpleNamespace(name="configuration", path=self.path.name),),
+            content_hash=lambda: "d" * 64,
+        )
+
+
 def test_service_accepts_only_connected_authenticated_repositories(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.setattr(
         "institutional_factor_platform.ml.service._git_commit", lambda root: "deadbeef"
     )
-    service = MLResearchService(_explicit_config(), tmp_path, _Factors(), _Pricing())  # type: ignore[arg-type]
+    service = MLResearchService(_explicit_config(), tmp_path, _Factors(), _Pricing(), _Phase1())  # type: ignore[arg-type]
     dataset, metadata = service.build_authenticated_dataset("phase3")
     assert not dataset.empty and metadata["phase2_publication_id"] == "phase2"
+    assert (dataset.groupby("formation_date")["target"].nunique() > 1).any()
+    assert metadata["target_source_dataset_id"] == "market-source"
     broken = _Pricing()
     broken.authenticate = lambda publication_id: SimpleNamespace(
         publication_id="phase3",
@@ -741,7 +847,7 @@ def test_service_accepts_only_connected_authenticated_repositories(
     )  # type: ignore[method-assign]
     with pytest.raises(EvidenceIntegrityError, match="lineage"):
         MLResearchService(
-            _explicit_config(), tmp_path, _Factors(), broken
+            _explicit_config(), tmp_path, _Factors(), broken, _Phase1()
         ).build_authenticated_dataset("phase3")  # type: ignore[arg-type]
 
 
@@ -756,14 +862,164 @@ def test_service_trains_publishes_and_restarts_authenticated_bundle(
         tmp_path,
         _Factors(),  # type: ignore[arg-type]
         _Pricing(),  # type: ignore[arg-type]
+        _Phase1(),  # type: ignore[arg-type]
     )
     first = service.train_evaluate_publish("phase3", "ridge")
     second = service.train_evaluate_publish("phase3", "ridge")
     assert first.publication_id == second.publication_id
     repository = MLRepository(tmp_path, tmp_path / "manifests")
     assert repository.load_model(first.publication_id).family == "ridge"
+    authenticated = repository.authenticate(first.publication_id)
+    artifacts = {item.name: item for item in authenticated.artifacts}
+    evaluation = json.loads((tmp_path / artifacts["evaluation"].path).read_text("utf-8"))
+    trials = json.loads((tmp_path / artifacts["hyperparameter_trials"].path).read_text("utf-8"))
+    card = json.loads((tmp_path / artifacts["model_card"].path).read_text("utf-8"))
+    split_table = pq.read_table(tmp_path / artifacts["splits"].path).to_pandas()
+    prediction_table = pq.read_table(tmp_path / artifacts["predictions"].path).to_pandas()
+    assert evaluation["fold_count"] == split_table["fold"].nunique()
+    assert prediction_table["fold"].nunique() == evaluation["fold_count"]
+    assert {item["status"] for item in trials["trials"]} <= {
+        "PASS",
+        "FAIL",
+        "REUSED_BY_RETRAINING_CADENCE",
+    }
+    assert card["target"]["source_publication_id"] == "market-source"
+    assert card["training_period"] and card["test_period"]
     with pytest.raises(DataQualityError, match="not enabled"):
         service.train_evaluate_publish("phase3", "neural_network")
+
+
+def test_service_economic_evaluation_reuses_authenticated_phase4_engine_and_costs(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(
+        "institutional_factor_platform.ml.service._git_commit", lambda root: "deadbeef"
+    )
+    base = _explicit_config(tmp_path)
+    config = base.model_copy(
+        update={
+            "inputs": base.inputs.model_copy(update={"phase4_publication_id": "phase4"}),
+            "economic_evaluation": base.economic_evaluation.model_copy(
+                update={"enabled": True, "selection_quantile": 0.25}
+            ),
+        }
+    )
+    service = MLResearchService(
+        config,
+        tmp_path,
+        _Factors(),  # type: ignore[arg-type]
+        _Pricing(),  # type: ignore[arg-type]
+        _Phase1(),  # type: ignore[arg-type]
+        _Portfolios(tmp_path),  # type: ignore[arg-type]
+    )
+    manifest = service.train_evaluate_publish("phase3", "ridge")
+    economic_artifact = next(
+        item for item in manifest.artifacts if item.name == "economic_evaluation"
+    )
+    result = json.loads((tmp_path / economic_artifact.path).read_text("utf-8"))
+    assert result["status"] == "PASS" and result["phase4_publication_id"] == "phase4"
+    assert result["folds"] and all(item["long_only"] for item in result["folds"])
+    assert all(item["reconciliation_status"] == "PASS" for item in result["folds"])
+    assert result["costs"]["commission_bps"] == 1.0
+
+
+def test_service_classifier_calibrates_only_on_validation_and_persists_identity(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(
+        "institutional_factor_platform.ml.service._git_commit", lambda root: "deadbeef"
+    )
+    base = _explicit_config(tmp_path)
+    config = base.model_copy(
+        update={
+            "target": base.target.model_copy(
+                update={
+                    "kind": "outperformance",
+                    "benchmark_id": "SP500-TR",
+                    "threshold": 0.0,
+                }
+            ),
+            "models": base.models.model_copy(
+                update={"enabled": (*base.models.enabled, "logistic")}
+            ),
+            "calibration": base.calibration.model_copy(
+                update={"method": "sigmoid", "minimum_samples": 10}
+            ),
+        }
+    )
+    manifest = MLResearchService(
+        config,
+        tmp_path,
+        _Factors(),  # type: ignore[arg-type]
+        _Pricing(),  # type: ignore[arg-type]
+        _Phase1(),  # type: ignore[arg-type]
+    ).train_evaluate_publish("phase3", "logistic")
+    artifacts = {item.name: item for item in manifest.artifacts}
+    calibration = json.loads((tmp_path / artifacts["calibration"].path).read_text("utf-8"))
+    predictions = pq.read_table(tmp_path / artifacts["predictions"].path).to_pandas()
+    assert all(item["status"] == "PASS" for item in calibration["folds"])
+    assert all(item["calibrator_id"] for item in calibration["folds"])
+    assert predictions["probability"].between(0, 1).all()
+
+
+def test_service_evaluates_all_rolling_folds_and_honors_retraining_cadence(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(
+        "institutional_factor_platform.ml.service._git_commit", lambda root: "deadbeef"
+    )
+    base = _explicit_config(tmp_path)
+    config = base.model_copy(
+        update={
+            "split": base.split.model_copy(
+                update={"method": "rolling", "rolling_periods": 10, "retrain_every": 2}
+            ),
+            "search": base.search.model_copy(update={"maximum_trials": 1}),
+        }
+    )
+    manifest = MLResearchService(
+        config,
+        tmp_path,
+        _Factors(),  # type: ignore[arg-type]
+        _Pricing(),  # type: ignore[arg-type]
+        _Phase1(),  # type: ignore[arg-type]
+    ).train_evaluate_publish("phase3", "ridge")
+    artifacts = {item.name: item for item in manifest.artifacts}
+    evaluation = json.loads((tmp_path / artifacts["evaluation"].path).read_text("utf-8"))
+    trials = json.loads((tmp_path / artifacts["hyperparameter_trials"].path).read_text("utf-8"))
+    predictions = pq.read_table(tmp_path / artifacts["predictions"].path).to_pandas()
+    assert evaluation["fold_count"] > 1
+    assert predictions["fold"].nunique() == evaluation["fold_count"]
+    assert any(item["status"] == "REUSED_BY_RETRAINING_CADENCE" for item in trials["trials"])
+
+
+def test_service_tree_model_persists_permutation_and_local_shap_evidence(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(
+        "institutional_factor_platform.ml.service._git_commit", lambda root: "deadbeef"
+    )
+    base = _explicit_config(tmp_path)
+    config = base.model_copy(
+        update={
+            "search": base.search.model_copy(update={"maximum_trials": 1}),
+            "explainability": base.explainability.model_copy(
+                update={"sample_size": 4, "background_size": 8}
+            ),
+        }
+    )
+    manifest = MLResearchService(
+        config,
+        tmp_path,
+        _Factors(),  # type: ignore[arg-type]
+        _Pricing(),  # type: ignore[arg-type]
+        _Phase1(),  # type: ignore[arg-type]
+    ).train_evaluate_publish("phase3", "random_forest")
+    artifact = next(item for item in manifest.artifacts if item.name == "explanations")
+    explanations = pq.read_table(tmp_path / artifact.path).to_pandas()
+    assert {"permutation", "shap"} <= set(explanations["method"])
+    assert explanations["prediction_artifact_checksum"].str.fullmatch(r"[a-f0-9]{64}").all()
+    assert explanations["background_hash"].str.fullmatch(r"[a-f0-9]{64}").all()
 
 
 def test_additional_fail_closed_contract_branches(tmp_path: Path) -> None:
@@ -854,7 +1110,7 @@ def test_additional_split_target_drift_and_explanation_guards() -> None:
     with pytest.raises(DataQualityError, match="contract"):
         build_targets(pd.DataFrame(), kind="future_return", horizon=1)
     risk, spec = build_targets(_returns(), kind="future_volatility", horizon=3)
-    assert not risk.empty and spec.unit == "volatility"
+    assert not risk.empty and spec.unit == "annualized_volatility"
     with pytest.raises(DataQualityError, match="PSI"):
         drift_report(pd.DataFrame({"a": [1.0]}), pd.DataFrame({"a": [2.0]}), ("a",), bins=1)
     with pytest.raises(DataQualityError, match="empty"):

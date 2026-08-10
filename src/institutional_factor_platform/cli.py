@@ -318,6 +318,7 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "compute-portfolio":
             factor_config = load_factor_config()
             pricing_config = load_asset_pricing_config()
+            portfolio_config = load_portfolio_config()
             portfolio_config = load_portfolio_config(args.portfolio_config)
             portfolio_service = PortfolioResearchService(
                 portfolio_config,
@@ -353,6 +354,9 @@ def main(argv: list[str] | None = None) -> int:
             ml_repository = MLRepository(
                 service.root, service.root / ml_config.publication.manifest_root
             )
+            portfolio_repository = PortfolioRepository(
+                service.root, service.root / portfolio_config.publication.manifest_root
+            )
             if args.command == "list-ml-publications":
                 for publication_id in ml_repository.list_authenticated():
                     print(publication_id)
@@ -360,12 +364,22 @@ def main(argv: list[str] | None = None) -> int:
                 print(ml_repository.authenticate(args.publication_id).publication_id)
             elif args.command == "build-ml-dataset":
                 dataset, metadata = MLResearchService(
-                    ml_config, service.root, factor_repository, pricing_repository
+                    ml_config,
+                    service.root,
+                    factor_repository,
+                    pricing_repository,
+                    service.research,
+                    portfolio_repository,
                 ).build_authenticated_dataset(args.asset_pricing_publication_id)
                 print(json.dumps({**metadata, "rows": len(dataset)}, sort_keys=True))
             else:
                 ml_manifest = MLResearchService(
-                    ml_config, service.root, factor_repository, pricing_repository
+                    ml_config,
+                    service.root,
+                    factor_repository,
+                    pricing_repository,
+                    service.research,
+                    portfolio_repository,
                 ).train_evaluate_publish(args.asset_pricing_publication_id, args.family)
                 print(ml_manifest.publication_id)
         elif args.command == "validate-delivery-config":
