@@ -1,0 +1,33 @@
+schema_version: "1.0.0"
+environment: local
+api:
+  host: 127.0.0.1
+  port: 8000
+  prefix: /api/v1
+  allow_non_loopback: false
+  unsafe_development_anonymous_non_loopback: false
+  authentication: optional
+  token_environment_variable: IFP_API_TOKEN
+  allowed_origins: []
+  trusted_hosts: [127.0.0.1, localhost, testserver, testclient]
+  maximum_request_bytes: 1048576
+  default_page_size: 50
+  maximum_page_size: 500
+  timeout_seconds: 30
+  requests_per_minute: 120
+dashboard:
+  api_url: http://127.0.0.1:8000/api/v1
+  maximum_chart_rows: 5000
+reports:
+  output_directory: data/delivery/reports
+  maximum_rows: 100000
+  allowed_formats: [markdown, html, json, csv]
+cache:
+  enabled: true
+  maximum_entries: 128
+logging:
+  level: INFO
+  format: json
+features:
+  reports: true
+  exports: true

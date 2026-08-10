@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import os
 import sys
 from datetime import UTC, date, datetime
 from pathlib import Path
@@ -34,6 +35,8 @@ from institutional_factor_platform.data.storage import (
     authenticate_dataset_evidence,
     sha256_file,
 )
+from institutional_factor_platform.delivery.config import load_delivery_config
+from institutional_factor_platform.delivery.service import DeliveryService
 from institutional_factor_platform.exceptions import ChecksumMismatchError, PlatformError
 from institutional_factor_platform.factors.config import load_factor_config
 from institutional_factor_platform.factors.service import FactorResearchService
@@ -148,6 +151,20 @@ def build_parser() -> argparse.ArgumentParser:
         "verify-ml-publication", help="Authenticate one immutable Phase 5 publication"
     )
     verify_ml.add_argument("publication_id")
+    delivery_config = commands.add_parser(
+        "validate-delivery-config", help="Validate Phase 6 delivery configuration"
+    )
+    delivery_config.add_argument("--delivery-config", type=Path, default=None)
+    verify_delivery = commands.add_parser(
+        "verify-delivery-platform", help="Verify delivery readiness and authenticated discovery"
+    )
+    verify_delivery.add_argument("--delivery-config", type=Path, default=None)
+    serve_api = commands.add_parser("serve-api", help="Start the local FastAPI delivery service")
+    serve_api.add_argument("--delivery-config", type=Path, default=None)
+    serve_dashboard = commands.add_parser(
+        "serve-dashboard", help="Start the institutional Streamlit dashboard"
+    )
+    serve_dashboard.add_argument("--delivery-config", type=Path, default=None)
     publication = commands.add_parser(
         "verify-publication", help="Authenticate one persisted publication evidence bundle"
     )
@@ -351,6 +368,37 @@ def main(argv: list[str] | None = None) -> int:
                     ml_config, service.root, factor_repository, pricing_repository
                 ).train_evaluate_publish(args.asset_pricing_publication_id, args.family)
                 print(ml_manifest.publication_id)
+        elif args.command == "validate-delivery-config":
+            print(load_delivery_config(args.delivery_config).canonical_hash())
+        elif args.command == "verify-delivery-platform":
+            delivery = DeliveryService(load_delivery_config(args.delivery_config), service.root)
+            publications = delivery.catalog.list()
+            print(
+                json.dumps(
+                    {
+                        "status": "READY",
+                        "authenticated_publications": len(publications),
+                        "empty_state": not publications,
+                    },
+                    sort_keys=True,
+                )
+            )
+        elif args.command == "serve-api":
+            import uvicorn
+
+            delivery_settings = load_delivery_config(args.delivery_config)
+            if args.delivery_config:
+                os.environ["IFP_DELIVERY_CONFIG"] = str(args.delivery_config.resolve())
+            uvicorn.run(
+                "institutional_factor_platform.api.app:app",
+                host=delivery_settings.api.host,
+                port=delivery_settings.api.port,
+                log_level=delivery_settings.logging.level.lower(),
+            )
+        elif args.command == "serve-dashboard":
+            from institutional_factor_platform.dashboard.launcher import run_dashboard
+
+            run_dashboard(args.delivery_config)
         elif args.command == "verify-publication":
             authenticate_dataset_evidence(
                 args.dataset_id,
