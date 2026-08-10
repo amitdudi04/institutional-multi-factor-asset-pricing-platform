@@ -37,9 +37,7 @@ def test_ci_has_required_read_only_gates() -> None:
     workflow = yaml.safe_load(Path(".github/workflows/quality.yml").read_text(encoding="utf-8"))
     assert workflow["permissions"] == {"contents": "read"}
     assert set(workflow["jobs"]) == {"validate", "docker"}
-    commands = "\n".join(
-        step.get("run", "") for step in workflow["jobs"]["validate"]["steps"]
-    )
+    commands = "\n".join(step.get("run", "") for step in workflow["jobs"]["validate"]["steps"])
     for gate in (
         "uv sync --frozen --all-groups",
         "uv lock --check",

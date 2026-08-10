@@ -28,6 +28,10 @@ Parquet, manifests, connected lineage, and the append-only lifecycle journal are
 | `data.sources` | Approved provider retrieval and source-specific normalization only |
 | `data.validation` | Common/source checks, statuses, machine/human reports |
 | `data.storage` | Raw checksums, atomic Parquet, quarantine, DuckDB registry |
+| `delivery.catalog` | Unified authenticated Phase 1–5 discovery; no arbitrary path access |
+| `delivery.reporting` | Deterministic checksum-bound research reports and exports |
+| `api`, `dashboard` | Versioned delivery and presentation over application services only |
+| `observability` | Redacted operational events and bounded local counters |
 | `data.evidence` | Canonical JSON, atomic evidence writes, and project-root path resolution |
 | `data.access` | Authenticated research reads, startup reconciliation, and atomic rebuild control |
 | `data.manifests` | Validated run/source/dataset metadata |

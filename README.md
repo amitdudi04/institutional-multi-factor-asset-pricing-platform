@@ -1,66 +1,108 @@
 # Institutional Multi-Factor Asset Pricing & Portfolio Analytics Platform
 
-A research-driven framework intended to support reproducible multi-factor asset pricing, portfolio construction, risk attribution, explainable machine learning, and institutional investment decision support.
+An authenticated, reproducible institutional-style quantitative research platform spanning governed data, factor research, classical asset pricing, constrained portfolios, risk, explainable machine learning, and non-advisory research delivery.
 
-## Current status
+## Status
 
-Repository governance and the owner-approved [Project Specification](docs/PROJECT_SPECIFICATION.md) are complete. Phase 1 is independently assured. Phases 2–5 are implemented and internally assured. Phase 5 adds authenticated point-in-time ML datasets, purged temporal validation, baseline/linear/forest/XGBoost research models, calibration, SHAP/permutation explanations, drift, model cards, Phase 4 economic-evaluation integration, and immutable publications. Phase 6 is authorized as the next phase but has not started. No API, dashboard, deployment, live model, or empirical investment claim has been implemented.
+Phases 1-6 are implemented and assured. The planned v1.0.0 architecture is complete: immutable evidence flows through authenticated analytical publications into a versioned FastAPI service, institutional Streamlit workspace, deterministic reporting, secure local Docker foundation, and CI gates.
 
-The governing standard is [docs/DEVELOPMENT_CONSTITUTION.md](docs/DEVELOPMENT_CONSTITUTION.md). Phase 5 architecture and methods are documented in [docs/PHASE5_ARCHITECTURE.md](docs/PHASE5_ARCHITECTURE.md) and [docs/PHASE5_METHODOLOGY.md](docs/PHASE5_METHODOLOGY.md). Implementation, model-validation, model-card, and internal-audit evidence is retained in the corresponding Phase 5 reports. Historical Phase 1–4 evidence remains unchanged.
+No empirical dataset, factor premium, regression result, portfolio performance, model output, or investment conclusion is committed. Live empirical validation remains pending until lawful authenticated inputs and explicit study decisions are supplied.
 
-## Planned phases
+## Architecture
 
-1. Institutional Data Platform
-2. Multi-Factor Research Engine
-3. Asset-Pricing Research Platform
-4. Portfolio Construction and Institutional Backtesting
-5. Risk Analytics and Explainable Machine Learning
-6. API, Dashboard, and Research Workspace
-7. Production Hardening and Research Publication
+1. Phase 1 - immutable data ingestion, validation, lifecycle evidence, lineage, and authenticated research access.
+2. Phase 2 - point-in-time factors, portfolios, diagnostics, and immutable publications.
+3. Phase 3 - asset-pricing models, robust inference, diagnostics, comparisons, and authenticated outputs.
+4. Phase 4 - constrained allocations, portfolio accounting, transaction costs, risk, scenarios, and backtests.
+5. Phase 5 - temporally safe ML, challengers, calibration, explanation, drift, cards, and economic evaluation.
+6. Phase 6 - FastAPI, Streamlit, reports/exports, observability, security, Docker, CI, and final assurance.
 
-These phases are scope boundaries, not claims of implemented functionality. See [docs/PROJECT_ROADMAP.md](docs/PROJECT_ROADMAP.md).
+The [Development Constitution](docs/DEVELOPMENT_CONSTITUTION.md) and [Project Specification](docs/PROJECT_SPECIFICATION.md) govern all phases. See [Final Platform Architecture](docs/FINAL_PLATFORM_ARCHITECTURE.md) and [Final Repository Assurance](docs/FINAL_REPOSITORY_ASSURANCE.md).
 
-## Research and data integrity
+## Installation
 
-The platform will not fabricate financial data, model outputs, portfolio results, or research conclusions. Owner-provided raw data is authoritative and will remain immutable. Missing inputs must cause an explicit, actionable failure rather than silent substitution. Every future empirical result must be traceable to its source data, configuration, code version, environment, and execution metadata.
-
-## Intended architecture
-
-The package separates configuration, authenticated data access, factors, asset pricing, constraints, optimization, portfolios, risk, scenarios, costs, backtesting, performance, machine learning, explainability, immutable research outputs, and CLI orchestration. Analytical logic remains independent of notebooks, APIs, and dashboards. The Phase 6 delivery layer does not exist.
-
-## Development setup
-
-Python 3.11 or newer and [uv](https://docs.astral.sh/uv/) are recommended.
+Python 3.11 or newer and [uv](https://docs.astral.sh/uv/) are required.
 
 ```shell
 uv sync --all-groups
+uv run institutional-factor-platform validate-config
+uv run institutional-factor-platform validate-delivery-config
+uv run institutional-factor-platform verify-delivery-platform
+```
+
+Configuration is strict and stored under `config/`. Credentials are never stored in YAML. Copy `.env.example` to an untracked `.env` only when local Docker or bearer protection requires it.
+
+## CLI
+
+Core commands validate and operate each governed phase. Delivery commands are:
+
+```shell
+uv run institutional-factor-platform validate-delivery-config
+uv run institutional-factor-platform verify-delivery-platform
+uv run institutional-factor-platform serve-api
+uv run institutional-factor-platform serve-dashboard
+```
+
+Run `uv run institutional-factor-platform --help` for the complete command surface.
+
+## API and dashboard
+
+The API listens on `127.0.0.1:8000` by default under `/api/v1`. The dashboard listens on `127.0.0.1:8501`. It contains overview, lineage, factor, asset-pricing, portfolio, risk, ML, validation/audit, and report-builder workspaces.
+
+```shell
+uv run institutional-factor-platform serve-api
+uv run institutional-factor-platform serve-dashboard
+```
+
+Empty empirical state is supported explicitly. The applications do not substitute test fixtures or fabricate charts. See the [API Guide](docs/PHASE6_API_GUIDE.md) and [Dashboard Guide](docs/PHASE6_DASHBOARD_GUIDE.md).
+
+## Docker
+
+Set a strong `IFP_API_TOKEN` in an untracked `.env`, then:
+
+```shell
+docker compose up --build
+```
+
+The containers run non-root, expose host-loopback ports, mount authenticated data read-only, use a separate writable report volume, and drop capabilities. Docker is a local deployment foundation, not a cloud production SLA. See the [Deployment Guide](docs/PHASE6_DEPLOYMENT_GUIDE.md).
+
+## Testing
+
+```shell
 uv run pytest
+uv run coverage report --fail-under=90
 uv run ruff check .
 uv run ruff format --check .
 uv run mypy src
+uv lock --check
 ```
 
-The default configuration is `config/base.yaml`; secrets are supplied only through documented environment variables. Copy `.env.example` to an untracked `.env` if needed, but the package does not automatically load `.env` files. Validate configuration and create ignored local storage with:
+The final recorded gate is 224 tests passing at 90.49% branch-aware coverage. CI repeats the suite, configuration/import smoke checks, dependency audit, and Docker build.
 
-```shell
-uv run institutional-factor-platform validate-config
-uv run institutional-factor-platform init-storage
-uv run institutional-factor-platform validate-factor-config
-uv run institutional-factor-platform list-factor-publications
-uv run institutional-factor-platform validate-asset-pricing-config
-uv run institutional-factor-platform list-asset-pricing-publications
-uv run institutional-factor-platform validate-portfolio-config
-uv run institutional-factor-platform list-portfolio-publications
-uv run institutional-factor-platform validate-ml-config
-uv run institutional-factor-platform list-ml-publications
-```
+## Security and data policy
 
-See [docs/DATA_SOURCE_GUIDE.md](docs/DATA_SOURCE_GUIDE.md) before any live retrieval and [docs/PHASE2_INPUT_GUIDE.md](docs/PHASE2_INPUT_GUIDE.md) before preparing factor inputs.
+Raw data is immutable. Research reads authenticate manifests, checksums, lifecycle state, schema, configuration, Git identity, and lineage. API/dashboard clients cannot supply local paths, SQL, Python expressions, model files, or templates. Loopback is the default; optional bearer tokens come only from environment variables. See [SECURITY.md](SECURITY.md) and [Phase 6 Security](docs/PHASE6_SECURITY.md).
 
-## Results availability
+Empirical data, databases, generated reports, model artifacts, caches, secrets, and local environments are ignored. Source licenses remain source-specific; the MIT project license does not grant rights to redistribute third-party data.
 
-Empirical results are **not available**. Phase 2–5 tests use isolated synthetic software fixtures only; no live dataset, factor return, regression result, portfolio result, model artifact, explanation, chart, or investment conclusion is committed. Runtime Phase 5 outputs are ignored local artifacts and require connected authenticated publications plus explicit target, horizon, cost, and other open-decision inputs. `LIVE EMPIRICAL ML VALIDATION PENDING`.
+## Supported research methods
+
+The platform includes point-in-time factor construction; CAPM and multifactor regression; robust and rolling inference; long-only unlevered allocation methods; covariance, constraints, costs, risk, scenarios, and reconciled backtesting; baseline, regularized-linear, Random Forest, and XGBoost research models; calibration, permutation/SHAP explanation, drift, model cards, and deterministic reports.
+
+## Limitations
+
+- Research outputs are not financial advice or investment recommendations.
+- Test fixtures validate software only and are not empirical evidence.
+- SHAP and feature importance are not causal.
+- Model performance is not guaranteed.
+- Local bearer protection is not enterprise identity management.
+- No brokerage, live execution, streaming prices, automatic retraining, or cloud SLA exists.
+- Docker was unavailable on the final local audit host; static validation passed and CI contains an image-build gate.
+
+## Reproducibility and academic use
+
+Results must bind approved source evidence, configuration, code revision, dependencies, timestamps, seeds, validation, and limitations. Academic users must cite original data and methodology sources, respect source licenses, disclose survivorship and availability limitations, and must not present software fixtures as research findings.
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE). Copyright (c) 2026 AMIT KUMAR DUDI.
+Licensed under the [MIT License](LICENSE). Copyright (c) 2026 AMIT KUMAR DUDI.

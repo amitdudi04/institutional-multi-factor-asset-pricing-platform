@@ -45,3 +45,7 @@ Phase 4 inputs are connected authenticated Phase 2 portfolio/characteristic arti
 ## Phase 5 contracts
 
 Phase 5 defines versioned feature-schema, target, split-assignment, prediction, explanation, model-card, artifact, manifest, and publication-authority contracts. They bind canonical security/date identity, source publication hashes, availability, units, deterministic feature order, preprocessor/model/target identities, configuration, Git commit, dependency versions, seeds, and complete artifact inventory. Unknown, reordered, late, missing, or substituted critical evidence fails closed.
+
+## Phase 6 contracts
+
+Phase 6 defines strict publication references, summaries, deterministic pages, report requests, report records, delivery configuration, error envelopes, and API response identities. Delivery discovery reauthenticates the underlying Phase 1–5 contract. Report manifests bind selected publication kind/ID, exact artifact checksums, configuration and Git identities, software/template versions, generation timestamp, limitations, disclaimer, output filename, and output checksum. API/dashboard clients cannot supply artifact paths, SQL, Python expressions, model files, or template code.
