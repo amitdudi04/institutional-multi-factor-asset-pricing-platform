@@ -48,9 +48,24 @@ class AssetPricingResearchService:
         selected = tuple(sorted(model_ids or self.config.models))
         if not selected or set(selected) - set(self.config.models):
             raise DataQualityError("Requested model set is empty or not approved by configuration")
+        required_aliases = {
+            factor
+            for model_id in selected
+            for factor in MODEL_SPECS[model_id].factors
+            if factor != "market_excess"
+        }
+        missing_mappings = required_aliases - set(self.config.factor_mappings)
+        if missing_mappings:
+            raise DataQualityError(
+                "Selected models lack configured Phase 2 mappings: "
+                + ", ".join(sorted(missing_mappings))
+            )
+        selected_mappings = {
+            alias: self.config.factor_mappings[alias] for alias in sorted(required_aliases)
+        }
         factor_table = self.factor_repository.read_table(factor_publication_id).to_pandas()
         portfolio_table = self.factor_repository.read_portfolios(factor_publication_id).to_pandas()
-        panel = build_research_panel(factor_table, portfolio_table, self.config.factor_mappings)
+        panel = build_research_panel(factor_table, portfolio_table, selected_mappings)
         git_commit = _git_commit(self.root)
         publication_id = _publication_id(
             phase2.content_hash(), self.config.canonical_hash(), git_commit, selected

@@ -360,3 +360,21 @@ def test_service_rejects_unapproved_model_set(
     monkeypatch.setattr(service_module, "_git_commit", lambda root: "deadbeef")
     with pytest.raises(DataQualityError, match="not approved"):
         service.compute_and_publish("factor-fixture", ("unknown",))
+
+
+def test_capm_does_not_resolve_unused_factor_mappings(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    factors, portfolios = _phase2_tables()
+    base = _small_config(tmp_path)
+    config = base.model_copy(
+        update={"factor_mappings": {**base.factor_mappings, "MOM": "not-present"}}
+    )
+    monkeypatch.setattr(service_module, "_git_commit", lambda root: "deadbeef")
+    service = AssetPricingResearchService(
+        config, tmp_path, _FactorRepositoryFixture(factors, portfolios)
+    )  # type: ignore[arg-type]
+
+    publication = service.compute_and_publish("factor-fixture", ("capm",))
+
+    assert publication.model_ids == ("capm",)

@@ -15,7 +15,7 @@ models:
 factor_mappings:
   SMB: log_market_cap
   HML: book_to_market
-  MOM: momentum_12_1
+  MOM: momentum_12_1m
   RMW: gross_profitability
   CMA: asset_growth
   ME: log_market_cap

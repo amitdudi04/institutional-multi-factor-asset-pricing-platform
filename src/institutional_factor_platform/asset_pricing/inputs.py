@@ -62,7 +62,7 @@ def build_research_panel(
         )
         spread.name = alias
         spread_parts.append(spread)
-    model_factors = pd.concat(spread_parts, axis=1)
+    model_factors = pd.concat(spread_parts, axis=1) if spread_parts else None
 
     assets = portfolios.loc[
         :,
@@ -76,9 +76,9 @@ def build_research_panel(
         ],
     ].copy()
     assets["asset_id"] = assets["factor_id"].astype(str) + ":Q" + assets["quantile"].astype(str)
-    panel = assets.merge(common.reset_index(), on="date", validate="many_to_one").merge(
-        model_factors.reset_index(), on="date", validate="many_to_one"
-    )
+    panel = assets.merge(common.reset_index(), on="date", validate="many_to_one")
+    if model_factors is not None:
+        panel = panel.merge(model_factors.reset_index(), on="date", validate="many_to_one")
     panel["excess_return"] = panel["value_weighted_return"] - panel["risk_free_rate"]
     panel = panel.sort_values(["asset_id", "date"], kind="stable").reset_index(drop=True)
     if panel.empty:
