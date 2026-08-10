@@ -49,7 +49,7 @@ The suite contains dedicated regressions for mapping selection, security/benchma
 - alternate `PYTHONHASHSEED` connected/determinism suite
 - dependency audit; Markdown link; UTF-8/mojibake; import-cycle; secret/credential/private-key; tracked-data/model/report/large-file; and Git whitespace scans
 
-Exact final command outcomes and Git identities are recorded in the release integration section after the post-documentation and post-merge gates.
+The pre-release implementation commits are `2e693dc`, `a0280ef`, `cdf8d6e`, and `33d62af`; the annotated `v1.0.1` tag records the final validated merged-main identity. The post-merge gate is required to repeat pytest, coverage, Ruff, formatting, Mypy, and lock verification before that tag is created.
 
 ## External and non-blocking status
 
