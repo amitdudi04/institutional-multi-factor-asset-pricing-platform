@@ -1,0 +1,39 @@
+name: quality
+on:
+  push:
+    branches: [main, "phase/**"]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --frozen --all-groups
+      - run: uv lock --check
+      - run: uv run pytest
+      - run: uv run coverage report --fail-under=90
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run mypy src
+      - run: uv run python -c "import institutional_factor_platform, institutional_factor_platform.api.app, institutional_factor_platform.dashboard.app"
+      - run: uv run institutional-factor-platform validate-delivery-config
+      - run: uv run institutional-factor-platform verify-delivery-platform
+      - run: uvx pip-audit --path .venv/lib/python*/site-packages --skip-editable
+  docker:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          tags: institutional-factor-platform:test

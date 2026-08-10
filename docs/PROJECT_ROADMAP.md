@@ -1,6 +1,6 @@
 # Project Roadmap
 
-This roadmap summarizes the boundaries defined in `docs/PROJECT_SPECIFICATION.md`. It does not authorize implementation, settle proposed/open assumptions, or claim completed analytical functionality. Each phase requires approved prerequisite decisions, acceptance criteria, and evidence-based closeout.
+This roadmap records the completed six-phase v1.0.0 platform defined by `docs/PROJECT_SPECIFICATION.md`. Proposed/open empirical assumptions remain gated and are not silently approved by software completion.
 
 ## Phase 1 — Institutional Data Platform
 
@@ -24,12 +24,8 @@ Complete and internally assured: authenticated feature/target construction; hold
 
 ## Phase 6 — API, Dashboard, and Research Workspace
 
-Authorized as the next phase but not started. Expose stable core services through approved API and dashboard interfaces, with provenance, freshness, and downloadable research artifacts. User interfaces must not duplicate or bypass core analytical logic.
-
-## Phase 7 — Production Hardening and Research Publication
-
-Complete continuous integration, packaging and deployment controls, performance and security reviews, documentation, model and data cards, research reporting, and the final reproducibility audit.
+Complete and finally assured: authenticated FastAPI discovery and evidence routes; institutional Streamlit research workspace; deterministic checksum-bound reports and exports; strict local access, request, path and error controls; redacted observability; non-root Docker/Compose foundation; GitHub Actions quality, dependency, and image-build gates; deployment/security/user documentation; and independent final repository assurance. Docker execution remains an explicitly disclosed external host limitation. No analytical logic is duplicated in delivery code and no empirical result is fabricated.
 
 ## Stage gates
 
-Every phase begins with governance/specification review, repository and Git inspection, reusable-component assessment, unresolved-risk review, and confirmation of scope. It ends with validation evidence, documentation updates, acceptance-criteria evaluation, unresolved-risk disclosure, and explicit confirmation that neither data nor results were fabricated.
+Every phase began with governance/specification review, repository and Git inspection, reusable-component assessment, unresolved-risk review, and confirmation of scope. Each closed with validation evidence, documentation updates, acceptance-criteria evaluation, unresolved-risk disclosure, and explicit non-fabrication confirmation. The planned v1.0.0 phase sequence is complete; no future placeholder phase is claimed.

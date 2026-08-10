@@ -6,9 +6,9 @@
 |---|---|
 | Document | Project Specification (“Project Bible”) |
 | Project | Institutional Multi-Factor Asset Pricing & Portfolio Analytics Platform |
-| Status/version | Owner Approved; Phases 1–5 Complete; Phase 6 Authorized / 0.5.0 |
-| Updated/owner | 2026-08-04 / Repository Owner |
-| Approval | Owner Approved; Phases 1–5 Assured; Phase 6 Authorized |
+| Status/version | Owner Approved; Phases 1–6 Complete and Finally Assured / 1.0.0 |
+| Updated/owner | 2026-08-10 / Repository Owner |
+| Approval | Owner Approved; Planned V1 Platform Complete |
 | Audience | Owner, researchers, engineers, validators, reviewers, future agents |
 | Authority | Owner instructions; `DEVELOPMENT_CONSTITUTION.md`; this document; approved phase specifications; validated configuration |
 
@@ -26,7 +26,7 @@ Revision requires Section 50 change control. Future agents must not silently cha
 
 The platform will support a reproducible empirical equity research chain: provenance-controlled data, point-in-time factors, classical asset-pricing tests, constrained portfolios, realistic walk-forward evaluation, risk/attribution, interpretable ML, and research delivery. It joins financial economics with research engineering; it is not a model collection or dashboard demonstration.
 
-“Institutional-style” must be earned through immutable inputs, explicit rights and assumptions, temporal correctness, robust inference, reconciled accounting, model-risk controls, reproducible runs, interface/domain separation, and limitation disclosure. It does not imply licensed institutional data or fiduciary readiness. Phase 1 passed post-remediation independent assurance; Phase 2 factor software, Phase 3 asset-pricing software, Phase 4 portfolio-risk software, and Phase 5 explainable-ML software passed their applicable assurance gates without producing live empirical results. Phase 6 is authorized, but no Phase 6–7 output exists. Success is regeneration of defensible answers from approved inputs without fabrication or silent substitution.
+“Institutional-style” must be earned through immutable inputs, explicit rights and assumptions, temporal correctness, robust inference, reconciled accounting, model-risk controls, reproducible runs, interface/domain separation, and limitation disclosure. It does not imply licensed institutional data or fiduciary readiness. Phase 1 passed post-remediation independent assurance; Phases 2–5 passed their applicable analytical assurance gates; and Phase 6 passed delivery and final repository assurance without producing live empirical results. Success is regeneration and authenticated delivery of defensible answers from approved inputs without fabrication or silent substitution.
 
 ## 3. Project Vision
 
@@ -144,7 +144,7 @@ Approved Phase 1 sources are Yahoo Finance, Kenneth French Data Library, FRED, S
 
 `APPROVED BASELINE`: immutable checksum-protected raw responses; append-only ingestion where feasible; manifests for request, timestamps, files/hashes, schema/license/status; versioned downstream artifacts with parent/config/code identities and validation reports; critical failures quarantined and blocked.
 
-Operational paths include Phase 1 `data/{raw,interim,processed,manifests,quarantine}` and ignored Phase 2 `data/{factors,factor_manifests}` outputs. Future model paths remain unimplemented. Empirical contents/databases/generated reports are ignored; reviewed contracts, metadata definitions, and isolated software fixtures may be tracked. Raw retention is until explicit owner deletion; access is local-owner-only with no public serving or redistribution. Transformations never edit raw files.
+Operational paths include Phase 1 `data/{raw,interim,processed,manifests,quarantine}`, ignored analytical publication roots, and ignored Phase 6 `data/delivery/reports` outputs. Empirical contents, databases, models, and generated reports are ignored; reviewed contracts, metadata definitions, and isolated software fixtures may be tracked. Raw retention is until explicit owner deletion; access is local-owner-only with no public redistribution. Transformations never edit raw files.
 
 ## 12. Data Contracts
 
@@ -293,11 +293,11 @@ Direction: UI/API → application services → domain → data access/storage �
 
 ## 33. Storage Architecture
 
-`APPROVED BASELINE` for Phase 1: original raw formats; immutable content/config/schema-addressed Parquet; replaceable DuckDB local catalog/query views; YAML/TOML configuration; authenticated JSON v5 dataset manifests, v4 promotion envelopes and lifecycle lineage, append-only lifecycle events with independent head checkpoints, and structured logs. PostgreSQL remains a later multi-user option, Redis remains deferred, and later report/model artifact formats are not authorized by this storage decision.
+`APPROVED BASELINE`: original raw formats; immutable content/config/schema-addressed Parquet; replaceable DuckDB local catalog/query views; strict YAML/TOML configuration; authenticated JSON manifests and publication authorities; append-only lifecycle evidence; checksum-bound analytical artifacts; deterministic Markdown/HTML/JSON/CSV delivery reports; and structured redacted logs. PostgreSQL remains a possible later multi-user option and Redis remains deferred.
 
 ## 34. Configuration Architecture
 
-Future domains: project, sources, universe, calendars, factors, asset pricing, ML, portfolio, backtesting, risk, scenarios, API, dashboard, logging. Require schema/version validation, relative paths, explicit units/defaults, documented environment precedence, no secrets/magic numbers, cross-field checks, immutable run snapshot/hash. Add only active-phase files; retain current base foundation.
+Implemented domains include project, sources, universe, calendars, factors, asset pricing, ML, portfolio, backtesting, risk, scenarios, delivery API/dashboard/reports, and logging. Configuration requires schema/version validation, confined relative paths, explicit units/defaults, documented environment precedence, no embedded secrets, cross-field checks, and canonical identities.
 
 ## 35. Experiment and Run Metadata
 
@@ -309,7 +309,7 @@ Families: quality/data cards, factor matrices/returns/diagnostics, pricing table
 
 ## 37. API Boundary
 
-Conceptual versioned `/health`, `/metadata`, `/data-quality`, `/factors`, `/asset-pricing`, `/scores`, `/predictions`, `/portfolios`, `/backtests`, `/risk`, `/attribution`, `/scenarios`, `/reports`. Future FastAPI calls application services, validates/authenticates, returns provenance/status, paginates, and distinguishes unavailable/failed/not-generated/empty. No research calculations or demo fallback.
+Implemented FastAPI `/api/v1` families cover health/readiness/version/governance/limitations, authenticated publications and lineage, Phase 1 data, factors, asset pricing, portfolios/risk/scenarios/costs, ML cards/predictions/evaluation/explanations/drift/economic evaluation, and deterministic reports. It calls delivery application services, validates and authenticates, paginates, preserves provenance, distinguishes valid empty state, and contains no research calculation or demo fallback.
 
 ## 38. Dashboard Boundary
 
@@ -366,7 +366,7 @@ Every model/optimizer records purpose, owner/version, theory, inputs, assumption
 | Phase 4 — Portfolio Construction and Institutional Backtesting | Estimators, methods, constraints, execution/cost ledger, benchmarks | Mandate/cost/capital; no silent fallback | Optimizer/backtest specs; constraint/accounting/timing tests; reconciled OOS |
 | Phase 5 — Risk Analytics and Explainable Machine Learning | Risk, scenarios, attribution, time-aware ML, explanation/cards | Deep learning excluded | Methods/cards; risk/reconciliation/leakage/stability tests |
 | Phase 6 — API, Dashboard, and Research Workspace | Services, versioned API/UI, provenance/downloads | Deployment/access; no duplicated analytics | Contracts/security/UI docs; smoke/integration tests |
-| Phase 7 — Production Hardening and Research Publication | CI, approved Docker/deployment, E2E, performance/security/license review, docs/report/audit | No scope creep | Runbooks/cards/report; clean regeneration and owner sign-off |
+| Phase 6 finalization | CI, local Docker foundation, security/license review, reporting, documentation, final audit | No live trading or cloud-production claim | Clean regeneration and final assurance |
 
 Each phase reviews governance/current Git/risks first and closes with evidence, documentation, unresolved risks, and non-fabrication confirmation.
 
@@ -378,7 +378,7 @@ Each phase reviews governance/current Git/risks first and closes with evidence, 
 - **P4:** documented objectives/constraints; feasible tolerance and diagnostic infeasibility; past-only estimates; reconciled ledger/actions/cash/cost/NAV; gross/net/benchmark distinction; sensitivity tests.
 - **P5:** risk conventions/components and attribution reconcile; scenarios not forecasts; ML splits/features/tuning time-safe; challengers, net/stability evidence, exact-pipeline explanations, cards/tests.
 - **P6:** service-only versioned interfaces; validated access/inputs; provenance/freshness; unavailable distinct from empty; downloads match artifacts; security/contract/smoke tests.
-- **P7:** locked clean setup/full suite; repeatable approved deployment; no critical dependency/license/secret/security issue; measured performance; aligned docs/code; report regeneration and owner sign-off.
+- **P6 final release:** locked clean setup/full suite; secure local deployment foundation; no critical dependency/license/secret/security issue; aligned docs/code; authenticated report regeneration and final assurance.
 
 ## 46. Definition of Done
 
@@ -407,7 +407,7 @@ All approved phases pass gates; no critical integrity defect or known leakage re
 | ML target/horizon | Rank or outperformance probability candidate | `OPEN — OWNER DECISION REQUIRED` | Phase 5 |
 | Storage | Immutable raw + versioned Parquet + DuckDB catalog | `APPROVED BASELINE` | Phase 1 |
 | Retention/privacy/access | Retain raw until owner deletion; local owner only; no public serving/redistribution | `APPROVED BASELINE` | Phase 1/6 |
-| Deployment | Local first; PostgreSQL later if needed | `PROPOSED — OWNER APPROVAL REQUIRED` | Phase 6 |
+| Deployment | Loopback native operation and secured local Docker/Compose foundation; PostgreSQL later if needed | `APPROVED BASELINE — LOCAL` | Phase 6 |
 | Deadline | Owner schedule | `OPEN — OWNER DECISION REQUIRED` | Planning |
 | License | MIT; copyright (c) 2026 AMIT KUMAR DUDI | `APPROVED BASELINE — MIT` | Effective baseline |
 
@@ -455,4 +455,4 @@ Every change records reason, affected questions/phases, migration/backward compa
 
 Phase 1 owner-approved baselines are: US common equities/USD; daily research frequency; 2010 onward; large/mid-cap with point-in-time inputs required for historical claims; broad S&P 500 total-return proxy; approved named sources; DGS3MO/XNYS/UTC; immutable raw plus Parquet/DuckDB; and local owner-only access with no redistribution. Later-phase methods and any item still marked proposed/open remain unauthorized until their named phase and owner decision. This clarification records prior explicit owner decisions and does not approve later-phase defaults.
 
-Phases 1–5 are implemented, assured, and complete under the governing documents and applicable owner instructions. Phase 6 is formally authorized as the next phase but has not started. Phase 5 leaves the empirical ML target/horizon unset until an owner-approved run configuration supplies them; proposed/open choices in the Owner Decision Register remain unchanged and unauthorized until their affected use requires explicit owner resolution.
+Phases 1–6 are implemented, assured, and complete under the governing documents and applicable owner instructions. The planned v1.0.0 platform includes authenticated local delivery, deterministic reporting, deployment foundations, CI, and final assurance. Phase 5 still leaves the empirical ML target/horizon unset until an owner-approved run configuration supplies them; proposed/open Owner Decision Register choices remain unchanged and unauthorized until their affected use requires explicit resolution.
