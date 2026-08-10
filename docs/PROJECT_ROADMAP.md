@@ -1,6 +1,6 @@
 # Project Roadmap
 
-This roadmap records the completed six-phase v1.0.0 platform defined by `docs/PROJECT_SPECIFICATION.md`. Proposed/open empirical assumptions remain gated and are not silently approved by software completion.
+This roadmap records the completed six-phase platform and the v1.0.1 full-platform functional remediation defined by `docs/PROJECT_SPECIFICATION.md`. Proposed/open empirical assumptions remain gated and are not silently approved by software completion.
 
 ## Phase 1 — Institutional Data Platform
 
@@ -12,15 +12,15 @@ Complete and internally assured: versioned observable characteristics across mar
 
 ## Phase 3 — Asset-Pricing Research Platform
 
-Complete and internally assured: authenticated Phase 2 inputs feed CAPM, Fama-French 3/5, Carhart 4, Hou-Xue-Zhang q-factor, and custom specifications; OLS/WLS, rolling, expanding, panel, and Fama-MacBeth estimators; classical/heteroskedasticity/HAC inference; assumption, influence, covariance, and stability diagnostics; and immutable checksum-bound research publications. Software validation uses isolated fixtures and makes no empirical pricing claim.
+Complete and post-remediation assured: authenticated Phase 2 inputs feed CAPM, Fama-French 3/5, Carhart 4, Hou-Xue-Zhang q-factor, and custom specifications; the corrected momentum mapping is `momentum_12_1m`, and model-specific factor selection does not require unused mappings. OLS/WLS, rolling, expanding, panel, and Fama-MacBeth estimators; classical/heteroskedasticity/HAC inference; diagnostics; and immutable publications remain covered. Authentic synthetic connected validation makes no empirical pricing claim.
 
 ## Phase 4 — Portfolio Construction and Institutional Backtesting
 
-Complete and internally assured: transparent and optimized allocation methods, Black-Litterman/Bayesian inputs, covariance estimation, long-only unlevered constraints, portfolio and tail-risk analytics, non-forecasting scenarios, explicit transaction costs, past-only rolling/expanding infrastructure, reconciled gross/net/benchmark accounting, and authenticated immutable publications. Open numeric bounds and costs remain explicit run inputs rather than approved defaults. No empirical performance claim is made.
+Complete and post-remediation assured: transparent and optimized allocation methods, covariance estimation, long-only unlevered constraints, portfolio/tail-risk analytics, explicit market/rates/volatility/inflation/liquidity/custom scenario execution with mapping disclosure, explicit transaction costs, past-only infrastructure, reconciled gross/net/benchmark accounting, and authenticated immutable publications. Open numeric bounds and costs remain explicit run inputs rather than approved defaults. No empirical performance claim is made.
 
 ## Phase 5 — Risk Analytics and Explainable Machine Learning
 
-Complete and internally assured: authenticated feature/target construction; holdout, rolling, expanding, walk-forward, purge and embargo controls; baseline, regularized-linear, Random Forest and XGBoost research models; calibration, comparison, ablation, uncertainty, SHAP/permutation explanations, drift, model cards, immutable publications, and Phase 4 economic-evaluation delegation. The empirical target/horizon remains an explicit owner decision for each live study. No empirical alpha claim is made.
+Complete and post-remediation assured: authenticated Phase 2 features and Phase 1 security-return targets; correct benchmark/risk conventions; all-fold holdout, rolling, expanding and walk-forward evaluation with purge, embargo and retraining cadence; bounded search; validation-only calibration; baselines, challengers, ablations and bootstrap stability; coefficient/permutation/local-SHAP evidence; drift; complete model cards; immutable publications; and authenticated Phase 4 economic delegation. The empirical target/horizon remains an explicit owner decision for each live study. No empirical alpha claim is made.
 
 ## Phase 6 — API, Dashboard, and Research Workspace
 
@@ -28,4 +28,4 @@ Complete and finally assured: authenticated FastAPI discovery and evidence route
 
 ## Stage gates
 
-Every phase began with governance/specification review, repository and Git inspection, reusable-component assessment, unresolved-risk review, and confirmation of scope. Each closed with validation evidence, documentation updates, acceptance-criteria evaluation, unresolved-risk disclosure, and explicit non-fabrication confirmation. The planned v1.0.0 phase sequence is complete; no future placeholder phase is claimed.
+The v1.0.1 corrective assurance adds an authentic synthetic Phase 1-to-6 publication, restart, API/report delivery, determinism, and parent-tamper regression. It closes the software defects recorded by the failed post-v1.0.0 full-platform audit without rewriting that historical evidence. Lawful live-equity universe/mapping, owner SEC contact identity, owner-supplied data, Docker runtime, and remote-CI visibility remain external/host-dependent limitations; no live empirical validation is claimed.

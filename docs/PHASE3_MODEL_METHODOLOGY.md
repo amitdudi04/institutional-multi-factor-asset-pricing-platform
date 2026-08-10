@@ -19,7 +19,7 @@ Each time-series model estimates (R_{i,t}-R_{f,t}=\alpha_i+\beta_i'F_t+\epsilon_
 | Hou-Xue-Zhang q | market excess, ME, IA, ROE |
 | Custom | explicit unique caller-defined factor tuple, outside the approved default registry |
 
-The default mappings are versioned in `config/asset_pricing.yaml`: size uses `log_market_cap`, value uses `book_to_market`, momentum uses `momentum_12_1`, profitability uses `gross_profitability`, investment uses `asset_growth`, and q profitability uses `earnings_yield`. Direction-adjusted Phase 2 scores determine the high-minus-low orientation.
+The default mappings are versioned in `config/asset_pricing.yaml`: size uses `log_market_cap`, value uses `book_to_market`, momentum uses `momentum_12_1m`, profitability uses `gross_profitability`, investment uses `asset_growth`, and q profitability uses `earnings_yield`. Direction-adjusted Phase 2 scores determine the high-minus-low orientation. The service resolves only factors required by the selected model, so CAPM does not depend on unused multifactor mappings.
 
 ## Estimation and inference
 

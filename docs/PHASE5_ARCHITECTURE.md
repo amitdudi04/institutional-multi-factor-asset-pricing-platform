@@ -2,16 +2,16 @@
 
 ## Trust boundary
 
-Phase 5 starts with authenticated Phase 2 and Phase 3 publication IDs. `MLResearchService` authenticates both manifests, verifies their parent hash connection, and reads tables only through `FactorRepository` and `AssetPricingRepository`. Its institutional entry point does not accept caller-supplied DataFrames or arbitrary artifact paths.
+Phase 5 starts with authenticated Phase 2 and Phase 3 publication IDs. `MLResearchService` authenticates both manifests, verifies their parent hash connection, resolves the exact Phase 1 market dataset recorded by Phase 2, and reauthenticates its artifact checksum and decimal-return unit before constructing targets. Feature, target, pricing, portfolio, and economic inputs are read only through authenticated repositories; the institutional entry point does not accept caller-supplied DataFrames or arbitrary artifact paths.
 
 ```text
-authenticated Phase 2 + connected Phase 3
-  -> point-in-time feature and target contracts
+authenticated Phase 1 market parent + Phase 2 + connected Phase 3
+  -> Phase 2 factor features + security-level Phase 1 return targets
   -> purged/embargoed temporal assignments
   -> training-only preprocessor
   -> baseline/linear/forest/XGBoost model
-  -> held-out predictions, metrics, explanations, drift
-  -> optional Phase 4 economic evaluation
+  -> every held-out fold, tuning/calibration, predictions, comparisons, explanations, drift
+  -> optional authenticated Phase 4 economic evaluation using Phase 4 costs/accounting
   -> immutable artifact bundle, manifest, publication authority
   -> checksum-authenticated research reads
 ```
