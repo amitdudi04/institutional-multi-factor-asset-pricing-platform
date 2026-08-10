@@ -1,0 +1,39 @@
+services:
+  api:
+    build: .
+    command: ["institutional-factor-platform", "serve-api", "--delivery-config", "config/delivery.container.yaml"]
+    ports: ["127.0.0.1:8000:8000"]
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - ./data:/app/data:ro
+      - delivery-output:/app/data/delivery
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+  dashboard:
+    build: .
+    command: ["institutional-factor-platform", "serve-dashboard", "--delivery-config", "config/delivery.container.yaml"]
+    ports: ["127.0.0.1:8501:8501"]
+    env_file:
+      - path: .env
+        required: false
+    depends_on:
+      api:
+        condition: service_healthy
+    volumes:
+      - ./data:/app/data:ro
+      - delivery-output:/app/data/delivery
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+volumes:
+  delivery-output:
