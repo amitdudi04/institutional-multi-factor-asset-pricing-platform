@@ -6,7 +6,19 @@ The v1.0.2 software release is operational, but the repository is not authorized
 
 Final verdict:
 
-**PHASE 7 EMPIRICAL VALIDATION BLOCKED — SOFTWARE READY, OWNER/LAWFUL DATA REQUIRED**
+**PHASE 7 EMPIRICAL VALIDATION BLOCKED — SOFTWARE READY, EXTERNAL DATA ACCESS REQUIRED**
+
+## Phase 7 acquisition discovery update
+
+Master Prompt 12.0 discovery completed at `2026-08-11T09:31:51.5315584Z` without reading or printing secret values. No WRDS access evidence, CRSP/Compustat entitlement evidence, Sharadar credential/client, Norgate installation, SEC owner identity, or complete owner empirical package was found. Institutional entitlements that cannot be authenticated remain `ENTITLEMENT UNKNOWN`; they were not guessed or queried without authorization.
+
+The source decision and minimal owner action are recorded in:
+
+- `PHASE7_DATA_RIGHTS_REGISTER.md`
+- `PHASE7_DATA_SOURCE_SELECTION_REPORT.md`
+- `PHASE7_DATA_ACQUISITION_ACTION_PLAN.md`
+
+Route A (WRDS/CRSP/Compustat) is the recommended acquisition target and Route B (Sharadar) is the backup. Neither is claimed accessible. Yahoo remains ineligible as universe authority.
 
 ## Release/branch gate
 
@@ -17,6 +29,24 @@ Final verdict:
 | `v1.0.2` peeled commit equals main | PASS |
 | Research branch | `phase/7-empirical-research-validation` |
 | Working tree at branch creation | Clean |
+
+The discovery update preserves `main`, `origin/main`, and the peeled `v1.0.2` tag at `0a96f93d79c3fec77a9396b2d792ee1c625a9c6e`; the Phase 7 branch descends from that release.
+
+## Software and external-infrastructure revalidation
+
+| Gate | Result |
+|---|---|
+| Dependency synchronization | PASS. The lockfile restored NumPy 2.2.6. An incomplete local package-metadata installation initially caused `importlib.metadata` to return no NumPy version; targeted reinstall repaired the generated virtual environment, and the reproducer passed without source/test changes. |
+| Full suite | PASS — 254 tests, 103 classified warnings, 91.37% branch-aware coverage. |
+| Ruff / format | PASS / PASS — 199 files formatted. |
+| Strict Mypy | PASS — 105 source files. |
+| Lock / dependency audit | PASS / PASS — no known vulnerabilities; the editable project distribution is the documented audit skip. |
+| Configuration / publication / delivery | PASS — all six phase configuration validators, catalog integrity, reconciliation, authenticated dataset listing and delivery readiness. |
+| Security / repository hygiene | PASS — no secret material and no tracked datasets/databases, model binaries, caches, generated artifacts or files over 5 MiB; UTF-8, local Markdown links and Git whitespace also pass. |
+| Docker | BLOCKED — EXTERNAL INFRASTRUCTURE. `docker` and Docker Compose are not installed. |
+| Remote CI | BLOCKED — EXTERNAL ACCOUNT/INFRASTRUCTURE. Public Actions run `31473334524` failed before execution; both jobs report zero steps. GitHub CLI/authenticated rerun capability is absent locally, so no account or billing change was attempted. |
+
+The environment-only NumPy metadata repair does not alter source, tests, the lockfile, research methodology, or v1.0.2 release history. No open software defect was identified by the final passing suite.
 
 ## Empirical data readiness matrix
 
@@ -45,6 +75,8 @@ Connectivity was tested in memory on 2026-08-11. No new provider payload was per
 | Yahoo Finance | BLOCKED — IDENTITY | Not called. A lawful requested universe and effective-dated provider mapping are prerequisites. |
 | SEC EDGAR | BLOCKED — OWNER INPUT | Not called. Real owner contact identity is required if SEC is used. |
 | Owner-supplied | BLOCKED — OWNER INPUT | No real market/universe/fundamental package satisfying the contracts is present. |
+
+The existing authenticated DGS3MO runtime publication covers `2010-01-04` through `2026-08-06`, contains 4,329 rows, preserves 178 missing values, and remains the only research-ready catalog entry. It is partial risk-free evidence, not an equity-data readiness pass.
 
 Connectivity does not establish provider completeness, data rights, empirical fitness or a historical equity universe.
 
