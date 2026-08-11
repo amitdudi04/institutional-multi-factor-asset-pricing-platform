@@ -8,16 +8,16 @@ No WRDS credentials, CRSP/Compustat entitlements, Norgate installation, Sharadar
 
 ## The one required owner action
 
-Obtain and make available **one owner- or institution-controlled WRDS account with verified entitlement to CRSP US Stock, Compustat Point-in-Time, and CRSP/Compustat Merged linking evidence** for local 2010-onward research.
+Obtain written Norgate confirmation of rights compatible with immutable academic research, then acquire and make available **one Norgate Data US Stocks Platinum subscription using the Python (Windows) access method, paired with a genuine owner-controlled `IFP_SEC_CONTACT_EMAIL` for SEC EDGAR retrieval**.
 
-The entitlement must permit the project to retrieve permanent security and company identifiers, effective-dated name/ticker/exchange history, daily returns/prices/shares/volume, distributions and delistings, point-in-time accounting facts with defensible availability, and authorized historical CRSP/Compustat links. The owner must also confirm the applicable retention, attribution, redistribution, and derived-output terms.
+The Norgate subscription or written addendum must permit local Python academic research, immutable evidence retention for reproducibility, and the project's required use of stable security identity, currently listed and delisted US stocks, daily price/volume, historical membership/major-exchange status, dividends, and capital events. It must also define permitted derived research outputs, attribution and non-redistribution. The current standard EULA requires deletion of Data and Derived Data when a subscription lapses, so the standard terms alone do not establish the required long-term retention right. SEC EDGAR will supply filing-time fundamental evidence; Norgate's current fundamentals will not be treated as point-in-time history.
 
-Configure only the non-secret username through `WRDS_USERNAME`. Store the password through WRDS' approved owner-controlled credential mechanism, such as a `.pgpass` file outside the repository or an institutional secret store. Do not send the password in chat and do not commit it.
+Install Norgate Data Updater through the vendor's owner-controlled process and select Python (Windows) as the access method. Set `IFP_SEC_CONTACT_EMAIL` only in the local environment to a genuine owner-controlled address. Do not send Norgate credentials in chat and do not commit credentials, contact identity, vendor data, or generated artifacts.
 
-This is one acquisition path. The owner does **not** also need Norgate, Sharadar, SEC bulk files, or manually assembled CSV contracts if the stated WRDS entitlements are available.
+This is the one selected acquisition path. The owner does **not** also need WRDS, Sharadar, or manually assembled historical files if Norgate and SEC pass the live rights/schema gates.
 
 ## Automatic continuation after that action
 
-After access exists, resume `phase/7-empirical-research-validation`. Codex will independently verify each entitlement, inspect live provider schemas, register rights, acquire ignored runtime extracts, construct the canonical security master and effective mappings, use the preregistered Project Top-1000 large/mid universe when licensed Russell membership is unavailable, authenticate SPY total returns as the approved empirical benchmark, and execute the complete Phase 1 through Phase 7 empirical and assurance workflow.
+After access exists, resume `phase/7-empirical-research-validation`. Codex will independently verify the installed Norgate product/level and terms, inspect live schemas, register rights, authenticate SEC access, acquire ignored runtime extracts, construct the canonical security master and effective mappings, use the preregistered Project Top-1000 large/mid universe when licensed Russell membership is unavailable, authenticate SPY total returns as the approved empirical benchmark, and execute the complete Phase 1 through Phase 7 empirical and assurance workflow.
 
 No empirical phase can lawfully begin before this action is complete.

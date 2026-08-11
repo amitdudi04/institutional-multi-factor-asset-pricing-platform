@@ -2,42 +2,41 @@
 
 ## Minimal owner action
 
-Provide **one institutional WRDS account with verified entitlements** to the following research components:
+Obtain written Norgate rights confirmation compatible with immutable/reproducible academic research, then provide **one Norgate Data US Stocks Platinum subscription using Python (Windows), paired with SEC EDGAR under a genuine owner-controlled `IFP_SEC_CONTACT_EMAIL`**, covering these research components:
 
-1. CRSP US Stock daily/history evidence sufficient for permanent security identities, name/ticker/exchange history, prices and holding-period returns, shares, distributions, corporate actions, delistings and terminal-return evidence.
-2. Compustat North America with Point-in-Time capability, or the strongest licensed historical filing/availability evidence that can defensibly populate the required fundamentals.
-3. CRSP/Compustat Merged historical link evidence.
-4. An authenticated total-return benchmark series that can implement the owner-approved broad S&P 500 proxy, or a separate exact benchmark entitlement/source approved for the study.
+1. Norgate stable AssetID, currently listed and delisted US-stock history, major-exchange status, prices/volume, dividends, capital events, and historical membership evidence.
+2. SEC submissions and XBRL facts with filing/accession availability sufficient to build defensible point-in-time fundamentals.
+3. Authenticated effective CIK-to-Norgate security mappings with ambiguity and interval controls.
+4. An authenticated SPY total-return benchmark series, including distributions, as preregistered for the empirical study.
 
-The account must permit local owner research across 2010 onward. The owner should confirm retention, no-redistribution, attribution, and derived-output terms. No purchase was attempted.
+The subscription or written addendum must permit local owner research across 2010 onward, immutable evidence retention, allowed derived research outputs, attribution and non-redistribution. Norgate's current standard EULA requires deletion of Data and Derived Data after lapse; the owner must resolve that incompatibility in writing before purchase/extraction or maintain an uninterrupted subscription for as long as evidence must be retained. No purchase was attempted and no SEC contact identity was invented.
 
 ## Why this is the recommended route
 
-One properly entitled WRDS route most directly resolves the permanent-identity, ticker-history, delisting, corporate-action, daily-return, shares-outstanding, point-in-time fundamental and historical-link requirements without constructing a survivor universe from current tickers. It also permits explicit entitlement probes before any query. FRED DGS3MO and Kenneth French comparison factors are already available as supporting public routes and do not need to be replaced.
+The current WRDS subscriber selector does not identify SRM Institute of Science and Technology. Norgate Platinum is the minimum published US package with history back to 1990, delisted securities and historical constituents; its stable AssetID is unaffected by name/ticker changes. SEC EDGAR's public submissions and XBRL APIs provide actual filing-time evidence and require no API key. This combination can address the institutional data contracts without constructing a survivor universe from current tickers, but only after compatible Norgate retention/derived-output rights and live schema/mapping sufficiency are established. FRED DGS3MO and Kenneth French comparison factors remain available supporting routes.
 
 ## Credential boundary after access exists
 
-Do not send a password in chat or commit it. Supply the WRDS username through `WRDS_USERNAME` and configure the password through WRDS' approved local credential mechanism (for example an owner-controlled `.pgpass` outside the repository) when the adapter is implemented. The repository will record only `PRESENT`/`ABSENT`/entitlement classifications. If institutional policy mandates a different secret store, the adapter must use that store without logging values.
+Do not send a password in chat or commit it. Install Norgate Data Updater through the vendor's owner-controlled process and select Python (Windows). Set `IFP_SEC_CONTACT_EMAIL` in the local environment only. The repository will record only `PRESENT`/`ABSENT`/entitlement classifications and must not log credential or contact values.
 
 Before extraction, the workflow will probe and record separately:
 
-- WRDS platform access;
-- CRSP entitlement;
-- Compustat entitlement;
-- Compustat Point-in-Time entitlement;
-- CRSP/Compustat Merged entitlement;
-- benchmark/index entitlement.
+- Norgate installation, product level and active subscription;
+- Python integration and licensed feature availability;
+- stable identity, delisted, historical membership, dividend and capital-event fields;
+- SEC contact identity and policy-compliant connectivity;
+- mapping sufficiency and benchmark entitlement/source.
 
 An absent entitlement will not be bypassed.
 
 ## Planned extracts after access is verified
 
-Provider schemas will be inspected live before column selection. Subject to entitlement, the extraction will obtain:
+Provider schemas will be inspected live before column selection. Subject to access and rights, the extraction will obtain:
 
-- CRSP permanent security/company identities and effective-dated name, ticker, exchange, share/security-type and listing histories;
-- daily prices, returns, shares, volume, distributions, split/action evidence, delisting dates and delisting returns;
-- Compustat fiscal observations with actual publication/availability evidence, restatements and units;
-- authorized historical CRSP/Compustat links with effective intervals and link quality;
+- Norgate stable security identities and available name, ticker, exchange, security-type and listing histories;
+- daily prices, volume, distributions, capital-event evidence, delisting dates and terminal-return evidence derivable under documented adjustment semantics;
+- SEC fiscal observations with actual filing/accession availability, amendments/restatements and units;
+- authenticated CIK-to-Norgate mappings with effective intervals, confidence and ambiguity controls;
 - exact total-return benchmark evidence and methodology.
 
 These will be transformed into the existing `security_master`, `SecurityMappingStore`, `daily_market`, `corporate_actions`, `factor_market_input`, and `factor_fundamental_input` contracts. Raw extracts, Parquet publications, DuckDB catalogs, and model artifacts remain under ignored runtime paths and will not enter Git.
@@ -46,16 +45,14 @@ These will be transformed into the existing `security_master`, `SecurityMappingS
 
 Data extraction may begin once access/rights pass, but final empirical formation still requires the owner to set the exact transparent large/mid-cap threshold. Before final Phase 4 and Phase 5 claims, the existing open concentration, sector, turnover, liquidity, cost/impact, ML target, horizon, retraining and primary-metric decisions must also be resolved or preregistered as the governing documents require.
 
-## Backup action
+## Other routes
 
-If WRDS cannot be supplied, provide one owner-controlled `NASDAQ_DATA_LINK_API_KEY` with verified Sharadar entitlements for historical active/delisted reference, end-of-day price/action evidence, and point-in-time fundamentals. After authentication, the workflow will inspect actual subscribed tables and current schemas; it will not assume product contents.
-
-If neither WRDS nor Sharadar is available, a lawful Norgate Platinum/Diamond installation can cover historical universe/market evidence only when paired with SEC EDGAR under a real `IFP_SEC_CONTACT_EMAIL` or another lawful point-in-time fundamental source. Alternatively, provide the complete owner package defined in `PHASE7_EMPIRICAL_INPUT_REQUIREMENTS.md`.
+No backup is recommended because Master Prompt 15.0 requires exactly one acquisition path. A future legitimate WRDS or Sharadar entitlement may be evaluated if it becomes available, but neither is represented as accessible now.
 
 ## Resume command boundary
 
-After the single credential/access action, resume this Phase 7 branch. The next execution will perform entitlement probes first, update `PHASE7_DATA_RIGHTS_REGISTER.md`, inspect provider schemas, acquire ignored runtime data, run the empirical data-quality gate, and only then attempt authenticated Phase 1 through Phase 6 research execution.
+After the single acquisition/configuration action, resume this Phase 7 branch. The next execution will verify the Norgate installation/product/rights and SEC identity first, update `PHASE7_DATA_RIGHTS_REGISTER.md`, inspect provider schemas, acquire ignored runtime data, run the empirical data-quality gate, and only then attempt authenticated Phase 1 through Phase 6 research execution.
 
 Until then:
 
-**PHASE 7 EMPIRICAL VALIDATION BLOCKED — SOFTWARE READY, EXTERNAL DATA ACCESS REQUIRED**
+**PHASE 7 INSTITUTIONAL DATA ACCESS UNAVAILABLE — EXTERNAL DATA ACQUISITION REQUIRED**
