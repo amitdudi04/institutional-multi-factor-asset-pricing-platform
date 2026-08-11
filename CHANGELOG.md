@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 1.0.3 - 2026-08-11
+
+- Fixed Streamlit delivery-configuration environment leakage and restored the caller's prior `IFP_DELIVERY_CONFIG` state after dashboard launch.
+- Restored the caller environment when dashboard startup or configuration loading raises an exception.
+- Added regression coverage for both absent and pre-existing caller environment states.
+
+This corrective release contains no analytical, factor, asset-pricing, portfolio, machine-learning, or empirical-methodology change.
+
 ## 1.0.2 - 2026-08-11
 
 - Reconciled all 465 historical capability rows against fresh executable evidence and added assurance-specific connected coverage.

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import sys
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -767,7 +768,19 @@ def test_dashboard_launcher(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> 
     monkeypatch.setattr(dashboard_launcher, "find_project_root", lambda: tmp_path)
     monkeypatch.setattr(dashboard_launcher, "load_delivery_config", lambda path: config)
     monkeypatch.setattr(dashboard_launcher.streamlit_cli, "main", called)
+    monkeypatch.delenv("IFP_DELIVERY_CONFIG", raising=False)
     original = list(sys.argv)
     dashboard_launcher.run_dashboard(tmp_path / "config.yaml")
     called.assert_called_once()
     assert sys.argv == original
+    assert "IFP_DELIVERY_CONFIG" not in os.environ
+
+    monkeypatch.setenv("IFP_DELIVERY_CONFIG", "existing.yaml")
+    monkeypatch.setattr(
+        dashboard_launcher,
+        "load_delivery_config",
+        Mock(side_effect=RuntimeError("invalid configuration")),
+    )
+    with pytest.raises(RuntimeError, match="invalid configuration"):
+        dashboard_launcher.run_dashboard(tmp_path / "missing.yaml")
+    assert os.environ["IFP_DELIVERY_CONFIG"] == "existing.yaml"
