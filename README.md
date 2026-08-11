@@ -4,7 +4,7 @@ An authenticated, reproducible institutional-style quantitative research platfor
 
 ## Status
 
-Phases 1-6 are implemented and post-remediation assured in v1.0.1. Immutable Phase 1 evidence flows through connected Phase 2-5 publications into the versioned FastAPI service, institutional Streamlit workspace, deterministic reporting, secure local Docker foundation, and CI gates. An authentic synthetic Phase 1-to-6 regression proves the complete software path, restart authentication, and parent-tamper rejection.
+Phases 1-6 are implemented and exhaustively reconciled in v1.0.2. Immutable Phase 1 evidence flows through connected Phase 2-5 publications into the versioned FastAPI service, institutional Streamlit workspace, deterministic reporting, secure local Docker foundation, and CI gates. Authenticated synthetic assurance covers all 48 factors, six asset-pricing specifications, every supported ML target, the connected API/dashboard/report surfaces, restart authentication, and cross-phase tamper rejection.
 
 No empirical dataset, factor premium, regression result, portfolio performance, model output, or investment conclusion is committed. Live empirical validation remains pending until lawful authenticated inputs and explicit study decisions are supplied.
 
@@ -77,7 +77,7 @@ uv run mypy src
 uv lock --check
 ```
 
-The post-remediation gate is 233 tests passing at 90.51% branch-aware coverage. CI repeats the suite, configuration/import smoke checks, dependency audit, and Docker build.
+The v1.0.2 gate requires the complete test suite, at least 90% branch-aware coverage, strict source typing, lint/format, dependency and repository-integrity checks, plus clean-root connected assurance. CI repeats the governed suite, configuration/import smoke checks, dependency audit, and Docker build.
 
 ## Security and data policy
 

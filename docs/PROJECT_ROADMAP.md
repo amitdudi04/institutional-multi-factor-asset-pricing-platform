@@ -1,6 +1,6 @@
 # Project Roadmap
 
-This roadmap records the completed six-phase platform and the v1.0.1 full-platform functional remediation defined by `docs/PROJECT_SPECIFICATION.md`. Proposed/open empirical assumptions remain gated and are not silently approved by software completion.
+This roadmap records the completed six-phase platform and the v1.0.2 total functional closure defined by `docs/PROJECT_SPECIFICATION.md`. Proposed/open empirical assumptions remain gated and are not silently approved by software completion.
 
 ## Phase 1 — Institutional Data Platform
 
@@ -28,4 +28,4 @@ Complete and finally assured: authenticated FastAPI discovery and evidence route
 
 ## Stage gates
 
-The v1.0.1 corrective assurance adds an authentic synthetic Phase 1-to-6 publication, restart, API/report delivery, determinism, and parent-tamper regression. It closes the software defects recorded by the failed post-v1.0.0 full-platform audit without rewriting that historical evidence. Lawful live-equity universe/mapping, owner SEC contact identity, owner-supplied data, Docker runtime, and remote-CI visibility remain external/host-dependent limitations; no live empirical validation is claimed.
+The v1.0.2 closure adds exhaustive authentic synthetic Phase 1-to-6 publication, model, target, optimization, restart, API/dashboard/report, CLI, determinism, and tamper evidence. It supersedes stale v1.0.1 capability classifications without rewriting historical reports. Lawful live-equity universe/mapping, owner SEC contact identity, owner-supplied data, Docker runtime, and remote-CI execution remain external or host-dependent limitations; no live empirical validation is claimed.
