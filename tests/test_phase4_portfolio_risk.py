@@ -491,8 +491,20 @@ def test_authenticated_portfolio_publication_restart_and_tamper(
     assert PortfolioRepository(tmp_path, tmp_path / "manifests").list_authenticated() == ()
 
 
-def test_authenticated_service_runs_optimized_method(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+@pytest.mark.parametrize(
+    "method",
+    (
+        "minimum_variance",
+        "mean_variance",
+        "maximum_sharpe",
+        "maximum_diversification",
+        "risk_parity",
+        "hrp",
+        "cvar",
+    ),
+)
+def test_authenticated_service_runs_every_optimized_method(
+    method: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.setattr(service_module, "_git_commit", lambda root: "deadbeef")
     service = PortfolioResearchService(
@@ -501,7 +513,7 @@ def test_authenticated_service_runs_optimized_method(
         _Factors(),
         _Pricing(),  # type: ignore[arg-type]
     )
-    manifest = service.compute_and_publish("phase3", "minimum_variance")
+    manifest = service.compute_and_publish("phase3", method)  # type: ignore[arg-type]
     diagnostics = next(
         item for item in manifest.artifacts if item.name == "optimization_diagnostics"
     )

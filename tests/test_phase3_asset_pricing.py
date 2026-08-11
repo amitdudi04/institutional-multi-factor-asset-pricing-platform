@@ -128,6 +128,14 @@ def test_approved_models_and_configuration_are_explicit(tmp_path: Path) -> None:
     assert custom_model("liquidity", ("LIQ",)).factors == ("LIQ",)
     with pytest.raises(ConfigurationError):
         custom_model("", ("LIQ",))
+    with pytest.raises(ConfigurationError, match="unique"):
+        custom_model("duplicate", ("HML", "HML"))
+    with pytest.raises(ConfigurationError, match="dependent"):
+        custom_model("bad-dependent", ("HML",), dependent_variable="return")
+    with pytest.raises(ConfigurationError, match="frequency"):
+        custom_model("bad-frequency", ("HML",), frequency="daily")
+    with pytest.raises(ConfigurationError, match="decimal_return"):
+        custom_model("bad-unit", ("HML",), return_unit="percent")
     with pytest.raises(ValidationError):
         config.publication.__class__(output_root="../escape", manifest_root="safe")
     broken = tmp_path / "broken.yaml"
@@ -348,6 +356,36 @@ def test_authenticated_publication_is_reproducible_and_tamper_evident(
     with pytest.raises(EvidenceIntegrityError, match="changed"):
         service.repository.authenticate(first.publication_id)
     assert AssetPricingRepository(tmp_path, tmp_path / "manifests").list_authenticated() == ()
+
+
+def test_custom_model_traverses_authenticated_service_publication_boundary(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    factors, portfolios = _phase2_tables()
+    fixture = _FactorRepositoryFixture(factors, portfolios)
+    monkeypatch.setattr(service_module, "_git_commit", lambda root: "deadbeef")
+    service = AssetPricingResearchService(
+        _small_config(tmp_path),
+        tmp_path,
+        fixture,  # type: ignore[arg-type]
+    )
+    specification = custom_model("custom_value_momentum", ("market_excess", "HML", "MOM"))
+
+    manifest = service.compute_and_publish(
+        "factor-fixture",
+        (specification.model_id,),
+        custom_models=(specification,),
+    )
+
+    assert manifest.model_ids == (specification.model_id,)
+    coefficients = service.repository.read_table(manifest.publication_id, "coefficients")
+    assert set(coefficients.column("model_id").to_pylist()) == {specification.model_id}
+    restarted = AssetPricingRepository(tmp_path, tmp_path / "manifests")
+    assert restarted.authenticate(manifest.publication_id) == manifest
+
+    missing = custom_model("custom_missing", ("market_excess", "UNMAPPED"))
+    with pytest.raises(DataQualityError, match="mappings"):
+        service.compute_and_publish("factor-fixture", (missing.model_id,), custom_models=(missing,))
 
 
 def test_service_rejects_unapproved_model_set(

@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Literal
 
 import numpy as np
-from scipy.optimize import linprog, minimize
+from scipy.optimize import OptimizeResult, linprog, minimize
 
 from institutional_factor_platform.constraints.models import ConstraintSet
 from institutional_factor_platform.exceptions import DataQualityError
@@ -97,6 +97,28 @@ def optimize(
             sectors,
             exposures,
         )
+    if method == "maximum_sharpe" and _supports_tangency_transform(constraints, sectors, exposures):
+        transformed = _maximum_sharpe_long_only(mean, matrix, risk_free)
+        if transformed is not None:
+            weights, iterations = transformed
+            variance = float(weights @ matrix @ weights)
+            objective = -float((mean @ weights - risk_free) / np.sqrt(variance))
+            output = _result(
+                method,
+                weights,
+                mean,
+                matrix,
+                objective,
+                True,
+                iterations,
+                constraints,
+                ids,
+                previous_weights,
+                sectors,
+                exposures,
+            )
+            output.diagnostics["tangency_transform"] = 1.0
+            return output
     start = previous_weights.copy() if previous_weights is not None else equal_weight(n)
     functions = {
         "minimum_variance": lambda w: float(w @ matrix @ w),
@@ -173,18 +195,36 @@ def optimize(
             low = max(low, float(previous_weights[index] - trade_limit))
             high = min(high, float(previous_weights[index] + trade_limit))
         bounds.append((low, high))
-    result = minimize(
-        functions[method],
-        start,
-        method="SLSQP",
-        bounds=bounds,
-        constraints=scipy_constraints,
-        options={"ftol": 1e-12, "maxiter": 2000},
-    )
+
+    def solve(initial: np.ndarray) -> OptimizeResult:
+        return minimize(
+            functions[method],
+            initial,
+            method="SLSQP",
+            bounds=bounds,
+            constraints=scipy_constraints,
+            options={"ftol": 1e-12, "maxiter": 2000},
+        )
+
+    result = solve(start)
+    deterministic_retry = False
+    if (not result.success or not np.isfinite(result.fun)) and previous_weights is not None:
+        result = solve(equal_weight(n))
+        deterministic_retry = True
+    if not result.success or not np.isfinite(result.fun):
+        boundary_results = [solve(candidate) for candidate in np.eye(n, dtype=float)]
+        converged = [
+            candidate
+            for candidate in boundary_results
+            if candidate.success and np.isfinite(candidate.fun)
+        ]
+        if converged:
+            result = min(converged, key=lambda candidate: float(candidate.fun))
+            deterministic_retry = True
     if not result.success or not np.isfinite(result.fun):
         raise DataQualityError(f"Optimizer failed to converge: {result.message}")
     weights = np.asarray(result.x, dtype=float)
-    return _result(
+    output = _result(
         method,
         weights,
         mean,
@@ -198,12 +238,62 @@ def optimize(
         sectors,
         exposures,
     )
+    output.diagnostics["deterministic_retry"] = float(deterministic_retry)
+    return output
 
 
 def _risk_parity_objective(weights: np.ndarray, covariance: np.ndarray) -> float:
     variance = float(weights @ covariance @ weights)
     contributions = weights * (covariance @ weights) / variance
     return float(((contributions - 1.0 / len(weights)) ** 2).sum())
+
+
+def _supports_tangency_transform(
+    constraints: ConstraintSet,
+    sectors: tuple[str, ...] | None,
+    exposures: dict[str, np.ndarray] | None,
+) -> bool:
+    return (
+        constraints.long_only
+        and constraints.minimum_weight == 0
+        and constraints.maximum_weight is None
+        and constraints.turnover_limit is None
+        and constraints.transaction_cost_limit is None
+        and not constraints.sector_limits
+        and not constraints.exposure_limits
+        and not constraints.liquidity_trade_limits
+        and sectors is None
+        and not exposures
+    )
+
+
+def _maximum_sharpe_long_only(
+    expected_returns: np.ndarray, covariance: np.ndarray, risk_free: float
+) -> tuple[np.ndarray, int] | None:
+    excess = expected_returns - risk_free
+    if float(excess.max()) <= 0:
+        return None
+    initial = equal_weight(len(excess))
+    initial_excess = float(excess @ initial)
+    if initial_excess <= 0:
+        initial = np.zeros(len(excess), dtype=float)
+        initial[int(np.argmax(excess))] = 1.0
+        initial_excess = float(excess @ initial)
+    initial /= initial_excess
+    scale = max(float(np.diag(covariance).max()), np.finfo(float).eps)
+    result = minimize(
+        lambda value: float(value @ (covariance / scale) @ value),
+        initial,
+        method="SLSQP",
+        bounds=[(0.0, None)] * len(excess),
+        constraints=[{"type": "eq", "fun": lambda value: float(excess @ value - 1.0)}],
+        options={"ftol": 1e-12, "maxiter": 2000},
+    )
+    if not result.success or not np.isfinite(result.fun) or float(result.x.sum()) <= 0:
+        return None
+    weights = np.asarray(result.x, dtype=float)
+    weights /= weights.sum()
+    return weights, int(result.nit)
 
 
 def _cvar(

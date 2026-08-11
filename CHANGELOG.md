@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+## 1.0.2 - 2026-08-11
+
+- Reconciled all 465 historical capability rows against fresh executable evidence and added assurance-specific connected coverage.
+- Exercised all 48 factors, six asset-pricing specifications, ten ML targets, supported optimization/model/split families, API routes, nine dashboard states, four report formats, and analytical/list/verify CLI boundaries.
+- Added authenticated custom-model service publication, robust long-only maximum-Sharpe optimization, Windows-safe verified Parquet publication, and JSON-safe ML dataset CLI output.
+- Expanded restart, identity, lineage, and cross-phase artifact-tamper regressions while retaining explicit synthetic-data and external-input labels.
+
+This assurance release does not claim live empirical validation. Lawful empirical inputs remain external.
+
 ## 1.0.1 - 2026-08-11
 
 - Repaired the authenticated Phase 2-to-3 momentum bridge and made model-specific factor resolution reject only factors required by the selected model.

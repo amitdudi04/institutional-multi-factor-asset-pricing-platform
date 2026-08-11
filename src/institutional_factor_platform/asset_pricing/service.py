@@ -14,7 +14,7 @@ import pyarrow as pa
 
 from institutional_factor_platform.asset_pricing.config import AssetPricingConfig
 from institutional_factor_platform.asset_pricing.inputs import build_research_panel
-from institutional_factor_platform.asset_pricing.models import MODEL_SPECS
+from institutional_factor_platform.asset_pricing.models import MODEL_SPECS, ModelSpec
 from institutional_factor_platform.data.evidence import atomic_write_json, canonical_json_bytes
 from institutional_factor_platform.data.storage import sha256_file
 from institutional_factor_platform.diagnostics.regression import regression_diagnostics
@@ -42,16 +42,27 @@ class AssetPricingResearchService:
         self.repository = AssetPricingRepository(self.root, self.manifest_root)
 
     def compute_and_publish(
-        self, factor_publication_id: str, model_ids: tuple[str, ...] | None = None
+        self,
+        factor_publication_id: str,
+        model_ids: tuple[str, ...] | None = None,
+        *,
+        custom_models: tuple[ModelSpec, ...] = (),
     ) -> AssetPricingManifest:
         phase2 = self.factor_repository.authenticate(factor_publication_id)
-        selected = tuple(sorted(model_ids or self.config.models))
-        if not selected or set(selected) - set(self.config.models):
+        custom_by_id = {spec.model_id: spec for spec in custom_models}
+        if len(custom_by_id) != len(custom_models):
+            raise DataQualityError("Custom model identifiers must be unique")
+        if set(custom_by_id) & set(MODEL_SPECS):
+            raise DataQualityError("Custom model identifiers cannot replace approved models")
+        specifications = {**MODEL_SPECS, **custom_by_id}
+        selected = tuple(sorted(model_ids or (*self.config.models, *custom_by_id)))
+        approved = set(self.config.models) | set(custom_by_id)
+        if not selected or set(selected) - approved:
             raise DataQualityError("Requested model set is empty or not approved by configuration")
         required_aliases = {
             factor
             for model_id in selected
-            for factor in MODEL_SPECS[model_id].factors
+            for factor in specifications[model_id].factors
             if factor != "market_excess"
         }
         missing_mappings = required_aliases - set(self.config.factor_mappings)
@@ -67,8 +78,12 @@ class AssetPricingResearchService:
         portfolio_table = self.factor_repository.read_portfolios(factor_publication_id).to_pandas()
         panel = build_research_panel(factor_table, portfolio_table, selected_mappings)
         git_commit = _git_commit(self.root)
+        selected_specs = {model_id: specifications[model_id] for model_id in selected}
         publication_id = _publication_id(
-            phase2.content_hash(), self.config.canonical_hash(), git_commit, selected
+            phase2.content_hash(),
+            self.config.canonical_hash(),
+            git_commit,
+            selected_specs,
         )
         existing = self.manifest_root / publication_id / "asset-pricing-publication.json"
         if existing.is_file():
@@ -82,7 +97,7 @@ class AssetPricingResearchService:
         diagnostics: dict[str, object] = {"publication_id": publication_id, "models": {}}
         for asset_id, asset in panel.groupby("asset_id", sort=True):
             for model_id in selected:
-                spec = MODEL_SPECS[model_id]
+                spec = specifications[model_id]
                 result = fit_regression(
                     asset,
                     "excess_return",
@@ -194,6 +209,7 @@ class AssetPricingResearchService:
             influence_frame,
             diagnostics,
             git_commit,
+            selected_specs,
         )
 
     def _publish(
@@ -210,6 +226,7 @@ class AssetPricingResearchService:
         influence: pd.DataFrame,
         diagnostics: dict[str, object],
         git_commit: str,
+        model_specs: dict[str, ModelSpec],
     ) -> AssetPricingManifest:
         output = self.output_root / publication_id
         run_root = self.manifest_root / publication_id
@@ -251,6 +268,16 @@ class AssetPricingResearchService:
                     "Project-specific characteristic spreads are not official provider factors.",
                     "Statistical association is not causal evidence.",
                 ],
+                "model_specifications": {
+                    model_id: {
+                        "factors": spec.factors,
+                        "equation": spec.equation,
+                        "dependent_variable": spec.dependent_variable,
+                        "frequency": spec.frequency,
+                        "return_unit": spec.return_unit,
+                    }
+                    for model_id, spec in sorted(model_specs.items())
+                },
             }
             validation = {
                 "publication_id": publication_id,
@@ -265,6 +292,15 @@ class AssetPricingResearchService:
                 "publication_id": publication_id,
                 "configuration_hash": self.config.canonical_hash(),
                 "configuration": self.config.model_dump(mode="json"),
+                "selected_model_specifications": {
+                    model_id: {
+                        "factors": spec.factors,
+                        "dependent_variable": spec.dependent_variable,
+                        "frequency": spec.frequency,
+                        "return_unit": spec.return_unit,
+                    }
+                    for model_id, spec in sorted(model_specs.items())
+                },
             }
             lineage = {
                 "publication_id": publication_id,
@@ -357,7 +393,10 @@ def _relative(path: Path, root: Path) -> str:
 
 
 def _publication_id(
-    parent_hash: str, config_hash: str, git_commit: str, models: tuple[str, ...]
+    parent_hash: str,
+    config_hash: str,
+    git_commit: str,
+    models: dict[str, ModelSpec],
 ) -> str:
     digest = hashlib.sha256(
         canonical_json_bytes(
@@ -365,7 +404,15 @@ def _publication_id(
                 "phase2_manifest_hash": parent_hash,
                 "configuration_hash": config_hash,
                 "git_commit": git_commit,
-                "models": models,
+                "models": {
+                    model_id: {
+                        "factors": spec.factors,
+                        "dependent_variable": spec.dependent_variable,
+                        "frequency": spec.frequency,
+                        "return_unit": spec.return_unit,
+                    }
+                    for model_id, spec in sorted(models.items())
+                },
                 "engine_version": "1.0.0",
             }
         )

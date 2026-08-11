@@ -667,6 +667,23 @@ def test_immutable_publication_restart_model_load_and_tamper(tmp_path: Path) -> 
     with pytest.raises(EvidenceIntegrityError, match="incomplete"):
         publish_bundle(tmp_path, Path("o2"), Path("m2"), values, {})
 
+    for target_name in (
+        "model",
+        "predictions",
+        "calibration",
+        "explanations",
+        "model_card",
+        "economic_evaluation",
+    ):
+        output_root = Path(f"tamper-{target_name}-outputs")
+        manifest_root = Path(f"tamper-{target_name}-manifests")
+        manifest = publish_bundle(tmp_path, output_root, manifest_root, values, contents)
+        target_artifact = next(item for item in manifest.artifacts if item.name == target_name)
+        target_path = tmp_path / target_artifact.path
+        target_path.write_bytes(target_path.read_bytes() + b"attack")
+        with pytest.raises(EvidenceIntegrityError, match="changed"):
+            MLRepository(tmp_path, tmp_path / manifest_root).authenticate(manifest.publication_id)
+
 
 def test_prediction_explanation_and_model_card_contracts() -> None:
     now = datetime.now(UTC)
@@ -887,6 +904,96 @@ def test_service_trains_publishes_and_restarts_authenticated_bundle(
     assert card["training_period"] and card["test_period"]
     with pytest.raises(DataQualityError, match="not enabled"):
         service.train_evaluate_publish("phase3", "neural_network")
+
+
+@pytest.mark.parametrize(("method", "minimum_folds"), (("holdout", 1), ("walk_forward", 2)))
+def test_service_executes_remaining_temporal_split_modes(
+    method: str,
+    minimum_folds: int,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        "institutional_factor_platform.ml.service._git_commit", lambda root: "deadbeef"
+    )
+    base = _explicit_config(tmp_path)
+    config = base.model_copy(
+        update={
+            "split": base.split.model_copy(update={"method": method}),
+            "search": base.search.model_copy(update={"maximum_trials": 1}),
+            "explainability": base.explainability.model_copy(update={"enabled": False}),
+        }
+    )
+    manifest = MLResearchService(
+        config,
+        tmp_path,
+        _Factors(),  # type: ignore[arg-type]
+        _Pricing(),  # type: ignore[arg-type]
+        _Phase1(),  # type: ignore[arg-type]
+    ).train_evaluate_publish("phase3", "ridge")
+    evaluation_artifact = next(item for item in manifest.artifacts if item.name == "evaluation")
+    evaluation = json.loads((tmp_path / evaluation_artifact.path).read_text("utf-8"))
+    assert evaluation["fold_count"] >= minimum_folds
+
+
+@pytest.mark.parametrize(
+    ("family", "classification"),
+    (
+        ("zero", False),
+        ("historical_mean", False),
+        ("factor_composite", False),
+        ("linear", False),
+        ("ridge", False),
+        ("lasso", False),
+        ("elastic_net", False),
+        ("random_forest", False),
+        ("xgboost", False),
+        ("logistic", True),
+        ("random_forest", True),
+        ("xgboost", True),
+    ),
+)
+def test_every_model_family_traverses_service_publication_boundary(
+    family: str,
+    classification: bool,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        "institutional_factor_platform.ml.service._git_commit", lambda root: "deadbeef"
+    )
+    base = _explicit_config(tmp_path)
+    target = base.target.model_copy(
+        update={
+            "kind": "outperformance" if classification else "future_return",
+            "benchmark_id": "SP500-TR" if classification else None,
+        }
+    )
+    config = base.model_copy(
+        update={
+            "target": target,
+            "split": base.split.model_copy(update={"method": "holdout"}),
+            "models": base.models.model_copy(
+                update={"enabled": tuple(sorted({*base.models.enabled, family}))}
+            ),
+            "search": base.search.model_copy(update={"maximum_trials": 1}),
+            "calibration": base.calibration.model_copy(
+                update={"method": "none", "minimum_samples": 10}
+            ),
+            "explainability": base.explainability.model_copy(update={"enabled": False}),
+        }
+    )
+    manifest = MLResearchService(
+        config,
+        tmp_path,
+        _Factors(),  # type: ignore[arg-type]
+        _Pricing(),  # type: ignore[arg-type]
+        _Phase1(),  # type: ignore[arg-type]
+    ).train_evaluate_publish("phase3", family)
+    assert (
+        MLRepository(tmp_path, tmp_path / "manifests").load_model(manifest.publication_id).family
+        == family
+    )
 
 
 def test_service_economic_evaluation_reuses_authenticated_phase4_engine_and_costs(
