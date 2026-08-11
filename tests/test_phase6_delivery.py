@@ -425,6 +425,14 @@ def test_report_formats_restart_and_authentication(tmp_path: Path) -> None:
     target.unlink()
 
     json_record = service.generate(ReportRequest(publications=(reference,), format="json"))
+    manifest_path = service.output_root / f"{json_record.report_id}.manifest.json"
+    original_manifest = manifest_path.read_bytes()
+    changed_manifest = json.loads(original_manifest)
+    changed_manifest["limitations"] = ["altered disclosure"]
+    manifest_path.write_text(json.dumps(changed_manifest), encoding="utf-8")
+    with pytest.raises(EvidenceIntegrityError, match="manifest identity"):
+        service.verify(json_record.report_id)
+    manifest_path.write_bytes(original_manifest)
     catalog.changed = True
     with pytest.raises(EvidenceIntegrityError, match="source identity"):
         service.verify(json_record.report_id)

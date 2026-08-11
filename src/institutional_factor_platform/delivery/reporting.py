@@ -101,6 +101,55 @@ class ReportService:
             output = output_path.read_bytes()
         except (OSError, KeyError, ValueError, json.JSONDecodeError) as exc:
             raise EvidenceIntegrityError("Report evidence is unavailable or malformed") from exc
+        expected_keys = {
+            "report_id",
+            "generated_at",
+            "template_version",
+            "format",
+            "sections",
+            "sources",
+            "software_version",
+            "delivery_config_hash",
+            "limitations",
+            "disclaimer",
+            "output_file",
+            "output_checksum",
+        }
+        if set(manifest) != expected_keys:
+            raise EvidenceIntegrityError("Report manifest schema changed after publication")
+        try:
+            identity = {
+                "template_version": manifest["template_version"],
+                "format": manifest["format"],
+                "sections": manifest["sections"],
+                "sources": manifest["sources"],
+                "software_version": manifest["software_version"],
+                "delivery_config_hash": manifest["delivery_config_hash"],
+            }
+            expected_report_id = "report-" + checksum(canonical_bytes(identity))[:32]
+            extension = {
+                "markdown": "md",
+                "html": "html",
+                "json": "json",
+                "csv": "csv",
+            }.get(manifest["format"])
+            limitations = tuple(manifest["limitations"])
+            expected_generation_time = self._generation_time(manifest["sources"]).isoformat()
+        except (KeyError, TypeError, ValueError) as exc:
+            raise EvidenceIntegrityError("Report manifest identity is malformed") from exc
+        if (
+            report_id != expected_report_id
+            or manifest["report_id"] != report_id
+            or extension is None
+            or manifest["output_file"] != f"{report_id}.{extension}"
+            or manifest["template_version"] != TEMPLATE_VERSION
+            or manifest["software_version"] != __version__
+            or manifest["delivery_config_hash"] != self.config.canonical_hash()
+            or limitations != LIMITATIONS
+            or manifest["disclaimer"] != DISCLAIMER
+            or manifest["generated_at"] != expected_generation_time
+        ):
+            raise EvidenceIntegrityError("Report manifest identity changed after publication")
         if checksum(output) != manifest.get("output_checksum"):
             raise EvidenceIntegrityError("Report output changed after publication")
         for source in manifest["sources"]:

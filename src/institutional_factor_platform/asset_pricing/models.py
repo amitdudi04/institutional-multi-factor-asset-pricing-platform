@@ -10,10 +10,21 @@ class ModelSpec:
     model_id: str
     factors: tuple[str, ...]
     equation: str
+    dependent_variable: str = "excess_return"
+    frequency: str = "monthly"
+    return_unit: str = "decimal_return"
 
     def __post_init__(self) -> None:
         if not self.model_id or not self.factors or len(set(self.factors)) != len(self.factors):
             raise ConfigurationError("Model specifications require a name and unique factors.")
+        if self.dependent_variable != "excess_return":
+            raise ConfigurationError(
+                "Asset-pricing models require excess_return as the dependent variable."
+            )
+        if self.frequency != "monthly":
+            raise ConfigurationError("Asset-pricing models require monthly input frequency.")
+        if self.return_unit != "decimal_return":
+            raise ConfigurationError("Asset-pricing models require decimal_return inputs.")
 
 
 MODEL_SPECS: dict[str, ModelSpec] = {
@@ -41,6 +52,20 @@ MODEL_SPECS: dict[str, ModelSpec] = {
 }
 
 
-def custom_model(model_id: str, factors: tuple[str, ...]) -> ModelSpec:
+def custom_model(
+    model_id: str,
+    factors: tuple[str, ...],
+    *,
+    dependent_variable: str = "excess_return",
+    frequency: str = "monthly",
+    return_unit: str = "decimal_return",
+) -> ModelSpec:
     """Create an explicit custom model without changing the approved registry."""
-    return ModelSpec(model_id, factors, "excess_return = alpha + factor loadings + e")
+    return ModelSpec(
+        model_id,
+        factors,
+        "excess_return = alpha + factor loadings + e",
+        dependent_variable,
+        frequency,
+        return_unit,
+    )

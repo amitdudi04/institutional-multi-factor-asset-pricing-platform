@@ -6,6 +6,9 @@ import os
 import sys
 from datetime import UTC, date, datetime
 from pathlib import Path
+from typing import Any
+
+from pydantic import BaseModel
 
 from institutional_factor_platform.asset_pricing.config import load_asset_pricing_config
 from institutional_factor_platform.asset_pricing.service import AssetPricingResearchService
@@ -220,6 +223,16 @@ def _dates(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--end", type=date.fromisoformat, required=True)
 
 
+def _json_default(value: Any) -> Any:
+    if isinstance(value, BaseModel):
+        return value.model_dump(mode="json")
+    if isinstance(value, Path):
+        return str(value)
+    if isinstance(value, (date, datetime)):
+        return value.isoformat()
+    raise TypeError(f"Unsupported CLI JSON value: {type(value).__name__}")
+
+
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
@@ -345,6 +358,7 @@ def main(argv: list[str] | None = None) -> int:
             ml_config = load_ml_config(getattr(args, "ml_config", None))
             factor_config = load_factor_config()
             pricing_config = load_asset_pricing_config()
+            portfolio_config = load_portfolio_config()
             factor_repository = FactorRepository(
                 service.root, service.root / factor_config.publication.manifest_root
             )
@@ -371,7 +385,13 @@ def main(argv: list[str] | None = None) -> int:
                     service.research,
                     portfolio_repository,
                 ).build_authenticated_dataset(args.asset_pricing_publication_id)
-                print(json.dumps({**metadata, "rows": len(dataset)}, sort_keys=True))
+                print(
+                    json.dumps(
+                        {**metadata, "rows": len(dataset)},
+                        sort_keys=True,
+                        default=_json_default,
+                    )
+                )
             else:
                 ml_manifest = MLResearchService(
                     ml_config,

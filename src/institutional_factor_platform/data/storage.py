@@ -134,12 +134,17 @@ class ParquetStorage:
                     os.close(descriptor)
             except OSError:
                 pass
-            check = pq.read_table(temporary)
+            # An explicit stream lifetime is required on Windows. Passing the path directly can
+            # leave PyArrow's dataset reader holding the temporary file when atomic replacement
+            # begins, causing a spurious sharing-violation despite successful verification.
+            with temporary.open("rb") as stream:
+                check = pq.read_table(stream)
             if (
                 not check.schema.equals(schema, check_metadata=False)
                 or check.num_rows != table.num_rows
             ):
                 raise RawStorageError(f"Parquet verification failed for {path}")
+            del check
             checksum = sha256_file(temporary)
             size = temporary.stat().st_size
             if path.exists():
