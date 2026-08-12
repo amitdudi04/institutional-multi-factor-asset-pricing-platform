@@ -16,6 +16,7 @@ from institutional_factor_platform.data.config import load_phase1_config
 from institutional_factor_platform.data.contracts import (
     CONTRACTS,
     FRENCH_FACTORS,
+    LISTING_LIFECYCLE,
     MACRO_OBSERVATIONS,
     SEC_FACTS,
 )
@@ -28,6 +29,7 @@ from institutional_factor_platform.data.domain import (
 from institutional_factor_platform.data.lineage import LifecycleState, LineageStore
 from institutional_factor_platform.data.manifests import DatasetManifest
 from institutional_factor_platform.data.services import DataIngestionService
+from institutional_factor_platform.data.sources.alpha_vantage import AlphaVantageListingAdapter
 from institutional_factor_platform.data.sources.base import HttpTransport
 from institutional_factor_platform.data.sources.fred import FredAdapter
 from institutional_factor_platform.data.sources.french import KennethFrenchAdapter
@@ -208,6 +210,11 @@ def build_parser() -> argparse.ArgumentParser:
     french.add_argument("dataset", choices=sorted(KennethFrenchAdapter.approved))
     sec = commands.add_parser("ingest-sec", help="Retrieve SEC company facts for one explicit CIK")
     sec.add_argument("cik")
+    alpha = commands.add_parser(
+        "ingest-alpha-listings", help="Retrieve a free Alpha Vantage listing snapshot"
+    )
+    alpha.add_argument("--state", choices=["active", "delisted"], required=True)
+    alpha.add_argument("--date", type=date.fromisoformat)
     owner = commands.add_parser(
         "ingest-owner-factor-input", help="Ingest an owner Phase 2 input under a strict contract"
     )
@@ -520,6 +527,22 @@ def main(argv: list[str] | None = None) -> int:
                 SEC_FACTS,
                 "json",
                 "application/json",
+            )
+        elif args.command == "ingest-alpha-listings":
+            parameters = {"state": args.state}
+            if args.date is not None:
+                parameters["date"] = args.date.isoformat()
+            request = RetrievalRequest(
+                DataSource.ALPHA_VANTAGE, "listing_status", parameters=parameters
+            )
+            service.ingest(
+                AlphaVantageListingAdapter(
+                    config.sources.alpha_vantage, HttpTransport(config.runtime)
+                ),
+                request,
+                LISTING_LIFECYCLE,
+                "csv",
+                "text/csv",
             )
         elif args.command == "ingest-owner-factor-input":
             metadata = json.loads(args.metadata_json.read_text(encoding="utf-8"))

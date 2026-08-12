@@ -17,6 +17,7 @@ class DataSource(StrEnum):
     FRED = "fred"
     KENNETH_FRENCH = "kenneth_french"
     SEC_EDGAR = "sec_edgar"
+    ALPHA_VANTAGE = "alpha_vantage"
 
 
 class DataFrequency(StrEnum):

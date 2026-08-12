@@ -188,6 +188,37 @@ SEC_FACTS = TableContract(
     {"filing_date": "SEC filing date", "availability_timestamp": "not before filing"},
 )
 
+LISTING_LIFECYCLE = TableContract(
+    "listing_lifecycle",
+    "1.0.0",
+    pa.schema(
+        [
+            ("symbol", pa.string(), False),
+            ("name", pa.string(), False),
+            ("exchange", pa.string(), False),
+            ("asset_type", pa.string(), False),
+            ("ipo_date", DATE),
+            ("delisting_date", DATE),
+            ("status", pa.string(), False),
+            ("source_duplicate_count", pa.int64(), False),
+            ("as_of_date", DATE, False),
+            ("source", pa.string(), False),
+            ("retrieval_timestamp", UTC_TS, False),
+            ("schema_version", pa.string(), False),
+        ]
+    ),
+    (
+        "symbol",
+        "name",
+        "exchange",
+        "ipo_date",
+        "delisting_date",
+        "as_of_date",
+        "status",
+    ),
+    {"as_of_date": "requested historical listing-state date"},
+)
+
 FACTOR_MARKET_INPUT = TableContract(
     "factor_market_input",
     "1.0.0",
@@ -247,6 +278,7 @@ CONTRACTS = {
         MACRO_OBSERVATIONS,
         FRENCH_FACTORS,
         SEC_FACTS,
+        LISTING_LIFECYCLE,
         FACTOR_MARKET_INPUT,
         FACTOR_FUNDAMENTAL_INPUT,
     ]

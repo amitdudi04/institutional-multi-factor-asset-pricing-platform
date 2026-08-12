@@ -9,6 +9,7 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 import pytest
+from pydantic import SecretStr
 
 from institutional_factor_platform.data.calendar import USEquityCalendar
 from institutional_factor_platform.data.config import load_phase1_config
@@ -25,7 +26,8 @@ from institutional_factor_platform.data.security_master import (
     SecurityMappingStore,
     mapping_from_listing,
 )
-from institutional_factor_platform.data.sources.base import HttpTransport
+from institutional_factor_platform.data.sources.alpha_vantage import AlphaVantageListingAdapter
+from institutional_factor_platform.data.sources.base import HttpTransport, _redact_url
 from institutional_factor_platform.data.sources.fred import FredAdapter
 from institutional_factor_platform.data.sources.french import KennethFrenchAdapter
 from institutional_factor_platform.data.sources.owner_supplied import OwnerSuppliedAdapter
@@ -129,6 +131,52 @@ def test_french_records_unit_transformation() -> None:
         adapter.standardize(b"not zip", request)
     with pytest.raises(RetrievalError, match="Unapproved"):
         adapter.retrieve(RetrievalRequest(DataSource.KENNETH_FRENCH, "unknown"))
+
+
+def test_alpha_vantage_listing_lifecycle_is_strict_and_secret_safe() -> None:
+    config = load_phase1_config()
+    settings = config.sources.alpha_vantage.model_copy(
+        update={"api_key": SecretStr("fixture-secret")}
+    )
+    payload = (
+        b"symbol,name,exchange,assetType,ipoDate,delistingDate,status\n"
+        b"SYNTH,Synthetic Issuer,NYSE,Stock,2011-01-03,null,Active\n"
+    )
+    adapter = AlphaVantageListingAdapter(
+        settings,
+        _transport(httpx.MockTransport(lambda request: httpx.Response(200, content=payload))),
+        now=lambda: NOW,
+    )
+    request = RetrievalRequest(
+        DataSource.ALPHA_VANTAGE,
+        "listing_status",
+        parameters={"state": "active", "date": "2014-07-10"},
+    )
+    records = adapter.standardize(adapter.retrieve(request), request)
+    assert records[0]["symbol"] == "SYNTH"
+    assert records[0]["as_of_date"] == date(2014, 7, 10)
+    assert records[0]["status"] == "active"
+    assert records[0]["source_duplicate_count"] == 1
+    with pytest.raises(RetrievalError, match="rate-limit"):
+        adapter.standardize(b'{"Note":"limit"}', request)
+    with pytest.raises(RetrievalError, match="schema changed"):
+        adapter.standardize(b"wrong,columns\n1,2\n", request)
+    with pytest.raises(RetrievalError, match="state"):
+        adapter.retrieve(
+            RetrievalRequest(
+                DataSource.ALPHA_VANTAGE,
+                "listing_status",
+                parameters={"state": "invalid"},
+            )
+        )
+
+
+def test_http_url_redaction_removes_query_credentials() -> None:
+    redacted = _redact_url(
+        "https://example.invalid/query?function=TEST&apikey=literal-secret&date=2020-01-01"
+    )
+    assert "literal-secret" not in redacted
+    assert "apikey=%5BREDACTED%5D" in redacted
 
 
 def test_sec_requires_contact_and_preserves_filing_metadata() -> None:

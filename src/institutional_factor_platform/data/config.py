@@ -109,14 +109,36 @@ class SecSettings(StrictModel):
         return f"{self.application_name} {self.contact_email}"
 
 
+class AlphaVantageSettings(StrictModel):
+    enabled: bool
+    api_key: SecretStr | None = None
+    minimum_interval_seconds: float = Field(default=12.0, ge=12.0)
+
+    def require_api_key(self) -> str:
+        if self.api_key is None or not self.api_key.get_secret_value().strip():
+            raise ConfigurationError(
+                "Live Alpha Vantage retrieval requires IFP_ALPHA_VANTAGE_API_KEY."
+            )
+        return self.api_key.get_secret_value()
+
+
 class SourceSettings(StrictModel):
     allowed: tuple[
-        Literal["owner_supplied", "yahoo_finance", "fred", "kenneth_french", "sec_edgar"], ...
+        Literal[
+            "owner_supplied",
+            "yahoo_finance",
+            "fred",
+            "kenneth_french",
+            "sec_edgar",
+            "alpha_vantage",
+        ],
+        ...,
     ]
     yahoo: YahooSettings
     fred: FredSettings
     french: FrenchSettings
     sec: SecSettings
+    alpha_vantage: AlphaVantageSettings
 
 
 class StorageSettings(StrictModel):
@@ -202,6 +224,9 @@ class Phase1Config(StrictModel):
         sec = data["sources"]["sec"]
         if isinstance(sec, dict) and sec.get("contact_email"):
             sec["contact_email"] = "[REDACTED]"
+        alpha = data["sources"]["alpha_vantage"]
+        if isinstance(alpha, dict) and alpha.get("api_key") is not None:
+            alpha["api_key"] = "**********"
         return data
 
     def write_snapshot(self, path: Path) -> str:
@@ -225,6 +250,9 @@ def load_phase1_config(path: Path | None = None) -> Phase1Config:
             fred = sources.get("fred")
             if isinstance(fred, dict) and os.environ.get("IFP_FRED_API_KEY"):
                 fred["api_key"] = os.environ["IFP_FRED_API_KEY"]
+            alpha = sources.get("alpha_vantage")
+            if isinstance(alpha, dict) and os.environ.get("IFP_ALPHA_VANTAGE_API_KEY"):
+                alpha["api_key"] = os.environ["IFP_ALPHA_VANTAGE_API_KEY"]
         return Phase1Config.model_validate(data)
     except ValueError as exc:
         raise ConfigurationError(f"Invalid Phase 1 configuration: {exc}") from exc

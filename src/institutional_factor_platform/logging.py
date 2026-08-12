@@ -50,5 +50,11 @@ def configure_logging(level: str = "INFO", output_format: str = "json") -> None:
                 }
             },
             "root": {"handlers": ["console"], "level": normalized_level},
+            "loggers": {
+                # HTTPX INFO records include complete request URLs. Provider credentials
+                # may be query parameters, so only warning/error records may propagate.
+                "httpx": {"level": "WARNING", "propagate": True},
+                "httpcore": {"level": "WARNING", "propagate": True},
+            },
         }
     )
