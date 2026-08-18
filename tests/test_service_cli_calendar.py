@@ -654,3 +654,21 @@ def test_cli_validate_config_and_errors(
     assert main(["rebuild-catalog"]) == 0
     assert "catalog.duckdb" in capsys.readouterr().out
     assert main(["verify-publication", "different", str(manifest_path)]) == 2
+
+
+def test_hf_inventory_cli_confines_output_to_project(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    config = _temp_config(tmp_path)
+    monkeypatch.setattr(cli_module, "load_phase1_config", lambda _: config)
+    monkeypatch.setattr(
+        cli_module, "DataIngestionService", lambda value: DataIngestionService(value, root=tmp_path)
+    )
+    monkeypatch.setattr(
+        cli_module.HFDataLibraryAdapter,
+        "inventory",
+        lambda _: {"schema_version": "1.0.0", "records": []},
+    )
+    assert main(["inventory-hf", "--output", "outputs/hf-inventory.json"]) == 0
+    assert (tmp_path / "outputs/hf-inventory.json").is_file()
+    assert main(["inventory-hf", "--output", str(tmp_path.parent / "escape.json")]) == 2

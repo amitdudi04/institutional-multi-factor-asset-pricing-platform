@@ -26,6 +26,7 @@ from institutional_factor_platform.data.domain import (
     DateRange,
     RetrievalRequest,
 )
+from institutional_factor_platform.data.evidence import atomic_write_json, resolve_project_path
 from institutional_factor_platform.data.lineage import LifecycleState, LineageStore
 from institutional_factor_platform.data.manifests import DatasetManifest
 from institutional_factor_platform.data.services import DataIngestionService
@@ -33,6 +34,7 @@ from institutional_factor_platform.data.sources.alpha_vantage import AlphaVantag
 from institutional_factor_platform.data.sources.base import HttpTransport
 from institutional_factor_platform.data.sources.fred import FredAdapter
 from institutional_factor_platform.data.sources.french import KennethFrenchAdapter
+from institutional_factor_platform.data.sources.hf_data_library import HFDataLibraryAdapter
 from institutional_factor_platform.data.sources.owner_supplied import OwnerSuppliedAdapter
 from institutional_factor_platform.data.sources.sec_edgar import SecEdgarAdapter
 from institutional_factor_platform.data.storage import (
@@ -215,6 +217,16 @@ def build_parser() -> argparse.ArgumentParser:
     )
     alpha.add_argument("--state", choices=["active", "delisted"], required=True)
     alpha.add_argument("--date", type=date.fromisoformat)
+    hf = commands.add_parser(
+        "ingest-hf-daily", help="Retrieve one HF Data Library daily Parquet series"
+    )
+    hf.add_argument("ticker")
+    hf.add_argument("--mapping-authority", type=Path, required=True)
+    _dates(hf)
+    hf_inventory = commands.add_parser(
+        "inventory-hf", help="Persist the reconciled public HF coverage inventory"
+    )
+    hf_inventory.add_argument("--output", type=Path, required=True)
     owner = commands.add_parser(
         "ingest-owner-factor-input", help="Ingest an owner Phase 2 input under a strict contract"
     )
@@ -544,6 +556,38 @@ def main(argv: list[str] | None = None) -> int:
                 "csv",
                 "text/csv",
             )
+        elif args.command == "ingest-hf-daily":
+            from institutional_factor_platform.data.security_master import SecurityMappingStore
+
+            request = RetrievalRequest(
+                DataSource.HF_DATA_LIBRARY,
+                "daily_market",
+                DateRange(args.start, args.end),
+                identifiers=(args.ticker.strip().upper(),),
+                parameters={
+                    "currency": "USD",
+                    "price_basis": "source_split_dividend_adjusted",
+                    "cleaning": "hf_documented_nine_step_clean_pipeline",
+                    "source_break": "pitrading_to_iex_march_2022",
+                },
+            )
+            service.ingest(
+                HFDataLibraryAdapter(
+                    config.sources.hf_data_library,
+                    HttpTransport(config.runtime),
+                    SecurityMappingStore(args.mapping_authority),
+                ),
+                request,
+                CONTRACTS["daily_market"],
+                "parquet",
+                "application/vnd.apache.parquet",
+            )
+        elif args.command == "inventory-hf":
+            inventory = HFDataLibraryAdapter(
+                config.sources.hf_data_library,
+                HttpTransport(config.runtime),
+            ).inventory()
+            atomic_write_json(resolve_project_path(str(args.output), service.root), inventory)
         elif args.command == "ingest-owner-factor-input":
             metadata = json.loads(args.metadata_json.read_text(encoding="utf-8"))
             if not isinstance(metadata, dict):

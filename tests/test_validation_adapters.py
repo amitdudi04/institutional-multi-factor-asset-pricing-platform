@@ -30,6 +30,7 @@ from institutional_factor_platform.data.sources.alpha_vantage import AlphaVantag
 from institutional_factor_platform.data.sources.base import HttpTransport, _redact_url
 from institutional_factor_platform.data.sources.fred import FredAdapter
 from institutional_factor_platform.data.sources.french import KennethFrenchAdapter
+from institutional_factor_platform.data.sources.hf_data_library import HFDataLibraryAdapter
 from institutional_factor_platform.data.sources.owner_supplied import OwnerSuppliedAdapter
 from institutional_factor_platform.data.sources.sec_edgar import SecEdgarAdapter
 from institutional_factor_platform.data.sources.yahoo import YahooFinanceAdapter
@@ -179,7 +180,103 @@ def test_http_url_redaction_removes_query_credentials() -> None:
     assert "apikey=%5BREDACTED%5D" in redacted
 
 
-def test_sec_requires_contact_and_preserves_filing_metadata() -> None:
+def test_hf_daily_market_requires_attribution_and_mapping(tmp_path: Path) -> None:
+    buffer = io.BytesIO()
+    table = pa.table(
+        {
+            "datetime": [datetime(2024, 1, 2)],
+            "Open": [10.0],
+            "High": [11.0],
+            "Low": [9.0],
+            "Close": [10.5],
+            "Volume": [100],
+            "source": ["pitrading"],
+        }
+    ).replace_schema_metadata(
+        {b"citation": b"CC BY 4.0 fixture", b"iex_attribution": b"IEX fixture"}
+    )
+    pq.write_table(table, buffer)
+    mapping_store = SecurityMappingStore(tmp_path / "hf-mappings.json")
+    mapping_store.persist(
+        (
+            mapping_from_listing(
+                source=DataSource.HF_DATA_LIBRARY,
+                source_identifier="SYNTH",
+                ticker="SYNTH",
+                exchange="XNYS",
+                mic="XNYS",
+                valid_from=date(2020, 1, 1),
+                valid_to=None,
+                provenance="CC BY 4.0 synthetic fixture",
+                retrieval_timestamp=NOW,
+                security_id=SecurityId.assign(),
+            ),
+        )
+    )
+    settings = load_phase1_config().sources.hf_data_library.model_copy(
+        update={"api_key": SecretStr("fixture-secret")}
+    )
+    token = b'{"url":"https://api.hfdatalibrary.com/v1/download/SYNTH?token=fixture"}'
+
+    def response(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200, content=token if "download-token" in str(request.url) else buffer.getvalue()
+        )
+
+    adapter = HFDataLibraryAdapter(
+        settings,
+        _transport(httpx.MockTransport(response)),
+        mapping_store,
+        now=lambda: NOW,
+    )
+    request = RetrievalRequest(
+        DataSource.HF_DATA_LIBRARY,
+        "daily_market",
+        DateRange(date(2024, 1, 1), date(2024, 1, 3)),
+        identifiers=("SYNTH",),
+    )
+    records = adapter.standardize(adapter.retrieve(request), request)
+    assert records[0]["ticker"] == "SYNTH"
+    assert records[0]["adjusted_close"] == 10.5
+    assert records[0]["dividend"] is None
+    assert records[0]["source"] == "hf_data_library:pitrading"
+    with pytest.raises(RetrievalError, match="mapping authority"):
+        HFDataLibraryAdapter(settings, adapter.transport).standardize(buffer.getvalue(), request)
+
+
+def test_hf_public_inventory_reconciles_classification() -> None:
+    settings = load_phase1_config().sources.hf_data_library
+    symbols = json.dumps(
+        {
+            "symbols": [
+                {"ticker": "SYNTH", "size_bytes": 10, "last_modified": "2026-01-01T00:00:00Z"},
+                {"ticker": "ETF1", "size_bytes": 20, "last_modified": "2026-01-02T00:00:00Z"},
+            ]
+        }
+    ).encode()
+    metadata = json.dumps({"SYNTH": {"type": "Stock"}, "ETF1": {"type": "ETF"}}).encode()
+
+    def response(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            content=metadata if "ticker_meta.json" in str(request.url) else symbols,
+        )
+
+    inventory = HFDataLibraryAdapter(
+        settings,
+        _transport(httpx.MockTransport(response)),
+        now=lambda: NOW,
+    ).inventory()
+    assert inventory["record_count"] == 2
+    assert inventory["selected_count"] == 1
+    assert inventory["rejected_count"] == 1
+    assert inventory["records"][1]["reason"] == "ETF excluded by project policy"  # type: ignore[index]
+
+
+def test_sec_requires_contact_and_preserves_filing_metadata(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.delenv("IFP_SEC_CONTACT_EMAIL", raising=False)
     config = load_phase1_config()
     no_contact = SecEdgarAdapter(
         config.sources.sec, _transport(httpx.MockTransport(lambda _: httpx.Response(200)))

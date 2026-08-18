@@ -46,6 +46,7 @@ def test_phase1_configuration_is_strict_hashable_and_redacted(
     monkeypatch.setenv("IFP_SEC_CONTACT_EMAIL", "owner@example.invalid")
     monkeypatch.setenv("IFP_FRED_API_KEY", "test-secret-not-a-live-key")
     monkeypatch.setenv("IFP_ALPHA_VANTAGE_API_KEY", "test-alpha-secret")
+    monkeypatch.setenv("IFP_HF_DATA_LIBRARY_API_KEY", "test-hf-secret")
     config = load_phase1_config()
     assert len(config.configuration_hash()) == 64
     assert config.configuration_hash() == config.configuration_hash()
@@ -53,11 +54,13 @@ def test_phase1_configuration_is_strict_hashable_and_redacted(
     assert redacted["sources"]["sec"]["contact_email"] == "[REDACTED]"  # type: ignore[index]
     assert redacted["sources"]["fred"]["api_key"] == "**********"  # type: ignore[index]
     assert redacted["sources"]["alpha_vantage"]["api_key"] == "**********"  # type: ignore[index]
+    assert redacted["sources"]["hf_data_library"]["api_key"] == "**********"  # type: ignore[index]
     snapshot = tmp_path / "snapshot.json"
     first = config.write_snapshot(snapshot)
     assert config.write_snapshot(snapshot) == first
     assert "owner@example.invalid" not in snapshot.read_text(encoding="utf-8")
     assert "test-alpha-secret" not in snapshot.read_text(encoding="utf-8")
+    assert "test-hf-secret" not in snapshot.read_text(encoding="utf-8")
 
 
 def test_configuration_date_unknown_field_and_paths_fail(tmp_path: Path) -> None:
@@ -83,7 +86,10 @@ def test_configuration_date_unknown_field_and_paths_fail(tmp_path: Path) -> None
         paths.resolved(tmp_path)
 
 
-def test_sec_contact_is_required_only_for_live_retrieval() -> None:
+def test_sec_contact_is_required_only_for_live_retrieval(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.delenv("IFP_SEC_CONTACT_EMAIL", raising=False)
     config = load_phase1_config()
     with pytest.raises(ConfigurationError, match="IFP_SEC_CONTACT_EMAIL"):
         config.sources.sec.require_live_user_agent()

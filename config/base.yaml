@@ -25,7 +25,7 @@ universe:
   primary_listings_only: true
   excluded_listing_types: [etf, etn, closed_end_fund, adr, preferred, warrant, right, unit, spac_unit, mutual_fund, money_market, debt, option, future, crypto]
 sources:
-  allowed: [owner_supplied, yahoo_finance, fred, kenneth_french, sec_edgar, alpha_vantage]
+  allowed: [owner_supplied, yahoo_finance, fred, kenneth_french, sec_edgar, alpha_vantage, hf_data_library]
   yahoo:
     enabled: true
     interval: 1d
@@ -44,6 +44,11 @@ sources:
     enabled: true
     api_key: null
     minimum_interval_seconds: 12.0
+  hf_data_library:
+    enabled: true
+    api_key: null
+    version: clean
+    timeframe: daily
 storage:
   parquet_compression: zstd
   raw_immutable: true
