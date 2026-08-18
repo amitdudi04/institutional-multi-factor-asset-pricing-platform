@@ -4,9 +4,9 @@ An authenticated, reproducible institutional-style quantitative research platfor
 
 ## Status
 
-Phases 1-6 are implemented and exhaustively reconciled in v1.0.2. Immutable Phase 1 evidence flows through connected Phase 2-5 publications into the versioned FastAPI service, institutional Streamlit workspace, deterministic reporting, secure local Docker foundation, and CI gates. Authenticated synthetic assurance covers all 48 factors, six asset-pricing specifications, every supported ML target, the connected API/dashboard/report surfaces, restart authentication, and cross-phase tamper rejection.
+The software implementation spans Phases 1-6. The Prompt 23 empirical run screened all 822 HF Data Library stock candidates and froze 487 defensibly bounded equities (372 Tier A, 115 Tier B). Raw, processed, and generated empirical artifacts remain local and untracked.
 
-A defensibly bounded real Phase 1 runtime publication now exists for AAPL and MSFT; raw and processed empirical data remain untracked. The preregistered Phase 2 study is not estimable because maximum authenticated breadth is two versus the approved minimum of three. No empirical factor premium, regression result, portfolio performance, model output, or investment conclusion is claimed.
+Authenticated real publications now exist for expanded Phase 1, all 48 configured Phase 2 factors (47 estimable; `equity_issuance` non-estimable), and the five asset-pricing model families configured in Phase 3. Phase 4 is not estimable because every transaction-cost input remains an explicit open owner decision. Phase 5 is not estimable because its target, horizon, benchmark, feature families, and Phase 4 parent remain unset. Phase 6 successfully authenticates and delivers the available real publications through API routes and Markdown, HTML, JSON, and CSV reports. These results are free/public-data research evidence, not a completed investment mandate or trading claim.
 
 ## Architecture
 
@@ -77,7 +77,7 @@ uv run mypy src
 uv lock --check
 ```
 
-The v1.0.2 gate requires the complete test suite, at least 90% branch-aware coverage, strict source typing, lint/format, dependency and repository-integrity checks, plus clean-root connected assurance. CI repeats the governed suite, configuration/import smoke checks, dependency audit, and Docker build.
+The local gate requires the complete test suite, at least 90% branch-aware coverage, strict source typing, lint/format, dependency and repository-integrity checks, plus restart and tamper assurance. Docker and GitHub operations were explicitly deferred by the owner for the Prompt 23 run.
 
 ## Security and data policy
 
@@ -97,8 +97,11 @@ The platform includes point-in-time factor construction; CAPM and multifactor re
 - Model performance is not guaranteed.
 - Local bearer protection is not enterprise identity management.
 - No brokerage, live execution, streaming prices, automatic retraining, or cloud SLA exists.
-- Docker was unavailable on the final local audit host; static validation passed and CI contains an image-build gate.
-- The bounded free/public-data intersection has only two securities with defensible identity, market continuity, and compatible PIT evidence. Phase 2 requires at least three, so Phases 2–6 empirical execution and final research release remain unauthorized. See [Phase 7 Empirical Data Readiness](docs/PHASE7_EMPIRICAL_DATA_READINESS_REPORT.md).
+- The free/public-data universe is source-availability selected and is not CRSP, Compustat, Russell 1000, or historical S&P 500 membership replication.
+- Effective coverage is bounded: annual security breadth rises from 4 in 2018 to 487 in 2024–2026; missing early PIT evidence is not backfilled.
+- Phase 4 net performance and Phase 5 ML conclusions are not estimable until the open owner decisions in the governing specification are approved.
+- Docker and GitHub/merge/tag operations were deferred by the owner and were not checked in this run.
+- See the [Final Research Paper](docs/FINAL_RESEARCH_PAPER.md) and [Final Project Assurance Report](docs/FINAL_PROJECT_ASSURANCE_REPORT.md).
 
 ## Reproducibility and academic use
 

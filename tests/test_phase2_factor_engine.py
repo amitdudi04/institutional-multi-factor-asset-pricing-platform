@@ -39,7 +39,10 @@ from institutional_factor_platform.factors.config import FactorConfig, load_fact
 from institutional_factor_platform.factors.contracts import MARKET_REQUIRED_UNITS, MARKET_SCHEMA
 from institutional_factor_platform.factors.definitions import FACTOR_DEFINITIONS
 from institutional_factor_platform.factors.diagnostics import build_factor_diagnostics
-from institutional_factor_platform.factors.portfolio import validate_factor_portfolios
+from institutional_factor_platform.factors.portfolio import (
+    compute_factor_portfolios,
+    validate_factor_portfolios,
+)
 from institutional_factor_platform.factors.preprocessing import normalize, winsorize
 from institutional_factor_platform.factors.service import FactorResearchService
 from institutional_factor_platform.factors.storage import authenticate_factor_publication
@@ -401,6 +404,52 @@ def test_full_catalog_publishes_authenticates_and_is_reproducible(tmp_path: Path
     with pytest.raises(EvidenceIntegrityError):
         service.repository.read_table(first.publication_id)
     assert service.repository.list_authenticated() == ()
+
+
+def test_factor_portfolio_uses_one_authenticated_benchmark_calendar() -> None:
+    securities = ["sec_" + value * 32 for value in "123"]
+    formation_dates = [date(2020, 1, 31), date(2020, 2, 28)]
+    factors = pd.DataFrame(
+        [
+            {
+                "security_id": security_id,
+                "date": formation_date,
+                "factor_id": "book_to_market",
+                "score_value": float(number),
+            }
+            for formation_date in formation_dates
+            for number, security_id in enumerate(securities, start=1)
+        ]
+    )
+    characteristics = pd.DataFrame(
+        [
+            {
+                "security_id": security_id,
+                "date": formation_date,
+                "market_cap": float(number * 100),
+            }
+            for formation_date in formation_dates
+            for number, security_id in enumerate(securities, start=1)
+        ]
+    )
+    market = pd.DataFrame(
+        [
+            {
+                "security_id": security_id,
+                "date": current,
+                "return": 0.001 * number,
+                "benchmark_return": 0.01,
+                "available_at": datetime.combine(current, datetime.min.time(), tzinfo=UTC),
+            }
+            for current in (date(2020, 2, 3), date(2020, 2, 4), date(2020, 3, 2))
+            for number, security_id in enumerate(securities, start=1)
+            if not (current == date(2020, 2, 3) and security_id == securities[-1])
+        ]
+    )
+    portfolios = compute_factor_portfolios(factors, characteristics, market)
+    first_period = portfolios.loc[portfolios["formation_date"].eq(date(2020, 1, 31))]
+    assert first_period["benchmark_return"].nunique() == 1
+    assert first_period["benchmark_return"].iloc[0] == pytest.approx((1.01**2) - 1.0)
 
 
 def test_publication_rejects_forged_parent_and_unit_contract(tmp_path: Path) -> None:

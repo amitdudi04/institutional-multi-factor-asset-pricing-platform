@@ -41,24 +41,32 @@ def compute_factor_portfolios(
     formation_dates = sorted(formation["date"].unique())
     realized_parts: list[pd.DataFrame] = []
     market_end = market["date"].max()
+    benchmark_grouped = market.groupby("date")["benchmark_return"]
+    if (benchmark_grouped.max() - benchmark_grouped.min() > 1e-12).any():
+        raise DataQualityError("Authenticated benchmark conflicts across securities")
+    benchmark = benchmark_grouped.mean().sort_index()
     for index, formation_date in enumerate(formation_dates):
         period_end = formation_dates[index + 1] if index + 1 < len(formation_dates) else market_end
         holding = market.loc[market["date"].gt(formation_date) & market["date"].le(period_end)]
         if holding.empty:
             continue
+        benchmark_holding = benchmark.loc[
+            benchmark.index.to_series().gt(formation_date)
+            & benchmark.index.to_series().le(period_end)
+        ]
+        if benchmark_holding.empty:
+            raise DataQualityError("Authenticated benchmark holding period is empty")
+        period_benchmark = float((1.0 + benchmark_holding).prod() - 1.0)
         realized = (
             holding.groupby("security_id")
             .agg(
                 realization_date=("date", "max"),
                 realized_return=("return", lambda values: (1.0 + values).prod() - 1.0),
-                realized_benchmark=(
-                    "benchmark_return",
-                    lambda values: (1.0 + values).prod() - 1.0,
-                ),
                 realized_available_at=("available_at", "max"),
             )
             .reset_index()
         )
+        realized["realized_benchmark"] = period_benchmark
         realized["date"] = formation_date
         realized_parts.append(realized)
     if not realized_parts:

@@ -44,6 +44,14 @@ data/raw/**
 data/interim/**
 data/processed/**
 data/factors/**
+data/factor_manifests/**
+data/asset_pricing/**
+data/asset_pricing_manifests/**
+data/portfolios/**
+data/portfolio_manifests/**
+data/ml/**
+data/ml_manifests/**
+data/delivery/**
 data/features/**
 data/model_ready/**
 data/manifests/**
