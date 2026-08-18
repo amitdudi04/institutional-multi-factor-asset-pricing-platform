@@ -105,3 +105,28 @@ def add_interactions(
             raise DataQualityError("Interaction feature identity collides")
         result[name] = result[left] * result[right]
     return result
+
+
+def monthly_decision_features(frame: pd.DataFrame) -> pd.DataFrame:
+    """Select the last authenticated decision observation per security/month."""
+    required = {"security_id", "formation_date", "decision_time", "feature_available_at"}
+    if frame.empty or required - set(frame):
+        raise DataQualityError("Monthly feature sampling requires decision-time identity")
+    result = frame.copy()
+    result["formation_date"] = pd.to_datetime(result["formation_date"], utc=True)
+    result["_decision_month"] = result["formation_date"].dt.tz_localize(None).dt.to_period("M")
+    result = (
+        result.sort_values(["security_id", "formation_date"], kind="stable")
+        .groupby(["security_id", "_decision_month"], sort=True, as_index=False)
+        .tail(1)
+        .drop(columns="_decision_month")
+        .sort_values(["formation_date", "security_id"], kind="stable")
+        .reset_index(drop=True)
+    )
+    if (
+        result.assign(month=result["formation_date"].dt.tz_localize(None).dt.to_period("M"))
+        .duplicated(["security_id", "month"])
+        .any()
+    ):
+        raise DataQualityError("Monthly feature sampling produced duplicate decisions")
+    return result

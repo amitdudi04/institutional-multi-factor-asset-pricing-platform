@@ -3,7 +3,7 @@
 import hashlib
 import io
 import json
-from datetime import UTC, date, datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -39,7 +39,11 @@ from institutional_factor_platform.ml.evaluation import (
     ranking_metrics,
     regression_metrics,
 )
-from institutional_factor_platform.ml.features import add_interactions, assemble_factor_features
+from institutional_factor_platform.ml.features import (
+    add_interactions,
+    assemble_factor_features,
+    monthly_decision_features,
+)
 from institutional_factor_platform.ml.models import ResearchModel, create_model
 from institutional_factor_platform.ml.preprocessing import SafePreprocessor, cross_sectional_median
 from institutional_factor_platform.ml.publication import (
@@ -66,9 +70,9 @@ from institutional_factor_platform.ml.validation import (
 
 def _factor_frame(periods: int = 30, securities: int = 8) -> pd.DataFrame:
     rows = []
-    start = date(2020, 1, 1)
-    for period in range(periods):
-        current = start + timedelta(days=period)
+    fixture_dates = pd.date_range("2020-01-31", periods=periods, freq="ME")
+    for period, timestamp in enumerate(fixture_dates):
+        current = timestamp.date()
         available = datetime.combine(current, datetime.min.time(), tzinfo=UTC) + timedelta(hours=12)
         for number in range(securities):
             security = f"sec_{number:032d}"
@@ -126,17 +130,24 @@ def _explicit_config(tmp_path: Path | None = None) -> MachineLearningConfig:
                     "embargo_periods": 0,
                 }
             ),
+            "economic_evaluation": base.economic_evaluation.model_copy(
+                update={"enabled": False, "selection_quantile": None}
+            ),
             "publication": publication,
         }
     )
 
 
-def test_configuration_keeps_owner_decisions_open_and_strict(tmp_path: Path) -> None:
+def test_configuration_keeps_frozen_empirical_decisions_strict(tmp_path: Path) -> None:
     base = load_ml_config()
     assert base.schema_version == "1.0.0"
     assert len(base.canonical_hash()) == 64
-    with pytest.raises(ConfigurationError, match="open owner decisions"):
-        base.target.require_explicit()
+    assert base.target.require_explicit() == ("future_excess_return", 21)
+    assert base.target.benchmark_id == "SPY"
+    assert base.features.families == ("book_to_market", "momentum_12_1m")
+    assert base.split.train_periods == 60 and base.split.test_periods == 1
+    assert base.split.embargo_periods == 1 and base.split.retrain_every == 1
+    assert base.economic_evaluation.enabled
     assert _explicit_config().target.require_explicit() == ("future_return", 1)
     with pytest.raises(ValidationError):
         base.model_copy(update={"unknown": True}).__class__.model_validate(
@@ -567,6 +578,22 @@ def test_drift_and_ablation_reports() -> None:
         feature_family_ablations(("a",), {"all": ("a",)})
 
 
+def test_monthly_decision_features_select_last_authenticated_observation() -> None:
+    dates = pd.to_datetime(["2020-01-02", "2020-01-31", "2020-02-28"], utc=True)
+    frame = pd.DataFrame(
+        {
+            "security_id": ["A", "A", "A"],
+            "formation_date": dates,
+            "decision_time": dates,
+            "feature_available_at": dates,
+            "value": [1.0, 2.0, 3.0],
+        }
+    )
+    monthly = monthly_decision_features(frame)
+    assert monthly["formation_date"].tolist() == [dates[1], dates[2]]
+    assert monthly["value"].tolist() == [2.0, 3.0]
+
+
 def test_economic_evaluation_uses_phase4_timing_costs_and_long_only() -> None:
     dates = pd.date_range("2020-01-31", periods=8, freq="ME")
     returns = pd.DataFrame({"A": 0.01, "B": 0.005, "C": 0.0}, index=dates)
@@ -594,6 +621,25 @@ def test_economic_evaluation_uses_phase4_timing_costs_and_long_only() -> None:
     assert (result.allocations["weight"] >= 0).all() and result.returns[
         "transaction_cost"
     ].sum() > 0
+    sparse = predictions.loc[
+        ~(predictions["formation_date"].eq(dates[3]) & predictions["security_id"].eq("B"))
+    ]
+    sparse_result = evaluate_ranked_signal(
+        sparse,
+        returns,
+        benchmark,
+        TransactionCostModel(1, 2, 1, 0),
+        selection_fraction=1 / 3,
+        window=3,
+    )
+    sparse_date = sparse_result.allocations["date"].eq(dates[4])
+    assert (
+        sparse_result.allocations.loc[
+            sparse_date & sparse_result.allocations["asset_id"].eq("B"), "weight"
+        ]
+        .eq(0.0)
+        .all()
+    )
     with pytest.raises(DataQualityError, match="Unauthenticated"):
         evaluate_ranked_signal(
             predictions.assign(authentication_status="FAIL"),
@@ -906,6 +952,26 @@ def test_service_trains_publishes_and_restarts_authenticated_bundle(
         service.train_evaluate_publish("phase3", "neural_network")
 
 
+def test_service_baseline_explainability_is_explicitly_not_applicable(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(
+        "institutional_factor_platform.ml.service._git_commit", lambda root: "deadbeef"
+    )
+    service = MLResearchService(
+        _explicit_config(tmp_path),
+        tmp_path,
+        _Factors(),  # type: ignore[arg-type]
+        _Pricing(),  # type: ignore[arg-type]
+        _Phase1(),  # type: ignore[arg-type]
+    )
+    manifest = service.train_evaluate_publish("phase3", "zero")
+    artifact = next(item for item in manifest.artifacts if item.name == "explanations")
+    explanations = pq.read_table(tmp_path / artifact.path).to_pandas()
+    assert set(explanations["method"]) == {"not_applicable_baseline"}
+    assert (explanations["value"] == 0.0).all()
+
+
 @pytest.mark.parametrize(("method", "minimum_folds"), (("holdout", 1), ("walk_forward", 2)))
 def test_service_executes_remaining_temporal_split_modes(
     method: str,
@@ -1020,6 +1086,8 @@ def test_service_economic_evaluation_reuses_authenticated_phase4_engine_and_cost
         _Portfolios(tmp_path),  # type: ignore[arg-type]
     )
     manifest = service.train_evaluate_publish("phase3", "ridge")
+    assert manifest.phase4_publication_id == "phase4"
+    assert manifest.phase4_manifest_hash == "d" * 64
     economic_artifact = next(
         item for item in manifest.artifacts if item.name == "economic_evaluation"
     )

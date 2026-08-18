@@ -1,17 +1,17 @@
 schema_version: "1.0.0"
 inputs:
-  phase2_publication_id: null
-  phase3_publication_id: null
-  phase4_publication_id: null
+  phase2_publication_id: factor-5a73616f131fca2102fa2ca4141ad64f
+  phase3_publication_id: asset-pricing-c0a72fae5349f1048e18557250da1927
+  phase4_publication_id: portfolio-dfef8d60d8a771e61224f0b314efd86c
 features:
-  families: []
+  families: [book_to_market, momentum_12_1m]
   value_column: score_value
   interactions: []
   minimum_coverage: 0.8
 target:
-  kind: null
-  horizon: null
-  benchmark_id: null
+  kind: future_excess_return
+  horizon: 21
+  benchmark_id: SPY
   threshold: null
   quantiles: 5
 missing:
@@ -22,16 +22,18 @@ preprocessing:
   winsor_lower: null
   winsor_upper: null
 split:
-  method: expanding
-  train_periods: 36
+  method: walk_forward
+  # Monthly decision periods: five years training, one year validation,
+  # then one-month walk-forward tests and retraining.
+  train_periods: 60
   validation_periods: 12
-  test_periods: 12
+  test_periods: 1
   rolling_periods: null
   purge_overlaps: true
   embargo_periods: 1
   retrain_every: 1
 models:
-  enabled: [zero, historical_mean, linear, ridge, lasso, elastic_net, random_forest, xgboost]
+  enabled: [zero, historical_mean, factor_composite, linear, ridge, elastic_net, random_forest, xgboost]
   random_seed: 17
   thread_limit: 1
 search:
@@ -70,9 +72,9 @@ drift:
   psi_bins: 10
   warning_threshold: 0.2
 economic_evaluation:
-  enabled: false
+  enabled: true
   portfolio_method: equal_weight
-  selection_quantile: null
+  selection_quantile: 0.2
 publication:
   output_root: data/ml
   manifest_root: data/ml_manifests

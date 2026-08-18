@@ -113,6 +113,7 @@ class MLRepository:
         ):
             raise EvidenceIntegrityError("ML publication does not bind its manifest")
         names = set()
+        economic_identity: tuple[bool, str | None, str | None] | None = None
         for artifact in manifest.artifacts:
             if artifact.name in names:
                 raise EvidenceIntegrityError("Duplicate ML artifact name")
@@ -137,8 +138,27 @@ class MLRepository:
                     publication_id,
                 }:
                     raise EvidenceIntegrityError(f"ML JSON identity differs: {artifact.name}")
+                if artifact.name == "economic_evaluation" and isinstance(value, dict):
+                    economic_identity = (
+                        bool(value.get("enabled")),
+                        cast(str | None, value.get("phase4_publication_id")),
+                        cast(str | None, value.get("phase4_manifest_hash")),
+                    )
         if names != REQUIRED_ARTIFACTS:
             raise EvidenceIntegrityError("ML artifact inventory is incomplete or unexpected")
+        if economic_identity is None:
+            raise EvidenceIntegrityError("ML publication lacks economic lineage evidence")
+        enabled, phase4_id, phase4_hash = economic_identity
+        if enabled:
+            if (
+                manifest.phase4_publication_id != phase4_id
+                or manifest.phase4_manifest_hash != phase4_hash
+            ):
+                raise EvidenceIntegrityError("ML publication does not bind its Phase 4 parent")
+        elif (
+            manifest.phase4_publication_id is not None or manifest.phase4_manifest_hash is not None
+        ):
+            raise EvidenceIntegrityError("Disabled ML economics cannot bind a Phase 4 parent")
         return manifest
 
     def list_authenticated(self) -> tuple[str, ...]:
