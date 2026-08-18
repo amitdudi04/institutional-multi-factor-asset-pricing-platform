@@ -19,6 +19,7 @@ from institutional_factor_platform.data.contracts import (
     LISTING_LIFECYCLE,
     MACRO_OBSERVATIONS,
     SEC_FACTS,
+    SEC_SUBMISSIONS,
 )
 from institutional_factor_platform.data.domain import (
     DataArtifact,
@@ -37,6 +38,7 @@ from institutional_factor_platform.data.sources.french import KennethFrenchAdapt
 from institutional_factor_platform.data.sources.hf_data_library import HFDataLibraryAdapter
 from institutional_factor_platform.data.sources.owner_supplied import OwnerSuppliedAdapter
 from institutional_factor_platform.data.sources.sec_edgar import SecEdgarAdapter
+from institutional_factor_platform.data.sources.sec_submissions import SecSubmissionsAdapter
 from institutional_factor_platform.data.storage import (
     RawStorage,
     authenticate_dataset_evidence,
@@ -212,6 +214,10 @@ def build_parser() -> argparse.ArgumentParser:
     french.add_argument("dataset", choices=sorted(KennethFrenchAdapter.approved))
     sec = commands.add_parser("ingest-sec", help="Retrieve SEC company facts for one explicit CIK")
     sec.add_argument("cik")
+    sec_submissions = commands.add_parser(
+        "ingest-sec-submissions", help="Retrieve SEC filing submissions for one explicit CIK"
+    )
+    sec_submissions.add_argument("cik")
     alpha = commands.add_parser(
         "ingest-alpha-listings", help="Retrieve a free Alpha Vantage listing snapshot"
     )
@@ -539,6 +545,15 @@ def main(argv: list[str] | None = None) -> int:
                 SEC_FACTS,
                 "json",
                 "application/json",
+            )
+        elif args.command == "ingest-sec-submissions":
+            request = RetrievalRequest(DataSource.SEC_EDGAR, args.cik)
+            service.ingest(
+                SecSubmissionsAdapter(config.sources.sec, HttpTransport(config.runtime)),
+                request,
+                SEC_SUBMISSIONS,
+                "zip",
+                "application/zip",
             )
         elif args.command == "ingest-alpha-listings":
             parameters = {"state": args.state}

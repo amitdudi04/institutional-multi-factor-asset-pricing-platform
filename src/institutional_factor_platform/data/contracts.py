@@ -197,6 +197,36 @@ SEC_FACTS = TableContract(
     {"filing_date": "SEC filing date", "availability_timestamp": "not before filing"},
 )
 
+SEC_SUBMISSIONS = TableContract(
+    "sec_filing_submissions",
+    "1.1.0",
+    pa.schema(
+        [
+            ("issuer_id", pa.string(), False),
+            ("cik", pa.string(), False),
+            ("entity_name", pa.string(), False),
+            ("accession_number", pa.string(), False),
+            ("filing_date", DATE, False),
+            ("report_date", DATE),
+            ("acceptance_datetime_text", pa.string()),
+            ("form", pa.string(), False),
+            ("primary_document", pa.string()),
+            ("is_xbrl", pa.bool_(), False),
+            ("is_inline_xbrl", pa.bool_(), False),
+            ("availability_timestamp", UTC_TS, False),
+            ("availability_quality", pa.string(), False),
+            ("retrieval_timestamp", UTC_TS, False),
+            ("schema_version", pa.string(), False),
+        ]
+    ),
+    ("cik", "accession_number"),
+    {
+        "filing_date": "SEC filing date",
+        "acceptance_datetime_text": "verbatim SEC submissions value; no timezone inferred",
+        "availability_timestamp": "acceptance only when offset-authenticated, else filing date",
+    },
+)
+
 LISTING_LIFECYCLE = TableContract(
     "listing_lifecycle",
     "1.0.0",
@@ -287,6 +317,7 @@ CONTRACTS = {
         MACRO_OBSERVATIONS,
         FRENCH_FACTORS,
         SEC_FACTS,
+        SEC_SUBMISSIONS,
         LISTING_LIFECYCLE,
         FACTOR_MARKET_INPUT,
         FACTOR_FUNDAMENTAL_INPUT,

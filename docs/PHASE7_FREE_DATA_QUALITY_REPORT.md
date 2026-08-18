@@ -19,6 +19,7 @@ The present evidence does not yet establish a point-in-time large/mid-cap univer
 | Kenneth French | Two authenticated official-host publications: daily five-factor plus daily Momentum |
 | SEC current ticker list | 10,398 current rows observed; exact current ticker intersection covers 707 of 822 HF stocks |
 | SEC PIT fundamentals | Four authenticated issuer-level company-facts publications; not yet linked to listings or expanded study-wide |
+| SEC filing submissions | Four complete recent-plus-supplemental issuer histories; filing identity/acceptance and primary-document discovery evidence |
 
 ## Lifecycle and universe quality
 
@@ -96,6 +97,8 @@ HF states that prices are split- and dividend-adjusted and that `clean` applies 
 | FD-007 | High | The SEC fact primary key omitted `period_start`, colliding 2,517 valid Apple keys where quarterly and year-to-date facts shared an end date and filing | Closed in contract v3.1.0; `period_start` is key material, all observed live collisions resolve without dropping rows, and four issuers publish successfully |
 | FD-008 | High | Phase 2 required all 19 accounting fields even when free point-in-time evidence could not support them, encouraging fabricated completeness instead of governed non-estimability | Closed in software; a non-empty approved subset is accepted with exact observed-field units, unknown fields fail, and unsupported characteristics remain null with explicit estimability diagnostics |
 | FD-009 | High | The issuer mapping store treated multiple simultaneous listings for one issuer as a conflict, making legitimate share classes such as Alphabet impossible to represent | Closed in software; plural resolution preserves every authenticated listing, while legacy singular consumers fail closed when more than one share class is active |
+| FD-010 | High | SEC `submissions` recent arrays are capped near 1,000 rows, causing ownership filings to crowd older annual reports out of the apparent history | Closed in acquisition; every SEC-advertised supplemental JSON is preserved byte-for-byte in an immutable raw ZIP and standardized with the primary response |
+| FD-011 | Medium | Historical SEC submissions rows may omit `primaryDocument`; requiring it discarded the issuer's entire valid filing index | Closed in contract v1.1.0; filing identity is retained with a null document, while cover-document workflows skip only the affected rows |
 
 Eight HF publications were durably demoted: six legacy standardized publications that did not preserve per-row feed identity and two corrected-format GOOG/GOOGL publications that failed splice continuity. Historical raw data, manifests, validation reports, lineage, and demotion events were retained.
 
@@ -108,6 +111,8 @@ The official Kenneth French five-factor publication `french_factor_returns-adf76
 SEC company facts are authenticated for Apple (`sec_financial_facts-c3bb91229bf1838fbd7157ae`, 25,135 rows), Microsoft (`sec_financial_facts-43ae6b01066b2c47d140c44d`, 32,671), Meta (`sec_financial_facts-7cd980b4173126a78d4c5ad3`, 18,053), and Alphabet (`sec_financial_facts-99512737441d0370cd0da855`, 20,907). Filing dates and date-level availability are preserved. These are issuer-level facts with null `security_id`; they cannot join market listings until effective-dated issuer-to-listing mappings are authenticated.
 
 The governed annual SEC projector now selects only registered standard-taxonomy concepts, enforces annual flow durations versus instant facts, rejects conflicts, retains amendment availability, computes only complete formulas, derives lags without look-ahead, and supports authenticated one-to-many issuer/share-class mappings. It has not been run empirically because the required effective-dated issuer-to-listing authority is still missing.
+
+Complete SEC submissions publications are Apple (`sec_filing_submissions-f79233e4c700bbb20f559709`, 2,240 filings, 1994-01-26 through 2026-08-13), Microsoft (`sec_filing_submissions-e00f46ffdddaa01bf2e0a232`, 4,482, 1994-02-14 through 2026-08-17), Meta (`sec_filing_submissions-b51df3bed7a4b784f54476c2`, 4,160, 2005-05-06 through 2026-08-12), and Alphabet (`sec_filing_submissions-f99c434ff0dfe5b53f511135`, 2,681, 2015-10-02 through 2026-08-11). Offset-bearing SEC acceptance values authenticate UTC availability. Apple and Microsoft respectively contain 109 and 137 older rows with no primary document; those filing identities remain usable, but they cannot supply cover-page ticker evidence. Alphabet's current CIK history begins with the 2015 holding-company reorganization, so earlier Google evidence requires an authenticated predecessor/successor relationship.
 
 ## Remaining blocking data gaps
 
