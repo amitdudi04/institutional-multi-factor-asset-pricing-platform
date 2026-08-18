@@ -55,7 +55,7 @@ class KennethFrenchAdapter(SourceAdapter[bytes]):
         reader = csv.reader(lines[header_index:])
         header = [cell.strip() for cell in next(reader)]
         factor_names = header[1:]
-        retrieved = self.now()
+        retrieved = self.retrieval_timestamp(self.now)
         records: list[dict[str, object]] = []
         for row in reader:
             if not row or not row[0].strip().isdigit() or len(row[0].strip()) != 8:

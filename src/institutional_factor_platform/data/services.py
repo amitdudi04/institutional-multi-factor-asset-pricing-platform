@@ -180,7 +180,7 @@ class DataIngestionService:
                 retrieved_at=started,
             )
             RawStorage.verify(artifact)
-            records = adapter.standardize(payload, request)
+            records = adapter.standardize_at(payload, request, artifact.retrieval_timestamp)
             unit_metadata = _reconcile_units(records, request, contract)
             mapping = _authenticate_mapping_authority(
                 adapter, records, request, contract, self.root

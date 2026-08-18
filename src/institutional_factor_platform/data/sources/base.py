@@ -4,6 +4,8 @@ import random
 import time
 from abc import ABC, abstractmethod
 from collections.abc import Callable
+from contextvars import ContextVar
+from datetime import datetime
 from pathlib import Path
 from typing import Generic, TypeVar
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
@@ -15,6 +17,9 @@ from institutional_factor_platform.data.domain import DataSource, RetrievalReque
 from institutional_factor_platform.exceptions import RateLimitError, RetrievalError
 
 T = TypeVar("T")
+_STANDARDIZATION_RETRIEVAL_TIME: ContextVar[datetime | None] = ContextVar(
+    "standardization_retrieval_time", default=None
+)
 
 
 class SourceAdapter(ABC, Generic[T]):
@@ -27,6 +32,22 @@ class SourceAdapter(ABC, Generic[T]):
     @abstractmethod
     def standardize(self, payload: T, request: RetrievalRequest) -> tuple[dict[str, object], ...]:
         """Convert a provider payload into its source-specific contract."""
+
+    def standardize_at(
+        self, payload: T, request: RetrievalRequest, retrieval_timestamp: datetime
+    ) -> tuple[dict[str, object], ...]:
+        """Standardize with the exact immutable raw-artifact retrieval identity."""
+        if retrieval_timestamp.tzinfo is None:
+            raise RetrievalError("Standardization retrieval timestamp must be timezone-aware.")
+        token = _STANDARDIZATION_RETRIEVAL_TIME.set(retrieval_timestamp)
+        try:
+            return self.standardize(payload, request)
+        finally:
+            _STANDARDIZATION_RETRIEVAL_TIME.reset(token)
+
+    def retrieval_timestamp(self, fallback: Callable[[], datetime]) -> datetime:
+        """Use the service-bound raw timestamp, or the adapter clock for direct calls."""
+        return _STANDARDIZATION_RETRIEVAL_TIME.get() or fallback()
 
     def mapping_authority_path(self) -> Path | None:
         """Return the persisted identity authority used by this adapter, if any."""

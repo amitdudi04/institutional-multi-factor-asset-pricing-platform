@@ -9,7 +9,13 @@ import institutional_factor_platform.cli as cli_module
 from institutional_factor_platform.cli import build_parser, main
 from institutional_factor_platform.data.calendar import USEquityCalendar
 from institutional_factor_platform.data.config import PathSettings, Phase1Config, load_phase1_config
-from institutional_factor_platform.data.contracts import DAILY_MARKET, MACRO_OBSERVATIONS, SEC_FACTS
+from institutional_factor_platform.data.contracts import (
+    DAILY_MARKET,
+    MACRO_OBSERVATIONS,
+    SEC_FACTS,
+    SEC_INLINE_XBRL,
+    SEC_SUBMISSIONS,
+)
 from institutional_factor_platform.data.domain import (
     DataArtifact,
     DatasetStatus,
@@ -28,6 +34,9 @@ from institutional_factor_platform.data.security_master import (
 )
 from institutional_factor_platform.data.services import DataIngestionService
 from institutional_factor_platform.data.sources.base import SourceAdapter
+from institutional_factor_platform.data.sources.sec_edgar import SecEdgarAdapter
+from institutional_factor_platform.data.sources.sec_inline_xbrl import SecInlineXbrlAdapter
+from institutional_factor_platform.data.sources.sec_submissions import SecSubmissionsAdapter
 from institutional_factor_platform.data.storage import (
     DuckDBCatalog,
     authenticate_dataset_evidence,
@@ -68,6 +77,45 @@ class SyntheticMacroAdapter(SourceAdapter[bytes]):
                 "schema_version": "1.0.0",
             },
         )
+
+
+class ClockedSyntheticMacroAdapter(SyntheticMacroAdapter):
+    def __init__(self, fallback: datetime) -> None:
+        self.fallback = fallback
+
+    def standardize(
+        self, payload: bytes, request: RetrievalRequest
+    ) -> tuple[dict[str, object], ...]:
+        row = dict(super().standardize(payload, request)[0])
+        row["retrieval_timestamp"] = self.retrieval_timestamp(lambda: self.fallback)
+        return (row,)
+
+
+def test_sec_raw_reprocessing_dispatches_by_contract(tmp_path: Path) -> None:
+    config = _temp_config(tmp_path)
+    retrieved = datetime(2026, 8, 18, 8, 5, 4, 841479, tzinfo=UTC)
+    assert isinstance(
+        cli_module._reprocessing_adapter(DataSource.SEC_EDGAR, SEC_FACTS.name, config, retrieved),
+        SecEdgarAdapter,
+    )
+    assert isinstance(
+        cli_module._reprocessing_adapter(
+            DataSource.SEC_EDGAR, SEC_SUBMISSIONS.name, config, retrieved
+        ),
+        SecSubmissionsAdapter,
+    )
+    inline = cli_module._reprocessing_adapter(
+        DataSource.SEC_EDGAR, SEC_INLINE_XBRL.name, config, retrieved
+    )
+    assert isinstance(inline, SecInlineXbrlAdapter)
+    assert inline.now() == retrieved
+    with pytest.raises(ValueError, match="does not support"):
+        cli_module._reprocessing_adapter(
+            DataSource.SEC_EDGAR, MACRO_OBSERVATIONS.name, config, retrieved
+        )
+    named = tmp_path / "20260818T080504841479Z_4b13dc8460e699d4.zip"
+    named.write_bytes(b"raw")
+    assert cli_module._raw_retrieval_timestamp(named) == retrieved
 
 
 class InvalidSyntheticSecAdapter(SourceAdapter[bytes]):
@@ -496,6 +544,35 @@ def test_existing_raw_artifact_reprocesses_idempotently_without_retrieval(tmp_pa
     )
     with pytest.raises(DataQualityError, match="source"):
         service.reprocess(NoRetrieveAdapter(), wrong_source, request, MACRO_OBSERVATIONS)
+
+
+def test_raw_reprocess_binds_original_retrieval_timestamp(tmp_path: Path) -> None:
+    service = DataIngestionService(_temp_config(tmp_path), root=tmp_path)
+    request = RetrievalRequest(DataSource.OWNER_SUPPLIED, "clocked_macro")
+    first = service.ingest(
+        ClockedSyntheticMacroAdapter(datetime(2030, 1, 1, tzinfo=UTC)),
+        request,
+        MACRO_OBSERVATIONS,
+        "txt",
+        "text/plain",
+    )
+    source = json.loads(next((tmp_path / "data/manifests").rglob("source.json")).read_text())
+    raw_path = tmp_path / source["raw_artifact_path"]
+    artifact = DataArtifact(
+        raw_path,
+        source["checksum"],
+        source["byte_size"],
+        source["media_type"],
+        DataSource.OWNER_SUPPLIED,
+        datetime.fromisoformat(source["retrieval_time"].replace("Z", "+00:00")),
+    )
+    second = service.reprocess(
+        ClockedSyntheticMacroAdapter(datetime(2040, 1, 1, tzinfo=UTC)),
+        artifact,
+        request,
+        MACRO_OBSERVATIONS,
+    )
+    assert second.dataset_id == first.dataset_id
 
 
 @pytest.mark.parametrize(

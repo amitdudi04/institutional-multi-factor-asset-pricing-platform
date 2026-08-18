@@ -3,6 +3,7 @@
 import argparse
 import json
 import os
+import re
 import sys
 from datetime import UTC, date, datetime
 from pathlib import Path
@@ -12,13 +13,14 @@ from pydantic import BaseModel
 
 from institutional_factor_platform.asset_pricing.config import load_asset_pricing_config
 from institutional_factor_platform.asset_pricing.service import AssetPricingResearchService
-from institutional_factor_platform.data.config import load_phase1_config
+from institutional_factor_platform.data.config import Phase1Config, load_phase1_config
 from institutional_factor_platform.data.contracts import (
     CONTRACTS,
     FRENCH_FACTORS,
     LISTING_LIFECYCLE,
     MACRO_OBSERVATIONS,
     SEC_FACTS,
+    SEC_INLINE_XBRL,
     SEC_SUBMISSIONS,
 )
 from institutional_factor_platform.data.domain import (
@@ -32,12 +34,13 @@ from institutional_factor_platform.data.lineage import LifecycleState, LineageSt
 from institutional_factor_platform.data.manifests import DatasetManifest
 from institutional_factor_platform.data.services import DataIngestionService
 from institutional_factor_platform.data.sources.alpha_vantage import AlphaVantageListingAdapter
-from institutional_factor_platform.data.sources.base import HttpTransport
+from institutional_factor_platform.data.sources.base import HttpTransport, SourceAdapter
 from institutional_factor_platform.data.sources.fred import FredAdapter
 from institutional_factor_platform.data.sources.french import KennethFrenchAdapter
 from institutional_factor_platform.data.sources.hf_data_library import HFDataLibraryAdapter
 from institutional_factor_platform.data.sources.owner_supplied import OwnerSuppliedAdapter
 from institutional_factor_platform.data.sources.sec_edgar import SecEdgarAdapter
+from institutional_factor_platform.data.sources.sec_inline_xbrl import SecInlineXbrlAdapter
 from institutional_factor_platform.data.sources.sec_submissions import SecSubmissionsAdapter
 from institutional_factor_platform.data.storage import (
     RawStorage,
@@ -218,6 +221,13 @@ def build_parser() -> argparse.ArgumentParser:
         "ingest-sec-submissions", help="Retrieve SEC filing submissions for one explicit CIK"
     )
     sec_submissions.add_argument("cik")
+    sec_inline = commands.add_parser(
+        "ingest-sec-inline-xbrl",
+        help="Retrieve one official SEC filing and its tagged DEI listing facts",
+    )
+    sec_inline.add_argument("cik")
+    sec_inline.add_argument("accession_number")
+    sec_inline.add_argument("primary_document")
     alpha = commands.add_parser(
         "ingest-alpha-listings", help="Retrieve a free Alpha Vantage listing snapshot"
     )
@@ -246,6 +256,47 @@ def build_parser() -> argparse.ArgumentParser:
 def _dates(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--start", type=date.fromisoformat, required=True)
     parser.add_argument("--end", type=date.fromisoformat, required=True)
+
+
+def _reprocessing_adapter(
+    source: DataSource,
+    contract_name: str,
+    config: Phase1Config,
+    retrieval_timestamp: datetime,
+) -> SourceAdapter[bytes]:
+    transport = HttpTransport(config.runtime)
+
+    def original_time() -> datetime:
+        return retrieval_timestamp
+
+    if source is DataSource.SEC_EDGAR:
+        adapters: dict[str, SourceAdapter[bytes]] = {
+            SEC_FACTS.name: SecEdgarAdapter(config.sources.sec, transport, now=original_time),
+            SEC_SUBMISSIONS.name: SecSubmissionsAdapter(
+                config.sources.sec, transport, now=original_time
+            ),
+            SEC_INLINE_XBRL.name: SecInlineXbrlAdapter(
+                config.sources.sec, transport, now=original_time
+            ),
+        }
+        if contract_name not in adapters:
+            raise ValueError(f"SEC raw reprocessing does not support {contract_name}.")
+        return adapters[contract_name]
+    adapters = {
+        DataSource.FRED: FredAdapter(transport, now=original_time),
+        DataSource.KENNETH_FRENCH: KennethFrenchAdapter(transport, now=original_time),
+        DataSource.OWNER_SUPPLIED: OwnerSuppliedAdapter(),
+    }
+    if source not in adapters:
+        raise ValueError(f"Raw reprocessing does not support source {source.value}.")
+    return adapters[source]
+
+
+def _raw_retrieval_timestamp(path: Path) -> datetime:
+    match = re.match(r"^(\d{8}T\d{12}Z)_", path.name)
+    if match:
+        return datetime.strptime(match.group(1), "%Y%m%dT%H%M%S%fZ").replace(tzinfo=UTC)
+    return datetime.fromtimestamp(path.stat().st_mtime, tz=UTC)
 
 
 def _json_default(value: Any) -> Any:
@@ -503,18 +554,14 @@ def main(argv: list[str] | None = None) -> int:
                 args.path.stat().st_size,
                 args.media_type,
                 source,
-                datetime.fromtimestamp(args.path.stat().st_mtime, tz=UTC),
+                _raw_retrieval_timestamp(args.path),
             )
-            adapters = {
-                DataSource.FRED: FredAdapter(HttpTransport(config.runtime)),
-                DataSource.KENNETH_FRENCH: KennethFrenchAdapter(HttpTransport(config.runtime)),
-                DataSource.SEC_EDGAR: SecEdgarAdapter(
-                    config.sources.sec, HttpTransport(config.runtime)
-                ),
-                DataSource.OWNER_SUPPLIED: OwnerSuppliedAdapter(),
-            }
+            contract = CONTRACTS[args.contract]
             reprocessed_manifest = service.reprocess(
-                adapters[source], artifact, request, CONTRACTS[args.contract]
+                _reprocessing_adapter(source, contract.name, config, artifact.retrieval_timestamp),
+                artifact,
+                request,
+                contract,
             )
             print(reprocessed_manifest.dataset_id)
         elif args.command == "ingest-fred":
@@ -552,6 +599,22 @@ def main(argv: list[str] | None = None) -> int:
                 SecSubmissionsAdapter(config.sources.sec, HttpTransport(config.runtime)),
                 request,
                 SEC_SUBMISSIONS,
+                "zip",
+                "application/zip",
+            )
+        elif args.command == "ingest-sec-inline-xbrl":
+            request = RetrievalRequest(
+                DataSource.SEC_EDGAR,
+                args.cik,
+                parameters={
+                    "accession_number": args.accession_number,
+                    "primary_document": args.primary_document,
+                },
+            )
+            service.ingest(
+                SecInlineXbrlAdapter(config.sources.sec, HttpTransport(config.runtime)),
+                request,
+                SEC_INLINE_XBRL,
                 "zip",
                 "application/zip",
             )

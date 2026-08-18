@@ -61,7 +61,7 @@ class AlphaVantageListingAdapter(SourceAdapter[bytes]):
         reader = csv.DictReader(StringIO(text))
         if tuple(reader.fieldnames or ()) != self.columns:
             raise RetrievalError("Alpha Vantage listing response schema changed.")
-        retrieved = self.now()
+        retrieved = self.retrieval_timestamp(self.now)
         as_of = date.fromisoformat(str(request.parameters.get("date", retrieved.date())))
         rows = [
             (

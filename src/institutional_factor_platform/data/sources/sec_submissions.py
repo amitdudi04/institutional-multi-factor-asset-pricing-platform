@@ -71,7 +71,7 @@ class SecSubmissionsAdapter(SourceAdapter[bytes]):
         recent = filings.get("recent") if isinstance(filings, dict) else None
         if not cik.isdigit() or not entity or not isinstance(recent, dict):
             raise RetrievalError("SEC submissions lacks required registrant or filing metadata.")
-        retrieved = self.now()
+        retrieved = self.retrieval_timestamp(self.now)
         issuer_id = IssuerId.from_cik(cik).value
         records: list[dict[str, object]] = []
         records.extend(_standardize_arrays(recent, cik, str(entity), issuer_id, retrieved))

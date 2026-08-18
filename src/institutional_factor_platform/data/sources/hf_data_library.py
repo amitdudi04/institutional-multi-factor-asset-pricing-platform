@@ -127,7 +127,7 @@ class HFDataLibraryAdapter(SourceAdapter[bytes]):
             raise RetrievalError("HF attribution metadata is missing.")
         if self.mapping_store is None:
             raise RetrievalError(f"HF mapping authority is required for {ticker}.")
-        retrieved = self.now()
+        retrieved = self.retrieval_timestamp(self.now)
         records: list[dict[str, object]] = []
         for row in table.to_pylist():
             timestamp = row["datetime"]

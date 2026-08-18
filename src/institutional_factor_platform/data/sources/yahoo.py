@@ -54,7 +54,7 @@ class YahooFinanceAdapter(SourceAdapter[pd.DataFrame]):
     def standardize(
         self, payload: pd.DataFrame, request: RetrievalRequest
     ) -> tuple[dict[str, object], ...]:
-        retrieved = self.now()
+        retrieved = self.retrieval_timestamp(self.now)
         records: list[dict[str, object]] = []
         failures: list[str] = []
         multiple = isinstance(payload.columns, pd.MultiIndex)
