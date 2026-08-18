@@ -1,3 +1,4 @@
+import json
 from dataclasses import replace
 from datetime import UTC, date, datetime
 from pathlib import Path
@@ -18,6 +19,7 @@ from institutional_factor_platform.data.domain import (
     DateRange,
     IssuerId,
     IssuerListingMapping,
+    IssuerSuccessionRecord,
     ListingType,
     MappingEvidence,
     MappingStatus,
@@ -28,6 +30,7 @@ from institutional_factor_platform.data.domain import (
 )
 from institutional_factor_platform.data.security_master import (
     IssuerListingMappingStore,
+    IssuerSuccessionStore,
     SecurityMappingStore,
     SymbolHistoryStore,
     mapping_from_listing,
@@ -344,3 +347,72 @@ def test_issuer_identity_is_distinct_and_ambiguous_listing_join_blocks(tmp_path:
     ambiguous_store.persist((ambiguous,))
     with pytest.raises(SecurityMappingError, match="unresolved or ambiguous"):
         ambiguous_store.resolve(issuer, date(2024, 1, 1))
+
+
+def test_issuer_succession_preserves_legal_identity_and_rejects_cycles(
+    tmp_path: Path,
+) -> None:
+    now = datetime(2026, 8, 18, tzinfo=UTC)
+    google = IssuerId.from_cik("1288776")
+    alphabet = IssuerId.from_cik("1652044")
+    succession = IssuerSuccessionRecord(
+        predecessor_issuer_id=google,
+        successor_issuer_id=alphabet,
+        effective_date=date(2015, 10, 2),
+        relationship="SUCCESSOR_ISSUER",
+        evidence_reference="SEC accession 0001193125-15-336550",
+        provenance="synthetic test record modeled on SEC evidence",
+        retrieval_timestamp=now,
+    )
+    store = IssuerSuccessionStore(tmp_path / "issuer-succession.json")
+    store.persist((succession,))
+    assert (
+        IssuerSuccessionStore(store.path).resolve_successor(google, date(2015, 10, 2)) == alphabet
+    )
+    with pytest.raises(SecurityMappingError, match="unresolved or ambiguous"):
+        store.resolve_successor(google, date(2015, 10, 1))
+    with pytest.raises(SecurityMappingError, match="multiple successor"):
+        store.persist(
+            (
+                succession,
+                replace(succession, effective_date=date(2015, 10, 3)),
+            )
+        )
+    with pytest.raises(SecurityMappingError, match="cycle"):
+        store.persist(
+            (
+                succession,
+                replace(
+                    succession,
+                    predecessor_issuer_id=alphabet,
+                    successor_issuer_id=google,
+                ),
+            )
+        )
+    store.path.write_text(
+        json.dumps(
+            [
+                {
+                    "predecessor_issuer_id": google.value,
+                    "successor_issuer_id": alphabet.value,
+                    "effective_date": "2015-10-02",
+                    "relationship": "SUCCESSOR_ISSUER",
+                    "evidence_reference": "SEC accession 0001193125-15-336550",
+                    "provenance": "synthetic tamper fixture",
+                    "retrieval_timestamp": now.isoformat(),
+                },
+                {
+                    "predecessor_issuer_id": alphabet.value,
+                    "successor_issuer_id": google.value,
+                    "effective_date": "2015-10-03",
+                    "relationship": "SUCCESSOR_ISSUER",
+                    "evidence_reference": "synthetic invalid reverse edge",
+                    "provenance": "synthetic tamper fixture",
+                    "retrieval_timestamp": now.isoformat(),
+                },
+            ]
+        ),
+        encoding="utf-8",
+    )
+    with pytest.raises(SecurityMappingError, match="cycle"):
+        store.load()

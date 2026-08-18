@@ -182,6 +182,27 @@ class IssuerListingMapping:
 
 
 @dataclass(frozen=True, slots=True)
+class IssuerSuccessionRecord:
+    predecessor_issuer_id: IssuerId
+    successor_issuer_id: IssuerId
+    effective_date: date
+    relationship: str
+    evidence_reference: str
+    provenance: str
+    retrieval_timestamp: datetime
+
+    def __post_init__(self) -> None:
+        if self.predecessor_issuer_id == self.successor_issuer_id:
+            raise SecurityMappingError("Issuer succession cannot be self-referential.")
+        if self.relationship != "SUCCESSOR_ISSUER":
+            raise SecurityMappingError("Issuer succession relationship is unsupported.")
+        if not self.evidence_reference.strip() or not self.provenance.strip():
+            raise SecurityMappingError("Issuer succession requires evidence and provenance.")
+        if self.retrieval_timestamp.tzinfo is None:
+            raise SecurityMappingError("Issuer succession retrieval timestamp must be aware.")
+
+
+@dataclass(frozen=True, slots=True)
 class DateRange:
     start: date
     end: date
