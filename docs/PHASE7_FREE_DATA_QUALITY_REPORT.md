@@ -6,7 +6,7 @@ Status date: 2026-08-18
 
 The free-source acquisition path is authenticated and materially stronger, but it is not yet sufficient for empirical Phase 2. Alpha Vantage now supplies complete annual June active/delisted lifecycle snapshots from 2010 through 2026. HF Data Library supplies a reconciled 1,391-symbol inventory, of which 822 are classified as stocks and 569 ETFs are rejected. Four adversarial-sample market publications remain research-ready after provider-specific remediation: AAPL, MSFT, SPY, and legacy FB through its verified ticker end date.
 
-The present evidence does not yet establish a point-in-time large/mid-cap universe, historical shares, historical market capitalization, comprehensive corporate actions, terminal returns, or point-in-time fundamentals. Current SEC ticker evidence maps 707 of the 822 HF stocks, but it is current evidence and is not backdated. No factor, asset-pricing, portfolio, or ML result may be represented as empirical from this acquisition state.
+The present evidence does not yet establish a point-in-time large/mid-cap universe, historical shares, historical market capitalization, comprehensive corporate actions, terminal returns, or study-wide point-in-time fundamentals. Current SEC ticker evidence maps 707 of the 822 HF stocks, but it is current evidence and is not backdated. No factor, asset-pricing, portfolio, or ML result may be represented as empirical from this acquisition state.
 
 ## Authenticated source evidence
 
@@ -18,7 +18,7 @@ The present evidence does not yet establish a point-in-time large/mid-cap univer
 | FRED DGS3MO | Two authenticated publications; latest covers 2010-01-04 through 2026-08-10 with 4,331 observations |
 | Kenneth French | Two authenticated official-host publications: daily five-factor plus daily Momentum |
 | SEC current ticker list | 10,398 current rows observed; exact current ticker intersection covers 707 of 822 HF stocks |
-| SEC PIT fundamentals | Not yet acquired or published |
+| SEC PIT fundamentals | Four authenticated issuer-level company-facts publications; not yet linked to listings or expanded study-wide |
 
 ## Lifecycle and universe quality
 
@@ -93,6 +93,7 @@ HF states that prices are split- and dividend-adjusted and that `clean` applies 
 | FD-004 | Medium | TWTR and ATVI HF files omitted citation/IEX schema metadata | Open upstream; files rejected and excluded |
 | FD-005 | High | FB source file continued beyond verified legacy-ticker interval | Closed; requested-date clipping and effective-dated mapping enforce 2022-06-08 end |
 | FD-006 | High | GOOG and GOOGL adjusted closes fell about 95.25% exactly at the 2022-03-07 source splice | Closed in code; live re-ingestion fails closed; affected publications demoted; upstream files excluded |
+| FD-007 | High | The SEC fact primary key omitted `period_start`, colliding 2,517 valid Apple keys where quarterly and year-to-date facts shared an end date and filing | Closed in contract v3.1.0; `period_start` is key material, all observed live collisions resolve without dropping rows, and four issuers publish successfully |
 
 Eight HF publications were durably demoted: six legacy standardized publications that did not preserve per-row feed identity and two corrected-format GOOG/GOOGL publications that failed splice continuity. Historical raw data, manifests, validation reports, lineage, and demotion events were retained.
 
@@ -102,12 +103,14 @@ The latest authenticated DGS3MO publication is `macro_observations-c81a80f735ccc
 
 The official Kenneth French five-factor publication `french_factor_returns-adf7661d83688a9374d91fd7` contains 95,124 long-form observations for Mkt-RF, SMB, HML, RMW, CMA, and RF from 1963-07-01 through 2026-06-30. The official Momentum publication `french_factor_returns-f803dd07dbe251239dbe0c33` contains 26,173 observations from 1926-11-03 through 2026-06-30. Both are authenticated comparison evidence; they do not replace the platform's own factor construction.
 
+SEC company facts are authenticated for Apple (`sec_financial_facts-c3bb91229bf1838fbd7157ae`, 25,135 rows), Microsoft (`sec_financial_facts-43ae6b01066b2c47d140c44d`, 32,671), Meta (`sec_financial_facts-7cd980b4173126a78d4c5ad3`, 18,053), and Alphabet (`sec_financial_facts-99512737441d0370cd0da855`, 20,907). Filing dates and date-level availability are preserved. These are issuer-level facts with null `security_id`; they cannot join market listings until effective-dated issuer-to-listing mappings are authenticated.
+
 ## Remaining blocking data gaps
 
 - Canonical effective-dated CIK/listing/share-class mappings for the study universe.
 - A preregistered, defensible universe rule that does not claim unavailable large/mid-cap ranking evidence.
 - Point-in-time shares and market capitalization, or an explicitly narrower universe design that does not require them.
-- Point-in-time SEC fundamentals with filing availability and restatement handling.
+- Study-wide point-in-time SEC fundamentals, selected accounting concepts, filing lags, restatement policy, and authenticated issuer-to-listing mappings.
 - Corporate-action and terminal-event evidence for delisted/acquired securities.
 - Broader HF daily coverage after per-file attribution and splice checks.
 

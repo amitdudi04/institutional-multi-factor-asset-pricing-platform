@@ -155,7 +155,7 @@ FRENCH_FACTORS = TableContract(
 
 SEC_FACTS = TableContract(
     "sec_financial_facts",
-    "3.0.0",
+    "3.1.0",
     pa.schema(
         [
             ("issuer_id", pa.string(), False),
@@ -184,7 +184,16 @@ SEC_FACTS = TableContract(
             ("schema_version", pa.string(), False),
         ]
     ),
-    ("cik", "taxonomy", "concept", "unit", "period_end", "filing_date", "accession_number"),
+    (
+        "cik",
+        "taxonomy",
+        "concept",
+        "unit",
+        "period_start",
+        "period_end",
+        "filing_date",
+        "accession_number",
+    ),
     {"filing_date": "SEC filing date", "availability_timestamp": "not before filing"},
 )
 

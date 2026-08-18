@@ -1,6 +1,6 @@
 # Phase 1 Data Contracts
 
-Tabular contracts use deterministic column order and exact PyArrow enforcement. SEC financial facts are version `3.0.0`; other table contracts remain `1.0.0`. Dataset manifests and DuckDB catalog state use strict schema `5.0.0`; lifecycle events/lineage and promotion envelopes use `4.0.0`; run/source envelopes and validation reports remain `2.0.0`. Earlier runtime manifest/lineage/catalog artifacts are unsupported and must be rebuilt; none is committed.
+Tabular contracts use deterministic column order and exact PyArrow enforcement. SEC financial facts are version `3.1.0`; other table contracts remain `1.0.0`. Dataset manifests and DuckDB catalog state use strict schema `5.0.0`; lifecycle events/lineage and promotion envelopes use `4.0.0`; run/source envelopes and validation reports remain `2.0.0`. Earlier runtime manifest/lineage/catalog artifacts are unsupported and must be rebuilt; none is committed.
 
 | Contract | Primary key | Required content | Temporal semantics |
 |---|---|---|---|
@@ -9,7 +9,7 @@ Tabular contracts use deterministic column order and exact PyArrow enforcement. 
 | Corporate actions | `security_id, action_id` | type, effective date, value, source | provider effective date |
 | Macro observations | `series_id, observation_date` | value/null marker, source unit/frequency, source/retrieval | source observation; release availability only if known |
 | French factors | `dataset_identifier, factor_date, factor_name` | value, original/standard units, frequency/source | published date; percent-to-decimal transformation recorded |
-| SEC facts | CIK, taxonomy, concept, unit, period end, filing, accession | entity, value, form, fiscal metadata, source/retrieval/availability and availability quality | period start ≤ end ≤ filing ≤ date-level availability ≤ retrieval |
+| SEC facts | CIK, taxonomy, concept, unit, period start, period end, filing, accession | entity, value, form, fiscal metadata, source/retrieval/availability and availability quality | period start ≤ end ≤ filing ≤ date-level availability ≤ retrieval |
 
 Manifest contracts contain:
 
@@ -31,7 +31,7 @@ The header-only `examples/templates/security_universe.csv` is a schema aid and c
 
 ## Schema v5 publication and identity
 
-Dataset manifests and DuckDB catalog state use `5.0.0`; lifecycle events/lineage and promotion envelopes use `4.0.0`; SEC facts use `3.0.0`; run/source envelopes and validation reports remain `2.0.0`; other tabular contracts remain `1.0.0`. Runtime earlier forms are rejected and rebuilt because no empirical artifacts are committed. The final lifecycle event authenticates the promotion-envelope content hash and expected terminal run; the lifecycle head checkpoint detects tail deletion. Listing ID, issuer ID, and effective-dated symbol history are distinct. Owner-supplied units must exactly cover unit-bearing fields and reconcile with source and row semantics; percent and decimal are never interchangeable without an explicit transformation.
+Dataset manifests and DuckDB catalog state use `5.0.0`; lifecycle events/lineage and promotion envelopes use `4.0.0`; SEC facts use `3.1.0`; run/source envelopes and validation reports remain `2.0.0`; other tabular contracts remain `1.0.0`. Runtime earlier forms are rejected and rebuilt because no empirical artifacts are committed. The final lifecycle event authenticates the promotion-envelope content hash and expected terminal run; the lifecycle head checkpoint detects tail deletion. Listing ID, issuer ID, and effective-dated symbol history are distinct. Owner-supplied units must exactly cover unit-bearing fields and reconcile with source and row semantics; percent and decimal are never interchangeable without an explicit transformation.
 
 ## Phase 3 asset-pricing contracts
 

@@ -116,7 +116,7 @@ class SecEdgarAdapter(SourceAdapter[bytes]):
                                 "retrieval_timestamp": retrieved,
                                 "availability_timestamp": availability,
                                 "availability_quality": "INFERRED_DATE_LEVEL",
-                                "schema_version": "3.0.0",
+                                "schema_version": "3.1.0",
                             }
                         )
         if not records:

@@ -13,7 +13,7 @@ from pydantic import SecretStr
 
 from institutional_factor_platform.data.calendar import USEquityCalendar
 from institutional_factor_platform.data.config import load_phase1_config
-from institutional_factor_platform.data.contracts import MACRO_OBSERVATIONS
+from institutional_factor_platform.data.contracts import MACRO_OBSERVATIONS, SEC_FACTS
 from institutional_factor_platform.data.domain import (
     DataSource,
     DateRange,
@@ -354,7 +354,17 @@ def test_sec_requires_contact_and_preserves_filing_metadata(
                                 "accn": "0000000001-24-000001",
                                 "fy": 2023,
                                 "fp": "FY",
-                            }
+                            },
+                            {
+                                "val": 4,
+                                "start": "2023-10-01",
+                                "end": "2023-12-31",
+                                "filed": "2024-02-01",
+                                "form": "10-K",
+                                "accn": "0000000001-24-000001",
+                                "fy": 2023,
+                                "fp": "FY",
+                            },
                         ]
                     },
                 }
@@ -367,7 +377,9 @@ def test_sec_requires_contact_and_preserves_filing_metadata(
     assert records[0]["filing_date"] == date(2024, 2, 1)
     assert records[0]["availability_timestamp"] >= datetime(2024, 2, 1, tzinfo=UTC)
     assert records[0]["availability_quality"] == "INFERRED_DATE_LEVEL"
-    assert records[0]["schema_version"] == "3.0.0"
+    assert records[0]["schema_version"] == "3.1.0"
+    assert len(records) == 2
+    assert not validate_table(pa.Table.from_pylist(records, schema=SEC_FACTS.schema), SEC_FACTS)
     assert str(records[0]["issuer_id"]).startswith("issuer_")
     with pytest.raises(RetrievalError, match="Invalid SEC JSON"):
         adapter.standardize(b"not json", RetrievalRequest(DataSource.SEC_EDGAR, "1"))
