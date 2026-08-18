@@ -69,12 +69,11 @@ def _covariance() -> np.ndarray:
     return np.array([[0.04, 0.006, 0.004], [0.006, 0.025, 0.003], [0.004, 0.003, 0.016]])
 
 
-def test_configuration_preserves_open_owner_decisions(tmp_path: Path) -> None:
+def test_configuration_preserves_frozen_empirical_cost_decision(tmp_path: Path) -> None:
     config = load_portfolio_config()
     assert config.constraints.long_only and config.constraints.leverage_limit == 1.0
     assert config.constraints.maximum_weight is None
-    with pytest.raises(ConfigurationError, match="open owner decisions"):
-        config.costs.require_explicit()
+    assert config.costs.require_explicit() == (0.0, 10.0, 5.0, 0.0)
     assert config.canonical_hash() == config.canonical_hash()
     raw = config.model_dump(mode="python")
     with pytest.raises(ValidationError):

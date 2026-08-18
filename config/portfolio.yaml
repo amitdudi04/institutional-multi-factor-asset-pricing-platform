@@ -15,10 +15,15 @@ constraints:
   exposure_limits: {}
   liquidity_trade_limits: {}
 costs:
-  commission_bps: null
-  spread_bps: null
-  slippage_bps: null
-  market_impact_coefficient: null
+  # Frozen before empirical Phase 4 performance inspection (Prompt 24).
+  # Sensitivity totals are LOW/BASE/HIGH = 5/10/20 one-way bps.
+  # The engine charges half of spread_bps. With no authenticated liquidity
+  # input, the fixed 3 bps BASE impact allowance is conservatively bundled
+  # with 2 bps slippage; nonlinear market impact remains disabled.
+  commission_bps: 0.0
+  spread_bps: 10.0
+  slippage_bps: 5.0
+  market_impact_coefficient: 0.0
 publication:
   output_root: data/portfolios
   manifest_root: data/portfolio_manifests
