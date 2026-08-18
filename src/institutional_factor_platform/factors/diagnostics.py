@@ -15,6 +15,17 @@ def build_factor_diagnostics(
         factors.groupby("factor_id")["raw_value"].agg(observed="count", total="size").reset_index()
     )
     coverage["coverage_ratio"] = coverage["observed"] / coverage["total"]
+    estimability = [
+        {
+            "factor_id": str(row.factor_id),
+            "status": (
+                "ESTIMABLE" if int(row.observed) > 0 else "NOT ESTIMABLE FROM DEFENSIBLE INPUTS"
+            ),
+            "observed": int(row.observed),
+            "total": int(row.total),
+        }
+        for row in coverage.itertuples(index=False)
+    ]
     outliers = (
         factors.assign(
             changed=factors["raw_value"].notna()
@@ -101,6 +112,7 @@ def build_factor_diagnostics(
     return {
         "schema_version": "1.0.0",
         "coverage": _records(coverage),
+        "estimability": estimability,
         "winsorized_outlier_counts": outliers.to_dict(),
         "pairwise_raw_correlations": {
             row: {column: _finite_or_none(value) for column, value in values.items()}
@@ -112,6 +124,7 @@ def build_factor_diagnostics(
         "rolling_active_performance": rolling_records,
         "plot_data_hooks": [
             "coverage",
+            "estimability",
             "pairwise_raw_correlations",
             "portfolio_group_returns_and_significance",
             "rolling_active_performance",

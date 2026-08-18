@@ -38,6 +38,7 @@ from institutional_factor_platform.factors import storage as factor_storage_modu
 from institutional_factor_platform.factors.config import FactorConfig, load_factor_config
 from institutional_factor_platform.factors.contracts import MARKET_REQUIRED_UNITS, MARKET_SCHEMA
 from institutional_factor_platform.factors.definitions import FACTOR_DEFINITIONS
+from institutional_factor_platform.factors.diagnostics import build_factor_diagnostics
 from institutional_factor_platform.factors.portfolio import validate_factor_portfolios
 from institutional_factor_platform.factors.preprocessing import normalize, winsorize
 from institutional_factor_platform.factors.service import FactorResearchService
@@ -170,6 +171,53 @@ def _inputs() -> tuple[pd.DataFrame, pd.DataFrame, dict[str, str]]:
             )
     fundamentals = pd.DataFrame(fundamental_rows)
     return pd.DataFrame(market_rows), fundamentals, {field: "USD" for field in FIELDS}
+
+
+def test_partial_defensible_fundamentals_preserve_unestimable_factors() -> None:
+    market, fundamentals, _ = _inputs()
+    partial = fundamentals.loc[fundamentals["field"].eq("book_equity")].copy()
+    factor_service_module._validate_units(
+        dict(MARKET_REQUIRED_UNITS), partial, {"book_equity": "USD"}
+    )
+    panel = point_in_time_panel(market, partial)
+    characteristics = factor_service_module.compute_characteristics(panel, _config())
+    assert characteristics["book_to_market"].notna().any()
+    assert characteristics["earnings_yield"].isna().all()
+
+    factors = pd.DataFrame(
+        {
+            "security_id": ["sec_" + "1" * 32] * 2,
+            "date": [date(2020, 1, 2)] * 2,
+            "factor_id": ["book_to_market", "earnings_yield"],
+            "raw_value": [1.0, None],
+            "winsorized_value": [1.0, None],
+            "normalized_value": [0.0, None],
+            "score_value": [0.0, None],
+        }
+    )
+    diagnostics = build_factor_diagnostics(
+        factors,
+        pd.DataFrame(
+            columns=[
+                "factor_id",
+                "quantile",
+                "active_return",
+                "value_weighted_return",
+            ]
+        ),
+        2,
+    )
+    statuses = {item["factor_id"]: item["status"] for item in diagnostics["estimability"]}
+    assert statuses == {
+        "book_to_market": "ESTIMABLE",
+        "earnings_yield": "NOT ESTIMABLE FROM DEFENSIBLE INPUTS",
+    }
+    with pytest.raises(DataQualityError, match="outside the approved"):
+        invalid = partial.copy()
+        invalid["field"] = "invented"
+        factor_service_module._validate_units(
+            dict(MARKET_REQUIRED_UNITS), invalid, {"invented": "USD"}
+        )
 
 
 def test_configuration_is_strict_and_reproducible(tmp_path: Path) -> None:

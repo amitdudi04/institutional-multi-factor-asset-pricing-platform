@@ -13,7 +13,11 @@ from pydantic import SecretStr
 
 from institutional_factor_platform.data.calendar import USEquityCalendar
 from institutional_factor_platform.data.config import load_phase1_config
-from institutional_factor_platform.data.contracts import MACRO_OBSERVATIONS, SEC_FACTS
+from institutional_factor_platform.data.contracts import (
+    FACTOR_FUNDAMENTAL_INPUT,
+    MACRO_OBSERVATIONS,
+    SEC_FACTS,
+)
 from institutional_factor_platform.data.domain import (
     DataSource,
     DateRange,
@@ -578,6 +582,58 @@ def test_owner_adapter_requires_explicit_contract(tmp_path: Path) -> None:
     )
     with pytest.raises(UnsupportedDatasetError, match="exactly cover"):
         adapter.retrieve(wrong_field)
+
+
+def test_owner_fundamentals_accept_only_the_declared_observed_subset(tmp_path: Path) -> None:
+    path = tmp_path / "partial-fundamentals.parquet"
+    pq.write_table(
+        pa.Table.from_pylist(
+            [
+                {
+                    "security_id": "sec_" + "1" * 32,
+                    "period_end": date(2023, 12, 31),
+                    "available_at": datetime(2024, 2, 1, tzinfo=UTC),
+                    "field": "book_equity",
+                    "value": 10.0,
+                    "unit": "USD",
+                }
+            ],
+            schema=FACTOR_FUNDAMENTAL_INPUT.schema,
+        ),
+        path,
+    )
+    parameters = {
+        "path": str(path),
+        "schema": FACTOR_FUNDAMENTAL_INPUT.name,
+        "contract_version": FACTOR_FUNDAMENTAL_INPUT.version,
+        "source_name": "synthetic partial SEC projection",
+        "source_ownership": "test fixture",
+        "units": {"book_equity": "USD"},
+        "date_semantics": "synthetic filing availability",
+        "security_identifier_semantics": "synthetic persisted listing identity",
+        "mapping_authority_path": str(tmp_path / "mapping.json"),
+    }
+    request = RetrievalRequest(
+        DataSource.OWNER_SUPPLIED, "partial-fundamentals", parameters=parameters
+    )
+    adapter = OwnerSuppliedAdapter()
+    assert len(adapter.standardize(adapter.retrieve(request), request)) == 1
+
+    contradictory = RetrievalRequest(
+        DataSource.OWNER_SUPPLIED,
+        "partial-fundamentals",
+        parameters={**parameters, "units": {"book_equity": "USD", "net_income": "USD"}},
+    )
+    with pytest.raises(UnsupportedDatasetError, match="observed fields"):
+        adapter.standardize(adapter.retrieve(contradictory), contradictory)
+
+    unknown = RetrievalRequest(
+        DataSource.OWNER_SUPPLIED,
+        "partial-fundamentals",
+        parameters={**parameters, "units": {"invented": "USD"}},
+    )
+    with pytest.raises(UnsupportedDatasetError, match="extra"):
+        adapter.retrieve(unknown)
 
 
 def test_common_market_and_temporal_validation() -> None:

@@ -120,11 +120,11 @@ Contract name: `factor_fundamental_input`. Required exact columns:
 | 5 | `value` | float64 | No | Reported numeric value. |
 | 6 | `unit` | string | No | `USD`. |
 
-Approved required field vocabulary:
+Approved field vocabulary (provide the defensible non-empty subset actually observed; do not fabricate unavailable fields):
 
 `book_equity`, `net_income`, `operating_cash_flow`, `dividends`, `shareholder_equity`, `total_assets`, `gross_profit`, `operating_income`, `revenue`, `average_assets`, `total_accruals`, `total_debt`, `interest_expense`, `prior_total_assets`, `capex`, `prior_capex`, `net_equity_issuance`, `working_capital`, `prior_working_capital`.
 
-The source package must preserve the reported fiscal period, filing/publication date, research `available_at`, restatement policy, security mapping, source document/provider, currency/unit and retrieval provenance. A period-end date is not an availability date.
+The source package must preserve the reported fiscal period, filing/publication date, research `available_at`, restatement policy, security mapping, source document/provider, currency/unit and retrieval provenance. Unit metadata must exactly cover the observed subset. A period-end date is not an availability date; unsupported fields and their dependent factors remain explicitly not estimable.
 
 ## Mandatory owner metadata
 

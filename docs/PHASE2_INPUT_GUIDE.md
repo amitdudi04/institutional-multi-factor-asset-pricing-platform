@@ -28,7 +28,7 @@ The metadata unit object must exactly declare:
 
 ## Fundamental input
 
-`factor_fundamental_input` is long form with `security_id`, `period_end`, actual or owner-evidenced `available_at`, `field`, `value`, and `unit`. Version 1 requires exactly these USD fields: `book_equity`, `net_income`, `operating_cash_flow`, `dividends`, `shareholder_equity`, `total_assets`, `gross_profit`, `operating_income`, `revenue`, `average_assets`, `total_accruals`, `total_debt`, `interest_expense`, `prior_total_assets`, `capex`, `prior_capex`, `net_equity_issuance`, `working_capital`, and `prior_working_capital`. The metadata unit object names each field with value `USD`; row units must agree.
+`factor_fundamental_input` is long form with `security_id`, `period_end`, actual or owner-evidenced `available_at`, `field`, `value`, and `unit`. Version 1 permits a non-empty subset of this approved USD vocabulary: `book_equity`, `net_income`, `operating_cash_flow`, `dividends`, `shareholder_equity`, `total_assets`, `gross_profit`, `operating_income`, `revenue`, `average_assets`, `total_accruals`, `total_debt`, `interest_expense`, `prior_total_assets`, `capex`, `prior_capex`, `net_equity_issuance`, `working_capital`, and `prior_working_capital`. The metadata unit object must name exactly the fields present, each with value `USD`; row units must agree. Unknown fields fail. Factors lacking defensible inputs remain null and are reported as not estimable.
 
 ## Owner metadata and ingestion
 

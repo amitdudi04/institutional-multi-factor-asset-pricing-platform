@@ -360,9 +360,13 @@ def _validate_units(
             "Market units must exactly match the approved Phase 2 decimal/USD/share contract."
         )
     fields = set(fundamentals["field"]) if "field" in fundamentals else set()
-    if fields != REQUIRED_FUNDAMENTAL_FIELDS:
+    if not fields:
+        raise DataQualityError("Fundamental inputs must contain at least one approved field.")
+    unsupported = fields - REQUIRED_FUNDAMENTAL_FIELDS
+    if unsupported:
         raise DataQualityError(
-            "Fundamental inputs must exactly cover the complete Phase 2 accounting field set."
+            "Fundamental inputs contain fields outside the approved Phase 2 vocabulary: "
+            + ", ".join(sorted(unsupported))
         )
     normalized_fundamental_units = _extract_units(fundamental_units, fields)
     if set(normalized_fundamental_units) != fields:

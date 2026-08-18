@@ -94,6 +94,7 @@ HF states that prices are split- and dividend-adjusted and that `clean` applies 
 | FD-005 | High | FB source file continued beyond verified legacy-ticker interval | Closed; requested-date clipping and effective-dated mapping enforce 2022-06-08 end |
 | FD-006 | High | GOOG and GOOGL adjusted closes fell about 95.25% exactly at the 2022-03-07 source splice | Closed in code; live re-ingestion fails closed; affected publications demoted; upstream files excluded |
 | FD-007 | High | The SEC fact primary key omitted `period_start`, colliding 2,517 valid Apple keys where quarterly and year-to-date facts shared an end date and filing | Closed in contract v3.1.0; `period_start` is key material, all observed live collisions resolve without dropping rows, and four issuers publish successfully |
+| FD-008 | High | Phase 2 required all 19 accounting fields even when free point-in-time evidence could not support them, encouraging fabricated completeness instead of governed non-estimability | Closed in software; a non-empty approved subset is accepted with exact observed-field units, unknown fields fail, and unsupported characteristics remain null with explicit estimability diagnostics |
 
 Eight HF publications were durably demoted: six legacy standardized publications that did not preserve per-row feed identity and two corrected-format GOOG/GOOGL publications that failed splice continuity. Historical raw data, manifests, validation reports, lineage, and demotion events were retained.
 

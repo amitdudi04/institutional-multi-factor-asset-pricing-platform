@@ -14,7 +14,7 @@ The `factors` package contains separate configuration, contracts, definitions, t
 
 The service accepts only finalized Phase 1 handles whose exact artifact bytes, validation state, and security-mapping disposition re-authenticate. The two approved preparation contracts are registered in the data layer as `factor_market_input` and `factor_fundamental_input`; owner inputs pass normal immutable Phase 1 ingestion and mapping authority before Phase 2 can read them. Market, universe eligibility, sector/industry classification, and accounting availability timestamps must be no later than the computation cutoff. Canonical security IDs use the Phase 1 `sec_<32 hex>` form.
 
-Market inputs explicitly declare total-return and split-adjusted-price semantics. Accounting inputs must exactly cover the version-1 USD field contract. Missing required inputs fail; unavailable point-in-time values remain null.
+Market inputs explicitly declare total-return and split-adjusted-price semantics. Accounting inputs may contain a non-empty subset of the version-1 USD vocabulary when lawful point-in-time evidence cannot support every field. Unit metadata must exactly cover the observed subset, unknown fields fail, and unavailable characteristics remain null and are reported `NOT ESTIMABLE FROM DEFENSIBLE INPUTS`. Missing values are never invented merely to obtain 48/48 coverage.
 
 ## Publication and recovery
 
