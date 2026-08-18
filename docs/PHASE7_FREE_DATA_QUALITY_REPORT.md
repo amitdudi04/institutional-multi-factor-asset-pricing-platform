@@ -95,6 +95,7 @@ HF states that prices are split- and dividend-adjusted and that `clean` applies 
 | FD-006 | High | GOOG and GOOGL adjusted closes fell about 95.25% exactly at the 2022-03-07 source splice | Closed in code; live re-ingestion fails closed; affected publications demoted; upstream files excluded |
 | FD-007 | High | The SEC fact primary key omitted `period_start`, colliding 2,517 valid Apple keys where quarterly and year-to-date facts shared an end date and filing | Closed in contract v3.1.0; `period_start` is key material, all observed live collisions resolve without dropping rows, and four issuers publish successfully |
 | FD-008 | High | Phase 2 required all 19 accounting fields even when free point-in-time evidence could not support them, encouraging fabricated completeness instead of governed non-estimability | Closed in software; a non-empty approved subset is accepted with exact observed-field units, unknown fields fail, and unsupported characteristics remain null with explicit estimability diagnostics |
+| FD-009 | High | The issuer mapping store treated multiple simultaneous listings for one issuer as a conflict, making legitimate share classes such as Alphabet impossible to represent | Closed in software; plural resolution preserves every authenticated listing, while legacy singular consumers fail closed when more than one share class is active |
 
 Eight HF publications were durably demoted: six legacy standardized publications that did not preserve per-row feed identity and two corrected-format GOOG/GOOGL publications that failed splice continuity. Historical raw data, manifests, validation reports, lineage, and demotion events were retained.
 
@@ -105,6 +106,8 @@ The latest authenticated DGS3MO publication is `macro_observations-c81a80f735ccc
 The official Kenneth French five-factor publication `french_factor_returns-adf7661d83688a9374d91fd7` contains 95,124 long-form observations for Mkt-RF, SMB, HML, RMW, CMA, and RF from 1963-07-01 through 2026-06-30. The official Momentum publication `french_factor_returns-f803dd07dbe251239dbe0c33` contains 26,173 observations from 1926-11-03 through 2026-06-30. Both are authenticated comparison evidence; they do not replace the platform's own factor construction.
 
 SEC company facts are authenticated for Apple (`sec_financial_facts-c3bb91229bf1838fbd7157ae`, 25,135 rows), Microsoft (`sec_financial_facts-43ae6b01066b2c47d140c44d`, 32,671), Meta (`sec_financial_facts-7cd980b4173126a78d4c5ad3`, 18,053), and Alphabet (`sec_financial_facts-99512737441d0370cd0da855`, 20,907). Filing dates and date-level availability are preserved. These are issuer-level facts with null `security_id`; they cannot join market listings until effective-dated issuer-to-listing mappings are authenticated.
+
+The governed annual SEC projector now selects only registered standard-taxonomy concepts, enforces annual flow durations versus instant facts, rejects conflicts, retains amendment availability, computes only complete formulas, derives lags without look-ahead, and supports authenticated one-to-many issuer/share-class mappings. It has not been run empirically because the required effective-dated issuer-to-listing authority is still missing.
 
 ## Remaining blocking data gaps
 

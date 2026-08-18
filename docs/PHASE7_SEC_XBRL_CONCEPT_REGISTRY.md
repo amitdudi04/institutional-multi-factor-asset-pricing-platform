@@ -4,11 +4,13 @@ Status date: 2026-08-18
 
 ## Governance boundary
 
-This registry governs projection from authenticated SEC issuer facts into the approved Phase 2 fundamental vocabulary. It does not itself authorize a listing-level join. SEC company facts remain issuer-level until effective-dated issuer-to-listing evidence is authenticated; a current ticker list is never backdated, company names are never fuzzy-matched, and a multi-class issuer is not forced through a singular listing resolver.
+This registry governs projection from authenticated SEC issuer facts into the approved Phase 2 fundamental vocabulary. It does not itself authorize a listing-level join. SEC company facts remain issuer-level until effective-dated issuer-to-listing evidence is authenticated; a current ticker list is never backdated, company names are never fuzzy-matched, and a multi-class issuer resolves to its complete authenticated listing set. Singular consumers fail closed rather than selecting a share class.
 
 Only standard `us-gaap` concepts listed below are eligible. Registrant extensions remain unrecognized until separately reviewed. Missing concepts and missing formula components remain missing. No missing component is interpreted as zero. Source facts retain CIK, accession, form, fiscal metadata, period start/end, filing date, date-level availability, taxonomy, concept, unit, retrieval time, and restatement history.
 
 The accepted form set is `10-K`, `10-K/A`, `10-Q`, and `10-Q/A`. Annual research fields use `10-K`/`10-K/A` facts with a validated annual duration for flow concepts and instant fiscal-year-end facts for stocks. Quarterly and year-to-date facts are not mixed. Filing date is the available date-level lower bound because Company Facts does not expose an acceptance timestamp. Research needing intraday acceptance must authenticate the original filing header before using finer timing.
+
+The implemented annual projector applies these rules per accession, selects the accession's latest fiscal period end, rejects conflicting values, and preserves later amendments as later-available observations. Complete same-filing formulas and prior-period lags are calculated only when every required input was legitimately available. Projection requires an immutable effective-dated issuer-to-listing mapping authority; one issuer may map to multiple share classes, and every authenticated class receives the issuer characteristic without collapsing identities.
 
 ## Approved field registry
 

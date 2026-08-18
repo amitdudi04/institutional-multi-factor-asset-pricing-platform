@@ -322,6 +322,14 @@ def test_issuer_identity_is_distinct_and_ambiguous_listing_join_blocks(tmp_path:
     store = IssuerListingMappingStore(tmp_path / "issuer-listing.json")
     store.persist((resolved,))
     assert IssuerListingMappingStore(store.path).resolve(issuer, date(2024, 1, 1)) == first
+    second_resolved = replace(resolved, security_id=second)
+    multiple_store = IssuerListingMappingStore(tmp_path / "issuer-listing-multiple.json")
+    multiple_store.persist((resolved, second_resolved))
+    assert multiple_store.resolve_all(issuer, date(2024, 1, 1)) == tuple(
+        sorted((first, second), key=lambda item: item.value)
+    )
+    with pytest.raises(SecurityMappingError, match="multiple resolved listings"):
+        multiple_store.resolve(issuer, date(2024, 1, 1))
     ambiguous = IssuerListingMapping(
         issuer,
         None,

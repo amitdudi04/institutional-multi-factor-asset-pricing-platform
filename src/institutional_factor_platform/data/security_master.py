@@ -191,6 +191,15 @@ class IssuerListingMappingStore:
             raise SecurityMappingError(f"Invalid issuer-listing mapping store: {exc}") from exc
 
     def resolve(self, issuer_id: IssuerId, as_of: date) -> SecurityId:
+        matches = self.resolve_all(issuer_id, as_of)
+        if len(matches) != 1:
+            raise SecurityMappingError(
+                "Issuer has multiple resolved listings; a singular listing join is ambiguous."
+            )
+        return matches[0]
+
+    def resolve_all(self, issuer_id: IssuerId, as_of: date) -> tuple[SecurityId, ...]:
+        """Resolve every authenticated listing for an issuer without collapsing share classes."""
         active = [
             item
             for item in self.load()
@@ -203,12 +212,11 @@ class IssuerListingMappingStore:
                 "Issuer-to-listing evidence is unresolved or ambiguous; conflict is preserved."
             )
         matches = {item.security_id for item in active}
-        if len(matches) != 1 or None in matches:
+        if not matches or None in matches:
             raise SecurityMappingError("Issuer-to-listing relationship is unresolved or ambiguous.")
-        resolved = next(iter(matches))
-        if resolved is None:
-            raise SecurityMappingError("Resolved issuer mapping unexpectedly lacks listing ID.")
-        return resolved
+        return tuple(
+            sorted((item for item in matches if item is not None), key=lambda item: item.value)
+        )
 
 
 def mapping_from_listing(
@@ -332,13 +340,8 @@ def _validate_issuer_listing_mappings(mappings: tuple[IssuerListingMapping, ...]
             overlaps = (left.valid_to is None or right.valid_from <= left.valid_to) and (
                 right.valid_to is None or left.valid_from <= right.valid_to
             )
-            if (
-                overlaps
-                and left.status is MappingStatus.RESOLVED
-                and right.status is MappingStatus.RESOLVED
-                and left.security_id != right.security_id
-            ):
-                raise SecurityMappingError("Conflicting effective issuer-to-listing mappings.")
+            if overlaps and left.security_id == right.security_id and left.status == right.status:
+                raise SecurityMappingError("Duplicate overlapping issuer-to-listing mapping.")
 
 
 def _symbol_dict(value: SymbolHistoryRecord) -> dict[str, object]:
