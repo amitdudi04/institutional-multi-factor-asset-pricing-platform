@@ -14,6 +14,8 @@ The implemented annual projector applies these rules per accession, selects the 
 
 Point-in-time shares are governed separately from monetary fundamentals. The only approved Company Facts share-count concept is `dei:EntityCommonStockSharesOutstanding` in `shares`, from the accepted form set. Duplicate identical facts within an accession collapse; conflicting, non-positive, non-finite, or incomplete facts fail closed. Because Company Facts does not preserve the dimensional share-class context needed to allocate an issuer total, projection is allowed only when exactly one authenticated listing is effective on the filing date. Multi-listing issuers remain not estimable until original inline-XBRL dimensional evidence supports an exact allocation. Amendments remain later-available observations and never overwrite earlier evidence.
 
+Legacy pre-inline filings use a separate parser for exactly one embedded `EX-101.INS` attachment. It recognizes official historical `xbrl.us/dei` and current `xbrl.sec.gov/dei` namespaces and only `DocumentType`, `EntityCentralIndexKey`, `EntityRegistrantName`, `Security12bTitle`, `SecurityExchangeName`, `TradingSymbol`, `EntityCommonStockSharesOutstanding`, and `EntityPublicFloat`. Contexts, explicit/typed dimensions, units, decimals, instance filename, attachment checksum, parser version, and filing identity are preserved. Only dimensionless issuer-level shares enter the existing PIT projector; dimensional subsidiary/class values remain evidence but are not silently allocated.
+
 ## Approved field registry
 
 | Phase 2 field | Method | Primary standard concept(s) | Governed fallback / calculation |

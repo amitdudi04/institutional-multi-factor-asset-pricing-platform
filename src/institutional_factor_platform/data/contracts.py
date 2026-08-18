@@ -261,6 +261,46 @@ SEC_INLINE_XBRL = TableContract(
     },
 )
 
+SEC_LEGACY_XBRL = TableContract(
+    "sec_legacy_xbrl_listing_facts",
+    "1.0.0",
+    pa.schema(
+        [
+            ("issuer_id", pa.string(), False),
+            ("cik", pa.string(), False),
+            ("accession_number", pa.string(), False),
+            ("filing_date", DATE, False),
+            ("acceptance_datetime_text", pa.string()),
+            ("form", pa.string(), False),
+            ("primary_document", pa.string(), False),
+            ("instance_document", pa.string(), False),
+            ("instance_sha256", pa.string(), False),
+            ("fact_ordinal", pa.int32(), False),
+            ("concept", pa.string(), False),
+            ("context_ref", pa.string(), False),
+            ("context_period_start", DATE),
+            ("context_period_end", DATE),
+            ("context_instant", DATE),
+            ("dimensions_json", pa.string(), False),
+            ("value", pa.string(), False),
+            ("unit_ref", pa.string()),
+            ("unit_measure", pa.string()),
+            ("decimals", pa.string()),
+            ("source", pa.string(), False),
+            ("retrieval_timestamp", UTC_TS, False),
+            ("availability_timestamp", UTC_TS, False),
+            ("availability_quality", pa.string(), False),
+            ("parser_version", pa.string(), False),
+            ("schema_version", pa.string(), False),
+        ]
+    ),
+    ("cik", "accession_number", "fact_ordinal"),
+    {
+        "filing_date": "official complete-submission filing header",
+        "availability_timestamp": "conservative end of SEC filing date",
+    },
+)
+
 LISTING_LIFECYCLE = TableContract(
     "listing_lifecycle",
     "1.0.0",
@@ -353,6 +393,7 @@ CONTRACTS = {
         SEC_FACTS,
         SEC_SUBMISSIONS,
         SEC_INLINE_XBRL,
+        SEC_LEGACY_XBRL,
         LISTING_LIFECYCLE,
         FACTOR_MARKET_INPUT,
         FACTOR_FUNDAMENTAL_INPUT,

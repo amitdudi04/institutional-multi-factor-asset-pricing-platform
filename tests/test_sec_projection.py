@@ -12,6 +12,7 @@ from institutional_factor_platform.data.domain import (
 )
 from institutional_factor_platform.data.sec_projection import (
     attach_point_in_time_shares,
+    legacy_sec_shares_facts,
     project_annual_sec_fundamentals,
     project_sec_shares_outstanding,
 )
@@ -158,6 +159,7 @@ def test_sec_shares_projection_requires_one_listing_and_preserves_restatements(
         "issuer_id": issuer.value,
         "taxonomy": "dei",
         "concept": "EntityCommonStockSharesOutstanding",
+        "dimensions_json": "{}",
         "unit": "shares",
         "value": 100.0,
         "period_end": date(2023, 1, 31),
@@ -269,3 +271,28 @@ def test_point_in_time_share_join_rejects_ambiguous_or_malformed_evidence() -> N
             ),
             (base,),
         )
+
+
+def test_legacy_sec_shares_translate_only_exact_positive_share_units() -> None:
+    row: dict[str, object] = {
+        "issuer_id": "issuer-example",
+        "concept": "EntityCommonStockSharesOutstanding",
+        "dimensions_json": "{}",
+        "unit_measure": "xbrli:shares",
+        "value": "1000000",
+        "context_instant": date(2012, 10, 19),
+        "filing_date": date(2012, 10, 31),
+        "form": "10-K",
+        "accession_number": "accession",
+        "availability_timestamp": datetime(2012, 10, 31, 23, 59, tzinfo=UTC),
+    }
+    translated = legacy_sec_shares_facts((row, {**row, "concept": "EntityPublicFloat"}))
+    assert translated[0]["value"] == 1_000_000.0
+    assert translated[0]["period_end"] == date(2012, 10, 19)
+    with pytest.raises(DataQualityError, match="invalid unit"):
+        legacy_sec_shares_facts(({**row, "unit_measure": "iso4217:USD"},))
+    with pytest.raises(DataQualityError, match="non-numeric"):
+        legacy_sec_shares_facts(({**row, "value": "unknown"},))
+    with pytest.raises(DataQualityError, match="positive and finite"):
+        legacy_sec_shares_facts(({**row, "value": "0"},))
+    assert legacy_sec_shares_facts(({**row, "dimensions_json": '{"axis":"member"}'},)) == ()

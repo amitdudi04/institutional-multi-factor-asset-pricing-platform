@@ -3,6 +3,7 @@
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import date, datetime
+from decimal import Decimal, InvalidOperation
 from math import isfinite
 
 from institutional_factor_platform.data.domain import IssuerId, SecurityId
@@ -159,6 +160,44 @@ def project_sec_shares_outstanding(
             ),
         )
     )
+
+
+def legacy_sec_shares_facts(
+    records: tuple[dict[str, object], ...],
+) -> tuple[dict[str, object], ...]:
+    """Translate governed legacy DEI share facts into the existing PIT projector input."""
+    output: list[dict[str, object]] = []
+    for row in records:
+        if (
+            row.get("concept") != "EntityCommonStockSharesOutstanding"
+            or row.get("dimensions_json") != "{}"
+        ):
+            continue
+        unit_measure = str(row.get("unit_measure", ""))
+        period_end = row.get("context_instant")
+        if unit_measure.rsplit(":", 1)[-1].lower() != "shares" or not isinstance(period_end, date):
+            raise DataQualityError("Legacy SEC shares fact has invalid unit or instant context.")
+        try:
+            numeric = Decimal(str(row.get("value", "")))
+        except InvalidOperation as exc:
+            raise DataQualityError("Legacy SEC shares fact is non-numeric.") from exc
+        if not numeric.is_finite() or numeric <= 0:
+            raise DataQualityError("Legacy SEC shares fact is not positive and finite.")
+        output.append(
+            {
+                "issuer_id": row.get("issuer_id"),
+                "taxonomy": "dei",
+                "concept": "EntityCommonStockSharesOutstanding",
+                "unit": "shares",
+                "value": float(numeric),
+                "period_end": period_end,
+                "filing_date": row.get("filing_date"),
+                "form": row.get("form"),
+                "accession_number": row.get("accession_number"),
+                "availability_timestamp": row.get("availability_timestamp"),
+            }
+        )
+    return tuple(output)
 
 
 def attach_point_in_time_shares(

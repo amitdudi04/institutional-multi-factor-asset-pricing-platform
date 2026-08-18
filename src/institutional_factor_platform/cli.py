@@ -21,6 +21,7 @@ from institutional_factor_platform.data.contracts import (
     MACRO_OBSERVATIONS,
     SEC_FACTS,
     SEC_INLINE_XBRL,
+    SEC_LEGACY_XBRL,
     SEC_SUBMISSIONS,
 )
 from institutional_factor_platform.data.domain import (
@@ -41,6 +42,7 @@ from institutional_factor_platform.data.sources.hf_data_library import HFDataLib
 from institutional_factor_platform.data.sources.owner_supplied import OwnerSuppliedAdapter
 from institutional_factor_platform.data.sources.sec_edgar import SecEdgarAdapter
 from institutional_factor_platform.data.sources.sec_inline_xbrl import SecInlineXbrlAdapter
+from institutional_factor_platform.data.sources.sec_legacy_xbrl import SecLegacyXbrlAdapter
 from institutional_factor_platform.data.sources.sec_submissions import SecSubmissionsAdapter
 from institutional_factor_platform.data.storage import (
     RawStorage,
@@ -228,6 +230,13 @@ def build_parser() -> argparse.ArgumentParser:
     sec_inline.add_argument("cik")
     sec_inline.add_argument("accession_number")
     sec_inline.add_argument("primary_document")
+    sec_legacy = commands.add_parser(
+        "ingest-sec-legacy-xbrl",
+        help="Retrieve one SEC complete submission and its legacy XBRL instance facts",
+    )
+    sec_legacy.add_argument("cik")
+    sec_legacy.add_argument("accession_number")
+    sec_legacy.add_argument("primary_document")
     alpha = commands.add_parser(
         "ingest-alpha-listings", help="Retrieve a free Alpha Vantage listing snapshot"
     )
@@ -276,6 +285,9 @@ def _reprocessing_adapter(
                 config.sources.sec, transport, now=original_time
             ),
             SEC_INLINE_XBRL.name: SecInlineXbrlAdapter(
+                config.sources.sec, transport, now=original_time
+            ),
+            SEC_LEGACY_XBRL.name: SecLegacyXbrlAdapter(
                 config.sources.sec, transport, now=original_time
             ),
         }
@@ -617,6 +629,22 @@ def main(argv: list[str] | None = None) -> int:
                 SEC_INLINE_XBRL,
                 "zip",
                 "application/zip",
+            )
+        elif args.command == "ingest-sec-legacy-xbrl":
+            request = RetrievalRequest(
+                DataSource.SEC_EDGAR,
+                args.cik,
+                parameters={
+                    "accession_number": args.accession_number,
+                    "primary_document": args.primary_document,
+                },
+            )
+            service.ingest(
+                SecLegacyXbrlAdapter(config.sources.sec, HttpTransport(config.runtime)),
+                request,
+                SEC_LEGACY_XBRL,
+                "txt",
+                "text/plain",
             )
         elif args.command == "ingest-alpha-listings":
             parameters = {"state": args.state}

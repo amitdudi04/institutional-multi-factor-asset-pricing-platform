@@ -12,6 +12,7 @@ from institutional_factor_platform.data.domain import (
 from institutional_factor_platform.data.sec_listing import (
     SecListingCandidate,
     bind_sec_listing_candidates,
+    project_legacy_sec_ticker_observations,
     project_sec_listing_candidates,
 )
 from institutional_factor_platform.data.security_master import SymbolHistoryStore
@@ -139,3 +140,25 @@ def test_sec_listing_candidates_bind_only_through_exact_symbol_history(tmp_path:
     )
     with pytest.raises(SecurityMappingError, match="one filing"):
         bind_sec_listing_candidates((candidate, another_filing), symbols)
+
+
+def test_legacy_sec_ticker_projection_splits_exact_combined_symbols() -> None:
+    retrieved = datetime(2026, 8, 18, tzinfo=UTC)
+    base: dict[str, object] = {
+        "cik": "0001652044",
+        "accession_number": "0001652044-16-000012",
+        "filing_date": date(2016, 2, 11),
+        "retrieval_timestamp": retrieved,
+        "concept": "TradingSymbol",
+        "context_ref": "document",
+        "dimensions_json": "{}",
+        "value": "GOOG, GOOGL",
+    }
+    observations = project_legacy_sec_ticker_observations((base, dict(base)))
+    assert observations[0].tickers == ("GOOG", "GOOGL")
+    assert observations[0].issuer_id.value.startswith("issuer_")
+    assert project_legacy_sec_ticker_observations(({**base, "dimensions_json": '{"x":"y"}'},)) == ()
+    with pytest.raises(SecurityMappingError, match="conflicting"):
+        project_legacy_sec_ticker_observations((base, {**base, "value": "GOOG"}))
+    with pytest.raises(SecurityMappingError, match="invalid ticker"):
+        project_legacy_sec_ticker_observations(({**base, "value": "NOT VALID"},))

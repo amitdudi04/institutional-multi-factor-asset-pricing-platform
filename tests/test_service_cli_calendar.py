@@ -14,6 +14,7 @@ from institutional_factor_platform.data.contracts import (
     MACRO_OBSERVATIONS,
     SEC_FACTS,
     SEC_INLINE_XBRL,
+    SEC_LEGACY_XBRL,
     SEC_SUBMISSIONS,
 )
 from institutional_factor_platform.data.domain import (
@@ -36,6 +37,7 @@ from institutional_factor_platform.data.services import DataIngestionService
 from institutional_factor_platform.data.sources.base import SourceAdapter
 from institutional_factor_platform.data.sources.sec_edgar import SecEdgarAdapter
 from institutional_factor_platform.data.sources.sec_inline_xbrl import SecInlineXbrlAdapter
+from institutional_factor_platform.data.sources.sec_legacy_xbrl import SecLegacyXbrlAdapter
 from institutional_factor_platform.data.sources.sec_submissions import SecSubmissionsAdapter
 from institutional_factor_platform.data.storage import (
     DuckDBCatalog,
@@ -109,6 +111,11 @@ def test_sec_raw_reprocessing_dispatches_by_contract(tmp_path: Path) -> None:
     )
     assert isinstance(inline, SecInlineXbrlAdapter)
     assert inline.now() == retrieved
+    legacy = cli_module._reprocessing_adapter(
+        DataSource.SEC_EDGAR, SEC_LEGACY_XBRL.name, config, retrieved
+    )
+    assert isinstance(legacy, SecLegacyXbrlAdapter)
+    assert legacy.now() == retrieved
     with pytest.raises(ValueError, match="does not support"):
         cli_module._reprocessing_adapter(
             DataSource.SEC_EDGAR, MACRO_OBSERVATIONS.name, config, retrieved

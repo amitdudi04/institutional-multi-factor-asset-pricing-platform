@@ -40,6 +40,63 @@ class SecListingCandidate:
     retrieval_timestamp: datetime
 
 
+@dataclass(frozen=True, slots=True)
+class LegacySecTickerObservation:
+    issuer_id: IssuerId
+    cik: str
+    tickers: tuple[str, ...]
+    filing_date: date
+    accession_number: str
+    context_ref: str
+    retrieval_timestamp: datetime
+
+
+def project_legacy_sec_ticker_observations(
+    records: tuple[dict[str, object], ...],
+) -> tuple[LegacySecTickerObservation, ...]:
+    """Project dimensionless legacy DEI ticker anchors without inferring a venue."""
+    grouped: dict[tuple[str, str], list[dict[str, object]]] = {}
+    for row in records:
+        if row.get("concept") == "TradingSymbol" and row.get("dimensions_json") == "{}":
+            grouped.setdefault(
+                (str(row.get("cik", "")), str(row.get("accession_number", ""))), []
+            ).append(row)
+    output: list[LegacySecTickerObservation] = []
+    for (cik, accession), rows in sorted(grouped.items()):
+        ticker_sets = {_split_legacy_tickers(str(row.get("value", ""))) for row in rows}
+        if len(ticker_sets) != 1:
+            raise SecurityMappingError("Legacy SEC filing contains conflicting ticker anchors.")
+        filing_dates = {row.get("filing_date") for row in rows}
+        retrieval_times = {row.get("retrieval_timestamp") for row in rows}
+        context_refs = {str(row.get("context_ref", "")) for row in rows}
+        if (
+            not cik.isdigit()
+            or not accession
+            or len(filing_dates) != 1
+            or len(retrieval_times) != 1
+            or len(context_refs) != 1
+        ):
+            raise SecurityMappingError("Legacy SEC ticker anchor lacks exact filing identity.")
+        filing_date = next(iter(filing_dates))
+        retrieved = next(iter(retrieval_times))
+        if not isinstance(filing_date, date) or not isinstance(retrieved, datetime):
+            raise SecurityMappingError("Legacy SEC ticker anchor has invalid timing.")
+        if retrieved.tzinfo is None:
+            raise SecurityMappingError("Legacy SEC ticker anchor retrieval time is naive.")
+        output.append(
+            LegacySecTickerObservation(
+                IssuerId.from_cik(cik),
+                cik.zfill(10),
+                next(iter(ticker_sets)),
+                filing_date,
+                accession,
+                next(iter(context_refs)),
+                retrieved,
+            )
+        )
+    return tuple(output)
+
+
 def project_sec_listing_candidates(
     records: tuple[dict[str, object], ...],
 ) -> tuple[SecListingCandidate, ...]:
@@ -148,3 +205,10 @@ def _is_common_equity(title: str) -> bool:
     return ("common stock" in normalized or "capital stock" in normalized) and not any(
         term in normalized for term in rejected
     )
+
+
+def _split_legacy_tickers(value: str) -> tuple[str, ...]:
+    tickers = tuple(sorted({item.strip().upper() for item in value.split(",") if item.strip()}))
+    if not tickers or any(_TICKER.fullmatch(item) is None for item in tickers):
+        raise SecurityMappingError("Legacy SEC filing contains an invalid ticker anchor.")
+    return tickers
