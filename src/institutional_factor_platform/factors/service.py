@@ -127,6 +127,13 @@ class FactorResearchService:
             raise DataQualityError(
                 "No securities are point-in-time eligible for factor computation."
             )
+        maximum_breadth = int(eligible_market.groupby("date")["security_id"].nunique().max())
+        if maximum_breadth < self.config.preprocessing.minimum_cross_section:
+            raise DataQualityError(
+                "Phase 2 is not estimable: no date meets the approved minimum "
+                f"cross-section of {self.config.preprocessing.minimum_cross_section}; "
+                f"maximum authenticated breadth is {maximum_breadth}."
+            )
         panel = point_in_time_panel(eligible_market, fundamental_value)
         characteristics = compute_characteristics(panel, self.config)
         factor_ids = tuple(item.factor_id for item in FACTOR_DEFINITIONS)

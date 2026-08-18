@@ -220,6 +220,32 @@ def test_partial_defensible_fundamentals_preserve_unestimable_factors() -> None:
         )
 
 
+def test_missing_nyse_reference_marks_size_breakpoints_unestimable() -> None:
+    market, fundamentals, _ = _inputs()
+    market["exchange"] = "XNAS"
+    panel = point_in_time_panel(market, fundamentals)
+
+    characteristics = factor_service_module.compute_characteristics(panel, _config())
+
+    assert characteristics[["size_small", "size_mid", "size_large"]].isna().all().all()
+
+
+def test_service_rejects_insufficient_authenticated_cross_section(tmp_path: Path) -> None:
+    market, fundamentals, _ = _inputs()
+    market = market.loc[market["security_id"].isin(("sec_" + "1" * 32, "sec_" + "2" * 32))]
+    parents = (
+        _parent(tmp_path, "market-parent", market),
+        _parent(tmp_path, "fundamental-parent", fundamentals),
+    )
+
+    with pytest.raises(DataQualityError, match="maximum authenticated breadth is 2"):
+        FactorResearchService(_config(), tmp_path).compute_and_publish(
+            parents,
+            market_dataset_id="market-parent",
+            fundamental_dataset_id="fundamental-parent",
+        )
+
+
 def test_configuration_is_strict_and_reproducible(tmp_path: Path) -> None:
     config = load_factor_config()
     assert config.canonical_hash() == config.canonical_hash()

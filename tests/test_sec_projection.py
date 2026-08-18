@@ -176,7 +176,8 @@ def test_sec_shares_projection_requires_one_listing_and_preserves_restatements(
         "accession_number": "accession-amendment",
         "availability_timestamp": datetime(2023, 3, 1, 23, 59, tzinfo=UTC),
     }
-    projected = project_sec_shares_outstanding((base, dict(base), amendment), store)
+    comparative = {**base, "period_end": date(2022, 1, 31), "value": 80.0}
+    projected = project_sec_shares_outstanding((base, dict(base), comparative, amendment), store)
     assert [row["shares_outstanding"] for row in projected] == [100.0, 101.0]
     assert {row["security_id"] for row in projected} == {security.value}
     assert all(row["unit"] == "shares" for row in projected)

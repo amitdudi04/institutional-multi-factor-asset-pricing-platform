@@ -414,8 +414,18 @@ def compute_characteristics(panel: pd.DataFrame, config: FactorConfig) -> pd.Dat
         .quantile([config.breakpoints.small_quantile, config.breakpoints.large_quantile])
         .unstack()
     )
-    small = result["date"].map(breakpoints.get(config.breakpoints.small_quantile))
-    large = result["date"].map(breakpoints.get(config.breakpoints.large_quantile))
+    small_values = breakpoints.get(config.breakpoints.small_quantile)
+    large_values = breakpoints.get(config.breakpoints.large_quantile)
+    small = (
+        result["date"].map(small_values)
+        if small_values is not None
+        else pd.Series(nan, index=result.index, dtype=float)
+    )
+    large = (
+        result["date"].map(large_values)
+        if large_values is not None
+        else pd.Series(nan, index=result.index, dtype=float)
+    )
     result["size_small"] = (result["market_cap"] <= small).astype(float).where(small.notna())
     result["size_mid"] = (
         ((result["market_cap"] > small) & (result["market_cap"] < large))

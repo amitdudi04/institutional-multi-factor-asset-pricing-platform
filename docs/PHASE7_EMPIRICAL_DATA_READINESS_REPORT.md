@@ -1,129 +1,93 @@
 # Phase 7 Empirical Data Readiness Report
 
+Status date: 2026-08-18
+
 ## Executive conclusion
 
-The v1.0.2 software release is operational, but the repository is not authorized to begin the historical US-equity empirical study. FRED and Kenneth French connectivity are available. The lawful effective-dated equity universe, canonical mappings, owner market/fundamental evidence and data-rights attestations are absent. No Yahoo equity or SEC empirical retrieval was attempted.
+The repository has completed a defensibly bounded real Phase 1 publication for AAPL and MSFT. It has not completed the preregistered cross-sectional empirical study. The authenticated intersection has maximum daily breadth two, while the approved Phase 2 configuration requires at least three securities and value-weighted factor portfolios.
 
 Final verdict:
 
-**PHASE 7 EMPIRICAL VALIDATION BLOCKED — SOFTWARE READY, EXTERNAL DATA ACCESS REQUIRED**
+**PHASE 7 EMPIRICAL ASSURANCE NOT PASSED — PHASE 2 IS NOT ESTIMABLE FROM THE DEFENSIBLE FREE/PUBLIC INPUT INTERSECTION**
 
-## Phase 7 acquisition discovery update
+## Starting and continuation evidence
 
-Master Prompt 12.0 discovery completed at `2026-08-11T09:31:51.5315584Z` without reading or printing secret values. No WRDS access evidence, CRSP/Compustat entitlement evidence, Sharadar credential/client, Norgate installation, SEC owner identity, or complete owner empirical package was found. Institutional entitlements that cannot be authenticated remain `ENTITLEMENT UNKNOWN`; they were not guessed or queried without authorization.
+The continuation began from validated checkpoint `7087ab9691530e3295837e1ca5e35be9d2e5ea60`. Commit `71f701b331eb1ce6d40cf73aef6874d34c8a10fb` added the governed legacy SEC XBRL parser and bounded historical identity/PIT authority without resetting earlier work.
 
-The source decision and minimal owner action are recorded in:
+## Bounded Phase 1 evidence
 
-- `PHASE7_DATA_RIGHTS_REGISTER.md`
-- `PHASE7_DATA_SOURCE_SELECTION_REPORT.md`
-- `PHASE7_DATA_ACQUISITION_ACTION_PLAN.md`
-
-Route A (WRDS/CRSP/Compustat) is the recommended acquisition target and Route B (Sharadar) is the backup. Neither is claimed accessible. Yahoo remains ineligible as universe authority.
-
-## Release/branch gate
-
-| Item | Result |
+| Evidence | Result |
 |---|---|
-| v1.0.2 main commit | `0a96f93d79c3fec77a9396b2d792ee1c625a9c6e` |
-| `main = origin/main` at branch creation | PASS |
-| `v1.0.2` peeled commit equals main | PASS |
-| Research branch | `phase/7-empirical-research-validation` |
-| Working tree at branch creation | Clean |
+| Historical SEC identity | 33 authenticated legacy annual XBRL publications, 2010–2018, across Apple, Microsoft, Meta, predecessor Google, and Alphabet |
+| Effective symbol authority | Nine bounded intervals preserving FB/META, Google/Alphabet succession, and separate GOOG/GOOGL classes |
+| PIT shares | 19 legacy dimensionless observations plus authenticated Company Facts; ambiguous multi-listing totals remain unallocated |
+| Market quality | AAPL and MSFT accepted; SPY benchmark accepted; FB is bounded at ticker change; GOOG/GOOGL rejected for the 95.25% PiTrading-to-IEX discontinuity |
+| Market input | `factor_market_input-9ee8af3b5f5d1f49095af46e`; 7,930 rows; 2010-10-27–2026-08-04; SHA-256 `fc9a867a7a8d7d823a543feb3becc7ffe3adf320f6e3511cb9a8817a8354f695` |
+| Fundamental input | `factor_fundamental_input-a6da21983efceee71390ca12`; 518 rows; 17 observed fields; SHA-256 `20f649dbcdd20a957f95cadbce0f51e188eae2582ebbc69c2c6c2da7a4bf2a92` |
+| Restart/determinism | Re-ingesting the exact inputs returned the same dataset IDs |
+| Catalog | PASS |
 
-The discovery update preserves `main`, `origin/main`, and the peeled `v1.0.2` tag at `0a96f93d79c3fec77a9396b2d792ee1c625a9c6e`; the Phase 7 branch descends from that release.
+The market publication uses SPY for market and benchmark return. DGS3MO uses the latest nonmissing FRED observation strictly before each trading date and converts annual percentage yield to a 252-day simple return. This is a documented conservative rule because the FRED artifact does not contain vintage release timestamps.
 
-## Software and external-infrastructure revalidation
+HF prices are source-adjusted. The authenticated AAPL/MSFT files contain no split-factor observations. MSFT has no study-period split; Apple pre-2020 filed counts are therefore not combined with restated prices. Apple shares remain null until the first post-split filing on 2020-10-30. The publication retains 5,410 rows with compatible PIT shares and 2,520 without shares.
+
+## Universe and terminal-event disposition
+
+The resulting population is the Free Public-Data Covered Common-Stock Research Universe, bounded to two exact listings. It is not Russell 1000, S&P 500 membership history, or a broad large/mid-cap universe. It cannot support the intended annual top-1,000 ranking.
+
+Neither retained security delists within the panel. The panel therefore has zero terminal events, zero terminal returns, and zero unresolved terminal cases within the retained population. FB/META is excluded at the source/ticker boundary rather than treated as a delisting. GOOG/GOOGL is excluded for market-series integrity, not assigned a synthetic terminal return.
+
+## Phase 2 execution evidence
+
+The exact authenticated command attempted the existing Phase 2 service with the two Phase 1 parents. The first adversarial run exposed and closed two software error-boundary defects: missing XNYS breakpoints caused a null callback crash, and insufficient breadth lacked an early preflight gate. Focused regression tests pass.
+
+The final execution result is:
+
+```text
+error: Phase 2 is not estimable: no date meets the approved minimum cross-section of 3; maximum authenticated breadth is 2.
+```
+
+No factor publication was created. No configuration threshold, quantile, weighting rule, factor formula, or universe rule was changed.
+
+## Downstream empirical status
+
+| Stage | Status | Reason |
+|---|---|---|
+| Real bounded Phase 1 | COMPLETE | Authenticated market and fundamental publications exist and restart deterministically |
+| Historical identity 2010–2018 | COMPLETE / defensibly bounded | Exact evidence exists for the five investigated issuers; unsupported broader identities are excluded |
+| Study-wide PIT shares | COMPLETE / explicit non-estimability coverage | Exact eligible facts are preserved; multi-class and split-basis gaps remain null |
+| Broad HF panel | COMPLETE with documented rejections | The defensible intersection is two securities; unsafe GOOG/GOOGL and discontinuous FB/META coverage are excluded |
+| Terminal treatment | COMPLETE for retained panel | No retained terminal cases; exclusions are not recoded as terminal returns |
+| Real Phase 2 | NOT ESTIMABLE | Maximum breadth two is below approved minimum three |
+| Real Phase 3 | NOT EXECUTED | No authenticated Phase 2 parent |
+| Real Phase 4 | NOT EXECUTED | No authenticated Phase 2/3 parents |
+| Real Phase 5 | NOT EXECUTED | No authenticated Phase 2/3/4 parents |
+| Real Phase 6 empirical delivery | NOT EXECUTED | No real empirical publications to serve; synthetic fallback remains forbidden |
+| Phase 7 assurance | NOT PASSED | Cross-sectional study cannot be estimated |
+| Phase 8 packaging | NOT AUTHORIZED | Final research-completion claim would be false |
+
+## Hypotheses and claims
+
+H1–H5 are **INCONCLUSIVE** because their required Phase 2–4 evidence does not exist. H6 and H7 are also **INCONCLUSIVE** because no authenticated ML research dataset can be assembled. No alpha, premium, coefficient, portfolio return, risk statistic, ML metric, or economic-value claim was generated.
+
+## Branch and release disposition
+
+The research branch must not be merged to `main`, pushed as a completed empirical release, or tagged `research-empirical-public-v1` / `project-complete-public-data-v1`. Those operations are conditional on Phase 7 assurance passing. Preserving the branch prevents the bounded negative result from being mislabeled as project completion.
+
+## Final software and operational gates
 
 | Gate | Result |
 |---|---|
-| Dependency synchronization | PASS. The lockfile restored NumPy 2.2.6. An incomplete local package-metadata installation initially caused `importlib.metadata` to return no NumPy version; targeted reinstall repaired the generated virtual environment, and the reproducer passed without source/test changes. |
-| Full suite | PASS — 254 tests, 103 classified warnings, 91.37% branch-aware coverage. |
-| Ruff / format | PASS / PASS — 199 files formatted. |
-| Strict Mypy | PASS — 105 source files. |
-| Lock / dependency audit | PASS / PASS — no known vulnerabilities; the editable project distribution is the documented audit skip. |
-| Configuration / publication / delivery | PASS — all six phase configuration validators, catalog integrity, reconciliation, authenticated dataset listing and delivery readiness. |
-| Security / repository hygiene | PASS — no secret material and no tracked datasets/databases, model binaries, caches, generated artifacts or files over 5 MiB; UTF-8, local Markdown links and Git whitespace also pass. |
-| Docker | BLOCKED — EXTERNAL INFRASTRUCTURE. `docker` and Docker Compose are not installed. |
-| Remote CI | BLOCKED — EXTERNAL ACCOUNT/INFRASTRUCTURE. Public Actions run `31473334524` failed before execution; both jobs report zero steps. GitHub CLI/authenticated rerun capability is absent locally, so no account or billing change was attempted. |
+| Full suite | PASS — 296 tests, 103 classified warnings |
+| Branch-aware coverage | PASS — 90.75% against 90% minimum |
+| Ruff / format | PASS / PASS — 219 files checked |
+| Strict Mypy | PASS — 113 source files |
+| Lock / dependency audit | PASS / PASS — no known vulnerabilities; editable project skipped as documented |
+| Catalog / Git whitespace | PASS / PASS |
+| Credential and repository hygiene | PASS — zero configured-value matches, private-key patterns, tracked empirical datasets/databases, generated artifacts, files over 5 MiB, or forbidden caches |
+| Docker | BLOCKED — EXTERNAL OWNER/ADMIN INFRASTRUCTURE; Docker is absent and WSL is not installed |
+| GitHub Actions | BLOCKED — EXTERNAL ACCOUNT/BILLING; latest public run failed in three seconds and both jobs were prevented from starting by the account lock |
 
-The environment-only NumPy metadata repair does not alter source, tests, the lockfile, research methodology, or v1.0.2 release history. No open software defect was identified by the final passing suite.
+## What would change the result
 
-## Empirical data readiness matrix
-
-| Required authority | Classification | Evidence and consequence |
-|---|---|---|
-| Historical/effective-dated equity universe | BLOCKED — OWNER INPUT | No lawful 2010-onward membership/inclusion/exclusion history was found. Present-day constituents cannot substitute. |
-| Canonical security identity | BLOCKED — IDENTITY | The software mapping authority exists, but no real study-wide canonical security master was supplied. |
-| Ticker/symbol history | BLOCKED — IDENTITY | No real effective-dated symbol-change/delisting mapping package was supplied. |
-| Market price/return source | BLOCKED — OWNER INPUT | Yahoo is approved as a provider, but it cannot be queried lawfully/reproducibly until the requested securities and effective mappings are authoritative. No owner market contract file is present. |
-| Corporate-action handling | PARTIAL | The platform retains adjusted prices, dividends and split factors and defines a corporate-action contract. No study-wide action/delisting evidence or owner total-return methodology is present. |
-| Benchmark | PARTIAL | Broad S&P 500 total-return proxy and USD are approved, but the exact empirical proxy series/instrument and authenticated return history are not supplied. |
-| Risk-free series | AVAILABLE | Approved DGS3MO/FRED. Existing authenticated runtime publication `macro_observations-62a503378065618009d5e7e9` passes catalog validation; fresh in-memory connectivity also passed. |
-| Fundamental data | BLOCKED — OWNER INPUT | Neither owner point-in-time fundamentals nor an authorized SEC execution path is available. |
-| Availability/publication dates | BLOCKED — OWNER INPUT | Required point-in-time timestamps must accompany universe, classifications and fundamentals. |
-| Source licensing/provenance | PARTIAL | Approved providers and local/no-redistribution policy exist, but owner rights/retention/derivation evidence for the empirical files has not been supplied. |
-| Real SEC contact identity | BLOCKED — OWNER INPUT | No SEC contact environment value was found. SEC is avoidable if lawful owner point-in-time fundamentals are supplied. |
-
-## Provider connectivity evidence
-
-Connectivity was tested in memory on 2026-08-11. No new provider payload was persisted or committed.
-
-| Provider | Status | Actual result |
-|---|---|---|
-| FRED | AVAILABLE | DGS3MO request for 2026-07-01 through 2026-07-10 returned 148 bytes and standardized to 8 observations; one provider-marked missing value was preserved. |
-| Kenneth French Data Library | AVAILABLE | `F-F_Research_Data_5_Factors_2x3_daily` returned 149,894 bytes and standardized to 95,124 long-form observations from 1963-07-01 through 2026-06-30 for `Mkt-RF`, `SMB`, `HML`, `RMW`, `CMA`, and `RF`. |
-| Yahoo Finance | BLOCKED — IDENTITY | Not called. A lawful requested universe and effective-dated provider mapping are prerequisites. |
-| SEC EDGAR | BLOCKED — OWNER INPUT | Not called. Real owner contact identity is required if SEC is used. |
-| Owner-supplied | BLOCKED — OWNER INPUT | No real market/universe/fundamental package satisfying the contracts is present. |
-
-The existing authenticated DGS3MO runtime publication covers `2010-01-04` through `2026-08-06`, contains 4,329 rows, preserves 178 missing values, and remains the only research-ready catalog entry. It is partial risk-free evidence, not an equity-data readiness pass.
-
-Connectivity does not establish provider completeness, data rights, empirical fitness or a historical equity universe.
-
-## Lawful universe and survivorship assessment
-
-No evidence supports historical membership, delisted securities, symbol changes or security-type exclusions over the approved 2010-onward period. A study based on current survivors would be survivorship-biased and cannot be described as the approved historical US large/mid-cap common-equity universe.
-
-Status: **BLOCKED — OWNER INPUT / IDENTITY**.
-
-## Market, benchmark and corporate actions
-
-No empirical `factor_market_input` publication exists. The approved benchmark concept is not yet an exact authenticated series. No action/delisting package demonstrates how terminal returns, dividends, splits, mergers and disappearances are handled. Yahoo retrieval would not solve universe authority or symbol-history requirements by itself.
-
-Status: **BLOCKED — OWNER INPUT**.
-
-## Fundamentals and temporal integrity
-
-No real `factor_fundamental_input` publication exists. The study therefore lacks fiscal-period, filing/publication, research-availability and restatement evidence. SEC cannot be used without a real contact identity, and SEC is not required if the owner supplies lawful point-in-time fundamentals.
-
-Status: **BLOCKED — OWNER INPUT**.
-
-## Owner action required
-
-Supply the package defined in `PHASE7_EMPIRICAL_INPUT_REQUIREMENTS.md`, including:
-
-- effective-dated universe/security master and mappings;
-- exact market and fundamental contract files;
-- corporate-action/delisting/total-return methodology;
-- exact benchmark identity and total-return history;
-- availability timestamps and provenance;
-- rights/licensing attestation;
-- SEC contact only if SEC will be used.
-
-## Downstream empirical execution
-
-| Stage | Result |
-|---|---|
-| Phase 1 empirical publication | NOT EXECUTED — REQUIRED LAWFUL INPUT UNAVAILABLE |
-| Phase 2 empirical 48-factor research | NOT EXECUTED — REQUIRED LAWFUL INPUT UNAVAILABLE |
-| Phase 3 empirical asset pricing | NOT EXECUTED — REQUIRED LAWFUL INPUT UNAVAILABLE |
-| Phase 4 empirical portfolio/risk research | NOT EXECUTED — REQUIRED LAWFUL INPUT UNAVAILABLE |
-| Phase 5 empirical ML | NOT EXECUTED — REQUIRED LAWFUL INPUT UNAVAILABLE |
-| Phase 6 empirical API/dashboard/report delivery | NOT EXECUTED — REQUIRED LAWFUL INPUT UNAVAILABLE |
-| Research-integrity audit | Limited to readiness/non-fabrication gate; no empirical claims exist to audit. |
-
-No empirical dataset, factor premium, regression estimate, backtest, performance metric, ML result or research conclusion was fabricated.
-
-## Branch disposition
-
-This readiness work must remain on `phase/7-empirical-research-validation`. It must not be merged into `main` as an empirical-completion claim and must not receive an empirical release tag while inputs remain blocked.
+The minimum missing evidence is at least one additional security with authenticated effective-dated common-stock identity, an HF series that passes the source-splice checks, and PIT share counts compatible with the split-adjusted price basis. This is an external evidence limitation, not authorization to invent mappings, allocate issuer totals across share classes, repair unexplained price jumps, or lower the approved cross-sectional threshold.

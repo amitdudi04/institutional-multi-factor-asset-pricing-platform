@@ -1,6 +1,6 @@
 # Phase 7 Free/Public-Data Universe Protocol
 
-Status: preregistered before empirical performance analysis; construction not yet authorized
+Status: preregistered before empirical performance analysis; bounded construction completed, Phase 2 not estimable
 
 ## Name and non-claim
 
@@ -30,13 +30,8 @@ The preliminary exact Alpha-active/HF-stock intersection observed before identit
 
 Historical Alpha snapshots, not a present-day constituent list, establish contemporaneous listing presence. HF coverage selection is reported as a separate source-availability filter because it may itself create survivorship bias. Delisted and acquired listings remain eligible through their evidenced end date. Terminal returns are included only when supported by trading or transaction evidence; otherwise they are labeled `UNRESOLVED TERMINAL RETURN` and enter preregistered sensitivity analysis.
 
-## Current blockers
+## Final bounded construction
 
-- Study-wide filing-cover ticker/CIK/share-class extraction and effective dating; the authenticated versioned sample authority covers six filing observations and five current/effective candidates but is validation evidence, not study-wide completion.
-- Study-wide predecessor/successor issuer relationships beyond the authenticated Google-to-Alphabet sample.
-- Defensible common-share versus ADR/preferred/REIT classification across the candidate set.
-- Point-in-time shares and market capitalization for annual top-1,000 ranking.
-- Comprehensive corporate-action and terminal-event evidence.
-- Broader validated HF files beyond the four currently research-ready adversarial samples.
+The completed evidence intersection contains AAPL and MSFT only. FB/META lacks a continuous accepted HF successor history and eligible dimensionless PIT shares. GOOG/GOOGL fails the documented source-splice continuity check. The retained panel cannot be called large/mid-cap because annual top-1,000 market-cap ranking is not supported.
 
-No Phase 2 empirical publication is authorized until the applicable variant's complete evidence and coverage report pass Phase 1 authentication.
+The exact Phase 1 publications pass authentication, but maximum cross-sectional breadth is two. No Phase 2 empirical publication is authorized because the preregistered minimum is three. The threshold and weighting method are not changed after observing the data limitation.

@@ -4,9 +4,9 @@ Status date: 2026-08-18
 
 ## Executive conclusion
 
-The free-source acquisition path is authenticated and materially stronger, but it is not yet sufficient for empirical Phase 2. Alpha Vantage now supplies complete annual June active/delisted lifecycle snapshots from 2010 through 2026. HF Data Library supplies a reconciled 1,391-symbol inventory, of which 822 are classified as stocks and 569 ETFs are rejected. Four adversarial-sample market publications remain research-ready after provider-specific remediation: AAPL, MSFT, SPY, and legacy FB through its verified ticker end date.
+The free-source path now produces authenticated, bounded Phase 1 empirical inputs, but it cannot support the preregistered cross-sectional study. The exact defensible intersection contains AAPL and MSFT only. It has 7,930 daily market rows from 2010-10-27 through 2026-08-04 and 518 point-in-time SEC fundamental rows across 17 observed fields. Alpha Vantage still supplies annual June active/delisted snapshots from 2010 through 2026; HF Data Library still supplies 822 policy-selected stocks from its 1,391-symbol inventory, but source survivorship, identity, splice, and PIT-share requirements reduce the usable empirical intersection to two securities.
 
-The present evidence does not yet establish a point-in-time large/mid-cap universe, historical shares, historical market capitalization, comprehensive corporate actions, terminal returns, or study-wide point-in-time fundamentals. Current SEC ticker evidence maps 707 of the 822 HF stocks, but it is current evidence and is not backdated. No factor, asset-pricing, portfolio, or ML result may be represented as empirical from this acquisition state.
+The authenticated Phase 1 publications are `factor_market_input-9ee8af3b5f5d1f49095af46e` and `factor_fundamental_input-a6da21983efceee71390ca12`. Deterministic re-ingestion returned the same IDs and catalog validation passed. The preregistered Phase 2 configuration requires a minimum cross-section of three and value-weighted factor portfolios. The real execution therefore fails closed with maximum authenticated breadth two. No factor, asset-pricing, portfolio, ML, or empirical delivery result is claimed.
 
 ## Authenticated source evidence
 
@@ -107,6 +107,10 @@ HF states that prices are split- and dividend-adjusted and that `clean` applies 
 | FD-015 | High | Original ingestion and raw reprocessing generated separate adapter `now()` timestamps, so identical immutable provider bytes produced different standardized publication identities | Closed across all source adapters; standardization is bound to the raw artifact's canonical UTC retrieval time, a repeated live Apple reprocess returns the same ID, and five affected sample publications were durably demoted and replaced without deleting history |
 | FD-016 | High | The original HF authority treated GOOG and GOOGL as one uninterrupted security identity across Google's 2015 conversion into Alphabet shares despite the official filing identifying new CUSIPs | Closed in a versioned sample authority; predecessor Google and successor Alphabet use distinct internal IDs and non-overlapping intervals, while the original authority remains unchanged as historical evidence |
 | FD-017 | High | The earlier sample symbol authority backdated ticker `GOOGL` to 2004 even though legacy filings show the original Class A security traded as `GOOG` until the 2014 Class C distribution | Closed in bounded authority v2; the same Class A listing ID uses `GOOG` through 2014-04-02 and `GOOGL` thereafter, while the new Class C listing receives `GOOG` from 2014-04-03; prior authority remains historical evidence |
+| FD-018 | High | Company Facts can include current and comparative prior-period share facts under the same accession and availability; treating both as concurrent observations creates artificial PIT conflicts | Closed in software; only the latest period end within issuer/accession/availability is eligible, with regression coverage |
+| FD-019 | Medium | A factor input without an XNYS breakpoint reference crashed when pandas received a null mapping callback | Closed in software; missing reference breakpoints now yield explicit null size classifications |
+| FD-020 | Medium | A cross-section below the approved minimum entered the expensive 48-factor daily pipeline before failing | Closed in software; Phase 2 now rejects early with the approved threshold and observed maximum breadth |
+| FD-021 | High | HF historical prices are split-adjusted, its authenticated AAPL/MSFT artifacts contain no split-factor rows, and legacy SEC shares are filing-time counts | Bounded without fabrication: MSFT counts remain compatible because no study-period split is present; AAPL shares are null until the first post-August-2020 filing. Pre-split Apple market capitalization is not estimated |
 
 Eight HF publications were durably demoted: six legacy standardized publications that did not preserve per-row feed identity and two corrected-format GOOG/GOOGL publications that failed splice continuity. Historical raw data, manifests, validation reports, lineage, and demotion events were retained.
 
@@ -132,17 +136,23 @@ The governed point-in-time shares projector uses only `dei:EntityCommonStockShar
 
 Legacy annual acquisition adds 33 authenticated publications from 2010–2018 across Apple, Microsoft, Meta, predecessor Google, and Alphabet. All 33 contain dimensionless ticker anchors; 19 dimensionless positive share facts project to three exact listing identities, while multi-listing totals remain `PIT_SHARES_NOT_ESTIMABLE`. The ignored bounded authorities are `sec-symbol-history-bounded-v2.json` (9 intervals, SHA-256 `f5c8ceed5f7746c606104f86bbddb3cc64514a211cc8677e60080278fd6f6b1c`), `sec-issuer-listing-bounded-v2.json` (7 intervals, `470b05071a624ac9a2cc8186a7f4cac8ca8f17fc277cbc6ae0d84294b8eaa57e`), `sec-pit-shares-bounded-v1.json` (19 observations, `aa1388e6a58284131fb8bb7ddb7bbad1304842c6e2e55266766207c1d717473a`), and `sec-historical-identity-coverage-v1.json` (`b43ffd3d5a668c2a1331af42829abd78ef36f9b87906579d31b4d92a3f51958d`). This is a defensibly bounded research sample, not study-wide US-equity coverage.
 
-## Remaining blocking data gaps
+## Final bounded Phase 1 publications
 
-- Canonical effective-dated CIK/listing/share-class mappings for the study universe.
-- A preregistered, defensible universe rule that does not claim unavailable large/mid-cap ranking evidence.
-- Study-wide point-in-time shares and market capitalization, or an explicitly narrower universe design that does not require them.
-- Study-wide point-in-time SEC fundamentals, selected accounting concepts, filing lags, restatement policy, and authenticated issuer-to-listing mappings.
-- Corporate-action and terminal-event evidence for delisted/acquired securities.
-- Broader HF daily coverage after per-file attribution and splice checks.
+| Publication | Rows | SHA-256 | Result |
+|---|---:|---|---|
+| `factor_market_input-9ee8af3b5f5d1f49095af46e` | 7,930 | `fc9a867a7a8d7d823a543feb3becc7ffe3adf320f6e3511cb9a8817a8354f695` | PASS |
+| `factor_fundamental_input-a6da21983efceee71390ca12` | 518 | `20f649dbcdd20a957f95cadbce0f51e188eae2582ebbc69c2c6c2da7a4bf2a92` | PASS |
+
+The market panel uses authenticated HF AAPL/MSFT prices, SPY benchmark returns, a strictly prior DGS3MO observation converted from annual percent to a 252-day simple return, exact XNAS identity, and explicit `UNCLASSIFIED` sector/industry values. Unknown classification is not represented as an observed sector. Of 7,930 rows, 5,410 carry basis-compatible PIT shares and 2,520 retain null shares. The panel contains no delisted security or terminal event; terminal-event and terminal-return counts are both zero, so no delisting return is invented.
+
+The fundamental publication contains only fields produced by the governed annual SEC projector. It preserves filing-date availability, amendments, lags, and missing fields. Comparative-period share facts no longer create false conflicts.
+
+## Remaining empirical limitation
+
+The free/public evidence does not establish a third security satisfying all of authenticated historical identity, accepted HF market continuity, and compatible PIT share evidence. FB/META lacks a continuous HF successor series and eligible dimensionless shares. GOOG/GOOGL fails the observed 95.25% source-splice continuity check. Other HF symbols lack completed study-wide historical SEC identity and PIT authority. Adding one merely to meet the configured threshold would violate the non-fabrication and point-in-time policies.
 
 ## Readiness verdict
 
-**REAL PHASE 1 ACQUISITION IN PROGRESS — EMPIRICAL PHASE 2 NOT AUTHORIZED.**
+**REAL PHASE 1 COMPLETE FOR A DEFENSIBLY BOUNDED TWO-SECURITY INTERSECTION — PHASE 2 NOT ESTIMABLE.**
 
-The software controls and current publications are authenticated, but the research data contract is incomplete. Advancing to factor results would create unsupported identity, universe, market-cap, fundamental, and survivorship claims.
+Phase 2 execution is not authorized because no date meets the approved minimum cross-section of three; maximum authenticated breadth is two. Phases 3–6 have no lawful authenticated Phase 2 parent and remain unexecuted. This is a data-limited negative result, not a software failure and not permission to weaken the preregistered design.

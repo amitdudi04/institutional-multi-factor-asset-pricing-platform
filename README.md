@@ -6,7 +6,7 @@ An authenticated, reproducible institutional-style quantitative research platfor
 
 Phases 1-6 are implemented and exhaustively reconciled in v1.0.2. Immutable Phase 1 evidence flows through connected Phase 2-5 publications into the versioned FastAPI service, institutional Streamlit workspace, deterministic reporting, secure local Docker foundation, and CI gates. Authenticated synthetic assurance covers all 48 factors, six asset-pricing specifications, every supported ML target, the connected API/dashboard/report surfaces, restart authentication, and cross-phase tamper rejection.
 
-No empirical dataset, factor premium, regression result, portfolio performance, model output, or investment conclusion is committed. Live empirical validation remains pending until lawful authenticated inputs and explicit study decisions are supplied.
+A defensibly bounded real Phase 1 runtime publication now exists for AAPL and MSFT; raw and processed empirical data remain untracked. The preregistered Phase 2 study is not estimable because maximum authenticated breadth is two versus the approved minimum of three. No empirical factor premium, regression result, portfolio performance, model output, or investment conclusion is claimed.
 
 ## Architecture
 
@@ -98,7 +98,7 @@ The platform includes point-in-time factor construction; CAPM and multifactor re
 - Local bearer protection is not enterprise identity management.
 - No brokerage, live execution, streaming prices, automatic retraining, or cloud SLA exists.
 - Docker was unavailable on the final local audit host; static validation passed and CI contains an image-build gate.
-- Lawful live US-equity universe/mapping evidence, owner SEC contact identity, and owner-supplied empirical data remain external blockers. FRED and Kenneth French connectivity do not remove those blockers. No live empirical validation is claimed.
+- The bounded free/public-data intersection has only two securities with defensible identity, market continuity, and compatible PIT evidence. Phase 2 requires at least three, so Phases 2–6 empirical execution and final research release remain unauthorized. See [Phase 7 Empirical Data Readiness](docs/PHASE7_EMPIRICAL_DATA_READINESS_REPORT.md).
 
 ## Reproducibility and academic use
 

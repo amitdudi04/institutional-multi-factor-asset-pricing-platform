@@ -100,6 +100,7 @@ def project_sec_shares_outstanding(
         and row.get("form") in ACCEPTED_SEC_FORMS
     ]
     grouped: dict[tuple[str, str, date, datetime], list[dict[str, object]]] = defaultdict(list)
+    latest_ends: dict[tuple[str, str, datetime], date] = {}
     for row in eligible:
         issuer_value = str(row.get("issuer_id", ""))
         accession = str(row.get("accession_number", ""))
@@ -118,11 +119,15 @@ def project_sec_shares_outstanding(
                 "SEC shares fact lacks complete filing and availability identity."
             )
         grouped[(issuer_value, accession, period_end, available_at)].append(row)
+        latest_key = (issuer_value, accession, available_at)
+        latest_ends[latest_key] = max(period_end, latest_ends.get(latest_key, period_end))
 
     output: list[dict[str, object]] = []
     for (issuer_value, accession, period_end, available_at), rows in sorted(
         grouped.items(), key=lambda item: item[0]
     ):
+        if period_end != latest_ends[(issuer_value, accession, available_at)]:
+            continue
         filing_dates = {row.get("filing_date") for row in rows}
         if len(filing_dates) != 1:
             raise DataQualityError(
