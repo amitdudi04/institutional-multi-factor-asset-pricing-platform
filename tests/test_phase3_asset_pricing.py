@@ -260,6 +260,18 @@ def test_rolling_and_expanding_are_past_only() -> None:
         frame, "date", "return", ("x1", "x2"), window=10, expanding=True, covariance="HC1"
     )
     assert expanding["window_start"].nunique() == 1
+    sparse = frame.copy()
+    sparse.loc[sparse.index[:6], "x1"] = np.nan
+    sparse_windows = window_regressions(
+        sparse,
+        "date",
+        "return",
+        ("x1", "x2"),
+        window=12,
+        covariance="HC1",
+        minimum_observations=8,
+    )
+    assert sparse_windows["window_end"].min() > frame["date"].iloc[11]
     with pytest.raises(DataQualityError, match="one observation"):
         window_regressions(pd.concat([frame, frame.iloc[[0]]]), "date", "return", ("x1",), window=8)
 

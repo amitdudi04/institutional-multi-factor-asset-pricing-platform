@@ -105,9 +105,15 @@ def window_regressions(
     if ordered[date_column].duplicated().any():
         raise DataQualityError("Rolling regressions require one observation per date")
     rows: list[dict[str, object]] = []
+    minimum_value = kwargs.get("minimum_observations", 8)
+    if isinstance(minimum_value, bool) or not isinstance(minimum_value, int):
+        raise DataQualityError("Rolling minimum_observations must be an integer")
+    minimum = minimum_value
     for end in range(window, len(ordered) + 1):
         start = 0 if expanding else end - window
         sample = ordered.iloc[start:end]
+        if len(sample.dropna(subset=[dependent, *factors])) < minimum:
+            continue
         result = fit_regression(sample, dependent, factors, **kwargs)  # type: ignore[arg-type]
         for record in result.coefficients.to_dict("records"):
             rows.append(
