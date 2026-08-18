@@ -4,7 +4,13 @@ import re
 from dataclasses import dataclass
 from datetime import date, datetime
 
-from institutional_factor_platform.data.domain import IssuerId
+from institutional_factor_platform.data.domain import (
+    IssuerId,
+    IssuerListingMapping,
+    MappingEvidence,
+    MappingStatus,
+)
+from institutional_factor_platform.data.security_master import SymbolHistoryStore
 from institutional_factor_platform.exceptions import SecurityMappingError
 
 _TICKER = re.compile(r"[A-Z0-9][A-Z0-9.-]{0,11}")
@@ -95,6 +101,45 @@ def project_sec_listing_candidates(
     if len(identities) != len(set(identities)):
         raise SecurityMappingError("SEC filing contains duplicate common-stock listing candidates.")
     return tuple(sorted(candidates, key=lambda item: (item.cik, item.ticker)))
+
+
+def bind_sec_listing_candidates(
+    candidates: tuple[SecListingCandidate, ...], symbol_history: SymbolHistoryStore
+) -> tuple[IssuerListingMapping, ...]:
+    """Bind one filing's candidates only through an existing exact symbol authority."""
+    accessions = {candidate.accession_number for candidate in candidates}
+    if len(accessions) > 1:
+        raise SecurityMappingError(
+            "SEC candidate binding requires one filing; reconcile repeated observations separately."
+        )
+    mappings: list[IssuerListingMapping] = []
+    for candidate in candidates:
+        security_id = symbol_history.resolve(candidate.ticker, candidate.mic, candidate.filing_date)
+        mappings.append(
+            IssuerListingMapping(
+                issuer_id=candidate.issuer_id,
+                security_id=security_id,
+                valid_from=candidate.filing_date,
+                valid_to=None,
+                status=MappingStatus.RESOLVED,
+                evidence=MappingEvidence.SEC_FILING,
+                provenance=(
+                    f"SEC accession {candidate.accession_number}; "
+                    f"context {candidate.context_ref}; {candidate.security_title}; "
+                    f"{candidate.exchange_name}"
+                ),
+                retrieval_timestamp=candidate.retrieval_timestamp,
+            )
+        )
+    return tuple(
+        sorted(
+            mappings,
+            key=lambda item: (
+                item.issuer_id.value,
+                item.security_id.value if item.security_id else "",
+            ),
+        )
+    )
 
 
 def _is_common_equity(title: str) -> bool:

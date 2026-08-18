@@ -32,8 +32,8 @@ Historical Alpha snapshots, not a present-day constituent list, establish contem
 
 ## Current blockers
 
-- Study-wide filing-cover ticker/CIK/share-class extraction and effective dating; the authenticated five-candidate sample is validation evidence, not study-wide completion.
-- Predecessor/successor issuer relationships, including pre-2015 Google versus Alphabet.
+- Study-wide filing-cover ticker/CIK/share-class extraction and effective dating; the authenticated versioned sample authority covers six filing observations and five current/effective candidates but is validation evidence, not study-wide completion.
+- Study-wide predecessor/successor issuer relationships beyond the authenticated Google-to-Alphabet sample.
 - Defensible common-share versus ADR/preferred/REIT classification across the candidate set.
 - Point-in-time shares and market capitalization for annual top-1,000 ranking.
 - Comprehensive corporate-action and terminal-event evidence.

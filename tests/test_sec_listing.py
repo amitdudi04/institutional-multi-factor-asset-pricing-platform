@@ -1,8 +1,20 @@
 from datetime import UTC, date, datetime
+from pathlib import Path
 
 import pytest
 
-from institutional_factor_platform.data.sec_listing import project_sec_listing_candidates
+from institutional_factor_platform.data.domain import (
+    DataSource,
+    MappingEvidence,
+    SecurityId,
+    SymbolHistoryRecord,
+)
+from institutional_factor_platform.data.sec_listing import (
+    SecListingCandidate,
+    bind_sec_listing_candidates,
+    project_sec_listing_candidates,
+)
+from institutional_factor_platform.data.security_master import SymbolHistoryStore
 from institutional_factor_platform.exceptions import SecurityMappingError
 
 
@@ -69,3 +81,61 @@ def test_sec_listing_projection_fails_on_unknown_venue_or_conflicting_triple() -
     original = _context("stock", "Common Stock", "MSFT")
     conflicting = (*original, {**original[1], "value": "MSFZ"})
     assert project_sec_listing_candidates(conflicting) == ()
+
+
+def test_sec_listing_candidates_bind_only_through_exact_symbol_history(tmp_path: Path) -> None:
+    records = tuple(_context("stock", "Common Stock", "MSFT"))
+    candidate = project_sec_listing_candidates(records)[0]
+    listing = SecurityId.assign()
+    symbols = SymbolHistoryStore(tmp_path / "symbols.json")
+    record = SymbolHistoryRecord(
+        security_id=listing,
+        ticker="MSFT",
+        exchange="XNAS",
+        mic="XNAS",
+        valid_from=date(2020, 1, 1),
+        valid_to=None,
+        source=DataSource.SEC_EDGAR,
+        source_identifier="0001193125-26-323660",
+        retrieval_timestamp=datetime(2026, 8, 18, tzinfo=UTC),
+        evidence_reference="synthetic SEC filing fixture",
+    )
+    symbols.persist((record,))
+    mappings = bind_sec_listing_candidates((candidate,), symbols)
+    assert mappings[0].security_id == listing
+    assert mappings[0].evidence is MappingEvidence.SEC_FILING
+    assert mappings[0].valid_from == date(2026, 7, 29)
+    wrong = SymbolHistoryStore(tmp_path / "wrong-symbols.json")
+    wrong.persist(
+        (
+            SymbolHistoryRecord(
+                security_id=listing,
+                ticker="OTHER",
+                exchange="XNAS",
+                mic="XNAS",
+                valid_from=record.valid_from,
+                valid_to=None,
+                source=record.source,
+                source_identifier=record.source_identifier,
+                retrieval_timestamp=record.retrieval_timestamp,
+                evidence_reference=record.evidence_reference,
+            ),
+        )
+    )
+    with pytest.raises(SecurityMappingError, match="unresolved or ambiguous"):
+        bind_sec_listing_candidates((candidate,), wrong)
+    another_filing = SecListingCandidate(
+        issuer_id=candidate.issuer_id,
+        cik=candidate.cik,
+        ticker=candidate.ticker,
+        security_title=candidate.security_title,
+        exchange_name=candidate.exchange_name,
+        mic=candidate.mic,
+        filing_date=date(2026, 8, 1),
+        accession_number="0001193125-26-999999",
+        context_ref=candidate.context_ref,
+        dimensions_json=candidate.dimensions_json,
+        retrieval_timestamp=candidate.retrieval_timestamp,
+    )
+    with pytest.raises(SecurityMappingError, match="one filing"):
+        bind_sec_listing_candidates((candidate, another_filing), symbols)

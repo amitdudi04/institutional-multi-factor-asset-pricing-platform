@@ -92,6 +92,7 @@ class MappingEvidence(StrEnum):
     OWNER_CONFIRMED = "OWNER_CONFIRMED"
     LISTING_METADATA = "LISTING_METADATA"
     REGISTRANT_ONLY = "REGISTRANT_ONLY"
+    SEC_FILING = "SEC_FILING"
 
 
 @dataclass(frozen=True, slots=True)
