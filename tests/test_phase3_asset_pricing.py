@@ -314,6 +314,19 @@ def test_phase2_alignment_and_temporal_attacks_are_rejected() -> None:
         build_research_panel(factors, portfolios, {"BAD": "not_present"})
 
 
+def test_phase3_excludes_non_estimable_sparse_factor_dates() -> None:
+    factors, portfolios = _phase2_tables()
+    target = portfolios.loc[portfolios["factor_id"].eq("log_market_cap")]
+    sparse_date = target["date"].min()
+    drop_index = target.loc[
+        target["date"].eq(sparse_date) & target["quantile"].eq(target["quantile"].max())
+    ].index
+    sparse = portfolios.drop(drop_index)
+    panel = build_research_panel(factors, sparse, {"SMB": "log_market_cap"})
+    assert sparse_date not in set(panel["date"])
+    assert not panel.empty
+
+
 class _FactorRepositoryFixture:
     def __init__(self, factors: pd.DataFrame, portfolios: pd.DataFrame) -> None:
         self.factors = pa.Table.from_pandas(factors, preserve_index=False)
