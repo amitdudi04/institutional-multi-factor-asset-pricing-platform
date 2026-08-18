@@ -273,6 +273,54 @@ def test_hf_public_inventory_reconciles_classification() -> None:
     assert inventory["records"][1]["reason"] == "ETF excluded by project policy"  # type: ignore[index]
 
 
+def test_hf_rejects_adjusted_price_discontinuity_at_source_splice(tmp_path: Path) -> None:
+    buffer = io.BytesIO()
+    table = pa.table(
+        {
+            "datetime": [datetime(2022, 3, 4), datetime(2022, 3, 7)],
+            "Open": [100.0, 5.0],
+            "High": [101.0, 5.1],
+            "Low": [99.0, 4.9],
+            "Close": [100.0, 5.0],
+            "Volume": [100, 100],
+            "source": ["pitrading", "iex"],
+        }
+    ).replace_schema_metadata(
+        {b"citation": b"CC BY 4.0 fixture", b"iex_attribution": b"IEX fixture"}
+    )
+    pq.write_table(table, buffer)
+    mapping_store = SecurityMappingStore(tmp_path / "hf-splice-mappings.json")
+    mapping_store.persist(
+        (
+            mapping_from_listing(
+                source=DataSource.HF_DATA_LIBRARY,
+                source_identifier="SYNTH",
+                ticker="SYNTH",
+                exchange="XNYS",
+                mic="XNYS",
+                valid_from=date(2020, 1, 1),
+                valid_to=None,
+                provenance="synthetic splice fixture",
+                retrieval_timestamp=NOW,
+                security_id=SecurityId.assign(),
+            ),
+        )
+    )
+    request = RetrievalRequest(
+        DataSource.HF_DATA_LIBRARY,
+        "daily_market",
+        DateRange(date(2022, 3, 4), date(2022, 3, 7)),
+        identifiers=("SYNTH",),
+    )
+    with pytest.raises(RetrievalError, match="continuity"):
+        HFDataLibraryAdapter(
+            load_phase1_config().sources.hf_data_library,
+            _transport(httpx.MockTransport(lambda _: httpx.Response(200))),
+            mapping_store,
+            now=lambda: NOW,
+        ).standardize(buffer.getvalue(), request)
+
+
 def test_sec_requires_contact_and_preserves_filing_metadata(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

@@ -5,7 +5,9 @@ import io
 import json
 from collections.abc import Callable
 from datetime import UTC, datetime
+from itertools import pairwise
 from pathlib import Path
+from typing import cast
 from urllib.parse import urlencode
 
 import pyarrow.parquet as pq
@@ -21,6 +23,7 @@ class HFDataLibraryAdapter(SourceAdapter[bytes]):
     source = DataSource.HF_DATA_LIBRARY
     base_url = "https://api.hfdatalibrary.com/v1"
     expected_columns = ("datetime", "Open", "High", "Low", "Close", "Volume", "source")
+    maximum_splice_return = 0.5
 
     def inventory(self) -> dict[str, object]:
         """Build a dated, checksummed public coverage manifest without claiming universe status."""
@@ -159,4 +162,13 @@ class HFDataLibraryAdapter(SourceAdapter[bytes]):
             )
         if not records:
             raise RetrievalError("HF daily Parquet contains no records in the requested interval.")
+        for previous, current in pairwise(records):
+            if previous["source"] == current["source"]:
+                continue
+            prior_close = cast(float, previous["close"])
+            splice_return = cast(float, current["close"]) / prior_close - 1.0
+            if abs(splice_return) > self.maximum_splice_return:
+                raise RetrievalError(
+                    "HF adjusted-price continuity fails at the documented source splice."
+                )
         return tuple(records)
