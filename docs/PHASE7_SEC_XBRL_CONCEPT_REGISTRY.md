@@ -12,6 +12,8 @@ The accepted form set is `10-K`, `10-K/A`, `10-Q`, and `10-Q/A`. Annual research
 
 The implemented annual projector applies these rules per accession, selects the accession's latest fiscal period end, rejects conflicting values, and preserves later amendments as later-available observations. Complete same-filing formulas and prior-period lags are calculated only when every required input was legitimately available. Projection requires an immutable effective-dated issuer-to-listing mapping authority; one issuer may map to multiple share classes, and every authenticated class receives the issuer characteristic without collapsing identities.
 
+Point-in-time shares are governed separately from monetary fundamentals. The only approved Company Facts share-count concept is `dei:EntityCommonStockSharesOutstanding` in `shares`, from the accepted form set. Duplicate identical facts within an accession collapse; conflicting, non-positive, non-finite, or incomplete facts fail closed. Because Company Facts does not preserve the dimensional share-class context needed to allocate an issuer total, projection is allowed only when exactly one authenticated listing is effective on the filing date. Multi-listing issuers remain not estimable until original inline-XBRL dimensional evidence supports an exact allocation. Amendments remain later-available observations and never overwrite earlier evidence.
+
 ## Approved field registry
 
 | Phase 2 field | Method | Primary standard concept(s) | Governed fallback / calculation |
@@ -36,7 +38,7 @@ The implemented annual projector applies these rules per accession, selects the 
 | `working_capital` | Difference | `AssetsCurrent`, `LiabilitiesCurrent` | `AssetsCurrent - LiabilitiesCurrent`; both required |
 | `prior_working_capital` | Lag | — | Prior eligible annual `working_capital`; no forward fill |
 
-All projected monetary rows use `USD`. Facts reported in another unit are rejected rather than converted without an authenticated exchange-rate policy. Per-share, shares, pure ratios, and currency-per-share units cannot satisfy monetary fields.
+All projected monetary rows use `USD`. Facts reported in another unit are rejected rather than converted without an authenticated exchange-rate policy. Per-share, shares, pure ratios, and currency-per-share units cannot satisfy monetary fields. The separate shares projection uses only the exact `shares` unit and cannot satisfy a monetary field.
 
 ## Filing and restatement policy
 

@@ -10,7 +10,11 @@ from institutional_factor_platform.data.domain import (
     MappingStatus,
     SecurityId,
 )
-from institutional_factor_platform.data.sec_projection import project_annual_sec_fundamentals
+from institutional_factor_platform.data.sec_projection import (
+    attach_point_in_time_shares,
+    project_annual_sec_fundamentals,
+    project_sec_shares_outstanding,
+)
 from institutional_factor_platform.data.security_master import IssuerListingMappingStore
 from institutional_factor_platform.exceptions import DataQualityError
 
@@ -128,3 +132,140 @@ def test_annual_projection_rejects_conflicting_standard_facts(tmp_path: Path) ->
     second = {**first, "value": 101.0}
     with pytest.raises(DataQualityError, match="Conflicting SEC values"):
         project_annual_sec_fundamentals((first, second), store)
+
+
+def test_sec_shares_projection_requires_one_listing_and_preserves_restatements(
+    tmp_path: Path,
+) -> None:
+    issuer = IssuerId.from_cik("1")
+    security = SecurityId.assign()
+    store = IssuerListingMappingStore(tmp_path / "single-listing.json")
+    store.persist(
+        (
+            IssuerListingMapping(
+                issuer,
+                security,
+                date(2020, 1, 1),
+                None,
+                MappingStatus.RESOLVED,
+                MappingEvidence.SEC_FILING,
+                "synthetic exact filing-cover evidence",
+                datetime(2024, 1, 1, tzinfo=UTC),
+            ),
+        )
+    )
+    base: dict[str, object] = {
+        "issuer_id": issuer.value,
+        "taxonomy": "dei",
+        "concept": "EntityCommonStockSharesOutstanding",
+        "unit": "shares",
+        "value": 100.0,
+        "period_end": date(2023, 1, 31),
+        "filing_date": date(2023, 2, 1),
+        "form": "10-K",
+        "accession_number": "accession-original",
+        "availability_timestamp": datetime(2023, 2, 1, 23, 59, tzinfo=UTC),
+    }
+    amendment = {
+        **base,
+        "value": 101.0,
+        "filing_date": date(2023, 3, 1),
+        "form": "10-K/A",
+        "accession_number": "accession-amendment",
+        "availability_timestamp": datetime(2023, 3, 1, 23, 59, tzinfo=UTC),
+    }
+    projected = project_sec_shares_outstanding((base, dict(base), amendment), store)
+    assert [row["shares_outstanding"] for row in projected] == [100.0, 101.0]
+    assert {row["security_id"] for row in projected} == {security.value}
+    assert all(row["unit"] == "shares" for row in projected)
+
+    ambiguous, _, _ = _mapping(tmp_path)
+    with pytest.raises(DataQualityError, match="exactly one authenticated listing"):
+        project_sec_shares_outstanding((base,), ambiguous)
+
+
+def test_sec_shares_projection_rejects_conflicts_and_invalid_values(tmp_path: Path) -> None:
+    store, issuer, _ = _mapping(tmp_path)
+    base: dict[str, object] = {
+        "issuer_id": issuer.value,
+        "taxonomy": "dei",
+        "concept": "EntityCommonStockSharesOutstanding",
+        "unit": "shares",
+        "value": 100.0,
+        "period_end": date(2023, 1, 31),
+        "filing_date": date(2023, 2, 1),
+        "form": "10-K",
+        "accession_number": "accession",
+        "availability_timestamp": datetime(2023, 2, 1, 23, 59, tzinfo=UTC),
+    }
+    with pytest.raises(DataQualityError, match="Conflicting SEC shares"):
+        project_sec_shares_outstanding((base, {**base, "value": 101.0}), store)
+    with pytest.raises(DataQualityError, match="not positive"):
+        project_sec_shares_outstanding(({**base, "value": 0.0},), store)
+    with pytest.raises(DataQualityError, match="non-numeric"):
+        project_sec_shares_outstanding(({**base, "value": "100"},), store)
+    with pytest.raises(DataQualityError, match="complete filing"):
+        project_sec_shares_outstanding(({**base, "accession_number": ""},), store)
+    with pytest.raises(DataQualityError, match="filing date conflicts"):
+        project_sec_shares_outstanding((base, {**base, "filing_date": date(2023, 2, 2)}), store)
+    assert project_sec_shares_outstanding(({**base, "taxonomy": "us-gaap"},), store) == ()
+
+
+def test_point_in_time_share_join_never_uses_future_observations() -> None:
+    first = datetime(2023, 2, 1, 23, 59, tzinfo=UTC)
+    second = datetime(2023, 3, 1, 23, 59, tzinfo=UTC)
+    observations = (
+        {
+            "security_id": "security-1",
+            "available_at": first,
+            "shares_outstanding": 100.0,
+            "unit": "shares",
+            "accession_number": "first",
+        },
+        {
+            "security_id": "security-1",
+            "available_at": second,
+            "shares_outstanding": 90.0,
+            "unit": "shares",
+            "accession_number": "second",
+        },
+    )
+    market = (
+        {"security_id": "security-1", "available_at": first.replace(hour=12)},
+        {"security_id": "security-1", "available_at": first},
+        {"security_id": "security-1", "available_at": second},
+        {"security_id": "security-2", "available_at": second},
+    )
+    joined = attach_point_in_time_shares(market, observations)
+    assert [row["shares_outstanding"] for row in joined] == [None, 100.0, 90.0, None]
+
+
+def test_point_in_time_share_join_rejects_ambiguous_or_malformed_evidence() -> None:
+    timestamp = datetime(2023, 2, 1, 23, 59, tzinfo=UTC)
+    base = {
+        "security_id": "security-1",
+        "available_at": timestamp,
+        "shares_outstanding": 100.0,
+        "unit": "shares",
+        "accession_number": "first",
+    }
+    with pytest.raises(DataQualityError, match="same availability"):
+        attach_point_in_time_shares((), (base, {**base, "shares_outstanding": 101.0}))
+    with pytest.raises(DataQualityError, match="identity, timing, or unit"):
+        attach_point_in_time_shares((), ({**base, "unit": "USD"},))
+    with pytest.raises(DataQualityError, match="Market row"):
+        attach_point_in_time_shares(
+            ({"security_id": "security-1", "available_at": timestamp.replace(tzinfo=None)},),
+            (base,),
+        )
+    with pytest.raises(DataQualityError, match="already carries"):
+        attach_point_in_time_shares(
+            (
+                {
+                    "security_id": "security-1",
+                    "available_at": timestamp,
+                    "shares_outstanding": 99.0,
+                },
+            ),
+            (base,),
+        )
