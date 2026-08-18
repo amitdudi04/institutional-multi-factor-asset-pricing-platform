@@ -16,7 +16,7 @@ The present evidence does not yet establish a point-in-time large/mid-cap univer
 | HF public inventory | 1,391 one-to-one reconciled records; 822 stocks selected and 569 ETFs rejected by policy |
 | HF market sample | Four research-ready publications after eight historical/unsafe publications were durably demoted |
 | FRED DGS3MO | Two authenticated publications; latest covers 2010-01-04 through 2026-08-10 with 4,331 observations |
-| Kenneth French | No authenticated runtime publication; official-host transport remains unresolved |
+| Kenneth French | Two authenticated official-host publications: daily five-factor plus daily Momentum |
 | SEC current ticker list | 10,398 current rows observed; exact current ticker intersection covers 707 of 822 HF stocks |
 | SEC PIT fundamentals | Not yet acquired or published |
 
@@ -100,7 +100,7 @@ Eight HF publications were durably demoted: six legacy standardized publications
 
 The latest authenticated DGS3MO publication is `macro_observations-c81a80f735cccb07624bcb7c` with 4,331 observations from 2010-01-04 through 2026-08-10. The earlier authenticated publication `macro_observations-62a503378065618009d5e7e9` remains historical evidence and contains 4,329 observations through 2026-08-06.
 
-No authenticated Kenneth French publication currently exists. No value is substituted or fabricated. SPY is present as market evidence but cannot by itself establish the approved benchmark methodology or repair universe survivorship.
+The official Kenneth French five-factor publication `french_factor_returns-adf7661d83688a9374d91fd7` contains 95,124 long-form observations for Mkt-RF, SMB, HML, RMW, CMA, and RF from 1963-07-01 through 2026-06-30. The official Momentum publication `french_factor_returns-f803dd07dbe251239dbe0c33` contains 26,173 observations from 1926-11-03 through 2026-06-30. Both are authenticated comparison evidence; they do not replace the platform's own factor construction.
 
 ## Remaining blocking data gaps
 
@@ -110,7 +110,6 @@ No authenticated Kenneth French publication currently exists. No value is substi
 - Point-in-time SEC fundamentals with filing availability and restatement handling.
 - Corporate-action and terminal-event evidence for delisted/acquired securities.
 - Broader HF daily coverage after per-file attribution and splice checks.
-- An authenticated Kenneth French comparison publication.
 
 ## Readiness verdict
 
