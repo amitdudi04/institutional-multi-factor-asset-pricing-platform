@@ -1,19 +1,21 @@
 # Final Empirical System Architecture
 
-The empirical path is a connected immutable chain:
+The completed empirical chain is:
 
 ```text
 HF market + Alpha lifecycle + SEC submissions/Company Facts/tagged covers
   -> ignored immutable source cache and 822-row screening matrix
-  -> persisted security and issuer/listing authorities
-  -> authenticated factor_market_input + factor_fundamental_input
-  -> authenticated 48-factor publication and diagnostic portfolios
+  -> effective-dated security and issuer/listing authorities
+  -> authenticated Phase 1 market and fundamental publications
+  -> authenticated 48-factor publication (47 estimable)
   -> authenticated five-family asset-pricing publication
-  -> authenticated FastAPI/report/dashboard delivery
+  -> frozen-cost eight-method portfolio and scenario publications
+  -> purged monthly walk-forward ML publications
+  -> authenticated FastAPI, Streamlit, and four-format reports
 ```
 
-Identity is listing-level and effective-dated. SEC issuer facts reach a security only through a singular persisted issuer/listing mapping. Share observations are filing-time and are attached only after availability. Accepted intervals begin no earlier than exact tagged filing anchors and, where necessary, after the last detected material share-basis jump.
+Identity is listing-level and effective-dated. SEC issuer facts reach a security only through singular persisted issuer/listing mappings. Fundamentals preserve availability dates, and accepted intervals begin no earlier than verified tagged filing anchors. Raw and generated evidence remains local and ignored by Git.
 
-Research reads authenticate checksums, manifests, configuration identity, Git identity, lineage, and lifecycle state. Raw evidence and generated Parquet/report artifacts are ignored by Git. The detailed candidate matrix is runtime evidence; versioned documentation contains aggregates only.
+Phase 4 freezes one-way LOW/BASE/HIGH costs at 5/10/20 bps before results. BASE uses authenticated equal-weight Phase 4 evidence as the Phase 5 economic parent. Phase 5 monthly decision sampling prevents daily pseudo-replication while its target retains the governed 21-session horizon. Purging, a one-month embargo, bounded hyperparameter grids, deterministic seed 17, and single-thread estimators protect temporal and configuration identity.
 
-Phase 4 and Phase 5 software remain implemented but have no real publication in this run because their approved empirical configuration is incomplete. Delivery surfaces expose authenticated real Phase 1–3 evidence and explicit empty states for absent portfolio/ML publications.
+Every analytical publication binds manifests, checksums, configuration identity, code revision, lineage, and lifecycle state. Phase 6 re-authenticates those boundaries for discovery, API responses, dashboard views, and report generation. The final restart check discovered 143 authenticated retained publications; it did not read analytical tables through an unverified database shortcut.

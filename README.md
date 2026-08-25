@@ -4,9 +4,9 @@ An authenticated, reproducible institutional-style quantitative research platfor
 
 ## Status
 
-The software implementation spans Phases 1-6. The Prompt 23 empirical run screened all 822 HF Data Library stock candidates and froze 487 defensibly bounded equities (372 Tier A, 115 Tier B). Raw, processed, and generated empirical artifacts remain local and untracked.
+The software implementation spans Phases 1-6, and the final local empirical study spans Phases 1-8. All 822 HF Data Library stock candidates were screened before performance analysis, producing 487 defensibly bounded equities (372 Tier A, 115 Tier B). Raw, processed, and generated empirical artifacts remain local and untracked.
 
-Authenticated real publications now exist for expanded Phase 1, all 48 configured Phase 2 factors (47 estimable; `equity_issuance` non-estimable), and the five asset-pricing model families configured in Phase 3. Phase 4 is not estimable because every transaction-cost input remains an explicit open owner decision. Phase 5 is not estimable because its target, horizon, benchmark, feature families, and Phase 4 parent remain unset. Phase 6 successfully authenticates and delivers the available real publications through API routes and Markdown, HTML, JSON, and CSV reports. These results are free/public-data research evidence, not a completed investment mandate or trading claim.
+Authenticated publications now cover expanded Phase 1, all 48 configured Phase 2 factors (47 estimable; `equity_issuance` non-estimable), five Phase 3 asset-pricing families, eight Phase 4 portfolio methods under transaction costs frozen before performance, eight Phase 5 purged walk-forward models, and Phase 6 API/dashboard/report delivery. The empirical results do not establish stable alpha or ML value: multifactor fit improves in-sample, costs are material, and ML IC intervals include zero. These are free/public-data research findings, not an investment mandate or trading claim.
 
 ## Architecture
 
@@ -99,7 +99,8 @@ The platform includes point-in-time factor construction; CAPM and multifactor re
 - No brokerage, live execution, streaming prices, automatic retraining, or cloud SLA exists.
 - The free/public-data universe is source-availability selected and is not CRSP, Compustat, Russell 1000, or historical S&P 500 membership replication.
 - Effective coverage is bounded: annual security breadth rises from 4 in 2018 to 487 in 2024–2026; missing early PIT evidence is not backfilled.
-- Phase 4 net performance and Phase 5 ML conclusions are not estimable until the open owner decisions in the governing specification are approved.
+- Phase 4 evidence spans only 32 months and uses factor-portfolio test assets; its observed performance is not evidence of persistence.
+- Phase 5 does not establish stable incremental predictive or after-cost economic value; explanation metrics are non-causal.
 - Docker and GitHub/merge/tag operations were deferred by the owner and were not checked in this run.
 - See the [Final Research Paper](docs/FINAL_RESEARCH_PAPER.md) and [Final Project Assurance Report](docs/FINAL_PROJECT_ASSURANCE_REPORT.md).
 
