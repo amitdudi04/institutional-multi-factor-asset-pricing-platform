@@ -24,6 +24,7 @@ ALLOWED_ROOTS = frozenset(
         "reports",
     }
 )
+AUTHENTICATED_DISCOVERY_TIMEOUT_SECONDS = 600
 
 
 class DashboardClient:
@@ -33,7 +34,10 @@ class DashboardClient:
 
     def get(self, path: str) -> Any:
         safe = self._safe_path(path)
-        with httpx.Client(timeout=self.config.api.timeout_seconds) as client:
+        timeout = self.config.api.timeout_seconds
+        if safe == "ready" or safe.split("?", 1)[0].endswith("publications"):
+            timeout = max(timeout, AUTHENTICATED_DISCOVERY_TIMEOUT_SECONDS)
+        with httpx.Client(timeout=timeout) as client:
             response = client.get(f"{self.base_url}/{safe}", headers=self._headers())
             response.raise_for_status()
             return response.json()
@@ -45,6 +49,24 @@ class DashboardClient:
             )
             response.raise_for_status()
             return response.json()
+
+    @staticmethod
+    def safe_error(exc: Exception) -> str:
+        prefix = "Authenticated delivery evidence is unavailable."
+        if isinstance(exc, httpx.TimeoutException):
+            return f"{prefix} API authentication timed out."
+        if isinstance(exc, httpx.ConnectError):
+            return f"{prefix} API is unreachable."
+        if isinstance(exc, httpx.HTTPStatusError):
+            status = exc.response.status_code
+            if status in {401, 403}:
+                return f"{prefix} API authorization failed ({status})."
+            if status == 404:
+                return f"{prefix} Publication query was not found (404)."
+            if status == 500:
+                return f"{prefix} Authenticated catalog is not ready (500)."
+            return f"{prefix} API request failed ({status})."
+        return f"{prefix} Local delivery error ({type(exc).__name__}); review local logs."
 
     @staticmethod
     def _safe_path(path: str) -> str:

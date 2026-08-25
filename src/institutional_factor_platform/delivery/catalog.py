@@ -4,6 +4,7 @@ import hashlib
 import json
 from dataclasses import asdict
 from pathlib import Path
+from threading import RLock
 from typing import Any, cast
 
 import pyarrow as pa
@@ -31,6 +32,7 @@ class DeliveryCatalog:
 
     def __init__(self, root: Path) -> None:
         self.root = root.resolve()
+        self._authentication_lock = RLock()
         phase1 = DataIngestionService(load_phase1_config(), root=self.root)
         factors = load_factor_config()
         pricing = load_asset_pricing_config()
@@ -49,6 +51,10 @@ class DeliveryCatalog:
         }
 
     def list(self, kind: PublicationKind | None = None) -> tuple[PublicationSummary, ...]:
+        with self._authentication_lock:
+            return self._list(kind)
+
+    def _list(self, kind: PublicationKind | None = None) -> tuple[PublicationSummary, ...]:
         kinds: tuple[PublicationKind, ...] = (
             (kind,) if kind else ("data", "factors", "asset_pricing", "portfolio", "ml")
         )
@@ -75,13 +81,14 @@ class DeliveryCatalog:
         return tuple(sorted(records, key=lambda item: (item.kind, item.publication_id)))
 
     def manifest(self, kind: PublicationKind, publication_id: str) -> dict[str, Any]:
-        validate_identifier(publication_id)
-        if kind == "data":
-            return asdict(self.data.get(publication_id))
-        return cast(
-            dict[str, Any],
-            self.repositories[kind].authenticate(publication_id).model_dump(mode="json"),
-        )
+        with self._authentication_lock:
+            validate_identifier(publication_id)
+            if kind == "data":
+                return asdict(self.data.get(publication_id))
+            return cast(
+                dict[str, Any],
+                self.repositories[kind].authenticate(publication_id).model_dump(mode="json"),
+            )
 
     def find(self, publication_id: str) -> tuple[PublicationKind, dict[str, Any]]:
         validate_identifier(publication_id)

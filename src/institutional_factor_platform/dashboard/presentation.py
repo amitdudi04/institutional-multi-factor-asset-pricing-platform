@@ -57,6 +57,21 @@ def provenance_panel(manifest: dict[str, Any]) -> dict[str, str]:
     }
 
 
+def publication_options(
+    items: list[dict[str, Any]], preferred_id: str | None = None
+) -> list[dict[str, Any]]:
+    """Prefer the newest authenticated evidence without deleting historical publications."""
+    return sorted(
+        items,
+        key=lambda item: (
+            str(item.get("publication_id")) == preferred_id,
+            str(item.get("created_at") or ""),
+            str(item.get("publication_id") or ""),
+        ),
+        reverse=True,
+    )
+
+
 def chart_from_page(
     records: list[dict[str, Any]], x: str, y: str, maximum_rows: int, unit: str | None = None
 ) -> Figure | None:

@@ -10,8 +10,10 @@ from institutional_factor_platform.dashboard.presentation import (
     EMPTY_STATE,
     PAGES,
     provenance_panel,
+    publication_options,
 )
 from institutional_factor_platform.delivery.config import load_delivery_config
+from institutional_factor_platform.ml.config import load_ml_config
 
 
 def main() -> None:
@@ -30,8 +32,8 @@ def main() -> None:
             _reports(client)
         else:
             _research_page(client, selected.key)
-    except Exception:
-        st.error("Authenticated delivery evidence is unavailable. Review API readiness and logs.")
+    except Exception as exc:
+        st.error(client.safe_error(exc))
     st.divider()
     st.caption("Research outputs are not financial advice or investment recommendations.")
 
@@ -64,7 +66,7 @@ def _research_page(client: DashboardClient, key: str) -> None:
         "validation": "publications",
     }[key]
     page = client.get(family)
-    items = page["items"]
+    items = publication_options(page["items"], _preferred_publication_id(key))
     if not items:
         st.info(EMPTY_STATE)
         if key == "ml":
@@ -144,6 +146,16 @@ def _detail_sections(key: str) -> tuple[tuple[str, str], ...]:
         ),
         "validation": (("Verification", "verify"),),
     }[key]
+
+
+def _preferred_publication_id(key: str) -> str | None:
+    inputs = load_ml_config().inputs
+    return {
+        "factors": inputs.phase2_publication_id,
+        "asset_pricing": inputs.phase3_publication_id,
+        "portfolio": inputs.phase4_publication_id,
+        "risk": inputs.phase4_publication_id,
+    }.get(key)
 
 
 if __name__ == "__main__":

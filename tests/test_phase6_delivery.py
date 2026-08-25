@@ -4,6 +4,8 @@ import json
 import logging
 import os
 import sys
+import threading
+import time
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -28,6 +30,7 @@ from institutional_factor_platform.dashboard.presentation import (
     chart_from_page,
     format_value,
     provenance_panel,
+    publication_options,
 )
 from institutional_factor_platform.data.domain import DatasetStatus
 from institutional_factor_platform.delivery.catalog import DeliveryCatalog
@@ -451,6 +454,15 @@ def test_dashboard_presentation_and_client(tmp_path: Path, monkeypatch: pytest.M
     panel = provenance_panel({"publication_id": "factor-123", "validation_status": "PASS"})
     assert panel["Publication"] == "factor-123"
     assert panel["Git commit"] == "Unavailable"
+    options = publication_options(
+        [
+            {"publication_id": "asset-pricing-old", "created_at": "2026-01-01T00:00:00Z"},
+            {"publication_id": "asset-pricing-final", "created_at": "2026-02-01T00:00:00Z"},
+        ]
+    )
+    assert options[0]["publication_id"] == "asset-pricing-final"
+    preferred = publication_options(options, "asset-pricing-old")
+    assert preferred[0]["publication_id"] == "asset-pricing-old"
     assert chart_from_page([], "date", "value", 5) is None
     assert chart_from_page([{"other": 1}], "date", "value", 5) is None
     figure = chart_from_page([{"date": "2026-01-01", "value": 1.0}], "date", "value", 5, "return")
@@ -476,9 +488,47 @@ def test_dashboard_presentation_and_client(tmp_path: Path, monkeypatch: pytest.M
     fake.post.return_value = Response()
     monkeypatch.setattr(httpx, "Client", Mock(return_value=fake))
     assert client.get("ready") == {"ok": True}
+    assert httpx.Client.call_args.kwargs["timeout"] == 600
+    assert client.get("asset-pricing/publications") == {"ok": True}
+    assert httpx.Client.call_args.kwargs["timeout"] == 600
     assert client.post_report({"publications": []}) == {"ok": True}
     monkeypatch.setenv("IFP_TEST_TOKEN", "owner-secret")
     assert client._headers() == {"authorization": "Bearer owner-secret"}
+    timeout_request = httpx.Request("GET", "http://127.0.0.1:8000/api/v1/ready")
+    assert "timed out" in client.safe_error(httpx.ReadTimeout("slow", request=timeout_request))
+    response = httpx.Response(401, request=timeout_request)
+    assert "authorization failed (401)" in client.safe_error(
+        httpx.HTTPStatusError("unauthorized", request=timeout_request, response=response)
+    )
+
+
+def test_delivery_catalog_serializes_authenticated_discovery() -> None:
+    catalog = DeliveryCatalog.__new__(DeliveryCatalog)
+    catalog.root = Path.cwd()
+    catalog._authentication_lock = threading.RLock()
+    active = 0
+    maximum_active = 0
+    state_lock = threading.Lock()
+
+    class DataRepository:
+        def list_authenticated(self) -> tuple[tuple[str, str, str], ...]:
+            nonlocal active, maximum_active
+            with state_lock:
+                active += 1
+                maximum_active = max(maximum_active, active)
+            time.sleep(0.05)
+            with state_lock:
+                active -= 1
+            return ()
+
+    catalog.data = DataRepository()
+    catalog.repositories = {}
+    workers = [threading.Thread(target=catalog.list, args=("data",)) for _ in range(2)]
+    for worker in workers:
+        worker.start()
+    for worker in workers:
+        worker.join()
+    assert maximum_active == 1
 
 
 def test_metrics_and_log_redaction(caplog: pytest.LogCaptureFixture) -> None:
@@ -609,6 +659,7 @@ def test_catalog_all_repository_paths(tmp_path: Path) -> None:
     )
     catalog = DeliveryCatalog.__new__(DeliveryCatalog)
     catalog.root = tmp_path
+    catalog._authentication_lock = threading.RLock()
     catalog.data = DataRepository()
     catalog.repositories = {
         "factors": Repository(Manifest("factor-123"), table),
