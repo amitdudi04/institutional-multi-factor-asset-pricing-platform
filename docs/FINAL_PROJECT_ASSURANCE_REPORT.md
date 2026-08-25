@@ -63,3 +63,17 @@ Warnings are non-blocking: the suite reports one FastAPI/Starlette TestClient de
 ## Verdict
 
 `LOCAL EMPIRICAL PHASES 1-8 COMPLETE — FINAL ASSURANCE PASSED`
+
+## Publication Readiness
+
+### SSRN-ready
+
+Yes, after ordinary author formatting and completion of formal citations. The study has a defined question, immutable empirical evidence, documented methodology, quantitative results, robustness checks, explicit hypothesis classifications, reproducibility instructions, and disciplined limitations. An SSRN upload should present it as a working paper and include the released empirical tag.
+
+### Working-paper ready
+
+Yes. The current document is suitable for supervisor, admissions, seminar, or replication review. Its strongest contribution is an auditable public-data research workflow and evidence about how data and governance constraints change claims—not a new persistent-alpha result.
+
+### Journal submission not yet recommended
+
+A journal submission is not yet recommended. The paper needs a formal bibliography and deeper literature positioning, an independently specified economic contribution, longer portfolio evidence, proprietary-data replication where lawful, broader robustness against source-selection effects, and ideally an untouched external holdout. These are research extensions, not reasons to alter the released conclusions.

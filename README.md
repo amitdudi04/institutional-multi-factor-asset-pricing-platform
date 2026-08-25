@@ -2,6 +2,24 @@
 
 An authenticated, reproducible institutional-style quantitative research platform spanning governed data, factor research, classical asset pricing, constrained portfolios, risk, explainable machine learning, and non-advisory research delivery.
 
+## Project at a glance
+
+This independent research project asks what remains of a multi-factor US-equity research pipeline when historical identity, filing-time availability, transaction costs, out-of-sample evaluation, and reproducibility are treated as first-class constraints. It connects effective-dated market and SEC evidence to factor construction, asset-pricing tests, constrained portfolios, walk-forward machine learning, and authenticated research delivery.
+
+The difficult part was not producing another backtest. It was preventing present-day tickers, late-filed fundamentals, unavailable securities, inconsistent adjustment bases, or future outcomes from silently entering earlier decisions. The system therefore fails closed when evidence cannot support a claim. That design produced an important negative result: multifactor models improved in-sample fit, but the study did not establish stable machine-learning predictability or after-cost incremental value.
+
+| Verified project evidence | Result |
+|---|---:|
+| Securities screened / accepted | 822 / 487 |
+| Market / fundamental observations | 715,447 / 37,273 |
+| Factor definitions / estimable | 48 / 47 |
+| Configured asset-pricing models | 5 |
+| Portfolio methods / ML models | 8 / 8 |
+| Walk-forward ML folds | 17 |
+| Tests / branch-aware coverage | 300 / 90.59% |
+
+For a rapid review, read the [case study](docs/PROJECT_CASE_STUDY.md), [research paper](docs/FINAL_RESEARCH_PAPER.md), and [final assurance report](docs/FINAL_PROJECT_ASSURANCE_REPORT.md). The project demonstrates combined finance, econometrics, software architecture, data engineering, and model-risk judgment; it does not claim professional investment experience or persistent alpha.
+
 ## Status
 
 The software implementation spans Phases 1-6, and the final local empirical study spans Phases 1-8. All 822 HF Data Library stock candidates were screened before performance analysis, producing 487 defensibly bounded equities (372 Tier A, 115 Tier B). Raw, processed, and generated empirical artifacts remain local and untracked.
@@ -77,7 +95,7 @@ uv run mypy src
 uv lock --check
 ```
 
-The local gate requires the complete test suite, at least 90% branch-aware coverage, strict source typing, lint/format, dependency and repository-integrity checks, plus restart and tamper assurance. Docker and GitHub operations were explicitly deferred by the owner for the Prompt 23 run.
+The release gate requires the complete test suite, at least 90% branch-aware coverage, strict source typing, lint/format, dependency and repository-integrity checks, plus restart and tamper assurance.
 
 ## Security and data policy
 
@@ -101,7 +119,7 @@ The platform includes point-in-time factor construction; CAPM and multifactor re
 - Effective coverage is bounded: annual security breadth rises from 4 in 2018 to 487 in 2024–2026; missing early PIT evidence is not backfilled.
 - Phase 4 evidence spans only 32 months and uses factor-portfolio test assets; its observed performance is not evidence of persistence.
 - Phase 5 does not establish stable incremental predictive or after-cost economic value; explanation metrics are non-causal.
-- Docker and GitHub/merge/tag operations were deferred by the owner and were not checked in this run.
+- The authenticated research release is tagged, but GitHub Actions remain subject to an external account/billing limitation; Docker was outside the empirical assurance scope.
 - See the [Final Research Paper](docs/FINAL_RESEARCH_PAPER.md) and [Final Project Assurance Report](docs/FINAL_PROJECT_ASSURANCE_REPORT.md).
 
 ## Reproducibility and academic use

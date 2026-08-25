@@ -2,6 +2,37 @@
 
 Reproduction requires the ignored local source cache, mapping authorities, governed YAML configuration, repository revision, and locked Python environment. Third-party raw data must not be committed or redistributed.
 
+## Released research identity
+
+- Validated merged commit: `5a3e930665756fa7aaedeceb5f9ab90792bcf849`
+- Empirical tag: `research-empirical-public-v1`
+- Project-complete tag: `project-complete-public-data-v1`
+
+The tags identify the audited empirical state. Later documentation-only commits must not move them.
+
+## Environment setup
+
+Install Python 3.11 or newer and `uv`, check out one of the empirical tags, and run `uv sync --all-groups`. Configuration lives under `config/`; dependency identity is locked in `uv.lock`. Do not substitute package versions silently when attempting an exact reproduction.
+
+## Data-source and credential requirements
+
+The study depends on locally retained, lawfully obtained HF Data Library market evidence, Alpha Vantage listing/lifecycle evidence, SEC EDGAR submissions and XBRL evidence, FRED macro/risk-free evidence, Kenneth French Library factors, and the persisted issuer/listing mapping authorities. Availability and licence terms remain source-specific.
+
+Credentials, where a provider requires them, are supplied only through environment variables described by `.env.example`. Never place live values in YAML, Markdown, command history, manifests, or committed `.env` files. A reviewer without the original source cache can audit code, configuration, tests, schemas, and publication identities but cannot reconstruct third-party empirical bytes from Git alone.
+
+## Pipeline order
+
+1. Validate configuration and confirm the checked-out empirical tag.
+2. Place immutable source evidence in the configured ignored raw paths.
+3. Rebuild or authenticate effective-dated security, issuer/listing, lifecycle, share, and fundamental authorities.
+4. Authenticate the two Phase 1 research inputs.
+5. Reproduce/authenticate Phase 2 factors, then Phase 3 asset-pricing publications.
+6. Reproduce/authenticate Phase 4 portfolios and scenarios using frozen 5/10/20 bps costs.
+7. Reproduce/authenticate Phase 5 monthly walk-forward models using the exact Phase 4 parent.
+8. Verify Phase 6 delivery and reports, then run catalog, test, restart, and tamper gates.
+
+No phase should be run against an unauthenticated or identity-mismatched parent.
+
 ## Canonical chain
 
 - Phase 1 market: `factor_market_input-89848f8e3c34d53d0432f6e0`
@@ -33,4 +64,8 @@ uv run institutional-factor-platform verify-delivery-platform
 git diff --check
 ```
 
-Identical source bytes, mappings, configuration, and code identity must authenticate the same immutable publications. A new analytical code commit intentionally produces new publication IDs; historical publications remain immutable. `equity_issuance` must remain non-estimable unless defensible source inputs and policy are added through governance. Docker and GitHub/merge/tag operations were deferred and are not evidence from this run.
+Identical source bytes, mappings, configuration, and code identity must authenticate the same immutable publications. A new analytical code commit intentionally produces new publication IDs; historical publications remain immutable. `equity_issuance` must remain non-estimable unless defensible source inputs and policy are added through governance.
+
+## Expected limitations during reproduction
+
+The source-selected universe is not CRSP/Compustat or historical-index replication. Early point-in-time breadth is limited, third-party data cannot be redistributed through this repository, and exact reproduction depends on retaining the licensed/permitted local evidence. Test fixtures demonstrate software behavior only and must never be reported as empirical replication.
