@@ -12,6 +12,7 @@ from institutional_factor_platform.data.domain import (
     DataSource,
     IssuerId,
     IssuerListingMapping,
+    IssuerSuccessionRecord,
     ListingType,
     MappingEvidence,
     MappingStatus,
@@ -191,6 +192,15 @@ class IssuerListingMappingStore:
             raise SecurityMappingError(f"Invalid issuer-listing mapping store: {exc}") from exc
 
     def resolve(self, issuer_id: IssuerId, as_of: date) -> SecurityId:
+        matches = self.resolve_all(issuer_id, as_of)
+        if len(matches) != 1:
+            raise SecurityMappingError(
+                "Issuer has multiple resolved listings; a singular listing join is ambiguous."
+            )
+        return matches[0]
+
+    def resolve_all(self, issuer_id: IssuerId, as_of: date) -> tuple[SecurityId, ...]:
+        """Resolve every authenticated listing for an issuer without collapsing share classes."""
         active = [
             item
             for item in self.load()
@@ -203,12 +213,41 @@ class IssuerListingMappingStore:
                 "Issuer-to-listing evidence is unresolved or ambiguous; conflict is preserved."
             )
         matches = {item.security_id for item in active}
-        if len(matches) != 1 or None in matches:
+        if not matches or None in matches:
             raise SecurityMappingError("Issuer-to-listing relationship is unresolved or ambiguous.")
-        resolved = next(iter(matches))
-        if resolved is None:
-            raise SecurityMappingError("Resolved issuer mapping unexpectedly lacks listing ID.")
-        return resolved
+        return tuple(
+            sorted((item for item in matches if item is not None), key=lambda item: item.value)
+        )
+
+
+class IssuerSuccessionStore:
+    """Immutable effective-dated legal-issuer succession; issuer IDs are never rewritten."""
+
+    def __init__(self, path: Path) -> None:
+        self.path = path
+
+    def persist(self, records: tuple[IssuerSuccessionRecord, ...]) -> None:
+        _validate_issuer_successions(records)
+        atomic_write_json(self.path, [_issuer_succession_dict(item) for item in records])
+
+    def load(self) -> tuple[IssuerSuccessionRecord, ...]:
+        try:
+            values = json.loads(self.path.read_text(encoding="utf-8"))
+            records = tuple(_issuer_succession_from_dict(item) for item in values)
+            _validate_issuer_successions(records)
+            return records
+        except (OSError, ValueError, TypeError, KeyError) as exc:
+            raise SecurityMappingError(f"Invalid issuer succession store: {exc}") from exc
+
+    def resolve_successor(self, issuer_id: IssuerId, as_of: date) -> IssuerId:
+        matches = {
+            item.successor_issuer_id
+            for item in self.load()
+            if item.predecessor_issuer_id == issuer_id and item.effective_date <= as_of
+        }
+        if len(matches) != 1:
+            raise SecurityMappingError("Issuer successor is unresolved or ambiguous.")
+        return next(iter(matches))
 
 
 def mapping_from_listing(
@@ -332,13 +371,23 @@ def _validate_issuer_listing_mappings(mappings: tuple[IssuerListingMapping, ...]
             overlaps = (left.valid_to is None or right.valid_from <= left.valid_to) and (
                 right.valid_to is None or left.valid_from <= right.valid_to
             )
-            if (
-                overlaps
-                and left.status is MappingStatus.RESOLVED
-                and right.status is MappingStatus.RESOLVED
-                and left.security_id != right.security_id
-            ):
-                raise SecurityMappingError("Conflicting effective issuer-to-listing mappings.")
+            if overlaps and left.security_id == right.security_id and left.status == right.status:
+                raise SecurityMappingError("Duplicate overlapping issuer-to-listing mapping.")
+
+
+def _validate_issuer_successions(records: tuple[IssuerSuccessionRecord, ...]) -> None:
+    predecessors = [item.predecessor_issuer_id for item in records]
+    if len(predecessors) != len(set(predecessors)):
+        raise SecurityMappingError("Issuer succession has multiple successor edges.")
+    graph = {item.predecessor_issuer_id: item.successor_issuer_id for item in records}
+    for start in graph:
+        observed: set[IssuerId] = set()
+        current = start
+        while current in graph:
+            if current in observed:
+                raise SecurityMappingError("Issuer succession graph contains a cycle.")
+            observed.add(current)
+            current = graph[current]
 
 
 def _symbol_dict(value: SymbolHistoryRecord) -> dict[str, object]:
@@ -396,6 +445,32 @@ def _issuer_listing_from_dict(value: dict[str, object]) -> IssuerListingMapping:
         valid_to=date.fromisoformat(str(value["valid_to"])) if value.get("valid_to") else None,
         status=MappingStatus(str(value["status"])),
         evidence=MappingEvidence(str(value["evidence"])),
+        provenance=str(value["provenance"]),
+        retrieval_timestamp=datetime.fromisoformat(str(value["retrieval_timestamp"])),
+    )
+
+
+def _issuer_succession_dict(value: IssuerSuccessionRecord) -> dict[str, object]:
+    return {
+        "predecessor_issuer_id": value.predecessor_issuer_id.value,
+        "successor_issuer_id": value.successor_issuer_id.value,
+        "effective_date": value.effective_date.isoformat(),
+        "relationship": value.relationship,
+        "evidence_reference": value.evidence_reference,
+        "provenance": value.provenance,
+        "retrieval_timestamp": value.retrieval_timestamp.isoformat(),
+    }
+
+
+def _issuer_succession_from_dict(value: dict[str, object]) -> IssuerSuccessionRecord:
+    from datetime import datetime
+
+    return IssuerSuccessionRecord(
+        predecessor_issuer_id=IssuerId(str(value["predecessor_issuer_id"])),
+        successor_issuer_id=IssuerId(str(value["successor_issuer_id"])),
+        effective_date=date.fromisoformat(str(value["effective_date"])),
+        relationship=str(value["relationship"]),
+        evidence_reference=str(value["evidence_reference"]),
         provenance=str(value["provenance"]),
         retrieval_timestamp=datetime.fromisoformat(str(value["retrieval_timestamp"])),
     )

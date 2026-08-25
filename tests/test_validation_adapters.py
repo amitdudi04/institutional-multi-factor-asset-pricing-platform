@@ -9,10 +9,15 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 import pytest
+from pydantic import SecretStr
 
 from institutional_factor_platform.data.calendar import USEquityCalendar
 from institutional_factor_platform.data.config import load_phase1_config
-from institutional_factor_platform.data.contracts import MACRO_OBSERVATIONS
+from institutional_factor_platform.data.contracts import (
+    FACTOR_FUNDAMENTAL_INPUT,
+    MACRO_OBSERVATIONS,
+    SEC_FACTS,
+)
 from institutional_factor_platform.data.domain import (
     DataSource,
     DateRange,
@@ -25,9 +30,11 @@ from institutional_factor_platform.data.security_master import (
     SecurityMappingStore,
     mapping_from_listing,
 )
-from institutional_factor_platform.data.sources.base import HttpTransport
+from institutional_factor_platform.data.sources.alpha_vantage import AlphaVantageListingAdapter
+from institutional_factor_platform.data.sources.base import HttpTransport, _redact_url
 from institutional_factor_platform.data.sources.fred import FredAdapter
 from institutional_factor_platform.data.sources.french import KennethFrenchAdapter
+from institutional_factor_platform.data.sources.hf_data_library import HFDataLibraryAdapter
 from institutional_factor_platform.data.sources.owner_supplied import OwnerSuppliedAdapter
 from institutional_factor_platform.data.sources.sec_edgar import SecEdgarAdapter
 from institutional_factor_platform.data.sources.yahoo import YahooFinanceAdapter
@@ -131,7 +138,197 @@ def test_french_records_unit_transformation() -> None:
         adapter.retrieve(RetrievalRequest(DataSource.KENNETH_FRENCH, "unknown"))
 
 
-def test_sec_requires_contact_and_preserves_filing_metadata() -> None:
+def test_alpha_vantage_listing_lifecycle_is_strict_and_secret_safe() -> None:
+    config = load_phase1_config()
+    settings = config.sources.alpha_vantage.model_copy(
+        update={"api_key": SecretStr("fixture-secret")}
+    )
+    payload = (
+        b"symbol,name,exchange,assetType,ipoDate,delistingDate,status\n"
+        b"SYNTH,Synthetic Issuer,NYSE,Stock,2011-01-03,null,Active\n"
+    )
+    adapter = AlphaVantageListingAdapter(
+        settings,
+        _transport(httpx.MockTransport(lambda request: httpx.Response(200, content=payload))),
+        now=lambda: NOW,
+    )
+    request = RetrievalRequest(
+        DataSource.ALPHA_VANTAGE,
+        "listing_status",
+        parameters={"state": "active", "date": "2014-07-10"},
+    )
+    records = adapter.standardize(adapter.retrieve(request), request)
+    assert records[0]["symbol"] == "SYNTH"
+    assert records[0]["as_of_date"] == date(2014, 7, 10)
+    assert records[0]["status"] == "active"
+    assert records[0]["source_duplicate_count"] == 1
+    with pytest.raises(RetrievalError, match="rate-limit"):
+        adapter.standardize(b'{"Note":"limit"}', request)
+    with pytest.raises(RetrievalError, match="schema changed"):
+        adapter.standardize(b"wrong,columns\n1,2\n", request)
+    with pytest.raises(RetrievalError, match="state"):
+        adapter.retrieve(
+            RetrievalRequest(
+                DataSource.ALPHA_VANTAGE,
+                "listing_status",
+                parameters={"state": "invalid"},
+            )
+        )
+
+
+def test_http_url_redaction_removes_query_credentials() -> None:
+    redacted = _redact_url(
+        "https://example.invalid/query?function=TEST&apikey=literal-secret&date=2020-01-01"
+    )
+    assert "literal-secret" not in redacted
+    assert "apikey=%5BREDACTED%5D" in redacted
+
+
+def test_hf_daily_market_requires_attribution_and_mapping(tmp_path: Path) -> None:
+    buffer = io.BytesIO()
+    table = pa.table(
+        {
+            "datetime": [datetime(2024, 1, 2)],
+            "Open": [10.0],
+            "High": [11.0],
+            "Low": [9.0],
+            "Close": [10.5],
+            "Volume": [100],
+            "source": ["pitrading"],
+        }
+    ).replace_schema_metadata(
+        {b"citation": b"CC BY 4.0 fixture", b"iex_attribution": b"IEX fixture"}
+    )
+    pq.write_table(table, buffer)
+    mapping_store = SecurityMappingStore(tmp_path / "hf-mappings.json")
+    mapping_store.persist(
+        (
+            mapping_from_listing(
+                source=DataSource.HF_DATA_LIBRARY,
+                source_identifier="SYNTH",
+                ticker="SYNTH",
+                exchange="XNYS",
+                mic="XNYS",
+                valid_from=date(2020, 1, 1),
+                valid_to=None,
+                provenance="CC BY 4.0 synthetic fixture",
+                retrieval_timestamp=NOW,
+                security_id=SecurityId.assign(),
+            ),
+        )
+    )
+    settings = load_phase1_config().sources.hf_data_library.model_copy(
+        update={"api_key": SecretStr("fixture-secret")}
+    )
+    token = b'{"url":"https://api.hfdatalibrary.com/v1/download/SYNTH?token=fixture"}'
+
+    def response(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200, content=token if "download-token" in str(request.url) else buffer.getvalue()
+        )
+
+    adapter = HFDataLibraryAdapter(
+        settings,
+        _transport(httpx.MockTransport(response)),
+        mapping_store,
+        now=lambda: NOW,
+    )
+    request = RetrievalRequest(
+        DataSource.HF_DATA_LIBRARY,
+        "daily_market",
+        DateRange(date(2024, 1, 1), date(2024, 1, 3)),
+        identifiers=("SYNTH",),
+    )
+    records = adapter.standardize(adapter.retrieve(request), request)
+    assert records[0]["ticker"] == "SYNTH"
+    assert records[0]["adjusted_close"] == 10.5
+    assert records[0]["dividend"] is None
+    assert records[0]["source"] == "hf_data_library:pitrading"
+    with pytest.raises(RetrievalError, match="mapping authority"):
+        HFDataLibraryAdapter(settings, adapter.transport).standardize(buffer.getvalue(), request)
+
+
+def test_hf_public_inventory_reconciles_classification() -> None:
+    settings = load_phase1_config().sources.hf_data_library
+    symbols = json.dumps(
+        {
+            "symbols": [
+                {"ticker": "SYNTH", "size_bytes": 10, "last_modified": "2026-01-01T00:00:00Z"},
+                {"ticker": "ETF1", "size_bytes": 20, "last_modified": "2026-01-02T00:00:00Z"},
+            ]
+        }
+    ).encode()
+    metadata = json.dumps({"SYNTH": {"type": "Stock"}, "ETF1": {"type": "ETF"}}).encode()
+
+    def response(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            content=metadata if "ticker_meta.json" in str(request.url) else symbols,
+        )
+
+    inventory = HFDataLibraryAdapter(
+        settings,
+        _transport(httpx.MockTransport(response)),
+        now=lambda: NOW,
+    ).inventory()
+    assert inventory["record_count"] == 2
+    assert inventory["selected_count"] == 1
+    assert inventory["rejected_count"] == 1
+    assert inventory["records"][1]["reason"] == "ETF excluded by project policy"  # type: ignore[index]
+
+
+def test_hf_rejects_adjusted_price_discontinuity_at_source_splice(tmp_path: Path) -> None:
+    buffer = io.BytesIO()
+    table = pa.table(
+        {
+            "datetime": [datetime(2022, 3, 4), datetime(2022, 3, 7)],
+            "Open": [100.0, 5.0],
+            "High": [101.0, 5.1],
+            "Low": [99.0, 4.9],
+            "Close": [100.0, 5.0],
+            "Volume": [100, 100],
+            "source": ["pitrading", "iex"],
+        }
+    ).replace_schema_metadata(
+        {b"citation": b"CC BY 4.0 fixture", b"iex_attribution": b"IEX fixture"}
+    )
+    pq.write_table(table, buffer)
+    mapping_store = SecurityMappingStore(tmp_path / "hf-splice-mappings.json")
+    mapping_store.persist(
+        (
+            mapping_from_listing(
+                source=DataSource.HF_DATA_LIBRARY,
+                source_identifier="SYNTH",
+                ticker="SYNTH",
+                exchange="XNYS",
+                mic="XNYS",
+                valid_from=date(2020, 1, 1),
+                valid_to=None,
+                provenance="synthetic splice fixture",
+                retrieval_timestamp=NOW,
+                security_id=SecurityId.assign(),
+            ),
+        )
+    )
+    request = RetrievalRequest(
+        DataSource.HF_DATA_LIBRARY,
+        "daily_market",
+        DateRange(date(2022, 3, 4), date(2022, 3, 7)),
+        identifiers=("SYNTH",),
+    )
+    with pytest.raises(RetrievalError, match="continuity"):
+        HFDataLibraryAdapter(
+            load_phase1_config().sources.hf_data_library,
+            _transport(httpx.MockTransport(lambda _: httpx.Response(200))),
+            mapping_store,
+            now=lambda: NOW,
+        ).standardize(buffer.getvalue(), request)
+
+
+def test_sec_requires_contact_and_preserves_filing_metadata(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.delenv("IFP_SEC_CONTACT_EMAIL", raising=False)
     config = load_phase1_config()
     no_contact = SecEdgarAdapter(
         config.sources.sec, _transport(httpx.MockTransport(lambda _: httpx.Response(200)))
@@ -161,7 +358,17 @@ def test_sec_requires_contact_and_preserves_filing_metadata() -> None:
                                 "accn": "0000000001-24-000001",
                                 "fy": 2023,
                                 "fp": "FY",
-                            }
+                            },
+                            {
+                                "val": 4,
+                                "start": "2023-10-01",
+                                "end": "2023-12-31",
+                                "filed": "2024-02-01",
+                                "form": "10-K",
+                                "accn": "0000000001-24-000001",
+                                "fy": 2023,
+                                "fp": "FY",
+                            },
                         ]
                     },
                 }
@@ -174,7 +381,9 @@ def test_sec_requires_contact_and_preserves_filing_metadata() -> None:
     assert records[0]["filing_date"] == date(2024, 2, 1)
     assert records[0]["availability_timestamp"] >= datetime(2024, 2, 1, tzinfo=UTC)
     assert records[0]["availability_quality"] == "INFERRED_DATE_LEVEL"
-    assert records[0]["schema_version"] == "3.0.0"
+    assert records[0]["schema_version"] == "3.1.0"
+    assert len(records) == 2
+    assert not validate_table(pa.Table.from_pylist(records, schema=SEC_FACTS.schema), SEC_FACTS)
     assert str(records[0]["issuer_id"]).startswith("issuer_")
     with pytest.raises(RetrievalError, match="Invalid SEC JSON"):
         adapter.standardize(b"not json", RetrievalRequest(DataSource.SEC_EDGAR, "1"))
@@ -373,6 +582,58 @@ def test_owner_adapter_requires_explicit_contract(tmp_path: Path) -> None:
     )
     with pytest.raises(UnsupportedDatasetError, match="exactly cover"):
         adapter.retrieve(wrong_field)
+
+
+def test_owner_fundamentals_accept_only_the_declared_observed_subset(tmp_path: Path) -> None:
+    path = tmp_path / "partial-fundamentals.parquet"
+    pq.write_table(
+        pa.Table.from_pylist(
+            [
+                {
+                    "security_id": "sec_" + "1" * 32,
+                    "period_end": date(2023, 12, 31),
+                    "available_at": datetime(2024, 2, 1, tzinfo=UTC),
+                    "field": "book_equity",
+                    "value": 10.0,
+                    "unit": "USD",
+                }
+            ],
+            schema=FACTOR_FUNDAMENTAL_INPUT.schema,
+        ),
+        path,
+    )
+    parameters = {
+        "path": str(path),
+        "schema": FACTOR_FUNDAMENTAL_INPUT.name,
+        "contract_version": FACTOR_FUNDAMENTAL_INPUT.version,
+        "source_name": "synthetic partial SEC projection",
+        "source_ownership": "test fixture",
+        "units": {"book_equity": "USD"},
+        "date_semantics": "synthetic filing availability",
+        "security_identifier_semantics": "synthetic persisted listing identity",
+        "mapping_authority_path": str(tmp_path / "mapping.json"),
+    }
+    request = RetrievalRequest(
+        DataSource.OWNER_SUPPLIED, "partial-fundamentals", parameters=parameters
+    )
+    adapter = OwnerSuppliedAdapter()
+    assert len(adapter.standardize(adapter.retrieve(request), request)) == 1
+
+    contradictory = RetrievalRequest(
+        DataSource.OWNER_SUPPLIED,
+        "partial-fundamentals",
+        parameters={**parameters, "units": {"book_equity": "USD", "net_income": "USD"}},
+    )
+    with pytest.raises(UnsupportedDatasetError, match="observed fields"):
+        adapter.standardize(adapter.retrieve(contradictory), contradictory)
+
+    unknown = RetrievalRequest(
+        DataSource.OWNER_SUPPLIED,
+        "partial-fundamentals",
+        parameters={**parameters, "units": {"invented": "USD"}},
+    )
+    with pytest.raises(UnsupportedDatasetError, match="extra"):
+        adapter.retrieve(unknown)
 
 
 def test_common_market_and_temporal_validation() -> None:

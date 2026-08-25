@@ -1,3 +1,4 @@
+import json
 from dataclasses import replace
 from datetime import UTC, date, datetime
 from pathlib import Path
@@ -18,6 +19,7 @@ from institutional_factor_platform.data.domain import (
     DateRange,
     IssuerId,
     IssuerListingMapping,
+    IssuerSuccessionRecord,
     ListingType,
     MappingEvidence,
     MappingStatus,
@@ -28,6 +30,7 @@ from institutional_factor_platform.data.domain import (
 )
 from institutional_factor_platform.data.security_master import (
     IssuerListingMappingStore,
+    IssuerSuccessionStore,
     SecurityMappingStore,
     SymbolHistoryStore,
     mapping_from_listing,
@@ -45,16 +48,22 @@ def test_phase1_configuration_is_strict_hashable_and_redacted(
 ) -> None:
     monkeypatch.setenv("IFP_SEC_CONTACT_EMAIL", "owner@example.invalid")
     monkeypatch.setenv("IFP_FRED_API_KEY", "test-secret-not-a-live-key")
+    monkeypatch.setenv("IFP_ALPHA_VANTAGE_API_KEY", "test-alpha-secret")
+    monkeypatch.setenv("IFP_HF_DATA_LIBRARY_API_KEY", "test-hf-secret")
     config = load_phase1_config()
     assert len(config.configuration_hash()) == 64
     assert config.configuration_hash() == config.configuration_hash()
     redacted = config.redacted_dict()
     assert redacted["sources"]["sec"]["contact_email"] == "[REDACTED]"  # type: ignore[index]
     assert redacted["sources"]["fred"]["api_key"] == "**********"  # type: ignore[index]
+    assert redacted["sources"]["alpha_vantage"]["api_key"] == "**********"  # type: ignore[index]
+    assert redacted["sources"]["hf_data_library"]["api_key"] == "**********"  # type: ignore[index]
     snapshot = tmp_path / "snapshot.json"
     first = config.write_snapshot(snapshot)
     assert config.write_snapshot(snapshot) == first
     assert "owner@example.invalid" not in snapshot.read_text(encoding="utf-8")
+    assert "test-alpha-secret" not in snapshot.read_text(encoding="utf-8")
+    assert "test-hf-secret" not in snapshot.read_text(encoding="utf-8")
 
 
 def test_configuration_date_unknown_field_and_paths_fail(tmp_path: Path) -> None:
@@ -80,7 +89,10 @@ def test_configuration_date_unknown_field_and_paths_fail(tmp_path: Path) -> None
         paths.resolved(tmp_path)
 
 
-def test_sec_contact_is_required_only_for_live_retrieval() -> None:
+def test_sec_contact_is_required_only_for_live_retrieval(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.delenv("IFP_SEC_CONTACT_EMAIL", raising=False)
     config = load_phase1_config()
     with pytest.raises(ConfigurationError, match="IFP_SEC_CONTACT_EMAIL"):
         config.sources.sec.require_live_user_agent()
@@ -313,6 +325,14 @@ def test_issuer_identity_is_distinct_and_ambiguous_listing_join_blocks(tmp_path:
     store = IssuerListingMappingStore(tmp_path / "issuer-listing.json")
     store.persist((resolved,))
     assert IssuerListingMappingStore(store.path).resolve(issuer, date(2024, 1, 1)) == first
+    second_resolved = replace(resolved, security_id=second)
+    multiple_store = IssuerListingMappingStore(tmp_path / "issuer-listing-multiple.json")
+    multiple_store.persist((resolved, second_resolved))
+    assert multiple_store.resolve_all(issuer, date(2024, 1, 1)) == tuple(
+        sorted((first, second), key=lambda item: item.value)
+    )
+    with pytest.raises(SecurityMappingError, match="multiple resolved listings"):
+        multiple_store.resolve(issuer, date(2024, 1, 1))
     ambiguous = IssuerListingMapping(
         issuer,
         None,
@@ -327,3 +347,72 @@ def test_issuer_identity_is_distinct_and_ambiguous_listing_join_blocks(tmp_path:
     ambiguous_store.persist((ambiguous,))
     with pytest.raises(SecurityMappingError, match="unresolved or ambiguous"):
         ambiguous_store.resolve(issuer, date(2024, 1, 1))
+
+
+def test_issuer_succession_preserves_legal_identity_and_rejects_cycles(
+    tmp_path: Path,
+) -> None:
+    now = datetime(2026, 8, 18, tzinfo=UTC)
+    google = IssuerId.from_cik("1288776")
+    alphabet = IssuerId.from_cik("1652044")
+    succession = IssuerSuccessionRecord(
+        predecessor_issuer_id=google,
+        successor_issuer_id=alphabet,
+        effective_date=date(2015, 10, 2),
+        relationship="SUCCESSOR_ISSUER",
+        evidence_reference="SEC accession 0001193125-15-336550",
+        provenance="synthetic test record modeled on SEC evidence",
+        retrieval_timestamp=now,
+    )
+    store = IssuerSuccessionStore(tmp_path / "issuer-succession.json")
+    store.persist((succession,))
+    assert (
+        IssuerSuccessionStore(store.path).resolve_successor(google, date(2015, 10, 2)) == alphabet
+    )
+    with pytest.raises(SecurityMappingError, match="unresolved or ambiguous"):
+        store.resolve_successor(google, date(2015, 10, 1))
+    with pytest.raises(SecurityMappingError, match="multiple successor"):
+        store.persist(
+            (
+                succession,
+                replace(succession, effective_date=date(2015, 10, 3)),
+            )
+        )
+    with pytest.raises(SecurityMappingError, match="cycle"):
+        store.persist(
+            (
+                succession,
+                replace(
+                    succession,
+                    predecessor_issuer_id=alphabet,
+                    successor_issuer_id=google,
+                ),
+            )
+        )
+    store.path.write_text(
+        json.dumps(
+            [
+                {
+                    "predecessor_issuer_id": google.value,
+                    "successor_issuer_id": alphabet.value,
+                    "effective_date": "2015-10-02",
+                    "relationship": "SUCCESSOR_ISSUER",
+                    "evidence_reference": "SEC accession 0001193125-15-336550",
+                    "provenance": "synthetic tamper fixture",
+                    "retrieval_timestamp": now.isoformat(),
+                },
+                {
+                    "predecessor_issuer_id": alphabet.value,
+                    "successor_issuer_id": google.value,
+                    "effective_date": "2015-10-03",
+                    "relationship": "SUCCESSOR_ISSUER",
+                    "evidence_reference": "synthetic invalid reverse edge",
+                    "provenance": "synthetic tamper fixture",
+                    "retrieval_timestamp": now.isoformat(),
+                },
+            ]
+        ),
+        encoding="utf-8",
+    )
+    with pytest.raises(SecurityMappingError, match="cycle"):
+        store.load()

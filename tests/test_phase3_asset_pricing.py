@@ -260,6 +260,18 @@ def test_rolling_and_expanding_are_past_only() -> None:
         frame, "date", "return", ("x1", "x2"), window=10, expanding=True, covariance="HC1"
     )
     assert expanding["window_start"].nunique() == 1
+    sparse = frame.copy()
+    sparse.loc[sparse.index[:6], "x1"] = np.nan
+    sparse_windows = window_regressions(
+        sparse,
+        "date",
+        "return",
+        ("x1", "x2"),
+        window=12,
+        covariance="HC1",
+        minimum_observations=8,
+    )
+    assert sparse_windows["window_end"].min() > frame["date"].iloc[11]
     with pytest.raises(DataQualityError, match="one observation"):
         window_regressions(pd.concat([frame, frame.iloc[[0]]]), "date", "return", ("x1",), window=8)
 
@@ -312,6 +324,19 @@ def test_phase2_alignment_and_temporal_attacks_are_rejected() -> None:
         build_research_panel(conflict, portfolios, load_asset_pricing_config().factor_mappings)
     with pytest.raises(DataQualityError, match="unavailable"):
         build_research_panel(factors, portfolios, {"BAD": "not_present"})
+
+
+def test_phase3_excludes_non_estimable_sparse_factor_dates() -> None:
+    factors, portfolios = _phase2_tables()
+    target = portfolios.loc[portfolios["factor_id"].eq("log_market_cap")]
+    sparse_date = target["date"].min()
+    drop_index = target.loc[
+        target["date"].eq(sparse_date) & target["quantile"].eq(target["quantile"].max())
+    ].index
+    sparse = portfolios.drop(drop_index)
+    panel = build_research_panel(factors, sparse, {"SMB": "log_market_cap"})
+    assert sparse_date not in set(panel["date"])
+    assert not panel.empty
 
 
 class _FactorRepositoryFixture:

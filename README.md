@@ -4,9 +4,9 @@ An authenticated, reproducible institutional-style quantitative research platfor
 
 ## Status
 
-Phases 1-6 are implemented and exhaustively reconciled in v1.0.2. Immutable Phase 1 evidence flows through connected Phase 2-5 publications into the versioned FastAPI service, institutional Streamlit workspace, deterministic reporting, secure local Docker foundation, and CI gates. Authenticated synthetic assurance covers all 48 factors, six asset-pricing specifications, every supported ML target, the connected API/dashboard/report surfaces, restart authentication, and cross-phase tamper rejection.
+The software implementation spans Phases 1-6, and the final local empirical study spans Phases 1-8. All 822 HF Data Library stock candidates were screened before performance analysis, producing 487 defensibly bounded equities (372 Tier A, 115 Tier B). Raw, processed, and generated empirical artifacts remain local and untracked.
 
-No empirical dataset, factor premium, regression result, portfolio performance, model output, or investment conclusion is committed. Live empirical validation remains pending until lawful authenticated inputs and explicit study decisions are supplied.
+Authenticated publications now cover expanded Phase 1, all 48 configured Phase 2 factors (47 estimable; `equity_issuance` non-estimable), five Phase 3 asset-pricing families, eight Phase 4 portfolio methods under transaction costs frozen before performance, eight Phase 5 purged walk-forward models, and Phase 6 API/dashboard/report delivery. The empirical results do not establish stable alpha or ML value: multifactor fit improves in-sample, costs are material, and ML IC intervals include zero. These are free/public-data research findings, not an investment mandate or trading claim.
 
 ## Architecture
 
@@ -77,7 +77,7 @@ uv run mypy src
 uv lock --check
 ```
 
-The v1.0.2 gate requires the complete test suite, at least 90% branch-aware coverage, strict source typing, lint/format, dependency and repository-integrity checks, plus clean-root connected assurance. CI repeats the governed suite, configuration/import smoke checks, dependency audit, and Docker build.
+The local gate requires the complete test suite, at least 90% branch-aware coverage, strict source typing, lint/format, dependency and repository-integrity checks, plus restart and tamper assurance. Docker and GitHub operations were explicitly deferred by the owner for the Prompt 23 run.
 
 ## Security and data policy
 
@@ -97,8 +97,12 @@ The platform includes point-in-time factor construction; CAPM and multifactor re
 - Model performance is not guaranteed.
 - Local bearer protection is not enterprise identity management.
 - No brokerage, live execution, streaming prices, automatic retraining, or cloud SLA exists.
-- Docker was unavailable on the final local audit host; static validation passed and CI contains an image-build gate.
-- Lawful live US-equity universe/mapping evidence, owner SEC contact identity, and owner-supplied empirical data remain external blockers. FRED and Kenneth French connectivity do not remove those blockers. No live empirical validation is claimed.
+- The free/public-data universe is source-availability selected and is not CRSP, Compustat, Russell 1000, or historical S&P 500 membership replication.
+- Effective coverage is bounded: annual security breadth rises from 4 in 2018 to 487 in 2024–2026; missing early PIT evidence is not backfilled.
+- Phase 4 evidence spans only 32 months and uses factor-portfolio test assets; its observed performance is not evidence of persistence.
+- Phase 5 does not establish stable incremental predictive or after-cost economic value; explanation metrics are non-causal.
+- Docker and GitHub/merge/tag operations were deferred by the owner and were not checked in this run.
+- See the [Final Research Paper](docs/FINAL_RESEARCH_PAPER.md) and [Final Project Assurance Report](docs/FINAL_PROJECT_ASSURANCE_REPORT.md).
 
 ## Reproducibility and academic use
 

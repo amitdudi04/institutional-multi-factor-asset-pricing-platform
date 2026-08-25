@@ -155,7 +155,7 @@ FRENCH_FACTORS = TableContract(
 
 SEC_FACTS = TableContract(
     "sec_financial_facts",
-    "3.0.0",
+    "3.1.0",
     pa.schema(
         [
             ("issuer_id", pa.string(), False),
@@ -184,8 +184,152 @@ SEC_FACTS = TableContract(
             ("schema_version", pa.string(), False),
         ]
     ),
-    ("cik", "taxonomy", "concept", "unit", "period_end", "filing_date", "accession_number"),
+    (
+        "cik",
+        "taxonomy",
+        "concept",
+        "unit",
+        "period_start",
+        "period_end",
+        "filing_date",
+        "accession_number",
+    ),
     {"filing_date": "SEC filing date", "availability_timestamp": "not before filing"},
+)
+
+SEC_SUBMISSIONS = TableContract(
+    "sec_filing_submissions",
+    "1.1.0",
+    pa.schema(
+        [
+            ("issuer_id", pa.string(), False),
+            ("cik", pa.string(), False),
+            ("entity_name", pa.string(), False),
+            ("accession_number", pa.string(), False),
+            ("filing_date", DATE, False),
+            ("report_date", DATE),
+            ("acceptance_datetime_text", pa.string()),
+            ("form", pa.string(), False),
+            ("primary_document", pa.string()),
+            ("is_xbrl", pa.bool_(), False),
+            ("is_inline_xbrl", pa.bool_(), False),
+            ("availability_timestamp", UTC_TS, False),
+            ("availability_quality", pa.string(), False),
+            ("retrieval_timestamp", UTC_TS, False),
+            ("schema_version", pa.string(), False),
+        ]
+    ),
+    ("cik", "accession_number"),
+    {
+        "filing_date": "SEC filing date",
+        "acceptance_datetime_text": "verbatim SEC submissions value; no timezone inferred",
+        "availability_timestamp": "acceptance only when offset-authenticated, else filing date",
+    },
+)
+
+SEC_INLINE_XBRL = TableContract(
+    "sec_inline_xbrl_listing_facts",
+    "1.0.0",
+    pa.schema(
+        [
+            ("issuer_id", pa.string(), False),
+            ("cik", pa.string(), False),
+            ("accession_number", pa.string(), False),
+            ("filing_date", DATE, False),
+            ("acceptance_datetime_text", pa.string()),
+            ("form", pa.string(), False),
+            ("primary_document", pa.string(), False),
+            ("fact_ordinal", pa.int32(), False),
+            ("concept", pa.string(), False),
+            ("context_ref", pa.string(), False),
+            ("context_period_start", DATE),
+            ("context_period_end", DATE),
+            ("context_instant", DATE),
+            ("dimensions_json", pa.string(), False),
+            ("value", pa.string(), False),
+            ("source", pa.string(), False),
+            ("retrieval_timestamp", UTC_TS, False),
+            ("availability_timestamp", UTC_TS, False),
+            ("availability_quality", pa.string(), False),
+            ("schema_version", pa.string(), False),
+        ]
+    ),
+    ("cik", "accession_number", "fact_ordinal"),
+    {
+        "filing_date": "official complete-submission filing header",
+        "availability_timestamp": "conservative end of SEC filing date",
+    },
+)
+
+SEC_LEGACY_XBRL = TableContract(
+    "sec_legacy_xbrl_listing_facts",
+    "1.0.0",
+    pa.schema(
+        [
+            ("issuer_id", pa.string(), False),
+            ("cik", pa.string(), False),
+            ("accession_number", pa.string(), False),
+            ("filing_date", DATE, False),
+            ("acceptance_datetime_text", pa.string()),
+            ("form", pa.string(), False),
+            ("primary_document", pa.string(), False),
+            ("instance_document", pa.string(), False),
+            ("instance_sha256", pa.string(), False),
+            ("fact_ordinal", pa.int32(), False),
+            ("concept", pa.string(), False),
+            ("context_ref", pa.string(), False),
+            ("context_period_start", DATE),
+            ("context_period_end", DATE),
+            ("context_instant", DATE),
+            ("dimensions_json", pa.string(), False),
+            ("value", pa.string(), False),
+            ("unit_ref", pa.string()),
+            ("unit_measure", pa.string()),
+            ("decimals", pa.string()),
+            ("source", pa.string(), False),
+            ("retrieval_timestamp", UTC_TS, False),
+            ("availability_timestamp", UTC_TS, False),
+            ("availability_quality", pa.string(), False),
+            ("parser_version", pa.string(), False),
+            ("schema_version", pa.string(), False),
+        ]
+    ),
+    ("cik", "accession_number", "fact_ordinal"),
+    {
+        "filing_date": "official complete-submission filing header",
+        "availability_timestamp": "conservative end of SEC filing date",
+    },
+)
+
+LISTING_LIFECYCLE = TableContract(
+    "listing_lifecycle",
+    "1.0.0",
+    pa.schema(
+        [
+            ("symbol", pa.string(), False),
+            ("name", pa.string(), False),
+            ("exchange", pa.string(), False),
+            ("asset_type", pa.string(), False),
+            ("ipo_date", DATE),
+            ("delisting_date", DATE),
+            ("status", pa.string(), False),
+            ("source_duplicate_count", pa.int64(), False),
+            ("as_of_date", DATE, False),
+            ("source", pa.string(), False),
+            ("retrieval_timestamp", UTC_TS, False),
+            ("schema_version", pa.string(), False),
+        ]
+    ),
+    (
+        "symbol",
+        "name",
+        "exchange",
+        "ipo_date",
+        "delisting_date",
+        "as_of_date",
+        "status",
+    ),
+    {"as_of_date": "requested historical listing-state date"},
 )
 
 FACTOR_MARKET_INPUT = TableContract(
@@ -247,6 +391,10 @@ CONTRACTS = {
         MACRO_OBSERVATIONS,
         FRENCH_FACTORS,
         SEC_FACTS,
+        SEC_SUBMISSIONS,
+        SEC_INLINE_XBRL,
+        SEC_LEGACY_XBRL,
+        LISTING_LIFECYCLE,
         FACTOR_MARKET_INPUT,
         FACTOR_FUNDAMENTAL_INPUT,
     ]

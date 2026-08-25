@@ -38,7 +38,11 @@ from institutional_factor_platform.factors import storage as factor_storage_modu
 from institutional_factor_platform.factors.config import FactorConfig, load_factor_config
 from institutional_factor_platform.factors.contracts import MARKET_REQUIRED_UNITS, MARKET_SCHEMA
 from institutional_factor_platform.factors.definitions import FACTOR_DEFINITIONS
-from institutional_factor_platform.factors.portfolio import validate_factor_portfolios
+from institutional_factor_platform.factors.diagnostics import build_factor_diagnostics
+from institutional_factor_platform.factors.portfolio import (
+    compute_factor_portfolios,
+    validate_factor_portfolios,
+)
 from institutional_factor_platform.factors.preprocessing import normalize, winsorize
 from institutional_factor_platform.factors.service import FactorResearchService
 from institutional_factor_platform.factors.storage import authenticate_factor_publication
@@ -170,6 +174,79 @@ def _inputs() -> tuple[pd.DataFrame, pd.DataFrame, dict[str, str]]:
             )
     fundamentals = pd.DataFrame(fundamental_rows)
     return pd.DataFrame(market_rows), fundamentals, {field: "USD" for field in FIELDS}
+
+
+def test_partial_defensible_fundamentals_preserve_unestimable_factors() -> None:
+    market, fundamentals, _ = _inputs()
+    partial = fundamentals.loc[fundamentals["field"].eq("book_equity")].copy()
+    factor_service_module._validate_units(
+        dict(MARKET_REQUIRED_UNITS), partial, {"book_equity": "USD"}
+    )
+    panel = point_in_time_panel(market, partial)
+    characteristics = factor_service_module.compute_characteristics(panel, _config())
+    assert characteristics["book_to_market"].notna().any()
+    assert characteristics["earnings_yield"].isna().all()
+
+    factors = pd.DataFrame(
+        {
+            "security_id": ["sec_" + "1" * 32] * 2,
+            "date": [date(2020, 1, 2)] * 2,
+            "factor_id": ["book_to_market", "earnings_yield"],
+            "raw_value": [1.0, None],
+            "winsorized_value": [1.0, None],
+            "normalized_value": [0.0, None],
+            "score_value": [0.0, None],
+        }
+    )
+    diagnostics = build_factor_diagnostics(
+        factors,
+        pd.DataFrame(
+            columns=[
+                "factor_id",
+                "quantile",
+                "active_return",
+                "value_weighted_return",
+            ]
+        ),
+        2,
+    )
+    statuses = {item["factor_id"]: item["status"] for item in diagnostics["estimability"]}
+    assert statuses == {
+        "book_to_market": "ESTIMABLE",
+        "earnings_yield": "NOT ESTIMABLE FROM DEFENSIBLE INPUTS",
+    }
+    with pytest.raises(DataQualityError, match="outside the approved"):
+        invalid = partial.copy()
+        invalid["field"] = "invented"
+        factor_service_module._validate_units(
+            dict(MARKET_REQUIRED_UNITS), invalid, {"invented": "USD"}
+        )
+
+
+def test_missing_nyse_reference_marks_size_breakpoints_unestimable() -> None:
+    market, fundamentals, _ = _inputs()
+    market["exchange"] = "XNAS"
+    panel = point_in_time_panel(market, fundamentals)
+
+    characteristics = factor_service_module.compute_characteristics(panel, _config())
+
+    assert characteristics[["size_small", "size_mid", "size_large"]].isna().all().all()
+
+
+def test_service_rejects_insufficient_authenticated_cross_section(tmp_path: Path) -> None:
+    market, fundamentals, _ = _inputs()
+    market = market.loc[market["security_id"].isin(("sec_" + "1" * 32, "sec_" + "2" * 32))]
+    parents = (
+        _parent(tmp_path, "market-parent", market),
+        _parent(tmp_path, "fundamental-parent", fundamentals),
+    )
+
+    with pytest.raises(DataQualityError, match="maximum authenticated breadth is 2"):
+        FactorResearchService(_config(), tmp_path).compute_and_publish(
+            parents,
+            market_dataset_id="market-parent",
+            fundamental_dataset_id="fundamental-parent",
+        )
 
 
 def test_configuration_is_strict_and_reproducible(tmp_path: Path) -> None:
@@ -327,6 +404,52 @@ def test_full_catalog_publishes_authenticates_and_is_reproducible(tmp_path: Path
     with pytest.raises(EvidenceIntegrityError):
         service.repository.read_table(first.publication_id)
     assert service.repository.list_authenticated() == ()
+
+
+def test_factor_portfolio_uses_one_authenticated_benchmark_calendar() -> None:
+    securities = ["sec_" + value * 32 for value in "123"]
+    formation_dates = [date(2020, 1, 31), date(2020, 2, 28)]
+    factors = pd.DataFrame(
+        [
+            {
+                "security_id": security_id,
+                "date": formation_date,
+                "factor_id": "book_to_market",
+                "score_value": float(number),
+            }
+            for formation_date in formation_dates
+            for number, security_id in enumerate(securities, start=1)
+        ]
+    )
+    characteristics = pd.DataFrame(
+        [
+            {
+                "security_id": security_id,
+                "date": formation_date,
+                "market_cap": float(number * 100),
+            }
+            for formation_date in formation_dates
+            for number, security_id in enumerate(securities, start=1)
+        ]
+    )
+    market = pd.DataFrame(
+        [
+            {
+                "security_id": security_id,
+                "date": current,
+                "return": 0.001 * number,
+                "benchmark_return": 0.01,
+                "available_at": datetime.combine(current, datetime.min.time(), tzinfo=UTC),
+            }
+            for current in (date(2020, 2, 3), date(2020, 2, 4), date(2020, 3, 2))
+            for number, security_id in enumerate(securities, start=1)
+            if not (current == date(2020, 2, 3) and security_id == securities[-1])
+        ]
+    )
+    portfolios = compute_factor_portfolios(factors, characteristics, market)
+    first_period = portfolios.loc[portfolios["formation_date"].eq(date(2020, 1, 31))]
+    assert first_period["benchmark_return"].nunique() == 1
+    assert first_period["benchmark_return"].iloc[0] == pytest.approx((1.01**2) - 1.0)
 
 
 def test_publication_rejects_forged_parent_and_unit_contract(tmp_path: Path) -> None:

@@ -141,6 +141,15 @@ class OwnerSuppliedAdapter(SourceAdapter[bytes]):
                 f"Owner file cannot be parsed under {contract.name}: {exc}"
             ) from exc
         contract.validate_schema(table)
+        if contract.name == "factor_fundamental_input" and table.num_rows:
+            observed_fields = {str(value) for value in table.column("field").to_pylist()}
+            declared_fields = set(request.parameters["units"])
+            if observed_fields != declared_fields:
+                raise UnsupportedDatasetError(
+                    "Fundamental unit metadata must exactly cover observed fields; "
+                    f"missing={sorted(observed_fields - declared_fields)}, "
+                    f"extra={sorted(declared_fields - observed_fields)}."
+                )
         return tuple(table.to_pylist())
 
 
@@ -180,7 +189,8 @@ def _contract(request: RetrievalRequest) -> TableContract:
     rules = UNIT_RULES[contract.name]
     unknown_fields = set(units) - set(rules)
     missing_fields = set(rules) - set(units)
-    if unknown_fields or missing_fields:
+    partial_fundamentals = contract.name == "factor_fundamental_input"
+    if unknown_fields or (missing_fields and not partial_fundamentals):
         raise UnsupportedDatasetError(
             "Owner unit metadata must exactly cover unit-bearing contract fields; "
             f"missing={sorted(missing_fields)}, extra={sorted(unknown_fields)}."

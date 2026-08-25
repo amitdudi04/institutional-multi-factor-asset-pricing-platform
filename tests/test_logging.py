@@ -30,3 +30,9 @@ def test_invalid_logging_level_is_rejected(level: str) -> None:
 def test_invalid_logging_format_is_rejected() -> None:
     with pytest.raises(ConfigurationError, match="Unsupported logging format"):
         configure_logging("INFO", "xml")
+
+
+def test_http_client_info_logging_is_suppressed() -> None:
+    configure_logging("INFO", "json")
+    assert logging.getLogger("httpx").getEffectiveLevel() >= logging.WARNING
+    assert logging.getLogger("httpcore").getEffectiveLevel() >= logging.WARNING

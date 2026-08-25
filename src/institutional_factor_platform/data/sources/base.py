@@ -4,8 +4,11 @@ import random
 import time
 from abc import ABC, abstractmethod
 from collections.abc import Callable
+from contextvars import ContextVar
+from datetime import datetime
 from pathlib import Path
 from typing import Generic, TypeVar
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 import httpx
 
@@ -14,6 +17,9 @@ from institutional_factor_platform.data.domain import DataSource, RetrievalReque
 from institutional_factor_platform.exceptions import RateLimitError, RetrievalError
 
 T = TypeVar("T")
+_STANDARDIZATION_RETRIEVAL_TIME: ContextVar[datetime | None] = ContextVar(
+    "standardization_retrieval_time", default=None
+)
 
 
 class SourceAdapter(ABC, Generic[T]):
@@ -26,6 +32,22 @@ class SourceAdapter(ABC, Generic[T]):
     @abstractmethod
     def standardize(self, payload: T, request: RetrievalRequest) -> tuple[dict[str, object], ...]:
         """Convert a provider payload into its source-specific contract."""
+
+    def standardize_at(
+        self, payload: T, request: RetrievalRequest, retrieval_timestamp: datetime
+    ) -> tuple[dict[str, object], ...]:
+        """Standardize with the exact immutable raw-artifact retrieval identity."""
+        if retrieval_timestamp.tzinfo is None:
+            raise RetrievalError("Standardization retrieval timestamp must be timezone-aware.")
+        token = _STANDARDIZATION_RETRIEVAL_TIME.set(retrieval_timestamp)
+        try:
+            return self.standardize(payload, request)
+        finally:
+            _STANDARDIZATION_RETRIEVAL_TIME.reset(token)
+
+    def retrieval_timestamp(self, fallback: Callable[[], datetime]) -> datetime:
+        """Use the service-bound raw timestamp, or the adapter clock for direct calls."""
+        return _STANDARDIZATION_RETRIEVAL_TIME.get() or fallback()
 
     def mapping_authority_path(self) -> Path | None:
         """Return the persisted identity authority used by this adapter, if any."""
@@ -45,13 +67,16 @@ class HttpTransport:
 
     def get(self, url: str, *, headers: dict[str, str] | None = None) -> bytes:
         last_error: Exception | None = None
+        safe_url = _redact_url(url)
         for attempt in range(self.runtime.max_retries + 1):
             try:
                 response = self.client.get(url, headers=headers)
                 if response.status_code == 429:
-                    raise RateLimitError(f"Provider rate limit for {url}")
+                    raise RateLimitError(f"Provider rate limit for {safe_url}")
                 if 400 <= response.status_code < 500:
-                    raise RetrievalError(f"Non-retryable HTTP {response.status_code} for {url}")
+                    raise RetrievalError(
+                        f"Non-retryable HTTP {response.status_code} for {safe_url}"
+                    )
                 response.raise_for_status()
                 return response.content
             except RateLimitError:
@@ -65,7 +90,20 @@ class HttpTransport:
                 delay = self.runtime.backoff_seconds * (2**attempt)
                 delay += random.uniform(0, self.runtime.jitter_seconds)
                 self.sleeper(delay)
-        raise RetrievalError(f"Retrieval failed after bounded retries for {url}: {last_error}")
+        error_type = type(last_error).__name__ if last_error is not None else "unknown"
+        raise RetrievalError(
+            f"Retrieval failed after bounded retries for {safe_url} ({error_type})."
+        )
+
+
+def _redact_url(url: str) -> str:
+    parts = urlsplit(url)
+    sensitive = {"apikey", "api_key", "key", "token", "access_token"}
+    query = [
+        (key, "[REDACTED]" if key.lower() in sensitive else value)
+        for key, value in parse_qsl(parts.query, keep_blank_values=True)
+    ]
+    return urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(query), parts.fragment))
 
 
 def completed_result(result: RetrievalResult) -> RetrievalResult:

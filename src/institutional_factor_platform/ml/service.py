@@ -29,7 +29,11 @@ from institutional_factor_platform.ml.evaluation import (
     ranking_metrics,
     regression_metrics,
 )
-from institutional_factor_platform.ml.features import add_interactions, assemble_factor_features
+from institutional_factor_platform.ml.features import (
+    add_interactions,
+    assemble_factor_features,
+    monthly_decision_features,
+)
 from institutional_factor_platform.ml.models import ResearchModel, Task, create_model
 from institutional_factor_platform.ml.preprocessing import SafePreprocessor
 from institutional_factor_platform.ml.publication import MLManifest, publish_bundle
@@ -85,6 +89,8 @@ class MLResearchService:
             minimum_coverage=self.config.features.minimum_coverage,
         )
         features = add_interactions(features, self.config.features.interactions)
+        features = monthly_decision_features(features)
+        report["monthly_rows"] = len(features)
         market_ids = tuple(phase2.market_source_dataset_ids)
         if len(market_ids) != 1:
             raise EvidenceIntegrityError(
@@ -367,7 +373,23 @@ class MLResearchService:
                 )
             )
             if self.config.explainability.enabled:
-                if family in {"linear", "ridge", "lasso", "elastic_net", "logistic"}:
+                if family in {"zero", "historical_mean"}:
+                    explanation = pd.DataFrame(
+                        {
+                            "feature": feature_names,
+                            "value": np.zeros(len(feature_names), dtype=float),
+                            "method": "not_applicable_baseline",
+                            "background_hash": hashlib.sha256(b"not-applicable").hexdigest(),
+                        }
+                    )
+                elif family in {
+                    "factor_composite",
+                    "linear",
+                    "ridge",
+                    "lasso",
+                    "elastic_net",
+                    "logistic",
+                }:
                     explanation = linear_explanation(model).rename(columns={"coefficient": "value"})
                     explanation["method"] = "coefficient"
                     explanation["background_hash"] = hashlib.sha256(b"not-applicable").hexdigest()
@@ -511,6 +533,8 @@ class MLResearchService:
                 "phase2_manifest_hash": metadata["phase2_manifest_hash"],
                 "phase3_publication_id": metadata["phase3_publication_id"],
                 "phase3_manifest_hash": metadata["phase3_manifest_hash"],
+                "phase4_publication_id": economic_evaluation.get("phase4_publication_id"),
+                "phase4_manifest_hash": economic_evaluation.get("phase4_manifest_hash"),
                 "configuration_hash": self.config.canonical_hash(),
                 "git_commit": metadata["git_commit"],
                 "model_id": model.model_id,
@@ -793,9 +817,11 @@ class MLResearchService:
             "configuration": _document(self.config.model_dump(mode="json")),
             "lineage": _document(
                 {
-                    "source": "authenticated Phase 1/2/3 publications",
+                    "source": "authenticated Phase 1/2/3/4 publications",
                     "target_source_dataset_id": metadata["target_source_dataset_id"],
                     "target_source_artifact_checksum": metadata["target_source_artifact_checksum"],
+                    "phase4_publication_id": economic_evaluation.get("phase4_publication_id"),
+                    "phase4_manifest_hash": economic_evaluation.get("phase4_manifest_hash"),
                 }
             ),
             "validation": _document(

@@ -50,7 +50,7 @@ class FredAdapter(SourceAdapter[bytes]):
         if date_column is None:
             raise RetrievalError("FRED response missing expected observation-date column")
         unit, frequency = self.approved_series[request.dataset]
-        retrieved = self.now()
+        retrieved = self.retrieval_timestamp(self.now)
         records: list[dict[str, object]] = []
         for row in reader:
             raw = row[request.dataset].strip()

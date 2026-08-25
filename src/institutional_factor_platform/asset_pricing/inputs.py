@@ -46,8 +46,15 @@ def build_research_panel(
         if selected.empty:
             raise DataQualityError(f"Mapped Phase 2 factor is unavailable: {alias}={factor_id}")
         bounds = selected.groupby("date")["quantile"].agg(["min", "max"])
-        if (bounds["min"] == bounds["max"]).any():
+        complete_dates = bounds.index[bounds["min"] != bounds["max"]]
+        if complete_dates.empty:
             raise DataQualityError(f"Factor {factor_id} lacks both extreme portfolios")
+        # Sparse early formation dates can legitimately contain only one quantile.
+        # They are non-estimable for a high-minus-low spread and must be excluded
+        # from the complete-case model intersection rather than invalidating later
+        # dates that carry both authenticated extremes.
+        selected = selected.loc[selected["date"].isin(complete_dates)].copy()
+        bounds = bounds.loc[complete_dates]
         low = selected.merge(
             bounds["min"].rename("bound").reset_index(), on="date", validate="many_to_one"
         ).loc[lambda value: value["quantile"].eq(value["bound"])]

@@ -52,7 +52,7 @@ class SecEdgarAdapter(SourceAdapter[bytes]):
         facts = data.get("facts")
         if not cik.isdigit() or not entity or not isinstance(facts, dict):
             raise RetrievalError("SEC company facts lacks required entity metadata.")
-        retrieved = self.now()
+        retrieved = self.retrieval_timestamp(self.now)
         issuer_id = IssuerId.from_cik(cik)
         if request.parameters.get("security_id") is not None:
             raise RetrievalError(
@@ -116,7 +116,7 @@ class SecEdgarAdapter(SourceAdapter[bytes]):
                                 "retrieval_timestamp": retrieved,
                                 "availability_timestamp": availability,
                                 "availability_quality": "INFERRED_DATE_LEVEL",
-                                "schema_version": "3.0.0",
+                                "schema_version": "3.1.0",
                             }
                         )
         if not records:

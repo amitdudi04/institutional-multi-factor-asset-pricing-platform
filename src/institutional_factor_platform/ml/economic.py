@@ -33,9 +33,14 @@ def evaluate_ranked_signal(
         available = predictions.loc[predictions["formation_date"].eq(formation)]
         if available.empty:
             raise DataQualityError("Authenticated prediction is missing at formation time")
-        ranks = available.set_index("security_id")["prediction"].reindex(history.columns)
-        if ranks.isna().any():
-            raise DataQualityError("Prediction and return universes do not align")
+        if available["security_id"].duplicated().any():
+            raise DataQualityError("Prediction universe contains duplicate security identity")
+        unknown = set(available["security_id"].astype(str)) - set(history.columns.astype(str))
+        if unknown:
+            raise DataQualityError("Prediction universe contains an unauthenticated return asset")
+        ranks = available.set_index("security_id")["prediction"].reindex(history.columns).dropna()
+        if ranks.empty:
+            raise DataQualityError("No authenticated prediction aligns with the return universe")
         count = max(1, int(np.ceil(len(ranks) * selection_fraction)))
         selected = set(ranks.nlargest(count).index)
         return np.array([1 / count if asset in selected else 0.0 for asset in history.columns])

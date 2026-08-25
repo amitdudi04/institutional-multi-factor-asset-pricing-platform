@@ -719,5 +719,13 @@ def test_identity_stores_fail_closed_on_corruption_conflict_and_absence(tmp_path
         )
         for security_id in (first_id, second_id)
     )
-    with pytest.raises(SecurityMappingError, match="Conflicting effective"):
-        IssuerListingMappingStore(tmp_path / "issuer-conflict.json").persist(issuer_mappings)
+    issuer_store = IssuerListingMappingStore(tmp_path / "issuer-multiple-listings.json")
+    issuer_store.persist(issuer_mappings)
+    assert set(issuer_store.resolve_all(issuer, date(2024, 1, 1))) == {
+        first_id,
+        second_id,
+    }
+    with pytest.raises(SecurityMappingError, match="singular listing join is ambiguous"):
+        issuer_store.resolve(issuer, date(2024, 1, 1))
+    with pytest.raises(SecurityMappingError, match="Duplicate overlapping"):
+        issuer_store.persist((issuer_mappings[0], issuer_mappings[0]))

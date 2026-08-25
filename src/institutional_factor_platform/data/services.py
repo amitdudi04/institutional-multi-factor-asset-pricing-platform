@@ -180,7 +180,7 @@ class DataIngestionService:
                 retrieved_at=started,
             )
             RawStorage.verify(artifact)
-            records = adapter.standardize(payload, request)
+            records = adapter.standardize_at(payload, request, artifact.retrieval_timestamp)
             unit_metadata = _reconcile_units(records, request, contract)
             mapping = _authenticate_mapping_authority(
                 adapter, records, request, contract, self.root
@@ -807,7 +807,7 @@ def _authenticate_mapping_authority(
     if not authority.is_file():
         raise DataQualityError("Persisted mapping authority is missing.")
     try:
-        if request.source is DataSource.YAHOO_FINANCE:
+        if request.source in {DataSource.YAHOO_FINANCE, DataSource.HF_DATA_LIBRARY}:
             security_store = SecurityMappingStore(authority)
             for row in identified:
                 observed = str(row["security_id"])

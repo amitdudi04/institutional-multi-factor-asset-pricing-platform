@@ -414,8 +414,18 @@ def compute_characteristics(panel: pd.DataFrame, config: FactorConfig) -> pd.Dat
         .quantile([config.breakpoints.small_quantile, config.breakpoints.large_quantile])
         .unstack()
     )
-    small = result["date"].map(breakpoints.get(config.breakpoints.small_quantile))
-    large = result["date"].map(breakpoints.get(config.breakpoints.large_quantile))
+    small_values = breakpoints.get(config.breakpoints.small_quantile)
+    large_values = breakpoints.get(config.breakpoints.large_quantile)
+    small = (
+        result["date"].map(small_values)
+        if small_values is not None
+        else pd.Series(nan, index=result.index, dtype=float)
+    )
+    large = (
+        result["date"].map(large_values)
+        if large_values is not None
+        else pd.Series(nan, index=result.index, dtype=float)
+    )
     result["size_small"] = (result["market_cap"] <= small).astype(float).where(small.notna())
     result["size_mid"] = (
         ((result["market_cap"] > small) & (result["market_cap"] < large))
@@ -445,9 +455,17 @@ def compute_characteristics(panel: pd.DataFrame, config: FactorConfig) -> pd.Dat
         "equity_issuance": ("net_equity_issuance", "shareholder_equity", False),
         "working_capital_growth": ("working_capital", "prior_working_capital", True),
     }
+
+    def available_column(name: str) -> pd.Series:
+        if name in result:
+            return result[name]
+        if name in frame:
+            return frame[name]
+        return pd.Series(nan, index=frame.index, dtype="float64")
+
     for name, (numerator, denominator, subtract_one) in ratios.items():
-        numerator_value = result[numerator] if numerator in result else frame[numerator]
-        denominator_value = result[denominator] if denominator in result else frame[denominator]
+        numerator_value = available_column(numerator)
+        denominator_value = available_column(denominator)
         value = _safe_div(numerator_value, denominator_value)
         result[name] = value - 1.0 if subtract_one else value
 
