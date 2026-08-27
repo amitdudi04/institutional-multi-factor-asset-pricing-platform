@@ -30,6 +30,13 @@ htmlcov/
 .vscode/
 .DS_Store
 Thumbs.db
+Desktop.ini
+.ipynb_checkpoints/
+*.swp
+*.swo
+*.tmp
+~$*.docx
+~$*.xlsx
 
 # Local runtime artifacts
 *.log
@@ -37,6 +44,8 @@ logs/
 *.sqlite
 *.sqlite3
 *.db
+*.duckdb
+*.duckdb.wal
 
 # Future data and generated artifacts are excluded by default. Keep manifests,
 # schemas, documentation, and explicitly reviewed small fixtures tracked.
@@ -60,6 +69,11 @@ outputs/**
 artifacts/**
 models/**
 reports/generated/**
+tmp/
+temp/
+rendered/
+screenshots/
+*.coverage.xml
 !data/**/.gitkeep
 !data/README.md
 !outputs/**/.gitkeep

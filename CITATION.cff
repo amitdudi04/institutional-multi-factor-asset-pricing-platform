@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this software or research repository, please cite it using these metadata and cite each upstream dataset separately."
+title: "Institutional Multi-Factor Asset Pricing & Portfolio Analytics Platform"
+type: software
+authors:
+  - family-names: Dudi
+    given-names: Amit Kumar
+repository-code: "https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform"
+url: "https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform"
+license: MIT
+release-date: 2026-08-27
+abstract: >-
+  An auditable public-data US-equity research pipeline connecting
+  point-in-time security identity and fundamentals to factor research,
+  asset-pricing models, constrained portfolios, risk analytics, purged
+  walk-forward machine learning, and versioned research delivery.
+keywords:
+  - empirical asset pricing
+  - factor investing
+  - point-in-time data
+  - portfolio analytics
+  - machine learning
+  - reproducible research
