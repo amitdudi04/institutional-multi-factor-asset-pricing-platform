@@ -239,12 +239,12 @@ def _process_alive(process_id: int) -> bool:
         import ctypes
 
         process_query_limited_information = 0x1000
-        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)  # type: ignore[attr-defined]
         handle = kernel32.OpenProcess(process_query_limited_information, False, process_id)
         if handle:
             kernel32.CloseHandle(handle)
             return True
-        return ctypes.get_last_error() == 5  # Access denied still proves the process exists.
+        return bool(ctypes.get_last_error() == 5)  # type: ignore[attr-defined]
     try:
         os.kill(process_id, 0)
     except OSError:
