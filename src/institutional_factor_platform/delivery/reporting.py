@@ -1,4 +1,4 @@
-"""Deterministic, checksum-bound research reports from authenticated evidence."""
+"""Deterministic research reports bound to stored publication metadata."""
 
 import csv
 import html
