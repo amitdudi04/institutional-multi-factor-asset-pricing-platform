@@ -22,11 +22,8 @@ The empirical study combines public or publicly accessible market, listing, fili
 | Candidate stocks | 822 |
 | Accepted | 487 |
 | Rejected | 335 |
-| Tier A | 372 |
-| Tier B | 115 |
 | Market observations | 715,447 |
 | Fundamental observations | 37,273 |
-| Fundamental fields | 18 |
 
 Market observations span 2018-02-14 through 2026-08-04. Fundamental availability spans 2019-02-23 through 2026-08-15.
 
