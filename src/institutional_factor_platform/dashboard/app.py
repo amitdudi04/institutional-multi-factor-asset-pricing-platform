@@ -20,7 +20,7 @@ def main() -> None:
     config = load_delivery_config()
     client = DashboardClient(config)
     st.set_page_config(page_title="Multi-Factor Research Platform", page_icon="📊", layout="wide")
-    st.title("Institutional Multi-Factor Research Platform")
+    st.title("Multi-Factor Asset Pricing Research Platform")
     st.caption(f"Version {__version__} · non-advisory research delivery")
     selected = st.sidebar.radio("Workspace", PAGES, format_func=lambda page: page.title)
     st.header(selected.title)
@@ -48,8 +48,8 @@ def _overview(client: DashboardClient) -> None:
     columns[2].metric("Research status", governance["advisory_status"])
     if ready["empty_state"]:
         st.info(EMPTY_STATE)
-    st.subheader("Phase status")
-    st.write("Phases 1-6 complete; live empirical validation remains evidence-dependent.")
+    st.subheader("Research status")
+    st.write("Stored research publications are shown only when available in the local catalog.")
     st.subheader("Limitations")
     for item in limitations["limitations"]:
         st.write(f"- {item}")
