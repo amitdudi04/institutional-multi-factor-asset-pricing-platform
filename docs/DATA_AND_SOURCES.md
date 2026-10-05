@@ -11,7 +11,7 @@ The empirical study combines public or publicly accessible market, listing, fili
 | HF Data Library | Historical US-equity market data and initial candidate stock universe | Source-selected coverage; historical membership is not a complete market database; the PiTrading-to-IEX transition affects volume comparability |
 | SEC EDGAR | CIK identity, filing history, XBRL fundamentals, shares, and filing-time evidence | Concept availability and reporting practice vary across issuers and time |
 | Alpha Vantage LISTING_STATUS | Listing/lifecycle evidence during universe screening | Does not reconstruct every historical security absent from other sources |
-| FRED DGS3MO | Short-rate/risk-free reference | Frequency conversion and release timing must be handled explicitly |
+| FRED DGS3MO | 3-month constant-maturity Treasury yield / risk-free reference | Frequency conversion and release timing must be handled explicitly |
 | Kenneth French Data Library | Reference factor datasets and methodology comparison | Provider definitions are not automatically identical to project-specific characteristic portfolios |
 | SPY | Broad investable US-equity benchmark proxy | Not a historical constituent-membership database |
 
