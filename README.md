@@ -25,15 +25,15 @@ For the complete numerical summary and interpretation, see [docs/RESULTS.md](doc
 
 ## Research Questions
 
-The study evaluates whether:
+The pre-specified hypotheses evaluate whether:
 
-1. observable equity characteristics can be estimated consistently from the available point-in-time public data;
-2. multifactor models provide greater explanatory fit than CAPM on the project diagnostic portfolios;
-3. factor relationships remain stable through time;
-4. higher transaction costs reduce observed portfolio performance;
-5. constrained portfolio methods produce meaningfully different risk, drawdown, concentration, and benchmark-relative outcomes;
-6. machine learning adds stable out-of-sample predictive and after-cost economic value; and
-7. feature rankings remain stable across model families and explanation methods.
+1. at least one factor spread survives the complete pre-specified cost and multiplicity rule;
+2. multifactor models improve explanatory fit relative to CAPM and that improvement extends to stable out-of-sample economic evidence;
+3. estimated relations remain stable through time under the original rule;
+4. higher transaction-cost assumptions reduce cumulative outcomes;
+5. constrained portfolio methods alter risk-return trade-offs and any apparent superiority is stable out of sample;
+6. machine learning adds stable out-of-sample predictive and after-cost value; and
+7. explanation rankings remain stable across methods.
 
 The study allows supported, unsupported, and inconclusive outcomes. It does not tune the research design until every hypothesis becomes positive.
 
