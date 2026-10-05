@@ -1,4 +1,4 @@
-"""Explicit point-in-time targets built from authenticated security returns."""
+"""Explicit point-in-time targets built from security returns."""
 
 import numpy as np
 import pandas as pd
