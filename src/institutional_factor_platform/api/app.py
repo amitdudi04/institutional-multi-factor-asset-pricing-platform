@@ -102,7 +102,7 @@ def create_app(
     @app.get(f"{prefix}/governance")
     def governance() -> dict[str, Any]:
         return {
-            "purpose": "Authenticated institutional quantitative research delivery",
+            "purpose": "Quantitative research result delivery",
             "advisory_status": "NON_ADVISORY_RESEARCH_ONLY",
             "phases": (1, 2, 3, 4, 5, 6),
             "timestamp": _now(),
