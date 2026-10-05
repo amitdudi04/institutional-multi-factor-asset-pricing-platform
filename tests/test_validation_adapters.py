@@ -478,7 +478,7 @@ def test_owner_adapter_requires_explicit_contract(tmp_path: Path) -> None:
         "path": str(path),
         "schema": "macro_observations",
         "contract_version": "1.0.0",
-        "source_name": "owner audit fixture",
+        "source_name": "owner test fixture",
         "source_ownership": "repository owner",
         "units": {"value": "index"},
         "date_semantics": "ISO observation date",
