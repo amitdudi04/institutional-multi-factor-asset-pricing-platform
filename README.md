@@ -4,7 +4,7 @@ An independent US-equity research project combining point-in-time public data, f
 
 ## Overview
 
-The project asks how much confidence can be placed in empirical equity results when security identity, filing availability, transaction costs, temporal validation, and reproducibility are treated as part of the research design rather than after-the-fact checks.
+This project studies how point-in-time data quality, factor construction, asset-pricing models, portfolio costs, and temporal validation affect empirical U.S. equity research results.
 
 The current study screens a broad public-data equity universe, constructs observable characteristics, compares standard asset-pricing specifications, evaluates constrained portfolio methods, and tests whether simple machine-learning models add stable out-of-sample information. The results are mixed rather than uniformly positive: multifactor models fit the project portfolios better than CAPM in-sample, transaction costs matter, portfolio methods produce different risk-return trade-offs, and the machine-learning study does not establish stable incremental value.
 
@@ -35,7 +35,7 @@ The pre-specified hypotheses evaluate whether:
 6. machine learning adds stable out-of-sample predictive and after-cost value; and
 7. explanation rankings remain stable across methods.
 
-The study allows supported, unsupported, and inconclusive outcomes. It does not tune the research design until every hypothesis becomes positive.
+Hypotheses are classified as supported, partially supported, unsupported, or inconclusive according to the pre-specified evaluation criteria.
 
 ## Data and Universe
 
@@ -112,7 +112,7 @@ Eight long-only, fully invested methods are compared:
 
 The one-way transaction-cost assumptions are 5, 10, and 20 basis points. Over the available approximately 32-month factor-portfolio test window, higher costs reduce cumulative performance for every method.
 
-Selected BASE results:
+Selected 10 bps BASE results:
 
 | Method | Observed result |
 |---|---:|
