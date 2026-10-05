@@ -15,9 +15,9 @@ constraints:
   exposure_limits: {}
   liquidity_trade_limits: {}
 costs:
-  # Frozen before empirical Phase 4 performance inspection (Prompt 24).
+  # Fixed before comparing the reported portfolio performance results.
   # Sensitivity totals are LOW/BASE/HIGH = 5/10/20 one-way bps.
-  # The engine charges half of spread_bps. With no authenticated liquidity
+  # The engine charges half of spread_bps. With no consistent liquidity
   # input, the fixed 3 bps BASE impact allowance is conservatively bundled
   # with 2 bps slippage; nonlinear market impact remains disabled.
   commission_bps: 0.0

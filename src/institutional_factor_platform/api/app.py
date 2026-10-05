@@ -1,4 +1,4 @@
-"""FastAPI application exposing authenticated Phase 1-5 research evidence."""
+"""FastAPI application exposing stored research results and metadata."""
 
 from datetime import UTC, datetime
 from typing import Annotated, Any
@@ -23,7 +23,7 @@ Identifier = Annotated[str, Path(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{2,127}$")]
 
 LIMITATIONS = (
     "Research outputs are not financial advice or investment recommendations.",
-    "Live empirical validation may remain pending.",
+    "Displayed results depend on the research publications available in the local catalog.",
     "SHAP and feature importance are not causal.",
     "Local bearer protection is not multi-tenant enterprise identity management.",
     "No brokerage, live execution, or automatic model retraining exists.",
@@ -40,7 +40,7 @@ def create_app(
     delivery = service or DeliveryService(settings)
     metrics = OperationalMetrics()
     app = FastAPI(
-        title="Institutional Research Delivery API",
+        title="Research Delivery API",
         version=__version__,
         docs_url=None,
         redoc_url=None,
@@ -63,7 +63,7 @@ def create_app(
     @app.exception_handler(PlatformError)
     async def platform_error(request: Request, exc: PlatformError) -> JSONResponse:
         del exc
-        return _error(request, 422, "evidence_unavailable", "Authenticated evidence is unavailable")
+        return _error(request, 422, "evidence_unavailable", "Research evidence is unavailable")
 
     @app.exception_handler(ValidationError)
     async def validation_error(request: Request, exc: ValidationError) -> JSONResponse:
@@ -102,7 +102,7 @@ def create_app(
     @app.get(f"{prefix}/governance")
     def governance() -> dict[str, Any]:
         return {
-            "purpose": "Authenticated institutional quantitative research delivery",
+            "purpose": "Quantitative research result delivery",
             "advisory_status": "NON_ADVISORY_RESEARCH_ONLY",
             "phases": (1, 2, 3, 4, 5, 6),
             "timestamp": _now(),

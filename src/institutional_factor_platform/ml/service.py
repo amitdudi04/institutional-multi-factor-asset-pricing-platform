@@ -1,4 +1,4 @@
-"""Authenticated Phase 5 dataset, training, evaluation, and publication service."""
+"""Machine-learning dataset, training, evaluation, and publication service."""
 
 import hashlib
 import io

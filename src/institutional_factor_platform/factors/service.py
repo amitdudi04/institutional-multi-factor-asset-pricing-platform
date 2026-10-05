@@ -61,7 +61,7 @@ class FactorRunResult:
 
 
 class FactorResearchService:
-    """Build factors only from explicitly authenticated Phase 1 parent handles."""
+    """Build factors only from validated upstream dataset handles."""
 
     def __init__(self, config: FactorConfig, project_root: Path) -> None:
         self.config = config

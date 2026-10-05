@@ -1,4 +1,4 @@
-"""Authentic synthetic Phase 1-to-6 connected regression assurance."""
+"""Connected Phase 1-to-6 integration regression tests."""
 
 import json
 from datetime import UTC, date, datetime, timedelta

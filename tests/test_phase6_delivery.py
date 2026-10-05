@@ -446,7 +446,7 @@ def test_report_formats_restart_and_authentication(tmp_path: Path) -> None:
 
 def test_dashboard_presentation_and_client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     assert len(PAGES) == 9
-    assert "No authenticated" in EMPTY_STATE
+    assert "No empirical publication" in EMPTY_STATE
     assert format_value(None) == "Unavailable"
     assert format_value(1234.56789, "USD") == "1,234.5679 USD"
     assert format_value(datetime(2026, 1, 1, tzinfo=UTC)).startswith("2026-01-01")
@@ -784,7 +784,7 @@ def test_dashboard_application_states(monkeypatch: pytest.MonkeyPatch, tmp_path:
     fake_st = FakeStreamlit()
     monkeypatch.setattr(dashboard_app, "st", fake_st)
     dashboard_app._overview(DashboardAPI())
-    assert any("No authenticated" in value for value in fake_st.messages)
+    assert any("No empirical publication" in value for value in fake_st.messages)
 
     dashboard_app._research_page(DashboardAPI(), "ml")
     assert any("SHAP" in value for value in fake_st.messages)

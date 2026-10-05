@@ -1,4 +1,4 @@
-"""Minimal explicit Phase 1 command-line workflow."""
+"""Command-line interface for the research workflows."""
 
 import argparse
 import json
@@ -76,10 +76,12 @@ from institutional_factor_platform.research_outputs.storage import (
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="institutional-factor-platform")
-    parser.add_argument("--config", type=Path, default=None, help="Phase 1 YAML configuration path")
+    parser.add_argument(
+        "--config", type=Path, default=None, help="Research YAML configuration path"
+    )
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("validate-config", help="Validate configuration and print its hash")
-    commands.add_parser("init-storage", help="Create approved local Phase 1 storage directories")
+    commands.add_parser("init-storage", help="Create local research storage directories")
     inspect = commands.add_parser(
         "inspect-manifest", help="Validate and print a local JSON manifest"
     )
@@ -88,47 +90,44 @@ def build_parser() -> argparse.ArgumentParser:
     listing.add_argument("--research-ready", action="store_true")
     commands.add_parser("validate-catalog", help="Verify all promoted catalog evidence")
     commands.add_parser("reconcile", help="Reconcile publication lifecycle and catalog state")
-    commands.add_parser("rebuild-catalog", help="Atomically rebuild the authenticated catalog")
-    commands.add_parser("validate-factor-config", help="Validate Phase 2 factor configuration")
-    commands.add_parser("list-factor-publications", help="List authenticated factor publications")
+    commands.add_parser("rebuild-catalog", help="Atomically rebuild the research catalog")
+    commands.add_parser("validate-factor-config", help="Validate factor configuration")
+    commands.add_parser("list-factor-publications", help="List factor publications")
     verify_factor = commands.add_parser(
-        "verify-factor-publication", help="Authenticate one Phase 2 factor publication"
+        "verify-factor-publication", help="Verify one factor publication"
     )
     verify_factor.add_argument("path", type=Path)
     compute_factors = commands.add_parser(
-        "compute-factors", help="Build an immutable Phase 2 publication from authenticated parents"
+        "compute-factors", help="Build a factor publication from validated parent datasets"
     )
     compute_factors.add_argument("--parent", action="append", required=True)
     compute_factors.add_argument("--market-dataset", required=True)
     compute_factors.add_argument("--fundamental-dataset", required=True)
     compute_factors.add_argument("--factor-config", type=Path, default=None)
-    commands.add_parser("validate-asset-pricing-config", help="Validate Phase 3 configuration")
     commands.add_parser(
-        "list-asset-pricing-publications", help="List authenticated Phase 3 publications"
+        "validate-asset-pricing-config", help="Validate asset-pricing configuration"
     )
+    commands.add_parser("list-asset-pricing-publications", help="List asset-pricing publications")
     verify_asset_pricing = commands.add_parser(
-        "verify-asset-pricing-publication", help="Authenticate one Phase 3 publication"
+        "verify-asset-pricing-publication", help="Verify one asset-pricing publication"
     )
     verify_asset_pricing.add_argument("path", type=Path)
     compute_asset_pricing = commands.add_parser(
         "compute-asset-pricing",
-        help="Build Phase 3 research from one authenticated Phase 2 publication",
+        help="Build asset-pricing research from one factor publication",
     )
     compute_asset_pricing.add_argument("factor_publication_id")
     compute_asset_pricing.add_argument("--model", action="append", default=None)
     compute_asset_pricing.add_argument("--asset-pricing-config", type=Path, default=None)
-    commands.add_parser(
-        "validate-portfolio-config", help="Validate Phase 4 portfolio configuration"
-    )
-    commands.add_parser(
-        "list-portfolio-publications", help="List authenticated Phase 4 publications"
-    )
+    commands.add_parser("validate-portfolio-config", help="Validate portfolio configuration")
+    commands.add_parser("list-portfolio-publications", help="List portfolio publications")
     verify_portfolio = commands.add_parser(
-        "verify-portfolio-publication", help="Authenticate one Phase 4 publication"
+        "verify-portfolio-publication", help="Verify one portfolio publication"
     )
     verify_portfolio.add_argument("path", type=Path)
     compute_portfolio = commands.add_parser(
-        "compute-portfolio", help="Run Phase 4 from connected authenticated Phase 2/3 evidence"
+        "compute-portfolio",
+        help="Run portfolio research from connected factor and asset-pricing publications",
     )
     compute_portfolio.add_argument("asset_pricing_publication_id")
     compute_portfolio.add_argument(
@@ -145,42 +144,36 @@ def build_parser() -> argparse.ArgumentParser:
         ],
     )
     compute_portfolio.add_argument("--portfolio-config", type=Path, default=None)
-    validate_ml = commands.add_parser(
-        "validate-ml-config", help="Validate Phase 5 ML configuration"
-    )
+    validate_ml = commands.add_parser("validate-ml-config", help="Validate ML configuration")
     validate_ml.add_argument("--ml-config", type=Path, default=None)
     build_ml = commands.add_parser(
-        "build-ml-dataset", help="Validate an authenticated Phase 5 feature/target assembly"
+        "build-ml-dataset", help="Validate an ML feature/target assembly"
     )
     build_ml.add_argument("asset_pricing_publication_id")
     build_ml.add_argument("--ml-config", type=Path, default=None)
-    train_ml = commands.add_parser(
-        "train-ml-model", help="Train and publish one authenticated Phase 5 research model"
-    )
+    train_ml = commands.add_parser("train-ml-model", help="Train and publish one research model")
     train_ml.add_argument("asset_pricing_publication_id")
     train_ml.add_argument("family")
     train_ml.add_argument("--ml-config", type=Path, default=None)
-    commands.add_parser("list-ml-publications", help="List authenticated Phase 5 publications")
-    verify_ml = commands.add_parser(
-        "verify-ml-publication", help="Authenticate one immutable Phase 5 publication"
-    )
+    commands.add_parser("list-ml-publications", help="List ML publications")
+    verify_ml = commands.add_parser("verify-ml-publication", help="Verify one ML publication")
     verify_ml.add_argument("publication_id")
     delivery_config = commands.add_parser(
-        "validate-delivery-config", help="Validate Phase 6 delivery configuration"
+        "validate-delivery-config", help="Validate delivery configuration"
     )
     delivery_config.add_argument("--delivery-config", type=Path, default=None)
     verify_delivery = commands.add_parser(
-        "verify-delivery-platform", help="Verify delivery readiness and authenticated discovery"
+        "verify-delivery-platform", help="Verify delivery readiness and research-result discovery"
     )
     verify_delivery.add_argument("--delivery-config", type=Path, default=None)
     serve_api = commands.add_parser("serve-api", help="Start the local FastAPI delivery service")
     serve_api.add_argument("--delivery-config", type=Path, default=None)
     serve_dashboard = commands.add_parser(
-        "serve-dashboard", help="Start the institutional Streamlit dashboard"
+        "serve-dashboard", help="Start the Streamlit research dashboard"
     )
     serve_dashboard.add_argument("--delivery-config", type=Path, default=None)
     publication = commands.add_parser(
-        "verify-publication", help="Authenticate one persisted publication evidence bundle"
+        "verify-publication", help="Verify one persisted publication evidence bundle"
     )
     publication.add_argument("dataset_id")
     publication.add_argument("manifest", type=Path)
@@ -253,7 +246,8 @@ def build_parser() -> argparse.ArgumentParser:
     )
     hf_inventory.add_argument("--output", type=Path, required=True)
     owner = commands.add_parser(
-        "ingest-owner-factor-input", help="Ingest an owner Phase 2 input under a strict contract"
+        "ingest-owner-factor-input",
+        help="Ingest an owner-supplied factor input under a strict contract",
     )
     owner.add_argument("dataset")
     owner.add_argument("contract", choices=["factor_market_input", "factor_fundamental_input"])

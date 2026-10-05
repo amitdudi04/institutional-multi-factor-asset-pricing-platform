@@ -1,4 +1,4 @@
-"""Authenticated, temporally safe Phase 5 machine-learning research."""
+"""Temporally safe machine-learning research components."""
 
 from institutional_factor_platform.ml.config import MachineLearningConfig, load_ml_config
 

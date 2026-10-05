@@ -1,98 +1,92 @@
-# Institutional Multi-Factor Asset Pricing & Portfolio Analytics Platform
+# Multi-Factor Asset Pricing & Portfolio Research Platform
 
-An auditable public-data research pipeline for point-in-time US-equity factors, asset pricing, portfolio risk, and walk-forward machine learning.
+An independent US-equity research project combining point-in-time public data, factor construction, classical asset pricing, portfolio allocation, transaction-cost analysis, risk analytics, and walk-forward machine learning.
 
 ## Overview
 
-This project studies how empirical equity results change when historical identity, filing-time availability, transaction costs, temporal validation, and reproducibility are treated as part of the research design. It connects governed public-source evidence to factor construction, classical asset-pricing tests, constrained portfolios, risk analytics, machine-learning evaluation, and authenticated research delivery.
+The project asks how much confidence can be placed in empirical equity results when security identity, filing availability, transaction costs, temporal validation, and reproducibility are treated as part of the research design rather than after-the-fact checks.
 
-The purpose is not to advertise persistent alpha. The released study preserves negative and inconclusive findings, distinguishes estimability from zero, and fails closed when available evidence cannot support a result.
+The current study screens a broad public-data equity universe, constructs observable characteristics, compares standard asset-pricing specifications, evaluates constrained portfolio methods, and tests whether simple machine-learning models add stable out-of-sample information. The results are mixed rather than uniformly positive: multifactor models fit the project portfolios better than CAPM in-sample, transaction costs matter, portfolio methods produce different risk-return trade-offs, and the machine-learning study does not establish stable incremental value.
 
-> **Key empirical results**
->
-> - **Universe:** 822 securities screened; 487 accepted and 335 rejected.
-> - **Data:** 715,447 daily market observations and 37,273 point-in-time fundamental observations.
-> - **Factors:** 47 of 48 configured definitions were estimable.
-> - **Asset pricing:** CAPM mean adjusted R² was 0.063; multifactor specifications ranged from 0.259 to 0.301.
-> - **Portfolios:** eight allocation methods were evaluated under one-way 5/10/20-basis-point cost schedules; higher costs reduced every cumulative result.
-> - **Machine learning:** eight models completed 17 purged out-of-sample folds; all aggregate bootstrap IC confidence intervals for non-constant models included zero, and stable after-cost incremental value was not established.
+## Main Results
+
+| Area | Current result |
+|---|---|
+| Universe | 822 securities screened; 487 accepted and 335 rejected |
+| Accepted universe | 372 Tier A and 115 Tier B equities |
+| Market data | 715,447 daily observations |
+| Point-in-time fundamentals | 37,273 observations across 18 fields |
+| Factors | 48 definitions; 47 estimable |
+| Asset pricing | Mean adjusted R²: CAPM 0.063; FF3 0.259; Carhart 4 0.277; FF5 0.301; configured q mapping 0.296 |
+| Portfolios | 8 long-only methods tested under 5/10/20 bps one-way cost assumptions |
+| ML design | 27,640 monthly decision observations across 91 months; 17 complete OOS folds |
+| ML conclusion | All aggregate IC confidence intervals include zero; stable after-cost incremental value is not established |
+
+For the complete numerical summary and interpretation, see [docs/RESULTS.md](docs/RESULTS.md).
 
 ## Research Questions
 
-The preregistered hypotheses ask whether:
+The study evaluates whether:
 
-1. at least one factor spread survives the complete net-cost and multiple-testing decision rule;
-2. multifactor models improve on CAPM;
-3. factor relationships remain stable across regimes;
-4. higher transaction costs reduce portfolio performance;
-5. constrained portfolio methods create distinct risk and concentration trade-offs;
+1. observable equity characteristics can be estimated consistently from the available point-in-time public data;
+2. multifactor models provide greater explanatory fit than CAPM on the project diagnostic portfolios;
+3. factor relationships remain stable through time;
+4. higher transaction costs reduce observed portfolio performance;
+5. constrained portfolio methods produce meaningfully different risk, drawdown, concentration, and benchmark-relative outcomes;
 6. machine learning adds stable out-of-sample predictive and after-cost economic value; and
-7. feature importance is stable across models and explanation methods.
+7. feature rankings remain stable across model families and explanation methods.
 
-## Key Findings
+The study allows supported, unsupported, and inconclusive outcomes. It does not tune the research design until every hypothesis becomes positive.
 
-1. Public and free data support a substantial point-in-time research pipeline, but source-selection, identity, lifecycle, and coverage limitations remain material.
-2. Forty-seven of 48 characteristics are constructible under the released evidence rules. `equity_issuance` is not estimable from defensible inputs.
-3. Multifactor models provide materially greater in-sample explanatory fit than CAPM on the diagnostic portfolios.
-4. Portfolio construction and transaction costs materially affect observed risk-return outcomes; no method is established as persistently superior.
-5. More complex machine-learning models do not establish stable incremental out-of-sample predictive or after-cost economic value.
+## Data and Universe
 
-## Research Pipeline
+| Source | Role |
+|---|---|
+| HF Data Library | Historical US-equity market observations and initial candidate universe |
+| SEC EDGAR | Filing identity, point-in-time fundamentals, shares, and XBRL evidence |
+| Alpha Vantage | Listing and lifecycle evidence used in universe screening |
+| FRED | 3-month Treasury-bill reference series |
+| Kenneth French Data Library | Reference factor datasets and methodology comparison |
+| SPY | Broad investable US-equity benchmark proxy |
+
+The final panel is source-availability selected. It is not presented as a reconstruction of CRSP, Compustat, the historical S&P 500, or the Russell 1000. Raw third-party data are not redistributed through this repository.
+
+More detail is in [docs/DATA_AND_SOURCES.md](docs/DATA_AND_SOURCES.md).
+
+## Research Design
 
 ```text
-Public-source evidence
-        ↓
-Point-in-time security identity, market data, and fundamentals
-        ↓
-Governed universe screening and immutable publications
-        ↓
-Factor construction and diagnostic portfolios
-        ↓
-Asset-pricing regressions and robust inference
-        ↓
-Constrained portfolios, transaction costs, and risk
-        ↓
-Purged walk-forward machine learning
-        ↓
-Versioned reports, API, dashboard, and assurance
+Historical market data + listing/lifecycle evidence + SEC filings
+                              ↓
+              point-in-time security and issuer mapping
+                              ↓
+                    822 candidates screened
+                         487 accepted
+                              ↓
+                    factor construction
+                   48 defined / 47 estimable
+                              ↓
+          CAPM / FF3 / Carhart 4 / FF5 / q mapping
+                              ↓
+             8 constrained portfolio methods
+                  + 5/10/20 bps costs
+                              ↓
+              purged monthly walk-forward ML
+                              ↓
+                 results, risk and reporting
 ```
 
-## Data Sources
-
-| Source | Research role | Important limitation |
-|---|---|---|
-| HF Data Library | Historical US-equity market observations and initial candidate universe | Source-selected universe; pre-2022 survivorship limitations; PiTrading-to-IEX source transition affects volume comparability |
-| SEC EDGAR | CIK identity, filings, filing-time fundamentals, shares, and taxonomy evidence | Accounting concepts and filing coverage vary across issuers and time |
-| Alpha Vantage `LISTING_STATUS` | Listing and lifecycle evidence used during screening | Coverage does not reconstruct every provider-absent historical security |
-| FRED `DGS3MO` | Approved 3-month Treasury-bill risk-free reference | Frequency conversion and release timing must be governed |
-| Kenneth French Data Library | Reference factor and methodology evidence | Provider definitions are not automatically identical to project-specific mappings |
-| SPY | Broad investable US-equity benchmark proxy | It is not a historical total-market or constituent-membership database |
-
-Raw third-party data and authenticated local publications are not redistributed by this repository.
-
-## Dataset Summary
-
-| Measure | Frozen result |
-|---|---:|
-| Candidate securities screened | 822 |
-| Accepted / rejected | 487 / 335 |
-| Tier A / Tier B accepted securities | 372 / 115 |
-| Daily market observations | 715,447 |
-| Market sample | 2018-02-14 to 2026-08-04 |
-| Point-in-time fundamental observations | 37,273 |
-| Fundamental availability sample | 2019-02-23 to 2026-08-15 |
-
-The frozen universe is not a reconstruction of CRSP, Compustat, the historical S&P 500, or the Russell 1000.
+The analytical design and formulas are summarized in [docs/METHODOLOGY.md](docs/METHODOLOGY.md).
 
 ## Factor Research
 
-The factor engine contains 48 configured definitions across market, size, value, momentum, profitability, investment/leverage, and risk/liquidity families. Forty-seven were estimable in the frozen release, producing 34,341,456 long-form factor rows and 11,545 factor-portfolio rows.
+The factor engine contains 48 configured definitions spanning market, size, value, momentum, profitability, investment/leverage, and risk/liquidity characteristics. Forty-seven are estimable in the current empirical release.
 
-`equity_issuance` remains **not estimable from defensible inputs** because the approved point-in-time SEC concepts do not support a consistent calculation without unsupported imputation. Non-estimable does not mean zero.
+`equity_issuance` remains non-estimable because the available point-in-time SEC evidence does not support a consistent calculation without unsupported imputation. Missing evidence is therefore left missing rather than converted to zero.
 
 ## Asset-Pricing Results
 
-Mean adjusted R² across 123 diagnostic portfolios per configured model:
+Mean adjusted R² across 123 diagnostic portfolios per model:
 
 | Model | Mean adjusted R² |
 |---|---:|
@@ -102,11 +96,11 @@ Mean adjusted R² across 123 diagnostic portfolios per configured model:
 | Fama-French 5 | 0.301 |
 | Configured q mapping | 0.296 |
 
-The configured q mapping is project-specific and is not claimed as an exact Hou-Xue-Zhang replication. Higher in-sample explanatory fit does not establish persistent alpha, causality, forecast accuracy, or investable performance.
+The multifactor specifications provide greater in-sample explanatory fit than CAPM on these project portfolios. That result is not interpreted as proof of persistent alpha, causality, or future performance.
 
-## Portfolio Construction
+## Portfolio Research
 
-The released study compares eight long-only, fully invested, unlevered methods:
+Eight long-only, fully invested methods are compared:
 
 - Equal Weight
 - Minimum Variance
@@ -117,21 +111,9 @@ The released study compares eight long-only, fully invested, unlevered methods:
 - Hierarchical Risk Parity
 - CVaR
 
-## Transaction Costs
+The one-way transaction-cost assumptions are 5, 10, and 20 basis points. Over the available approximately 32-month factor-portfolio test window, higher costs reduce cumulative performance for every method.
 
-The one-way cost schedules were frozen before portfolio performance was inspected:
-
-| Schedule | One-way assumption |
-|---|---:|
-| LOW | 5 bps |
-| BASE | 10 bps |
-| HIGH | 20 bps |
-
-Higher assumed costs reduced cumulative results for every portfolio method. Nonlinear market impact was not estimated because no authenticated liquidity input supported it.
-
-## Selected Portfolio Results
-
-Selected frozen BASE results from the approximately 32-month factor-portfolio test window:
+Selected BASE results:
 
 | Method | Observed result |
 |---|---:|
@@ -140,57 +122,42 @@ Selected frozen BASE results from the approximately 32-month factor-portfolio te
 | Maximum Sharpe | Sharpe ratio: 1.575 |
 | CVaR | Highest cumulative return: 83.17%; Sharpe ratio: 1.667 |
 
-These are descriptive results on factor-portfolio test assets. CVaR led observed cumulative return, while other methods led on different risk measures; persistent strategy superiority is not established.
+These are descriptive results from a short factor-portfolio window. They do not establish persistent strategy superiority.
 
-## Machine Learning
+## Walk-Forward Machine Learning
 
-The ML study uses two authenticated features: book-to-market and 12-minus-1 momentum. The target is the next 21-trading-session security return minus SPY's return over the same interval.
+The ML study uses book-to-market and 12-minus-1 momentum to predict the next 21-trading-session security return relative to SPY.
 
-The walk-forward design uses 60 monthly training periods, 12 validation periods, one test month, monthly retraining, label purging, a one-month embargo, seed 17, and single-thread estimators. The real decision panel contains 27,640 observations across 91 monthly dates and 17 complete out-of-sample folds.
+The evaluation uses:
 
-Eight models were evaluated: zero and historical-mean baselines, factor composite, linear regression, Ridge, Elastic Net, Random Forest, and XGBoost.
+- monthly decisions;
+- 60 monthly training periods;
+- 12 validation periods;
+- one test month per fold;
+- label purging;
+- a one-month embargo;
+- monthly retraining;
+- 17 complete out-of-sample folds.
 
-## ML Results
+Eight models are evaluated: zero and historical-mean baselines, factor composite, linear regression, Ridge, Elastic Net, Random Forest, and XGBoost.
 
-All aggregate bootstrap information-coefficient confidence intervals for non-constant models include zero.
+All aggregate bootstrap information-coefficient confidence intervals for non-constant models include zero. Random Forest has a very small positive mean after-cost fold return, but it is positive in only 9 of 17 folds. The study therefore does not establish stable incremental predictive or economic value from the ML models.
 
-- **Stable predictive information:** not established.
-- **Stable after-cost incremental value:** not established.
-
-Random Forest's small positive mean after-cost fold result was positive in only 9 of 17 folds. This is a legitimate negative empirical result, not evidence that the software failed.
-
-## Hypothesis Outcomes
-
-| Hypothesis | Outcome |
-|---|---|
-| H1 | Inconclusive |
-| H2 | Partially supported |
-| H3 | Inconclusive |
-| H4 | Supported |
-| H5 | Partially supported |
-| H6 | Not supported |
-| H7 | Not supported |
-
-## Why the Negative Results Matter
-
-Universe admission, transaction costs, feature families, model grids, temporal splits, and hypothesis rules were fixed before the relevant results were inspected. Preserving weak, negative, and inconclusive outcomes limits researcher degrees of freedom and is more informative than repeatedly tuning the study until a favorable result appears.
-
-## Architecture
+## Repository Structure
 
 ```text
-config/   Frozen research and delivery configuration
-src/      Data, factors, asset pricing, portfolios, risk, ML, and delivery code
-tests/    Unit, connected, restart, tamper, and deployment assurance
-docs/     Methodology, governance, architecture, results, and user guides
-data/     Public structure guide; empirical data remain local and ignored
-paper/    Canonical public research manuscript
+config/     Research and delivery configuration
+src/        Data, factors, asset pricing, portfolios, risk, ML, API and dashboard code
+tests/      Methodology, temporal-integrity, accounting and software tests
+docs/       Research methodology, results, limitations and reproducibility
+data/       Public data-access notes; empirical source files remain local
+paper/      Research manuscript
+examples/   Small redistributable templates
 ```
-
-See the [repository manifest](docs/REPOSITORY_MANIFEST.md) and [system architecture](docs/FINAL_SYSTEM_ARCHITECTURE.md).
 
 ## Quick Start
 
-Python 3.11 or newer and [uv](https://docs.astral.sh/uv/) are required.
+Python 3.11 or newer and `uv` are required.
 
 ```shell
 uv sync --all-groups
@@ -199,9 +166,7 @@ uv run institutional-factor-platform validate-delivery-config
 uv run institutional-factor-platform verify-delivery-platform
 ```
 
-Credentials are read only from environment variables. Copy `.env.example` to an untracked `.env` when local bearer protection is required.
-
-## Running Tests
+Run the test suite:
 
 ```shell
 uv run pytest
@@ -212,51 +177,50 @@ uv run mypy src
 uv lock --check
 ```
 
-The final verified counts are recorded in the [cleanup report](outputs/repository-cleanup/FINAL_REPOSITORY_CLEANUP_REPORT.md) after the post-packaging checks run.
+The verified research release passed 301 tests with 90.52% branch-aware coverage. These software checks support reproducibility; they are not empirical evidence of investment performance.
 
-## Running the API and Dashboard
+## API and Dashboard
 
 ```shell
 uv run institutional-factor-platform serve-api
 uv run institutional-factor-platform serve-dashboard
 ```
 
-The API defaults to `127.0.0.1:8000` under `/api/v1`; the Streamlit dashboard defaults to `127.0.0.1:8501`. Empty empirical state is represented explicitly and is never replaced with fabricated examples.
+The API and Streamlit dashboard expose stored research outputs. They are research interfaces, not brokerage or live-trading infrastructure. See [docs/SOFTWARE_USAGE.md](docs/SOFTWARE_USAGE.md).
 
 ## Reproducibility
 
-- Empirical release tag: `project-complete-public-data-v1`
-- Parallel empirical tag: `research-empirical-public-v1`
-- Frozen empirical commit: `5a3e930665756fa7aaedeceb5f9ab90792bcf849`
+The empirical release is identified by:
 
-Both tags resolve to the frozen commit. Repository cleanup occurs above that record and does not move the tags or alter Phase 1-5 empirical results. Reproduction requires lawful acquisition of the source evidence described in [data/README.md](data/README.md) and the [reproducibility guide](docs/FINAL_REPRODUCIBILITY_GUIDE.md).
+- tag: `project-complete-public-data-v1`
+- parallel research tag: `research-empirical-public-v1`
+- commit: `5a3e930665756fa7aaedeceb5f9ab90792bcf849`
 
-## Research Paper
-
-The canonical public manuscript is available as [Institutional Multi-Factor Asset Pricing Research Paper](paper/Institutional_Multi_Factor_Asset_Pricing_Research_Paper.pdf). It is an independent research manuscript and is not represented as peer reviewed or formally published on SSRN.
+Exact empirical reproduction requires lawful access to the same third-party source data, mappings, configuration, and locked environment. See [docs/REPRODUCIBILITY.md](docs/REPRODUCIBILITY.md).
 
 ## Limitations
 
-- The universe is selected by public-source availability and is not CRSP/Compustat or historical-index replication.
-- The HF Data Library universe has pre-2022 survivorship limitations; provider-absent delisted securities cannot be reconstructed.
-- The PiTrading-to-IEX source transition limits historical volume and liquidity comparability.
-- Early cross-sectional coverage is sparse.
-- SEC accounting concepts and issuer reporting practices are heterogeneous.
-- Equity issuance is non-estimable under the released evidence rules.
-- Phase 4 spans only about 32 months and uses factor portfolios rather than direct-security portfolios.
-- Transaction costs are modeled sensitivity assumptions; nonlinear market impact is not estimated.
-- Phase 5 uses two features and 17 complete test folds.
-- H1 and H3 remain inconclusive because the complete preregistered multiplicity and regime decisions are unavailable.
-- Feature importance and SHAP values are non-causal.
+The principal limitations are:
 
-## Citation
+- source-availability selection and incomplete historical-universe coverage;
+- limited early cross-sectional breadth;
+- heterogeneous SEC accounting concepts and issuer reporting;
+- a roughly 32-month portfolio test window using factor portfolios rather than directly investable security portfolios;
+- transaction costs modeled as sensitivity assumptions rather than measured executions;
+- two ML characteristics and 17 complete test folds;
+- no stable after-cost ML improvement;
+- non-causal feature-importance and scenario outputs.
 
-Primary market-data citation:
+See [docs/LIMITATIONS.md](docs/LIMITATIONS.md) for the full discussion.
 
-> Elkassabgi, Ahmed. (2026). *HF Data Library: High-Frequency U.S. Equity Data* (Version 1.0) [Dataset]. Zenodo. https://doi.org/10.5281/zenodo.19501605
+## Research Paper
 
-For the software and research repository, use the metadata in [`CITATION.cff`](CITATION.cff) and cite the frozen empirical release and commit above. Cite each upstream provider separately and comply with its terms.
+The public manuscript is available at [paper/Institutional_Multi_Factor_Asset_Pricing_Research_Paper.pdf](paper/Institutional_Multi_Factor_Asset_Pricing_Research_Paper.pdf).
 
-## License
+It is an independent research manuscript. It is not represented as peer reviewed, professional investment advice, or a live trading system.
 
-Repository code and original documentation are licensed under the [MIT License](LICENSE), copyright © 2026 Amit Kumar Dudi. Third-party datasets, provider archives, and derived materials remain subject to their own licenses and terms. The MIT License does not grant permission to redistribute HF Data Library, IEX, Alpha Vantage, SEC, FRED, Kenneth French, or other third-party source data.
+## License and Citation
+
+Original code and documentation are licensed under the [MIT License](LICENSE). Third-party datasets remain subject to their own licenses and terms.
+
+Repository citation metadata are provided in [CITATION.cff](CITATION.cff). Upstream datasets should be cited separately.

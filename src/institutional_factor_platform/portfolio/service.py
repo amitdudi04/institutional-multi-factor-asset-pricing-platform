@@ -1,4 +1,4 @@
-"""Authenticated Phase 4 portfolio research orchestration."""
+"""Portfolio research orchestration."""
 
 import hashlib
 import os

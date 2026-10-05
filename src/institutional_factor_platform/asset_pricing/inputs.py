@@ -1,4 +1,4 @@
-"""Construct temporally aligned model matrices from authenticated Phase 2 tables."""
+"""Construct temporally aligned model matrices from factor tables."""
 
 from collections.abc import Mapping
 
