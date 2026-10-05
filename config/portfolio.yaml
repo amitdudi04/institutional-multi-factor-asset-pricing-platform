@@ -17,9 +17,11 @@ constraints:
 costs:
   # Fixed before comparing the reported portfolio performance results.
   # Sensitivity totals are LOW/BASE/HIGH = 5/10/20 one-way bps.
-  # The engine charges half of spread_bps. With no consistent liquidity
-  # input, the fixed 3 bps BASE impact allowance is conservatively bundled
-  # with 2 bps slippage; nonlinear market impact remains disabled.
+  # Reported BASE decomposition: 5 bps spread + 2 bps slippage
+  # + 3 bps fixed-impact allowance = 10 bps one way.
+  # The engine charges half of spread_bps; the 2 bps slippage and
+  # 3 bps fixed-impact allowance are bundled in slippage_bps.
+  # Nonlinear market impact remains disabled.
   commission_bps: 0.0
   spread_bps: 10.0
   slippage_bps: 5.0
