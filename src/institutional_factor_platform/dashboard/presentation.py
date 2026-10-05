@@ -18,7 +18,7 @@ class PageDefinition:
 
 PAGES = (
     PageDefinition("overview", "Platform Overview", "Validated platform status and capabilities."),
-    PageDefinition("lineage", "Data and Lineage Explorer", "Research-data lineage and source connections."),
+    PageDefinition(\n        "lineage", "Data and Lineage Explorer", "Research-data lineage and source connections."\n    ),
     PageDefinition("factors", "Factor Research", "Definitions, coverage, and diagnostics."),
     PageDefinition("asset_pricing", "Asset-Pricing Research", "Models and statistical estimates."),
     PageDefinition("portfolio", "Portfolio Construction", "Constraints, weights, and accounting."),
