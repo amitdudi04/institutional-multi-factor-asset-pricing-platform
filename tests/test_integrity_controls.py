@@ -5,8 +5,8 @@ from datetime import UTC, date, datetime
 from pathlib import Path
 
 import pytest
-from test_service_cli_calendar import SyntheticMarketAdapter, _temp_config
 from test_recovery_and_lineage import _publish
+from test_service_cli_calendar import SyntheticMarketAdapter, _temp_config
 
 from institutional_factor_platform.data.contracts import DAILY_MARKET, SEC_FACTS
 from institutional_factor_platform.data.domain import (
