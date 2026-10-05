@@ -177,7 +177,7 @@ uv run mypy src
 uv lock --check
 ```
 
-The verified research release passed 301 tests with 90.49% branch-aware coverage. These software checks support reproducibility; they are not empirical evidence of investment performance.
+The verified research release passed 301 tests with 90.52% branch-aware coverage. These software checks support reproducibility; they are not empirical evidence of investment performance.
 
 ## API and Dashboard
 
