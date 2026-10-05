@@ -170,7 +170,7 @@ def project_sec_shares_outstanding(
 def legacy_sec_shares_facts(
     records: tuple[dict[str, object], ...],
 ) -> tuple[dict[str, object], ...]:
-    """Translate governed legacy DEI share facts into the existing PIT projector input."""
+    """Translate legacy DEI share facts into the point-in-time projector input."""
     output: list[dict[str, object]] = []
     for row in records:
         if (
