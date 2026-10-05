@@ -1,4 +1,4 @@
-"""Deterministic point-in-time feature assembly from authenticated tables."""
+"""Deterministic point-in-time feature assembly from validated tables."""
 
 from datetime import UTC, datetime, time
 
