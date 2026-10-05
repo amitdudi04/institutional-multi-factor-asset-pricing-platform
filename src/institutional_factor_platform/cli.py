@@ -176,11 +176,11 @@ def build_parser() -> argparse.ArgumentParser:
     serve_api = commands.add_parser("serve-api", help="Start the local FastAPI delivery service")
     serve_api.add_argument("--delivery-config", type=Path, default=None)
     serve_dashboard = commands.add_parser(
-        "serve-dashboard", help="Start the institutional Streamlit dashboard"
+        "serve-dashboard", help="Start the Streamlit research dashboard"
     )
     serve_dashboard.add_argument("--delivery-config", type=Path, default=None)
     publication = commands.add_parser(
-        "verify-publication", help="Authenticate one persisted publication evidence bundle"
+        "verify-publication", help="Verify one persisted publication evidence bundle"
     )
     publication.add_argument("dataset_id")
     publication.add_argument("manifest", type=Path)
