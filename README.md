@@ -13,9 +13,8 @@ The current study screens a broad public-data equity universe, constructs observ
 | Area | Current result |
 |---|---|
 | Universe | 822 securities screened; 487 accepted and 335 rejected |
-| Accepted universe | 372 Tier A and 115 Tier B equities |
 | Market data | 715,447 daily observations |
-| Point-in-time fundamentals | 37,273 observations across 18 fields |
+| Point-in-time fundamentals | 37,273 observations |
 | Factors | 48 definitions; 47 estimable |
 | Asset pricing | Mean adjusted R²: CAPM 0.063; FF3 0.259; Carhart 4 0.277; FF5 0.301; configured q mapping 0.296 |
 | Portfolios | 8 long-only methods tested under 5/10/20 bps one-way cost assumptions |
@@ -45,7 +44,7 @@ The study allows supported, unsupported, and inconclusive outcomes. It does not 
 | HF Data Library | Historical US-equity market observations and initial candidate universe |
 | SEC EDGAR | Filing identity, point-in-time fundamentals, shares, and XBRL evidence |
 | Alpha Vantage | Listing and lifecycle evidence used in universe screening |
-| FRED | 3-month Treasury-bill reference series |
+| FRED | 3-month constant-maturity Treasury yield reference (DGS3MO) |
 | Kenneth French Data Library | Reference factor datasets and methodology comparison |
 | SPY | Broad investable US-equity benchmark proxy |
 
@@ -151,7 +150,6 @@ src/        Data, factors, asset pricing, portfolios, risk, ML, API and dashboar
 tests/      Methodology, temporal-integrity, accounting and software tests
 docs/       Research methodology, results, limitations and reproducibility
 data/       Public data-access notes; empirical source files remain local
-paper/      Research manuscript
 examples/   Small redistributable templates
 ```
 
@@ -212,12 +210,6 @@ The principal limitations are:
 - non-causal feature-importance and scenario outputs.
 
 See [docs/LIMITATIONS.md](docs/LIMITATIONS.md) for the full discussion.
-
-## Research Paper
-
-The public manuscript is available at [paper/An_Auditable_Public_Data_US_Equity_Research_Pipeline.pdf](paper/An_Auditable_Public_Data_US_Equity_Research_Pipeline.pdf).
-
-It is an independent research manuscript. It is not represented as peer reviewed, professional investment advice, or a live trading system.
 
 ## License and Citation
 
