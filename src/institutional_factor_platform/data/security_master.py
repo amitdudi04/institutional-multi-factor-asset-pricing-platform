@@ -103,7 +103,7 @@ def validate_security_master(
 
 
 class SecurityMappingStore:
-    """Small owner-governed mapping registry; it is not a commercial security master."""
+    """Small owner-maintained mapping registry; it is not a commercial security master."""
 
     def __init__(self, path: Path) -> None:
         self.path = path
