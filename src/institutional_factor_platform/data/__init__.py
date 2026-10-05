@@ -1,1 +1,1 @@
-"""Phase 1 institutional data platform."""
+"""Point-in-time research data layer."""

@@ -1,4 +1,4 @@
-"""Versioned institutional characteristic definitions and computations."""
+"""Versioned equity characteristic definitions and computations."""
 
 from dataclasses import dataclass
 from math import inf, log, nan, prod, sqrt

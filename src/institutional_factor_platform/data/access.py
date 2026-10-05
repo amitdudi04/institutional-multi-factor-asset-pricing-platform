@@ -239,12 +239,12 @@ def _process_alive(process_id: int) -> bool:
         import ctypes
 
         process_query_limited_information = 0x1000
-        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)  # type: ignore[attr-defined]
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)  # type: ignore[attr-defined, unused-ignore]
         handle = kernel32.OpenProcess(process_query_limited_information, False, process_id)
         if handle:
             kernel32.CloseHandle(handle)
             return True
-        return bool(ctypes.get_last_error() == 5)  # type: ignore[attr-defined]
+        return bool(ctypes.get_last_error() == 5)  # type: ignore[attr-defined, unused-ignore]
     try:
         os.kill(process_id, 0)
     except OSError:

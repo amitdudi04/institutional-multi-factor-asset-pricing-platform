@@ -1,4 +1,4 @@
-"""Institutional quantitative research platform foundation."""
+"""Quantitative research platform package."""
 
 from importlib.metadata import PackageNotFoundError, version
 

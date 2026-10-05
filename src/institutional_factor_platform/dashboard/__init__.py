@@ -1,4 +1,4 @@
-"""Institutional Streamlit dashboard presentation layer."""
+"""Streamlit research dashboard presentation layer."""
 
 from institutional_factor_platform.dashboard.presentation import PAGES
 

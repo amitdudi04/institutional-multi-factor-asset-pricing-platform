@@ -1,1 +1,1 @@
-"""Approved Phase 1 source adapters."""
+"""Research data source adapters."""
