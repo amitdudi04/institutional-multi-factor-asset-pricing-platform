@@ -30,7 +30,7 @@ The initial candidate set contains 822 HF Data Library stocks. Screening combine
 - split-basis consistency;
 - terminal-event treatment.
 
-The accepted research universe contains 487 equities: 372 Tier A and 115 Tier B.
+The accepted research universe contains 487 equities.
 
 The design does not backfill present-day identities, shares, or company names into earlier periods.
 
@@ -96,7 +96,7 @@ One-way cost assumptions are evaluated at:
 - BASE: 10 bps
 - HIGH: 20 bps
 
-The BASE case represents a simple spread/slippage allowance. Nonlinear market impact is not estimated because the required liquidity evidence is not available at the same standard across the research panel.
+The reported BASE total decomposes to 5 bps spread, 2 bps slippage, and a 3 bps fixed-impact allowance. In the current engine configuration, the 2 bps slippage and 3 bps fixed-impact allowance are bundled into the configured slippage field; nonlinear market impact remains disabled because consistent liquidity evidence is not available at the required standard across the research panel.
 
 Portfolio accounting reconciles holdings, trades, turnover, gross returns, costs, and net returns.
 
