@@ -215,7 +215,7 @@ See [docs/LIMITATIONS.md](docs/LIMITATIONS.md) for the full discussion.
 
 ## Research Paper
 
-The public manuscript is available at [paper/Institutional_Multi_Factor_Asset_Pricing_Research_Paper.pdf](paper/Institutional_Multi_Factor_Asset_Pricing_Research_Paper.pdf).
+The public manuscript is available at [paper/An_Auditable_Public_Data_US_Equity_Research_Pipeline.pdf](paper/An_Auditable_Public_Data_US_Equity_Research_Pipeline.pdf).
 
 It is an independent research manuscript. It is not represented as peer reviewed, professional investment advice, or a live trading system.
 

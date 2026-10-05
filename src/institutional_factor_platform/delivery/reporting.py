@@ -22,7 +22,8 @@ from .schemas import ReportRecord, ReportRequest
 
 DISCLAIMER = "Research software output only; not financial advice or an investment recommendation."
 LIMITATIONS = (
-    "Live empirical validation may be pending.",
+    "Exact empirical reproduction requires the source data and mappings "
+    "used for the reported release.",
     "Model explanations are not causal.",
     "Model performance is not guaranteed.",
 )
@@ -266,7 +267,7 @@ class ReportService:
                 f"Generated: `{document['generated_at']}`  \n"
                 f"Software: `{document['software_version']}`  \n"
                 f"Template: `{document['template_version']}`\n\n"
-                f"## Authenticated publications\n\n{rows}\n\n## Limitations\n\n"
+                f"## Research publications\n\n{rows}\n\n## Limitations\n\n"
                 + "\n".join(f"- {x}" for x in LIMITATIONS)
                 + f"\n\n> {DISCLAIMER}\n"
             ).encode()
