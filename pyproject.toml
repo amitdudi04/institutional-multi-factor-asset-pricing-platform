@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "institutional-factor-platform"
 version = "1.0.3"
-description = "Authenticated institutional quantitative research, portfolio-risk, and explainable ML platform"
+description = "US-equity factor, asset-pricing, portfolio, risk, and walk-forward machine-learning research platform"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"
