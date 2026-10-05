@@ -45,7 +45,7 @@ def _market_publication(root: Path) -> tuple[DataIngestionService, object, Path]
                 mic="XNYS",
                 valid_from=date(2020, 1, 1),
                 valid_to=None,
-                provenance="synthetic assurance mapping",
+                provenance="synthetic test mapping",
                 retrieval_timestamp=datetime(2024, 1, 1, tzinfo=UTC),
                 evidence=MappingEvidence.OWNER_CONFIRMED,
                 security_id=security_id,
@@ -351,7 +351,7 @@ def test_sec_mapping_authority_is_enforced_centrally(tmp_path: Path) -> None:
                 valid_to=None,
                 status=MappingStatus.RESOLVED,
                 evidence=MappingEvidence.OWNER_CONFIRMED,
-                provenance="synthetic assurance mapping",
+                provenance="synthetic test mapping",
                 retrieval_timestamp=datetime(2024, 1, 1, tzinfo=UTC),
             ),
         )
