@@ -19,7 +19,7 @@ from institutional_factor_platform.ml.config import load_ml_config
 def main() -> None:
     config = load_delivery_config()
     client = DashboardClient(config)
-    st.set_page_config(page_title="Institutional Research Platform", page_icon="📊", layout="wide")
+    st.set_page_config(page_title="Multi-Factor Research Platform", page_icon="📊", layout="wide")
     st.title("Institutional Multi-Factor Research Platform")
     st.caption(f"Version {__version__} · non-advisory research delivery")
     selected = st.sidebar.radio("Workspace", PAGES, format_func=lambda page: page.title)
@@ -44,7 +44,7 @@ def _overview(client: DashboardClient) -> None:
     limitations = client.get("limitations")
     columns = st.columns(3)
     columns[0].metric("Platform", ready["status"])
-    columns[1].metric("Authenticated publications", ready["authenticated_publications"])
+    columns[1].metric("Available publications", ready["authenticated_publications"])
     columns[2].metric("Research status", governance["advisory_status"])
     if ready["empty_state"]:
         st.info(EMPTY_STATE)
@@ -73,11 +73,11 @@ def _research_page(client: DashboardClient, key: str) -> None:
             st.warning("SHAP and feature importance are not causal.")
         return
     labels = [item["publication_id"] for item in items]
-    publication_id = st.selectbox("Authenticated publication", labels)
+    publication_id = st.selectbox("Research publication", labels)
     selected = next(item for item in items if item["publication_id"] == publication_id)
     st.subheader("Provenance")
     st.json(provenance_panel(selected), expanded=True)
-    st.warning("Display values retain authenticated source identity and configured units.")
+    st.warning("Display values retain source identity and configured units.")
     detail_family = {
         "lineage": "publications",
         "factors": "factors/publications",
@@ -88,7 +88,7 @@ def _research_page(client: DashboardClient, key: str) -> None:
         "validation": "publications",
     }[key]
     detail = client.get(f"{detail_family}/{publication_id}")
-    st.subheader("Authenticated evidence")
+    st.subheader("Research evidence")
     st.json(detail, expanded=False)
     for title, suffix in _detail_sections(key):
         st.subheader(title)
@@ -104,7 +104,7 @@ def _reports(client: DashboardClient) -> None:
         st.info(EMPTY_STATE)
         return
     options = {f"{item['kind']}: {item['publication_id']}": item for item in items}
-    selected = st.multiselect("Authenticated publications", sorted(options))
+    selected = st.multiselect("Available publications", sorted(options))
     format_name = st.selectbox("Format", ("markdown", "html", "json", "csv"))
     if st.button("Generate deterministic report", disabled=not selected):
         references = [
@@ -112,7 +112,7 @@ def _reports(client: DashboardClient) -> None:
             for label in selected
         ]
         result: Any = client.post_report({"publications": references, "format": format_name})
-        st.success(f"Authenticated report created: {result['report_id']}")
+        st.success(f"Research report created: {result['report_id']}")
 
 
 def _detail_sections(key: str) -> tuple[tuple[str, str], ...]:
