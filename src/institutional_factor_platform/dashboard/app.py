@@ -1,4 +1,4 @@
-"""Streamlit entry point for non-advisory authenticated research review."""
+"""Streamlit entry point for research review."""
 
 from typing import Any
 
