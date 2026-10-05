@@ -242,7 +242,7 @@ class ReportService:
                 for x in document["sources"]
             )
             return (
-                "<!doctype html><html><body><h1>Institutional Research Report</h1>"
+                "<!doctype html><html><body><h1>Quantitative Research Report</h1>"
                 + "<p>"
                 + html.escape(
                     f"Report {document['report_id']} generated {document['generated_at']} "
