@@ -30,7 +30,7 @@ The initial candidate set contains 822 HF Data Library stocks. Screening combine
 - split-basis consistency;
 - terminal-event treatment.
 
-The accepted research universe contains 487 equities: 372 Tier A and 115 Tier B.
+The accepted research universe contains 487 equities.
 
 The design does not backfill present-day identities, shares, or company names into earlier periods.
 
