@@ -18,19 +18,19 @@ class PageDefinition:
 
 PAGES = (
     PageDefinition("overview", "Platform Overview", "Validated platform status and capabilities."),
-    PageDefinition("lineage", "Data and Lineage Explorer", "Authenticated evidence connections."),
+    PageDefinition("lineage", "Data and Lineage Explorer", "Research-data lineage and source connections."),
     PageDefinition("factors", "Factor Research", "Definitions, coverage, and diagnostics."),
     PageDefinition("asset_pricing", "Asset-Pricing Research", "Models and statistical estimates."),
     PageDefinition("portfolio", "Portfolio Construction", "Constraints, weights, and accounting."),
     PageDefinition("risk", "Risk Analytics", "Risk measures and scenario evidence."),
     PageDefinition("ml", "Machine Learning", "Model cards, explanations, and drift."),
-    PageDefinition("validation", "Validation and Audit", "Quality gates and assurance evidence."),
-    PageDefinition("reports", "Report Builder", "Deterministic authenticated research reports."),
+    PageDefinition("validation", "Validation", "Quality checks and validation status."),
+    PageDefinition("reports", "Report Builder", "Research reports generated from stored results."),
 )
 
 EMPTY_STATE = (
-    "No authenticated empirical publication is currently available. "
-    "Create and promote evidence through the governed Phase 1-5 workflows; no synthetic result "
+     "No empirical publication is currently available. "
+     "Run the relevant research workflow first; no placeholder result "
     "is displayed by the live application."
 )
 
@@ -60,7 +60,7 @@ def provenance_panel(manifest: dict[str, Any]) -> dict[str, str]:
 def publication_options(
     items: list[dict[str, Any]], preferred_id: str | None = None
 ) -> list[dict[str, Any]]:
-    """Prefer the newest authenticated evidence without deleting historical publications."""
+    """Prefer the newest available publication without deleting historical publications."""
     return sorted(
         items,
         key=lambda item: (
