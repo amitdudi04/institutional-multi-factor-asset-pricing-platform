@@ -1,6 +1,6 @@
 # Research Results
 
-This document provides the compact numerical record for the current public research release. Numerical claims in the README are intended to match this file and the public research manuscript.
+This document provides the compact numerical record for the current public research release. Numerical claims in the README are intended to match this file and the frozen empirical release.
 
 ## 1. Universe and Data
 
@@ -9,13 +9,10 @@ This document provides the compact numerical record for the current public resea
 | Candidate securities screened | 822 |
 | Accepted securities | 487 |
 | Rejected securities | 335 |
-| Tier A accepted | 372 |
-| Tier B accepted | 115 |
 | Daily market observations | 715,447 |
 | Market sample | 2018-02-14 to 2026-08-04 |
 | Point-in-time fundamental observations | 37,273 |
 | Fundamental availability sample | 2019-02-23 to 2026-08-15 |
-| Fundamental fields | 18 |
 
 The panel is selected by source availability and research eligibility. It is not a reconstruction of CRSP, Compustat, the historical S&P 500, or the Russell 1000.
 
@@ -86,7 +83,7 @@ Selected outcomes:
 | Minimum Variance | Lowest annualized volatility: 10.00% |
 | Maximum Diversification | Smallest maximum drawdown: -5.43% |
 | Maximum Sharpe | Sharpe ratio: 1.575 |
-| CVaR | Highest cumulative return: 83.17%; Sharpe ratio: 1.667; information ratio: 0.299 |
+| CVaR | Highest cumulative return: 83.17%; Sharpe ratio: 1.667; information ratio: 0.298 |
 
 ### Cost Sensitivity
 
@@ -152,9 +149,9 @@ Feature rankings also vary across models and explanation methods, so no stable o
 
 | Hypothesis | Outcome | Interpretation |
 |---|---|---|
-| H1 | Inconclusive | The factor publication does not provide the complete net-cost/multiple-testing decision needed for the original directional-spread claim |
+| H1 | Inconclusive | The complete factor-level cost and multiplicity decision is not persisted |
 | H2 | Partially supported | Multifactor models improve in-sample explanatory fit; stable OOS economic improvement is not established |
-| H3 | Inconclusive | Rolling evidence exists, but the complete corrected regime/break decision is unavailable |
+| H3 | Inconclusive | Rolling evidence exists, but the complete original temporal-stability decision is absent |
 | H4 | Supported | Higher frozen transaction costs reduce every portfolio's net result |
 | H5 | Partially supported | Portfolio methods show different risk and concentration trade-offs; persistent superiority is not established |
 | H6 | Not supported | ML IC intervals include zero and after-cost gains are not stable across folds |
