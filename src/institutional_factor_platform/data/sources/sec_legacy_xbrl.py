@@ -1,4 +1,4 @@
-"""Governed parser for legacy SEC XBRL instances embedded in complete submissions."""
+"""Parser for legacy SEC XBRL instances embedded in complete submissions."""
 
 import hashlib
 import re
