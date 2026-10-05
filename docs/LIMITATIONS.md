@@ -21,8 +21,8 @@ The project is intentionally explicit about what the available evidence can and 
 
 - Project characteristic portfolios are not claimed to be exact replications of every published academic factor construction.
 - Higher adjusted R² in the multifactor regressions is an in-sample explanatory result, not evidence of causal pricing or future alpha.
-- H1 remains inconclusive because the complete net-cost/multiple-testing decision for the original directional-spread hypothesis is unavailable.
-- H3 remains inconclusive because the complete corrected regime/break decision is unavailable.
+- H1 remains inconclusive because the complete factor-level cost and multiplicity decision is not persisted.
+- H3 remains inconclusive because rolling evidence exists but the complete original temporal-stability decision is absent.
 
 ## Portfolio Research
 
