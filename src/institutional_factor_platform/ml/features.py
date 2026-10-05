@@ -63,7 +63,7 @@ def assemble_factor_features(
         FeatureDefinition(
             name=name,
             family=name.split("_", 1)[0],
-            definition=f"Authenticated Phase 2 {value_column}",
+            definition=f"Point-in-time factor input: {value_column}",
             rationale="Owner-selected classical characteristic",
             source=source_publication_id,
             unit="score" if value_column != "raw_value" else "source_unit",
