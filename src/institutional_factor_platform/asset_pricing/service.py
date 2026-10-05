@@ -1,4 +1,4 @@
-"""Authenticated orchestration of Phase 3 empirical research publications."""
+"""Asset-pricing research orchestration."""
 
 import hashlib
 import os
