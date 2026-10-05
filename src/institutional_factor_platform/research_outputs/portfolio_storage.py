@@ -1,4 +1,4 @@
-"""Authenticated immutable Phase 4 portfolio publication storage."""
+"""Immutable portfolio publication storage."""
 
 import hashlib
 import json
