@@ -165,7 +165,7 @@ Feature rankings also vary across models and explanation methods, so no stable o
 The research release passed:
 
 - 301 tests;
-- 90.49% branch-aware coverage;
+- 90.52% branch-aware coverage;
 - Ruff formatting and lint checks;
 - strict Mypy checks;
 - dependency-lock verification;
