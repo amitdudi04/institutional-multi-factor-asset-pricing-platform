@@ -1,4 +1,4 @@
-"""Authenticated immutable Phase 3 research publications."""
+"""Asset-pricing research publication storage."""
 
 from institutional_factor_platform.research_outputs.storage import AssetPricingRepository
 
