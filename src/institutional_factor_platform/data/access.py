@@ -1,4 +1,4 @@
-"""Authenticated Phase 1 read and recovery boundary for future research consumers."""
+"""Research-data read and recovery boundary."""
 
 import json
 import os
