@@ -19,7 +19,9 @@ class PageDefinition:
 PAGES = (
     PageDefinition("overview", "Platform Overview", "Validated platform status and capabilities."),
     PageDefinition(
-        "lineage", "Data and Lineage Explorer", "Research-data lineage and source connections."
+        "lineage",
+        "Data and Lineage Explorer",
+        "Research-data lineage and source connections.",
     ),
     PageDefinition("factors", "Factor Research", "Definitions, coverage, and diagnostics."),
     PageDefinition("asset_pricing", "Asset-Pricing Research", "Models and statistical estimates."),
@@ -32,7 +34,7 @@ PAGES = (
 
 EMPTY_STATE = (
     "No empirical publication is currently available. "
-     "Run the relevant research workflow first; no placeholder result "
+    "Run the relevant research workflow first; no placeholder result "
     "is displayed by the live application."
 )
 
