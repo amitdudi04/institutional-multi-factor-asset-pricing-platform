@@ -1,4 +1,4 @@
-"""Immutable authenticated Phase 2 factor publication and access."""
+"""Immutable factor publication and access."""
 
 import hashlib
 import json
