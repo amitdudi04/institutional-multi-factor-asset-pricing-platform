@@ -263,7 +263,7 @@ class ReportService:
                 for x in document["sources"]
             )
             return (
-                f"# Institutional Research Report\n\nReport ID: `{document['report_id']}`  \n"
+                f"# Quantitative Research Report\n\nReport ID: `{document['report_id']}`  \n"
                 f"Generated: `{document['generated_at']}`  \n"
                 f"Software: `{document['software_version']}`  \n"
                 f"Template: `{document['template_version']}`\n\n"
