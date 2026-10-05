@@ -1,11 +1,11 @@
-"""Governed SEC XBRL concept vocabulary for Phase 7 fundamental projection."""
+"""SEC XBRL concept vocabulary for point-in-time fundamental projection."""
 
 from dataclasses import dataclass
 from enum import StrEnum
 
 
 class SecFieldMethod(StrEnum):
-    """How an approved Phase 2 field may be obtained from SEC facts."""
+    """How a supported fundamental field may be obtained from SEC facts."""
 
     DIRECT = "DIRECT"
     COMPONENT_SUM = "COMPONENT_SUM"
@@ -27,7 +27,7 @@ class SecConceptRule:
     calculation: str | None = None
 
     def select_concept(self, observed: set[str]) -> str | None:
-        """Select only an explicitly governed standard concept, in precedence order."""
+        """Select only a configured standard concept, in precedence order."""
         if self.method is not SecFieldMethod.DIRECT:
             return None
         return next(
