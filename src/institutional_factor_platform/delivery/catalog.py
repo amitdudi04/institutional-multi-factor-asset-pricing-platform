@@ -1,4 +1,4 @@
-"""Unified authenticated discovery over existing Phase 1-5 repositories."""
+"""Unified discovery over stored research publications."""
 
 import hashlib
 import json
