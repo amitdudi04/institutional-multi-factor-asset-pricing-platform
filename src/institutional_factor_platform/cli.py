@@ -107,9 +107,7 @@ def build_parser() -> argparse.ArgumentParser:
     commands.add_parser(
         "validate-asset-pricing-config", help="Validate asset-pricing configuration"
     )
-    commands.add_parser(
-        "list-asset-pricing-publications", help="List asset-pricing publications"
-    )
+    commands.add_parser("list-asset-pricing-publications", help="List asset-pricing publications")
     verify_asset_pricing = commands.add_parser(
         "verify-asset-pricing-publication", help="Verify one asset-pricing publication"
     )
@@ -121,12 +119,8 @@ def build_parser() -> argparse.ArgumentParser:
     compute_asset_pricing.add_argument("factor_publication_id")
     compute_asset_pricing.add_argument("--model", action="append", default=None)
     compute_asset_pricing.add_argument("--asset-pricing-config", type=Path, default=None)
-    commands.add_parser(
-        "validate-portfolio-config", help="Validate portfolio configuration"
-    )
-    commands.add_parser(
-        "list-portfolio-publications", help="List portfolio publications"
-    )
+    commands.add_parser("validate-portfolio-config", help="Validate portfolio configuration")
+    commands.add_parser("list-portfolio-publications", help="List portfolio publications")
     verify_portfolio = commands.add_parser(
         "verify-portfolio-publication", help="Verify one portfolio publication"
     )
@@ -150,25 +144,19 @@ def build_parser() -> argparse.ArgumentParser:
         ],
     )
     compute_portfolio.add_argument("--portfolio-config", type=Path, default=None)
-    validate_ml = commands.add_parser(
-        "validate-ml-config", help="Validate ML configuration"
-    )
+    validate_ml = commands.add_parser("validate-ml-config", help="Validate ML configuration")
     validate_ml.add_argument("--ml-config", type=Path, default=None)
     build_ml = commands.add_parser(
         "build-ml-dataset", help="Validate an ML feature/target assembly"
     )
     build_ml.add_argument("asset_pricing_publication_id")
     build_ml.add_argument("--ml-config", type=Path, default=None)
-    train_ml = commands.add_parser(
-        "train-ml-model", help="Train and publish one research model"
-    )
+    train_ml = commands.add_parser("train-ml-model", help="Train and publish one research model")
     train_ml.add_argument("asset_pricing_publication_id")
     train_ml.add_argument("family")
     train_ml.add_argument("--ml-config", type=Path, default=None)
     commands.add_parser("list-ml-publications", help="List ML publications")
-    verify_ml = commands.add_parser(
-        "verify-ml-publication", help="Verify one ML publication"
-    )
+    verify_ml = commands.add_parser("verify-ml-publication", help="Verify one ML publication")
     verify_ml.add_argument("publication_id")
     delivery_config = commands.add_parser(
         "validate-delivery-config", help="Validate delivery configuration"
