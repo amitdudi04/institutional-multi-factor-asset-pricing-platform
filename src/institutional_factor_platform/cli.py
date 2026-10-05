@@ -76,7 +76,7 @@ from institutional_factor_platform.research_outputs.storage import (
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="institutional-factor-platform")
-    parser.add_argument("--config", type=Path, default=None, help="Research YAML configuration path")
+    parser.add_argument(\n        "--config", type=Path, default=None, help="Research YAML configuration path"\n    )
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("validate-config", help="Validate configuration and print its hash")
     commands.add_parser("init-storage", help="Create local research storage directories")
@@ -102,7 +102,7 @@ def build_parser() -> argparse.ArgumentParser:
     compute_factors.add_argument("--market-dataset", required=True)
     compute_factors.add_argument("--fundamental-dataset", required=True)
     compute_factors.add_argument("--factor-config", type=Path, default=None)
-    commands.add_parser("validate-asset-pricing-config", help="Validate asset-pricing configuration")
+    commands.add_parser(\n        "validate-asset-pricing-config", help="Validate asset-pricing configuration"\n    )
     commands.add_parser(
         "list-asset-pricing-publications", help="List asset-pricing publications"
     )
@@ -128,7 +128,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     verify_portfolio.add_argument("path", type=Path)
     compute_portfolio = commands.add_parser(
-        "compute-portfolio", help="Run portfolio research from connected factor and asset-pricing publications"
+        "compute-portfolio",\n        help="Run portfolio research from connected factor and asset-pricing publications",
     )
     compute_portfolio.add_argument("asset_pricing_publication_id")
     compute_portfolio.add_argument(
@@ -253,7 +253,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     hf_inventory.add_argument("--output", type=Path, required=True)
     owner = commands.add_parser(
-        "ingest-owner-factor-input", help="Ingest an owner-supplied factor input under a strict contract"
+        "ingest-owner-factor-input",\n        help="Ingest an owner-supplied factor input under a strict contract",
     )
     owner.add_argument("dataset")
     owner.add_argument("contract", choices=["factor_market_input", "factor_fundamental_input"])
