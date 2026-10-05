@@ -1,6 +1,6 @@
 # Research Results
 
-This document is the public numerical record for the current research repository. The values below correspond to the frozen empirical release identified in [REPRODUCIBILITY.md](REPRODUCIBILITY.md). The repository does not store a manuscript PDF; the empirical results remain documented here without personal-profile metadata.
+This document is the public numerical record for the current research repository. The values below correspond to the frozen empirical release identified in [REPRODUCIBILITY.md](REPRODUCIBILITY.md).
 
 ## 1. Universe and Data
 
