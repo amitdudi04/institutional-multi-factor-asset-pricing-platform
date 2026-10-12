@@ -129,8 +129,10 @@ def build_research_panel(
         low = selected.loc[selected["quantile"].eq(selected["min"])]
         high = selected.loc[selected["quantile"].eq(selected["max"])]
         period_keys = ["formation_date", "date"]
-        if low.duplicated(period_keys).any() or high.duplicated(period_keys).any():
-            raise DataQualityError(f"Factor {factor_id} has duplicate extreme portfolios")
+        if low["date"].duplicated().any() or high["date"].duplicated().any():
+            raise DataQualityError(
+                f"Factor {factor_id} has multiple extreme portfolios for one realization date"
+            )
         spread = high[period_keys + ["value_weighted_return"]].merge(
             low[period_keys + ["value_weighted_return"]],
             on=period_keys,
