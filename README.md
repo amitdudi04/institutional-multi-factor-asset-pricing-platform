@@ -12,7 +12,7 @@ The current study screens a public-data equity universe, constructs observable c
 
 > **Empirical status:** The figures below are from the frozen release identified in the reproducibility section. The correction branch now aligns asset-pricing factors and risk-free returns to the same holding periods as the test portfolios, corrects the Jensen-alpha calculation, and uses a neutral equal-weight baseline for constant ML scores. The historical asset-pricing, portfolio-risk and ML economic tables have **not yet been regenerated** from the original source data. Treat those values as historical, not as verified results from the corrected code.
 
-| Area | Current result |
+| Area | Historical result (pending rerun) |
 |---|---|
 | Universe | 822 securities screened; 487 accepted and 335 rejected |
 | Market data | 715,447 daily observations |
@@ -67,7 +67,7 @@ Historical market data + listing/lifecycle evidence + SEC filings
                     factor construction
                    48 defined / 47 estimable
                               ↓
-          CAPM / FF3 / Carhart 4 / FF5 / q mapping
+          CAPM / FF-style 3 / Carhart-style 4 / FF-style 5 / q-style mapping
                               ↓
              8 constrained portfolio methods
                   + 5/10/20 bps costs
@@ -97,7 +97,7 @@ Mean adjusted R² across 123 diagnostic portfolios per model:
 | FF-style 5-factor specification | 0.301 |
 | Project-specific q-style mapping | 0.296 |
 
-The multifactor specifications provide greater in-sample explanatory fit than CAPM on these project portfolios. These are project-specific high-minus-low characteristic spreads rather than official provider factor returns; the RMW proxy uses gross profitability, and the q-style mapping uses earnings yield as an ROE proxy. That result is not interpreted as proof of persistent alpha, causality, or future performance.
+In the historical snapshot, the multifactor specifications show greater in-sample explanatory fit than CAPM on these project portfolios. These are project-specific high-minus-low characteristic spreads rather than official provider factor returns; the RMW proxy uses gross profitability, and the q-style mapping uses earnings yield as an ROE proxy. Because the return-frequency correction affects this table, the figures are provisional until the original source data are rerun. They are not interpreted as proof of persistent alpha, causality, or future performance.
 
 ## Portfolio Research
 
