@@ -6,7 +6,7 @@ An independent US-equity research project combining point-in-time public data, f
 
 This project studies how point-in-time data quality, factor construction, asset-pricing models, portfolio costs, and temporal validation affect empirical U.S. equity research results.
 
-The current study screens a broad public-data equity universe, constructs observable characteristics, compares standard asset-pricing specifications, evaluates constrained portfolio methods, and tests whether simple machine-learning models add stable out-of-sample information. The results are mixed rather than uniformly positive: multifactor models fit the project portfolios better than CAPM in-sample, transaction costs matter, portfolio methods produce different risk-return trade-offs, and the machine-learning study does not establish stable incremental value.
+The current study screens a public-data equity universe, constructs observable characteristics, compares CAPM with FF-style, Carhart-style and q-motivated specifications built from project-specific characteristic spreads, evaluates constrained portfolio methods, and tests whether simple machine-learning models add stable out-of-sample information. The factor specifications are not exact replications of the official provider factor portfolios. The results are mixed rather than uniformly positive: multifactor models fit the project portfolios better than CAPM in-sample, transaction costs matter, portfolio methods produce different risk-return trade-offs, and the machine-learning study does not establish stable incremental value.
 
 ## Main Results
 
@@ -18,7 +18,7 @@ The current study screens a broad public-data equity universe, constructs observ
 | Market data | 715,447 daily observations |
 | Point-in-time fundamentals | 37,273 observations |
 | Factors | 48 definitions; 47 estimable |
-| Asset pricing | Mean adjusted R²: CAPM 0.063; FF3 0.259; Carhart 4 0.277; FF5 0.301; configured q mapping 0.296 |
+| Asset pricing | Historical mean adjusted R²: CAPM 0.063; FF-style 3-factor 0.259; Carhart-style 4-factor 0.277; FF-style 5-factor 0.301; project-specific q-style mapping 0.296 |
 | Portfolios | 8 long-only methods tested under 5/10/20 bps one-way cost assumptions |
 | ML design | 27,640 monthly decision observations across 91 months; 17 complete OOS folds |
 | ML conclusion | All aggregate IC confidence intervals include zero; stable after-cost incremental value is not established |
@@ -92,12 +92,12 @@ Mean adjusted R² across 123 diagnostic portfolios per model:
 | Model | Mean adjusted R² |
 |---|---:|
 | CAPM | 0.063 |
-| Fama-French 3 | 0.259 |
-| Carhart 4 | 0.277 |
-| Fama-French 5 | 0.301 |
-| Configured q mapping | 0.296 |
+| FF-style 3-factor specification | 0.259 |
+| Carhart-style 4-factor specification | 0.277 |
+| FF-style 5-factor specification | 0.301 |
+| Project-specific q-style mapping | 0.296 |
 
-The multifactor specifications provide greater in-sample explanatory fit than CAPM on these project portfolios. That result is not interpreted as proof of persistent alpha, causality, or future performance.
+The multifactor specifications provide greater in-sample explanatory fit than CAPM on these project portfolios. These are project-specific high-minus-low characteristic spreads rather than official provider factor returns; the RMW proxy uses gross profitability, and the q-style mapping uses earnings yield as an ROE proxy. That result is not interpreted as proof of persistent alpha, causality, or future performance.
 
 ## Portfolio Research
 
@@ -177,7 +177,7 @@ uv run mypy src
 uv lock --check
 ```
 
-The verified research release passed 301 tests with 90.52% branch-aware coverage. These software checks support reproducibility; they are not empirical evidence of investment performance.
+The frozen pre-correction research release passed 301 tests with 90.52% branch-aware coverage. The current correction branch adds tests for holding-period alignment, period-matched risk-free returns, Jensen alpha and constant-score baselines; its checks must pass before it is considered verified. Software tests are not, by themselves, empirical evidence of investment performance.
 
 ## API and Dashboard
 
