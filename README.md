@@ -10,6 +10,8 @@ The current study screens a broad public-data equity universe, constructs observ
 
 ## Main Results
 
+> **Empirical status:** The figures below are from the frozen release identified in the reproducibility section. The correction branch now aligns asset-pricing factors and risk-free returns to the same holding periods as the test portfolios, corrects the Jensen-alpha calculation, and uses a neutral equal-weight baseline for constant ML scores. The historical asset-pricing, portfolio-risk and ML economic tables have **not yet been regenerated** from the original source data. Treat those values as historical, not as verified results from the corrected code.
+
 | Area | Current result |
 |---|---|
 | Universe | 822 securities screened; 487 accepted and 335 rejected |
