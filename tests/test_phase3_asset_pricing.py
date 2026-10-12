@@ -388,6 +388,22 @@ def test_phase2_alignment_and_temporal_attacks_are_rejected() -> None:
         build_research_panel(factors, portfolios, {"BAD": "not_present"})
 
 
+def test_holding_periods_are_keyed_by_both_formation_and_realization_dates() -> None:
+    factors, portfolios = _phase2_tables()
+    target_date = portfolios["date"].iloc[10]
+    extra_period = portfolios.loc[portfolios["date"].eq(target_date)].copy()
+    extra_period["formation_date"] = target_date - timedelta(days=40)
+    overlapping = pd.concat([portfolios, extra_period], ignore_index=True)
+
+    panel = build_research_panel(
+        factors,
+        overlapping,
+        {"SMB": "log_market_cap", "HML": "book_to_market"},
+    )
+    same_realization = panel.loc[panel["date"].eq(pd.Timestamp(target_date))]
+    assert same_realization["formation_date"].nunique() == 2
+
+
 def test_phase3_excludes_non_estimable_sparse_factor_dates() -> None:
     factors, portfolios = _phase2_tables()
     target = portfolios.loc[portfolios["factor_id"].eq("log_market_cap")]
