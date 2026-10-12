@@ -65,8 +65,9 @@ class PortfolioResearchService:
             raise EvidenceIntegrityError("Phase 3 and Phase 2 lineage do not connect")
         source = self.factors.read_portfolios(phase2.publication_id).to_pandas()
         returns, benchmark = _return_matrix(source)
+        factor_table = self.factors.read_table(phase2.publication_id).to_pandas()
         risk_free = _risk_free_series(
-            self.factors.read_table(phase2.publication_id).to_pandas(), returns.index
+            factor_table, source[["formation_date", "date"]].drop_duplicates()
         )
         costs = TransactionCostModel(*self.config.costs.require_explicit())
         constraints = ConstraintSet(**self.config.constraints.model_dump())
@@ -316,19 +317,44 @@ def _return_matrix(frame: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
     return returns, benchmark
 
 
-def _risk_free_series(frame: pd.DataFrame, dates: pd.Index) -> pd.Series:
+def _risk_free_series(frame: pd.DataFrame, periods: pd.DataFrame) -> pd.Series:
     required = {"date", "factor_id", "raw_value"}
-    if required - set(frame):
-        raise DataQualityError("Phase 2 factor contract lacks risk-free evidence")
-    selected = frame.loc[frame["factor_id"].eq("risk_free_rate"), ["date", "raw_value"]]
+    if required - set(frame) or {"formation_date", "date"} - set(periods):
+        raise DataQualityError("Phase 2 factor/portfolio contract lacks risk-free holding-period fields")
+    selected = frame.loc[
+        frame["factor_id"].eq("risk_free_rate"), ["date", "raw_value"]
+    ].copy()
     if selected.empty:
         raise DataQualityError("Phase 2 risk-free evidence is unavailable")
+    selected["date"] = pd.to_datetime(selected["date"])
     grouped = selected.groupby("date")["raw_value"]
     if (grouped.nunique(dropna=False) > 1).any():
         raise DataQualityError("Risk-free values conflict across securities")
-    result = grouped.first().reindex(dates)
+    daily = grouped.first().sort_index().astype(float)
+    if daily.isna().any() or not np.isfinite(daily.to_numpy()).all() or (daily <= -1.0).any():
+        raise DataQualityError("Daily risk-free returns must be finite simple returns greater than -100%")
+
+    intervals = periods[["formation_date", "date"]].drop_duplicates().copy()
+    if intervals.empty:
+        raise DataQualityError("Portfolio holding periods are unavailable")
+    if intervals["date"].duplicated().any():
+        raise DataQualityError("A portfolio realization date maps to multiple formation intervals")
+    intervals["formation_date_dt"] = pd.to_datetime(intervals["formation_date"])
+    intervals["date_dt"] = pd.to_datetime(intervals["date"])
+    values: dict[object, float] = {}
+    for row in intervals.itertuples(index=False):
+        holding = daily.loc[
+            (daily.index > row.formation_date_dt) & (daily.index <= row.date_dt)
+        ]
+        if holding.empty:
+            raise DataQualityError(
+                f"No daily risk-free observations for holding period "
+                f"{row.formation_date_dt.date()} to {row.date_dt.date()}"
+            )
+        values[row.date] = float(np.prod(1.0 + holding.to_numpy(dtype=float)) - 1.0)
+    result = pd.Series(values).reindex(pd.Index(intervals["date"]))
     if result.isna().any():
-        raise DataQualityError("Risk-free values do not align with portfolio dates")
+        raise DataQualityError("Risk-free returns do not cover every portfolio holding period")
     return result.astype(float)
 
 
