@@ -144,14 +144,16 @@ def build_research_panel(
         )
         spread_parts.append(spread[period_keys + [alias]])
 
-    model_factors = spread_parts[0]
-    for part in spread_parts[1:]:
-        model_factors = model_factors.merge(
-            part,
-            on=["formation_date", "date"],
-            how="outer",
-            validate="one_to_one",
-        )
+    model_factors = None
+    if spread_parts:
+        model_factors = spread_parts[0]
+        for part in spread_parts[1:]:
+            model_factors = model_factors.merge(
+                part,
+                on=["formation_date", "date"],
+                how="outer",
+                validate="one_to_one",
+            )
 
     assets = portfolio_data.loc[
         :,
@@ -170,11 +172,12 @@ def build_research_panel(
         on=["formation_date", "date"],
         validate="many_to_one",
     )
-    panel = panel.merge(
-        model_factors,
-        on=["formation_date", "date"],
-        validate="many_to_one",
-    )
+    if model_factors is not None:
+        panel = panel.merge(
+            model_factors,
+            on=["formation_date", "date"],
+            validate="many_to_one",
+        )
     # Both terms now represent the same formation-to-realization holding period.
     panel["excess_return"] = panel["value_weighted_return"] - panel["risk_free_rate"]
     panel = panel.sort_values(["asset_id", "date"], kind="stable").reset_index(drop=True)
