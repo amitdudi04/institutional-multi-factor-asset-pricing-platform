@@ -35,13 +35,15 @@ def beta_alpha(
     aligned = pd.concat([returns, benchmark], axis=1).dropna()
     if len(aligned) < 3:
         raise DataQualityError("Beta requires at least three aligned return observations")
-    if np.isscalar(risk_free):
-        rf = np.full(len(aligned), float(risk_free), dtype=float)
-    else:
-        rf_series = pd.to_numeric(pd.Series(risk_free), errors="coerce").reindex(aligned.index)
+    if isinstance(risk_free, pd.Series):
+        rf_series = pd.to_numeric(risk_free, errors="coerce").reindex(aligned.index)
         if rf_series.isna().any():
-            raise DataQualityError("Risk-free returns must align with portfolio and benchmark dates")
+            raise DataQualityError(
+                "Risk-free returns must align with portfolio and benchmark dates"
+            )
         rf = rf_series.to_numpy(dtype=float)
+    else:
+        rf = np.full(len(aligned), float(risk_free), dtype=float)
     if not np.isfinite(rf).all() or (rf <= -1.0).any():
         raise DataQualityError("Risk-free returns must be finite simple returns greater than -100%")
 
