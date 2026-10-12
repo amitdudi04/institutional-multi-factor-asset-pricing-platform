@@ -430,6 +430,7 @@ def _factor_portfolios(periods: int = 16) -> pd.DataFrame:
             for quantile in (1, 3):
                 rows.append(
                     {
+                        "formation_date": current - timedelta(days=30),
                         "date": current,
                         "factor_id": factor,
                         "quantile": quantile,
@@ -447,10 +448,14 @@ class _Factors:
         self.manifest = SimpleNamespace(publication_id="phase2", content_hash=lambda: "a" * 64)
         portfolio_frame = _factor_portfolios()
         self.table = pa.Table.from_pandas(portfolio_frame, preserve_index=False)
+        daily_dates = pd.bdate_range(
+            start=pd.Timestamp(portfolio_frame["formation_date"].min()) + pd.Timedelta(days=1),
+            end=pd.Timestamp(portfolio_frame["date"].max()),
+        )
         self.factors = pa.Table.from_pandas(
             pd.DataFrame(
                 {
-                    "date": portfolio_frame["date"].drop_duplicates(),
+                    "date": [value.date() for value in daily_dates],
                     "factor_id": "risk_free_rate",
                     "raw_value": 0.001,
                 }
