@@ -621,6 +621,20 @@ def test_economic_evaluation_uses_phase4_timing_costs_and_long_only() -> None:
     assert (result.allocations["weight"] >= 0).all() and result.returns[
         "transaction_cost"
     ].sum() > 0
+
+    # A constant score is a no-signal baseline, not a tie to break by row order.
+    constant = evaluate_ranked_signal(
+        predictions.assign(prediction=0.0),
+        returns,
+        benchmark,
+        TransactionCostModel(1, 2, 1, 0),
+        selection_fraction=1 / 3,
+        window=3,
+    )
+    for _, group in constant.allocations.groupby("date"):
+        weights = group.set_index("asset_id")["weight"].reindex(["A", "B", "C"])
+        np.testing.assert_allclose(weights.to_numpy(dtype=float), [1 / 3, 1 / 3, 1 / 3])
+
     sparse = predictions.loc[
         ~(predictions["formation_date"].eq(dates[3]) & predictions["security_id"].eq("B"))
     ]

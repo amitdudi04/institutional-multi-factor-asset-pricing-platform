@@ -8,7 +8,7 @@ The empirical research release is identified by:
 - `research-empirical-public-v1`
 - commit `5a3e930665756fa7aaedeceb5f9ab90792bcf849`
 
-These identifiers refer to the empirical state used for the reported factor, asset-pricing, portfolio and machine-learning results.
+These identifiers refer to the frozen pre-correction empirical state used for the historical factor, asset-pricing, portfolio and machine-learning results. They do not identify a recalculated release after the holding-period alignment and risk-metric corrections. The affected published values remain provisional until the original source evidence is reacquired and the complete dependent stages are rerun.
 
 ## Environment
 

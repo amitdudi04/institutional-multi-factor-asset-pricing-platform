@@ -27,13 +27,35 @@ def rolling_volatility(returns: pd.Series, window: int, annualization: int = 12)
 
 
 def beta_alpha(
-    returns: pd.Series, benchmark: pd.Series, annualization: int = 12
+    returns: pd.Series,
+    benchmark: pd.Series,
+    annualization: int = 12,
+    risk_free: pd.Series | float = 0.0,
 ) -> tuple[float, float]:
     aligned = pd.concat([returns, benchmark], axis=1).dropna()
-    if len(aligned) < 3 or aligned.iloc[:, 1].var(ddof=1) <= 0:
-        raise DataQualityError("Beta requires aligned variable benchmark observations")
-    beta = float(aligned.cov().iloc[0, 1] / aligned.iloc[:, 1].var(ddof=1))
-    alpha = float((aligned.iloc[:, 0].mean() - beta * aligned.iloc[:, 1].mean()) * annualization)
+    if len(aligned) < 3:
+        raise DataQualityError("Beta requires at least three aligned return observations")
+    if isinstance(risk_free, pd.Series):
+        rf_series = pd.to_numeric(risk_free, errors="coerce").reindex(aligned.index)
+        if rf_series.isna().any():
+            raise DataQualityError(
+                "Risk-free returns must align with portfolio and benchmark dates"
+            )
+        rf = rf_series.to_numpy(dtype=float)
+    else:
+        rf = np.full(len(aligned), float(risk_free), dtype=float)
+    if not np.isfinite(rf).all() or (rf <= -1.0).any():
+        raise DataQualityError("Risk-free returns must be finite simple returns greater than -100%")
+
+    portfolio_excess = aligned.iloc[:, 0].to_numpy(dtype=float) - rf
+    benchmark_excess = aligned.iloc[:, 1].to_numpy(dtype=float) - rf
+    benchmark_variance = float(np.var(benchmark_excess, ddof=1))
+    if benchmark_variance <= 0:
+        raise DataQualityError("Beta requires variable benchmark excess returns")
+    beta = float(np.cov(portfolio_excess, benchmark_excess, ddof=1)[0, 1] / benchmark_variance)
+    alpha = float(
+        (portfolio_excess.mean() - beta * benchmark_excess.mean()) * annualization
+    )
     return beta, alpha
 
 
@@ -117,10 +139,15 @@ def risk_summary(
     excess = values - rf
     active = values - benchmark_values
     vol = float(values.std(ddof=1) * np.sqrt(annualization))
-    downside = downside_deviation(pd.Series(values), annualization=annualization)
+    downside = downside_deviation(pd.Series(excess), annualization=annualization)
     max_dd = abs(maximum_drawdown(pd.Series(values)))
     cumulative = float(np.prod(1.0 + values) - 1.0)
-    beta, alpha = beta_alpha(pd.Series(values), pd.Series(benchmark_values), annualization)
+    beta, alpha = beta_alpha(
+        pd.Series(values),
+        pd.Series(benchmark_values),
+        annualization,
+        risk_free=pd.Series(rf),
+    )
     gains = np.maximum(values, 0).sum()
     losses = -np.minimum(values, 0).sum()
     return {

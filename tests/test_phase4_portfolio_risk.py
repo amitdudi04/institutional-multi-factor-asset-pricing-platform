@@ -246,6 +246,20 @@ def test_risk_metrics_and_contribution_reconciliation() -> None:
     assert rolling_volatility(returns, 6).notna().sum() == 35
     beta, alpha = beta_alpha(returns, benchmark)
     assert np.isfinite(beta) and np.isfinite(alpha)
+    risk_free = pd.Series(
+        np.linspace(0.0005, 0.0012, len(returns)), index=returns.index
+    )
+    beta_excess, alpha_excess = beta_alpha(
+        returns, benchmark, risk_free=risk_free
+    )
+    portfolio_excess = returns - risk_free
+    benchmark_excess = benchmark - risk_free
+    expected_beta = portfolio_excess.cov(benchmark_excess) / benchmark_excess.var(ddof=1)
+    expected_alpha = (
+        portfolio_excess.mean() - expected_beta * benchmark_excess.mean()
+    ) * 12
+    assert beta_excess == pytest.approx(expected_beta)
+    assert alpha_excess == pytest.approx(expected_alpha)
     assert rolling_beta(returns, benchmark, 6).notna().sum() == 35
     assert maximum_drawdown(returns) == pytest.approx(drawdown(returns).min())
     assert value_at_risk(returns) >= 0
@@ -267,6 +281,23 @@ def test_risk_metrics_and_contribution_reconciliation() -> None:
         risk_contributions(np.array([0.5, 0.5]), np.zeros((2, 2)))
     with pytest.raises(DataQualityError, match="aligned"):
         risk_summary(returns, benchmark.iloc[:-1])
+
+
+
+def test_risk_free_series_compounds_over_portfolio_holding_periods() -> None:
+    frame = pd.DataFrame(
+        [
+            {"date": date(2020, 1, 2), "factor_id": "risk_free_rate", "raw_value": 0.001},
+            {"date": date(2020, 1, 3), "factor_id": "risk_free_rate", "raw_value": 0.002},
+            {"date": date(2020, 1, 6), "factor_id": "risk_free_rate", "raw_value": 0.003},
+        ]
+    )
+    periods = pd.DataFrame(
+        {"formation_date": [date(2020, 1, 1)], "date": [date(2020, 1, 3)]}
+    )
+    result = service_module._risk_free_series(frame, periods)
+    assert result.iloc[0] == pytest.approx((1.001 * 1.002) - 1.0)
+    assert result.iloc[0] != pytest.approx(0.002)
 
 
 def test_scenario_framework_discloses_unmapped_shocks() -> None:
@@ -399,6 +430,7 @@ def _factor_portfolios(periods: int = 16) -> pd.DataFrame:
             for quantile in (1, 3):
                 rows.append(
                     {
+                        "formation_date": current - timedelta(days=30),
                         "date": current,
                         "factor_id": factor,
                         "quantile": quantile,
@@ -416,10 +448,14 @@ class _Factors:
         self.manifest = SimpleNamespace(publication_id="phase2", content_hash=lambda: "a" * 64)
         portfolio_frame = _factor_portfolios()
         self.table = pa.Table.from_pandas(portfolio_frame, preserve_index=False)
+        daily_dates = pd.bdate_range(
+            start=pd.Timestamp(portfolio_frame["formation_date"].min()) + pd.Timedelta(days=1),
+            end=pd.Timestamp(portfolio_frame["date"].max()),
+        )
         self.factors = pa.Table.from_pandas(
             pd.DataFrame(
                 {
-                    "date": portfolio_frame["date"].drop_duplicates(),
+                    "date": [value.date() for value in daily_dates],
                     "factor_id": "risk_free_rate",
                     "raw_value": 0.001,
                 }
