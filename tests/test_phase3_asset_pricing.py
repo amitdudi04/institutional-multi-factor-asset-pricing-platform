@@ -55,22 +55,36 @@ def _regression_frame(count: int = 80) -> pd.DataFrame:
 
 
 def _phase2_tables(periods: int = 20) -> tuple[pd.DataFrame, pd.DataFrame]:
-    start = date(2018, 1, 31)
-    dates = [start + timedelta(days=31 * index) for index in range(periods)]
+    monthly_timestamps = pd.date_range("2018-01-31", periods=periods, freq="ME")
+    monthly_dates = [value.date() for value in monthly_timestamps]
+    formation_dates = [
+        (monthly_timestamps[0] - pd.offsets.MonthEnd(1)).date(),
+        *monthly_dates[:-1],
+    ]
+    daily_dates = pd.bdate_range(
+        start=pd.Timestamp(formation_dates[0]) + pd.Timedelta(days=1),
+        end=monthly_timestamps[-1],
+    )
     factor_rows: list[dict[str, object]] = []
     portfolio_rows: list[dict[str, object]] = []
     mapped = tuple(dict.fromkeys(load_asset_pricing_config().factor_mappings.values()))
-    for index, current in enumerate(dates):
+
+    daily_market_values: dict[date, float] = {}
+    daily_rf_values: dict[date, float] = {}
+    for daily_index, timestamp in enumerate(daily_dates):
+        current = timestamp.date()
+        market = 0.0002 + 0.0015 * np.sin(daily_index / 3.0)
+        risk_free = 0.00002 + daily_index * 0.00000001
+        daily_market_values[current] = market
+        daily_rf_values[current] = risk_free
         available = datetime.combine(current, datetime.min.time(), tzinfo=UTC)
-        market = 0.01 + 0.015 * np.sin(index / 3.0)
-        risk_free = 0.001 + index * 0.000001
         for security in ("sec-a", "sec-b"):
             factor_rows.extend(
                 [
                     {
                         "security_id": security,
                         "date": current,
-                        "factor_id": "excess_return",
+                        "factor_id": "market_return",
                         "raw_value": market,
                         "available_at": available,
                     },
@@ -81,8 +95,25 @@ def _phase2_tables(periods: int = 20) -> tuple[pd.DataFrame, pd.DataFrame]:
                         "raw_value": risk_free,
                         "available_at": available,
                     },
+                    {
+                        "security_id": security,
+                        "date": current,
+                        "factor_id": "excess_return",
+                        "raw_value": market - risk_free,
+                        "available_at": available,
+                    },
                 ]
             )
+
+    for index, current in enumerate(monthly_dates):
+        formation = formation_dates[index]
+        available = datetime.combine(current, datetime.min.time(), tzinfo=UTC)
+        interval_market = [
+            value
+            for current_date, value in daily_market_values.items()
+            if formation < current_date <= current
+        ]
+        market = float(np.prod(1.0 + np.asarray(interval_market)) - 1.0)
         for factor_number, factor_id in enumerate(mapped, start=1):
             spread = (
                 0.002 * factor_number * np.sin((index + factor_number) / (factor_number + 1))
@@ -92,7 +123,7 @@ def _phase2_tables(periods: int = 20) -> tuple[pd.DataFrame, pd.DataFrame]:
             for quantile, value in ((1, base), (3, base + spread)):
                 portfolio_rows.append(
                     {
-                        "formation_date": current - timedelta(days=30),
+                        "formation_date": formation,
                         "date": current,
                         "factor_id": factor_id,
                         "quantile": quantile,
@@ -309,6 +340,37 @@ def test_phase2_alignment_and_temporal_attacks_are_rejected() -> None:
     assert {"market_excess", "risk_free_rate", "SMB", "HML", "excess_return"} <= set(panel)
     expected = panel["value_weighted_return"] - panel["risk_free_rate"]
     pd.testing.assert_series_equal(panel["excess_return"], expected, check_names=False)
+
+    first = portfolios.iloc[0]
+    period_start = pd.Timestamp(first["formation_date"])
+    period_end = pd.Timestamp(first["date"])
+    daily_rf = factors.loc[
+        factors["factor_id"].eq("risk_free_rate")
+        & pd.to_datetime(factors["date"]).gt(period_start)
+        & pd.to_datetime(factors["date"]).le(period_end),
+        ["date", "raw_value"],
+    ].drop_duplicates("date")
+    expected_period_rf = float(np.prod(1.0 + daily_rf["raw_value"].to_numpy()) - 1.0)
+    daily_market = factors.loc[
+        factors["factor_id"].eq("market_return")
+        & pd.to_datetime(factors["date"]).gt(period_start)
+        & pd.to_datetime(factors["date"]).le(period_end),
+        ["date", "raw_value"],
+    ].drop_duplicates("date")
+    expected_period_market = float(np.prod(1.0 + daily_market["raw_value"].to_numpy()) - 1.0)
+    selected_panel = panel.loc[
+        panel["factor_id"].eq(first["factor_id"])
+        & panel["quantile"].eq(first["quantile"])
+        & panel["date"].eq(period_end)
+    ].iloc[0]
+    assert selected_panel["risk_free_rate"] == pytest.approx(expected_period_rf)
+    assert selected_panel["market_excess"] == pytest.approx(
+        expected_period_market - expected_period_rf
+    )
+    assert selected_panel["risk_free_rate"] != pytest.approx(
+        float(daily_rf.iloc[-1]["raw_value"])
+    )
+
     future = factors.copy()
     future.loc[0, "available_at"] = datetime(2030, 1, 1, tzinfo=UTC)
     with pytest.raises(TemporalIntegrityError):
