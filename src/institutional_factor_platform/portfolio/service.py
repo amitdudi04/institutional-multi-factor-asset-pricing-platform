@@ -320,7 +320,9 @@ def _return_matrix(frame: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
 def _risk_free_series(frame: pd.DataFrame, periods: pd.DataFrame) -> pd.Series:
     required = {"date", "factor_id", "raw_value"}
     if required - set(frame) or {"formation_date", "date"} - set(periods):
-        raise DataQualityError("Phase 2 factor/portfolio contract lacks risk-free holding-period fields")
+        raise DataQualityError(
+            "Phase 2 factor/portfolio contract lacks risk-free holding-period fields"
+        )
     selected = frame.loc[
         frame["factor_id"].eq("risk_free_rate"), ["date", "raw_value"]
     ].copy()
@@ -332,7 +334,9 @@ def _risk_free_series(frame: pd.DataFrame, periods: pd.DataFrame) -> pd.Series:
         raise DataQualityError("Risk-free values conflict across securities")
     daily = grouped.first().sort_index().astype(float)
     if daily.isna().any() or not np.isfinite(daily.to_numpy()).all() or (daily <= -1.0).any():
-        raise DataQualityError("Daily risk-free returns must be finite simple returns greater than -100%")
+        raise DataQualityError(
+            "Daily risk-free returns must be finite simple returns greater than -100%"
+        )
 
     intervals = periods[["formation_date", "date"]].drop_duplicates().copy()
     if intervals.empty:
