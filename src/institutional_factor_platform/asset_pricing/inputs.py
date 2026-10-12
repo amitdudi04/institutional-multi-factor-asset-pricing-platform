@@ -51,14 +51,15 @@ def build_research_panel(
     common = common_rows.drop_duplicates(["date", "factor_id"]).pivot(
         index="date", columns="factor_id", values="raw_value"
     )
-    required_common = set(common_ids)
-    if required_common - set(common.columns):
-        raise DataQualityError("Authenticated daily market-return, excess-return and risk-free factors are required")
+    if set(common_ids) - set(common.columns):
+        raise DataQualityError(
+            "Authenticated daily market-return, excess-return and risk-free factors are required"
+        )
     common.index = pd.to_datetime(common.index)
     common = common.sort_index()
-    if common[list(required_common)].isna().any().any():
+    if common[common_ids].isna().any().any():
         raise DataQualityError("Daily market-factor evidence contains missing values")
-    if not np.isfinite(common[list(required_common)].to_numpy(dtype=float)).all():
+    if not np.isfinite(common[common_ids].to_numpy(dtype=float)).all():
         raise DataQualityError("Daily market-factor evidence contains non-finite values")
     if (common[["market_return", "risk_free_rate"]] <= -1.0).any().any():
         raise DataQualityError("Daily market and risk-free returns must be greater than -100%")
@@ -69,7 +70,9 @@ def build_research_panel(
         rtol=0.0,
         atol=1e-10,
     ):
-        raise DataQualityError("Daily market excess return does not reconcile to market minus risk-free return")
+        raise DataQualityError(
+            "Daily market excess return does not reconcile to market minus risk-free return"
+        )
 
     periods = (
         portfolio_data[["formation_date", "date"]]
@@ -77,8 +80,6 @@ def build_research_panel(
         .sort_values(["formation_date", "date"])
         .reset_index(drop=True)
     )
-    if periods["date"].duplicated().any():
-        raise DataQualityError("A realization date maps to more than one portfolio holding period")
     period_rows: list[dict[str, object]] = []
     for formation_date, realization_date in periods.itertuples(index=False, name=None):
         daily = common.loc[
@@ -90,8 +91,12 @@ def build_research_panel(
                 f"No daily market/risk-free observations for holding period "
                 f"{formation_date.date()} to {realization_date.date()}"
             )
-        market_period = float(np.prod(1.0 + daily["market_return"].to_numpy(dtype=float)) - 1.0)
-        risk_free_period = float(np.prod(1.0 + daily["risk_free_rate"].to_numpy(dtype=float)) - 1.0)
+        market_period = float(
+            np.prod(1.0 + daily["market_return"].to_numpy(dtype=float)) - 1.0
+        )
+        risk_free_period = float(
+            np.prod(1.0 + daily["risk_free_rate"].to_numpy(dtype=float)) - 1.0
+        )
         period_rows.append(
             {
                 "formation_date": formation_date,
@@ -104,36 +109,47 @@ def build_research_panel(
     if period_factors.duplicated(["formation_date", "date"]).any():
         raise DataQualityError("Aggregated market-factor holding periods are not unique")
 
-    spread_parts: list[pd.Series] = []
+    spread_parts: list[pd.DataFrame] = []
     for alias, factor_id in mappings.items():
         selected = portfolio_data.loc[portfolio_data["factor_id"].eq(factor_id)].copy()
         if selected.empty:
             raise DataQualityError(f"Mapped Phase 2 factor is unavailable: {alias}={factor_id}")
-        bounds = selected.groupby("date")["quantile"].agg(["min", "max"])
-        complete_dates = bounds.index[bounds["min"] != bounds["max"]]
-        if complete_dates.empty:
+        bounds = selected.groupby(["formation_date", "date"])["quantile"].agg(["min", "max"])
+        complete_periods = bounds.loc[bounds["min"] != bounds["max"]].reset_index()
+        if complete_periods.empty:
             raise DataQualityError(f"Factor {factor_id} lacks both extreme portfolios")
-        # Sparse early formation dates can legitimately contain only one quantile.
-        # They are non-estimable for a high-minus-low spread and must be excluded
-        # from the complete-case model intersection rather than invalidating later
-        # dates that carry both authenticated extremes.
-        selected = selected.loc[selected["date"].isin(complete_dates)].copy()
-        bounds = bounds.loc[complete_dates]
-        low = selected.merge(
-            bounds["min"].rename("bound").reset_index(), on="date", validate="many_to_one"
-        ).loc[lambda value: value["quantile"].eq(value["bound"])]
-        high = selected.merge(
-            bounds["max"].rename("bound").reset_index(), on="date", validate="many_to_one"
-        ).loc[lambda value: value["quantile"].eq(value["bound"])]
-        if low["date"].duplicated().any() or high["date"].duplicated().any():
-            raise DataQualityError(f"Factor {factor_id} has duplicate extreme portfolios")
-        spread = (
-            high.set_index("date")["value_weighted_return"]
-            - low.set_index("date")["value_weighted_return"]
+        # Sparse early formation periods can legitimately contain only one quantile.
+        # Exclude those periods from the spread, without conflating periods that share
+        # an end date but have different formation dates.
+        selected = selected.merge(
+            complete_periods[["formation_date", "date", "min", "max"]],
+            on=["formation_date", "date"],
+            validate="many_to_one",
         )
-        spread.name = alias
-        spread_parts.append(spread)
-    model_factors = pd.concat(spread_parts, axis=1) if spread_parts else None
+        low = selected.loc[selected["quantile"].eq(selected["min"])]
+        high = selected.loc[selected["quantile"].eq(selected["max"])]
+        period_keys = ["formation_date", "date"]
+        if low.duplicated(period_keys).any() or high.duplicated(period_keys).any():
+            raise DataQualityError(f"Factor {factor_id} has duplicate extreme portfolios")
+        spread = high[period_keys + ["value_weighted_return"]].merge(
+            low[period_keys + ["value_weighted_return"]],
+            on=period_keys,
+            suffixes=("_high", "_low"),
+            validate="one_to_one",
+        )
+        spread[alias] = (
+            spread["value_weighted_return_high"] - spread["value_weighted_return_low"]
+        )
+        spread_parts.append(spread[period_keys + [alias]])
+
+    model_factors = spread_parts[0]
+    for part in spread_parts[1:]:
+        model_factors = model_factors.merge(
+            part,
+            on=["formation_date", "date"],
+            how="outer",
+            validate="one_to_one",
+        )
 
     assets = portfolio_data.loc[
         :,
@@ -152,8 +168,11 @@ def build_research_panel(
         on=["formation_date", "date"],
         validate="many_to_one",
     )
-    if model_factors is not None:
-        panel = panel.merge(model_factors.reset_index(), on="date", validate="many_to_one")
+    panel = panel.merge(
+        model_factors,
+        on=["formation_date", "date"],
+        validate="many_to_one",
+    )
     # Both terms now represent the same formation-to-realization holding period.
     panel["excess_return"] = panel["value_weighted_return"] - panel["risk_free_rate"]
     panel = panel.sort_values(["asset_id", "date"], kind="stable").reset_index(drop=True)
