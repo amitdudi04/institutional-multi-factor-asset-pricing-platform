@@ -53,12 +53,12 @@ Each configured model is evaluated on 123 diagnostic portfolios. Intercept infer
 | Model | N | Mean adj. R² | Median adj. R² | Mean monthly alpha | Median monthly alpha | Mean HAC t | p<0.05 share | Mean market beta |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | CAPM | 123 | 0.063 | 0.061 | 0.01187 | 0.01128 | 2.467 | 85.4% | 1.402 |
-| Fama-French 3 | 123 | 0.259 | 0.247 | 0.00923 | 0.00937 | 2.146 | 58.5% | 1.421 |
-| Carhart 4 | 123 | 0.277 | 0.261 | 0.00899 | 0.00910 | 2.048 | 52.8% | 1.408 |
-| Fama-French 5 | 123 | 0.301 | 0.281 | 0.01056 | 0.01026 | 2.569 | 92.7% | 1.284 |
-| Configured q mapping | 123 | 0.296 | 0.295 | 0.00875 | 0.00876 | 2.090 | 58.5% | 1.291 |
+| FF-style 3-factor specification | 123 | 0.259 | 0.247 | 0.00923 | 0.00937 | 2.146 | 58.5% | 1.421 |
+| Carhart-style 4-factor specification | 123 | 0.277 | 0.261 | 0.00899 | 0.00910 | 2.048 | 52.8% | 1.408 |
+| FF-style 5-factor specification | 123 | 0.301 | 0.281 | 0.01056 | 0.01026 | 2.569 | 92.7% | 1.284 |
+| Project-specific q-style mapping | 123 | 0.296 | 0.295 | 0.00875 | 0.00876 | 2.090 | 58.5% | 1.291 |
 
-Fama-French 5 exceeds CAPM by 0.238 in mean adjusted R² (0.301 - 0.063). This supports greater in-sample explanatory fit, not persistent alpha, causality, or future performance.
+The FF-style 5-factor specification exceeds CAPM by 0.238 in mean adjusted R² (0.301 - 0.063) in the historical snapshot. These are project-specific characteristic spreads, not official provider factors; the profitability proxy is gross profitability, and the q-style mapping uses earnings yield as an ROE proxy. This supports only greater in-sample explanatory fit in the historical output, not persistent alpha, causality, or future performance.
 
 ## 4. Portfolio, Cost and Risk Results
 
