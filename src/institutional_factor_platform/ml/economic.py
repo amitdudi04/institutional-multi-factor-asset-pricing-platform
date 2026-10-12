@@ -41,6 +41,15 @@ def evaluate_ranked_signal(
         ranks = available.set_index("security_id")["prediction"].reindex(history.columns).dropna()
         if ranks.empty:
             raise DataQualityError("No authenticated prediction aligns with the return universe")
+        # Constant scores contain no cross-sectional information. Do not let
+        # nlargest() break ties by row order and create an arbitrary portfolio;
+        # use the full-universe equal-weight portfolio as the no-signal baseline.
+        if ranks.nunique(dropna=True) <= 1:
+            count = history.shape[1]
+            if count == 0:
+                raise DataQualityError("No return assets are available for the neutral baseline")
+            return np.full(count, 1.0 / count, dtype=float)
+
         count = max(1, int(np.ceil(len(ranks) * selection_fraction)))
         selected = set(ranks.nlargest(count).index)
         return np.array([1 / count if asset in selected else 0.0 for asset in history.columns])
