@@ -1,6 +1,8 @@
 # Research Results
 
-This document is the public numerical record for the current research repository. The values below correspond to the frozen empirical release identified in [REPRODUCIBILITY.md](REPRODUCIBILITY.md).
+This document preserves the numerical record for the frozen empirical release identified in [REPRODUCIBILITY.md](REPRODUCIBILITY.md).
+
+> **Status: historical snapshot pending recalculation.** A later code review found that daily market-factor and risk-free observations were joined to holding-period portfolio returns without aggregating the former to the same interval. The correction branch also fixes risk-free compounding for portfolio risk metrics, Jensen-alpha estimation, and constant-score ML baseline handling. The tables below have not yet been regenerated from the original source data and must not be cited as corrected empirical findings. The underlying third-party data are not redistributed in Git, so the corrected numerical release requires reacquiring the same source evidence and rerunning the pipeline.
 
 ## 1. Universe and Data
 
