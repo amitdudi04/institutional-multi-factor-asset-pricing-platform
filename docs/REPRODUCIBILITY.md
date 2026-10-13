@@ -12,7 +12,7 @@ These identifiers refer to the previous empirical state used for the reported fa
 
 ## Current Audit Status
 
-The previous release's asset-pricing statistics and dependent portfolio/ML metrics are not validated under the corrected calculations. The audit branch aligns portfolio and factor returns over the same formation-to-realization interval, compounds daily risk-free returns to that interval, computes Jensen alpha from portfolio and market excess returns, and treats constant ML predictions as a neutral equal-weight baseline. Targeted regression tests cover these cases, and the full repository CI workflow has passed on the current audit commit. This validates the software checks, not the corrected empirical results: the data-backed pipeline still needs to be rerun before the numerical tables can be treated as current.
+The previous release's asset-pricing statistics and dependent portfolio/ML metrics are not validated under the corrected calculations. See [RESULTS_RECONCILIATION.md](RESULTS_RECONCILIATION.md) for the result-by-result interpretation and status. The audit branch aligns portfolio and factor returns over the same formation-to-realization interval, compounds daily risk-free returns to that interval, computes Jensen alpha from portfolio and market excess returns, and treats constant ML predictions as a neutral equal-weight baseline. Targeted regression tests cover these cases, and the full repository CI workflow has passed on the current audit commit. This validates the software checks, not the corrected empirical results: the data-backed pipeline still needs to be rerun before the numerical tables can be treated as current.
 
 The raw provider data are absent from Git. Until the original lawful data inputs are restored or reacquired, the corrected pipeline cannot regenerate the empirical outputs. The numbers in [RESULTS.md](RESULTS.md), README tables, and the associated paper must remain labeled as historical pre-correction results; do not silently carry them forward as corrected findings.
 
@@ -82,7 +82,7 @@ uv run institutional-factor-platform verify-delivery-platform
 git diff --check
 ```
 
-The verified research release passed 301 tests with 90.52% branch-aware coverage.
+The previous verified research release recorded 301 tests passing with 90.52% branch-aware coverage; this is a historical software-validation record, not evidence that the corrected empirical tables have been regenerated.
 
 ## What Can Be Reproduced from Git Alone?
 

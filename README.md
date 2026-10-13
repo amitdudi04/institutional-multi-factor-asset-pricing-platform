@@ -6,7 +6,7 @@ An independent US-equity research project combining point-in-time public data, f
 
 The numerical tables in this repository describe the previous empirical release; they are not regenerated outputs from the corrected calculations now under review. The code review identified a frequency mismatch between holding-period portfolio returns and daily market/risk-free factors, daily rather than holding-period risk-free returns in portfolio metrics, a Jensen-alpha calculation that omitted risk-free adjustment, and a constant-score ML baseline that could select securities by row order.
 
-The audit branch corrects these calculations and adds targeted regression tests. The raw provider data required for the full empirical pipeline are not included in Git, so the corrected numerical results have not yet been regenerated. Treat the values below and in [docs/RESULTS.md](docs/RESULTS.md) as historical pre-correction snapshots only—not as validated results from the corrected implementation. The linked paper should be revised after the corrected pipeline is run and its outputs are reconciled.
+The audit branch corrects these calculations and adds targeted regression tests. The raw provider data required for the full empirical pipeline are not included in Git, so the corrected numerical results have not yet been regenerated. Treat the values below and in [docs/RESULTS.md](docs/RESULTS.md) as historical pre-correction snapshots only—not as validated results from the corrected implementation. See [the results reconciliation](docs/RESULTS_RECONCILIATION.md) for reviewer-facing notes on limitations, suspiciously similar ML summaries, hypothesis decisions, and the evidence still required. The linked paper should be revised after the corrected pipeline is run and its outputs are reconciled.
 
 ## Overview
 
@@ -181,7 +181,7 @@ uv run mypy src
 uv lock --check
 ```
 
-The verified research release passed 301 tests with 90.52% branch-aware coverage. These software checks support reproducibility; they are not empirical evidence of investment performance.
+The previous verified research release recorded 301 tests passing with 90.52% branch-aware coverage. These historical software checks support reproducibility; they are not empirical evidence of investment performance or proof that corrected empirical tables have been regenerated.
 
 ## API and Dashboard
 

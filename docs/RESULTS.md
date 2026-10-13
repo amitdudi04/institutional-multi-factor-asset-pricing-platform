@@ -1,6 +1,6 @@
 # Research Results
 
-> **Historical snapshot — not yet recalculated.** The tables below reproduce the prior empirical release identified in [REPRODUCIBILITY.md](REPRODUCIBILITY.md). Code review found a daily/monthly return-frequency mismatch in asset-pricing inputs, risk-free returns that were not compounded to portfolio holding periods, a Jensen-alpha calculation that did not use excess returns, and a constant-score ML baseline vulnerable to row-order selection. The audit branch corrects these calculations and adds tests, but the raw provider data are not included in Git and the empirical outputs have not been regenerated. Do not cite these values as results of the corrected implementation. Regenerate all dependent outputs and update the paper before treating the numerical study as final.
+> **Historical snapshot — not yet recalculated.** The tables below reproduce the prior empirical release identified in [REPRODUCIBILITY.md](REPRODUCIBILITY.md). Code review found a daily/monthly return-frequency mismatch in asset-pricing inputs, risk-free returns that were not compounded to portfolio holding periods, a Jensen-alpha calculation that did not use excess returns, and a constant-score ML baseline vulnerable to row-order selection. The audit branch corrects these calculations and adds tests, but the raw provider data are not included in Git and the empirical outputs have not been regenerated. Do not cite these values as results of the corrected implementation. See [RESULTS_RECONCILIATION.md](RESULTS_RECONCILIATION.md) for the reviewer-facing status and interpretation notes. Regenerate all dependent outputs and update the paper before treating the numerical study as final.
 
 ## 1. Universe and Data
 
@@ -56,7 +56,7 @@ Each configured model is evaluated on 123 diagnostic portfolios. Intercept infer
 | FF5-style project factors | 123 | 0.301 | 0.281 | 0.01056 | 0.01026 | 2.569 | 92.7% | 1.284 |
 | q-style project mapping | 123 | 0.296 | 0.295 | 0.00875 | 0.00876 | 2.090 | 58.5% | 1.291 |
 
-The FF5-style project specification exceeds CAPM by 0.238 in the prior-release mean adjusted R² (0.301 - 0.063). This supports greater in-sample explanatory fit, not persistent alpha, causality, or future performance.
+The FF5-style project specification exceeds CAPM by 0.238 in the prior-release mean adjusted R² (0.301 - 0.063). This supports greater in-sample explanatory fit, not persistent alpha, causality, or future performance. **Result-status note:** these values predate the audit-branch frequency and excess-return corrections and have not been recalculated. The reported p<0.05 shares are unadjusted descriptive summaries, not multiplicity-adjusted discoveries.
 
 ## 4. Portfolio, Cost and Risk Results
 
@@ -165,7 +165,7 @@ Eight rows are evaluated: zero baseline, historical mean, factor composite, line
 | Random Forest | 0.009558 | [-0.074074, 0.131357] | 10/17 | 58.8% |
 | XGBoost | -0.009069 | [-0.049268, 0.055085] | 8/17 | 47.1% |
 
-Every non-constant model interval includes zero; stable predictive information is not established.
+Every non-constant model interval includes zero; stable predictive information is not established. **Result-status note:** the displayed metrics are from the previous release, not a fresh run of the corrected pipeline. Linear and factor-composite results are identical to displayed precision and Ridge is nearly identical; the similarity should be checked against model-level prediction artifacts when data are restored, not treated as independent confirmation.
 
 ### After-cost economic fold results
 
@@ -198,7 +198,7 @@ Feature-attribution rankings also vary across methods. Coefficients, permutation
 
 ## 7. Software Validation
 
-The current verified repository release records:
+The previous verified repository release recorded:
 
 - 301 passing tests;
 - 90.52% branch-aware coverage;
@@ -209,7 +209,7 @@ The current verified repository release records:
 - Docker build verification;
 - dependency vulnerability audit.
 
-These checks support software correctness and reproducibility. They are not empirical evidence of investment performance.
+These historical checks support software correctness and reproducibility. They are not empirical evidence of investment performance and do not show that corrected empirical outputs have been regenerated.
 
 ## 8. Overall Conclusion
 
