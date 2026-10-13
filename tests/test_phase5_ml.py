@@ -651,6 +651,37 @@ def test_economic_evaluation_uses_phase4_timing_costs_and_long_only() -> None:
         )
 
 
+def test_constant_predictions_are_a_neutral_equal_weight_baseline() -> None:
+    dates = pd.date_range("2021-01-31", periods=8, freq="ME")
+    returns = pd.DataFrame({"A": [0.01] * 8, "B": [0.005] * 8, "C": [0.0] * 8}, index=dates)
+    benchmark = pd.Series(0.003, index=dates)
+    predictions = pd.DataFrame(
+        [
+            {
+                "formation_date": current,
+                "security_id": security,
+                "prediction": 0.0,
+                "authentication_status": "PASS",
+            }
+            for current in dates
+            for security in ("A", "B", "C")
+        ]
+    )
+
+    result = evaluate_ranked_signal(
+        predictions,
+        returns,
+        benchmark,
+        TransactionCostModel(0, 0, 0, 0),
+        selection_fraction=1 / 3,
+        window=3,
+    )
+
+    for _, allocation in result.allocations.groupby("date"):
+        weights = allocation.set_index("asset_id")["weight"].reindex(["A", "B", "C"])
+        assert weights.tolist() == pytest.approx([1 / 3, 1 / 3, 1 / 3])
+
+
 def _parquet_bytes() -> tuple[bytes, tuple[str, ...]]:
     table = pa.table({"value": [1.0]})
     buffer = io.BytesIO()

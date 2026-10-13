@@ -20,7 +20,7 @@ factor_mappings:
   CMA: asset_growth
   ME: log_market_cap
   IA: asset_growth
-  ROE: earnings_yield
+  ROE: roe
 publication:
   output_root: data/asset_pricing
   manifest_root: data/asset_pricing_manifests

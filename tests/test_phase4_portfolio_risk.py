@@ -269,6 +269,43 @@ def test_risk_metrics_and_contribution_reconciliation() -> None:
         risk_summary(returns, benchmark.iloc[:-1])
 
 
+def test_jensen_alpha_uses_aligned_portfolio_and_market_excess_returns() -> None:
+    index = pd.date_range("2020-01-31", periods=8, freq="ME")
+    risk_free = pd.Series(
+        [0.001, 0.002, 0.0015, 0.0025, 0.001, 0.0018, 0.0022, 0.0012], index=index
+    )
+    benchmark = pd.Series([0.01, 0.02, -0.005, 0.03, 0.015, -0.01, 0.025, 0.018], index=index)
+    portfolio = risk_free + 0.005 + 1.5 * (benchmark - risk_free)
+
+    beta, alpha = beta_alpha(portfolio, benchmark, annualization=12, risk_free=risk_free)
+    summary = risk_summary(portfolio, benchmark, risk_free=risk_free, annualization=12)
+
+    assert beta == pytest.approx(1.5)
+    assert alpha == pytest.approx(0.06)
+    assert summary["alpha"] == pytest.approx(0.06)
+    with pytest.raises(DataQualityError, match="indexes"):
+        beta_alpha(portfolio, benchmark, risk_free=risk_free.reset_index(drop=True))
+
+
+def test_risk_free_series_compounds_daily_returns_over_the_portfolio_holding_period() -> None:
+    formation = date(2020, 1, 31)
+    realization = date(2020, 2, 28)
+    factors = pd.DataFrame(
+        {
+            "date": [date(2020, 2, 3), date(2020, 2, 4), realization],
+            "factor_id": ["risk_free_rate"] * 3,
+            "raw_value": [0.01, 0.02, 0.03],
+        }
+    )
+
+    result = service_module._risk_free_series(
+        factors,
+        pd.DataFrame({"formation_date": [formation], "date": [realization]}),
+    )
+
+    assert result.iloc[0] == pytest.approx(1.01 * 1.02 * 1.03 - 1.0)
+
+
 def test_scenario_framework_discloses_unmapped_shocks() -> None:
     scenario = Scenario("crash and rates", {"market": -0.2, "rates": 0.01}, "market_crash")
     result = apply_scenario(
@@ -399,6 +436,7 @@ def _factor_portfolios(periods: int = 16) -> pd.DataFrame:
             for quantile in (1, 3):
                 rows.append(
                     {
+                        "formation_date": current - timedelta(days=30),
                         "date": current,
                         "factor_id": factor,
                         "quantile": quantile,

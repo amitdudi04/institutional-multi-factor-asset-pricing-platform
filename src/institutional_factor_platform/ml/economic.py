@@ -41,8 +41,15 @@ def evaluate_ranked_signal(
         ranks = available.set_index("security_id")["prediction"].reindex(history.columns).dropna()
         if ranks.empty:
             raise DataQualityError("No authenticated prediction aligns with the return universe")
-        count = max(1, int(np.ceil(len(ranks) * selection_fraction)))
-        selected = set(ranks.nlargest(count).index)
+        if np.allclose(ranks.to_numpy(dtype=float), float(ranks.iloc[0]), rtol=0.0, atol=1e-12):
+            # A constant prediction contains no cross-sectional ranking information.
+            # Treat it as a neutral equal-weight baseline instead of selecting assets
+            # based on incidental row order.
+            count = len(ranks)
+            selected = set(ranks.index)
+        else:
+            count = max(1, int(np.ceil(len(ranks) * selection_fraction)))
+            selected = set(ranks.nlargest(count).index)
         return np.array([1 / count if asset in selected else 0.0 for asset in history.columns])
 
     return run_backtest(

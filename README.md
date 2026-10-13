@@ -2,21 +2,27 @@
 
 An independent US-equity research project combining point-in-time public data, factor construction, classical asset pricing, portfolio allocation, transaction-cost analysis, risk analytics, and walk-forward machine learning.
 
+## Empirical Result Status
+
+The numerical tables in this repository describe the previous empirical release; they are not regenerated outputs from the corrected calculations now under review. The code review identified a frequency mismatch between holding-period portfolio returns and daily market/risk-free factors, daily rather than holding-period risk-free returns in portfolio metrics, a Jensen-alpha calculation that omitted risk-free adjustment, and a constant-score ML baseline that could select securities by row order.
+
+The audit branch corrects these calculations and adds targeted regression tests. The raw provider data required for the full empirical pipeline are not included in Git, so the corrected numerical results have not yet been regenerated. Treat the values below and in [docs/RESULTS.md](docs/RESULTS.md) as historical pre-correction snapshots only—not as validated results from the corrected implementation. See [the results reconciliation](docs/RESULTS_RECONCILIATION.md) for reviewer-facing notes on limitations, suspiciously similar ML summaries, hypothesis decisions, and the evidence still required. The linked paper should be revised after the corrected pipeline is run and its outputs are reconciled.
+
 ## Overview
 
 This project studies how point-in-time data quality, factor construction, asset-pricing models, portfolio costs, and temporal validation affect empirical U.S. equity research results.
 
-The current study screens a broad public-data equity universe, constructs observable characteristics, compares standard asset-pricing specifications, evaluates constrained portfolio methods, and tests whether simple machine-learning models add stable out-of-sample information. The results are mixed rather than uniformly positive: multifactor models fit the project portfolios better than CAPM in-sample, transaction costs matter, portfolio methods produce different risk-return trade-offs, and the machine-learning study does not establish stable incremental value.
+The previous release screens a broad public-data equity universe, constructs observable characteristics, compares conventional asset-pricing model forms with project-specific factor proxies, evaluates constrained portfolio methods, and tests whether simple machine-learning models add stable out-of-sample information. The results are mixed rather than uniformly positive: multifactor models fit the project portfolios better than CAPM in-sample, transaction costs matter, portfolio methods produce different risk-return trade-offs, and the machine-learning study does not establish stable incremental value.
 
-## Main Results
+## Previous Release Summary
 
-| Area | Current result |
+| Area | Previously reported result |
 |---|---|
 | Universe | 822 securities screened; 487 accepted and 335 rejected |
 | Market data | 715,447 daily observations |
 | Point-in-time fundamentals | 37,273 observations |
 | Factors | 48 definitions; 47 estimable |
-| Asset pricing | Mean adjusted R²: CAPM 0.063; FF3 0.259; Carhart 4 0.277; FF5 0.301; configured q mapping 0.296 |
+| Asset pricing | Previously reported mean adjusted R²: CAPM 0.063; FF3-style project factors 0.259; Carhart-style project factors 0.277; FF5-style project factors 0.301; q-style project mapping 0.296 |
 | Portfolios | 8 long-only methods tested under 5/10/20 bps one-way cost assumptions |
 | ML design | 27,640 monthly decision observations across 91 months; 17 complete OOS folds |
 | ML conclusion | All aggregate IC confidence intervals include zero; stable after-cost incremental value is not established |
@@ -65,7 +71,7 @@ Historical market data + listing/lifecycle evidence + SEC filings
                     factor construction
                    48 defined / 47 estimable
                               ↓
-          CAPM / FF3 / Carhart 4 / FF5 / q mapping
+          CAPM / FF3-style / Carhart-style / FF5-style / q-style project mapping
                               ↓
              8 constrained portfolio methods
                   + 5/10/20 bps costs
@@ -79,23 +85,23 @@ The analytical design and formulas are summarized in [docs/METHODOLOGY.md](docs/
 
 ## Factor Research
 
-The factor engine contains 48 configured definitions spanning market, size, value, momentum, profitability, investment/leverage, and risk/liquidity characteristics. Forty-seven are estimable in the current empirical release.
+The factor engine contains 48 configured definitions spanning market, size, value, momentum, profitability, investment/leverage, and risk/liquidity characteristics. Forty-seven were estimable in the previous empirical release.
 
 `equity_issuance` remains non-estimable because the available point-in-time SEC evidence does not support a consistent calculation without unsupported imputation. Missing evidence is therefore left missing rather than converted to zero.
 
-## Asset-Pricing Results
+## Previously Reported Asset-Pricing Results
 
-Mean adjusted R² across 123 diagnostic portfolios per model:
+Previously reported mean adjusted R² across 123 diagnostic portfolios per model:
 
 | Model | Mean adjusted R² |
 |---|---:|
 | CAPM | 0.063 |
-| Fama-French 3 | 0.259 |
-| Carhart 4 | 0.277 |
-| Fama-French 5 | 0.301 |
-| Configured q mapping | 0.296 |
+| FF3-style project factors | 0.259 |
+| Carhart-style project factors | 0.277 |
+| FF5-style project factors | 0.301 |
+| q-style project mapping | 0.296 |
 
-The multifactor specifications provide greater in-sample explanatory fit than CAPM on these project portfolios. That result is not interpreted as proof of persistent alpha, causality, or future performance.
+The previous release reported higher in-sample explanatory fit for its multifactor project specifications than for CAPM; these figures have not been recalculated after the methodology corrections. That result is not interpreted as proof of persistent alpha, causality, or future performance.
 
 ## Portfolio Research
 
@@ -110,9 +116,9 @@ Eight long-only, fully invested methods are compared:
 - Hierarchical Risk Parity
 - CVaR
 
-The one-way transaction-cost assumptions are 5, 10, and 20 basis points. Over the available approximately 32-month factor-portfolio test window, higher costs reduce cumulative performance for every method.
+The prior release used one-way transaction-cost assumptions of 5, 10, and 20 basis points over an approximately 32-month factor-portfolio window. Its cost comparisons are historical snapshots pending recalculation.
 
-Selected 10 bps BASE results:
+Previously reported 10 bps BASE results:
 
 | Method | Observed result |
 |---|---:|
@@ -140,7 +146,7 @@ The evaluation uses:
 
 Eight models are evaluated: zero and historical-mean baselines, factor composite, linear regression, Ridge, Elastic Net, Random Forest, and XGBoost.
 
-All aggregate bootstrap information-coefficient confidence intervals for non-constant models include zero. Random Forest has a very small positive mean after-cost fold return, but it is positive in only 9 of 17 folds. The study therefore does not establish stable incremental predictive or economic value from the ML models.
+In the previous release, all aggregate bootstrap information-coefficient confidence intervals for non-constant models included zero. The previous release's Random Forest had a very small positive mean after-cost fold return, but it was positive in only 9 of 17 folds. The study therefore does not establish stable incremental predictive or economic value from the ML models.
 
 ## Repository Structure
 
@@ -175,7 +181,7 @@ uv run mypy src
 uv lock --check
 ```
 
-The verified research release passed 301 tests with 90.52% branch-aware coverage. These software checks support reproducibility; they are not empirical evidence of investment performance.
+The previous verified research release recorded 301 tests passing with 90.52% branch-aware coverage. These historical software checks support reproducibility; they are not empirical evidence of investment performance or proof that corrected empirical tables have been regenerated.
 
 ## API and Dashboard
 

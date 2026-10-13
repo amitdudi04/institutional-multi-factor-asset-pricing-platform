@@ -55,21 +55,23 @@ The factor engine contains 48 definitions spanning:
 
 Cross-sectional preprocessing and portfolio formation use information available at the relevant date. Factor portfolios are formed from project characteristics rather than relabelled as official provider factors.
 
-Forty-seven definitions are estimable in the current study.
+Forty-seven definitions were estimable in the previous empirical release.
 
 ## 5. Asset Pricing
 
 Five model families are compared:
 
 1. CAPM
-2. Fama-French 3
-3. Carhart 4
-4. Fama-French 5
-5. configured q-factor mapping
+2. FF3-style project specification
+3. Carhart-style project specification
+4. FF5-style project specification
+5. q-style project mapping
 
-The dependent variable is portfolio excess return. The implementation supports OLS and related diagnostic tools; the reported study uses the configured publication estimator with heteroskedasticity/autocorrelation-aware inference where specified.
+The dependent variable is portfolio excess return. Each portfolio return is a simple holding-period return from the day after formation through its realization date. Daily market total returns and daily risk-free returns are compounded over that same interval; the market factor is the compounded market return minus the compounded risk-free return. Portfolio excess returns subtract the risk-free return compounded over the matching interval. These frequency-matched observations are then used for monthly model estimation and HAC/Newey-West inference.
 
-Model comparison emphasizes adjusted R², coefficients, uncertainty, residual diagnostics, and stability. Higher in-sample fit is not interpreted as proof of persistent alpha.
+The conventional model-family identifiers are shorthand for project-specific characteristic-spread specifications, not a claim that the portfolio factors exactly reproduce the official factor files or canonical academic constructions. In particular, RMW is proxied by a gross-profitability characteristic spread, CMA/IA use an asset-growth spread, SMB uses a log-market-cap spread, and the q-style model uses the ROE characteristic for ROE. The configured q-style mapping is not the official Hou-Xue-Zhang factor dataset.
+
+Model comparison emphasizes adjusted R², coefficients, uncertainty, residual diagnostics, and stability. Higher in-sample fit is not interpreted as proof of persistent alpha. Historical reported coefficients and fit statistics must be regenerated after the frequency-alignment corrections before they can be treated as results of the corrected implementation.
 
 ## 6. Portfolio Construction
 
