@@ -12,7 +12,7 @@ These identifiers refer to the previous empirical state used for the reported fa
 
 ## Current Audit Status
 
-The previous release's asset-pricing statistics and dependent portfolio/ML metrics are not validated under the corrected calculations. The audit branch aligns portfolio and factor returns over the same formation-to-realization interval, compounds daily risk-free returns to that interval, computes Jensen alpha from portfolio and market excess returns, and treats constant ML predictions as a neutral equal-weight baseline. Targeted regression tests cover these cases; the full repository suite still needs a complete run before merge.
+The previous release's asset-pricing statistics and dependent portfolio/ML metrics are not validated under the corrected calculations. The audit branch aligns portfolio and factor returns over the same formation-to-realization interval, compounds daily risk-free returns to that interval, computes Jensen alpha from portfolio and market excess returns, and treats constant ML predictions as a neutral equal-weight baseline. Targeted regression tests cover these cases, and the full repository CI workflow has passed on the current audit commit. This validates the software checks, not the corrected empirical results: the data-backed pipeline still needs to be rerun before the numerical tables can be treated as current.
 
 The raw provider data are absent from Git. Until the original lawful data inputs are restored or reacquired, the corrected pipeline cannot regenerate the empirical outputs. The numbers in [RESULTS.md](RESULTS.md), README tables, and the associated paper must remain labeled as historical pre-correction results; do not silently carry them forward as corrected findings.
 
