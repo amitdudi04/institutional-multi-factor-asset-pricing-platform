@@ -70,6 +70,13 @@ def _phase2_tables(periods: int = 20) -> tuple[pd.DataFrame, pd.DataFrame]:
                     {
                         "security_id": security,
                         "date": current,
+                        "factor_id": "market_return",
+                        "raw_value": market + risk_free,
+                        "available_at": available,
+                    },
+                    {
+                        "security_id": security,
+                        "date": current,
                         "factor_id": "excess_return",
                         "raw_value": market,
                         "available_at": available,
@@ -326,6 +333,60 @@ def test_phase2_alignment_and_temporal_attacks_are_rejected() -> None:
         build_research_panel(factors, portfolios, {"BAD": "not_present"})
 
 
+def test_asset_pricing_compounds_daily_market_and_cash_returns_over_holding_period() -> None:
+    formation = date(2020, 1, 31)
+    realization = date(2020, 2, 28)
+    daily_values = (
+        (date(2020, 2, 3), 0.10, 0.01),
+        (date(2020, 2, 4), -0.05, 0.01),
+        (date(2020, 2, 28), 0.02, 0.01),
+    )
+    factor_rows: list[dict[str, object]] = []
+    for current, market_return, risk_free in daily_values:
+        available = datetime.combine(current, datetime.min.time(), tzinfo=UTC)
+        for security in ("sec-a", "sec-b"):
+            for factor_id, value in (
+                ("market_return", market_return),
+                ("risk_free_rate", risk_free),
+                ("excess_return", market_return - risk_free),
+            ):
+                factor_rows.append(
+                    {
+                        "security_id": security,
+                        "date": current,
+                        "factor_id": factor_id,
+                        "raw_value": value,
+                        "available_at": available,
+                    }
+                )
+    available = datetime.combine(realization, datetime.min.time(), tzinfo=UTC)
+    portfolios = pd.DataFrame(
+        [
+            {
+                "formation_date": formation,
+                "date": realization,
+                "factor_id": "log_market_cap",
+                "quantile": quantile,
+                "value_weighted_return": value,
+                "available_at": available,
+            }
+            for quantile, value in ((1, 0.04), (3, 0.06))
+        ]
+    )
+
+    panel = build_research_panel(pd.DataFrame(factor_rows), portfolios, {"SMB": "log_market_cap"})
+
+    expected_market = (1.10 * 0.95 * 1.02) - 1.0
+    expected_cash = (1.01**3) - 1.0
+    assert panel["market_excess"].unique().tolist() == pytest.approx(
+        [expected_market - expected_cash]
+    )
+    assert panel["risk_free_rate"].unique().tolist() == pytest.approx([expected_cash])
+    assert panel["excess_return"].tolist() == pytest.approx(
+        [0.04 - expected_cash, 0.06 - expected_cash]
+    )
+
+
 def test_phase3_excludes_non_estimable_sparse_factor_dates() -> None:
     factors, portfolios = _phase2_tables()
     target = portfolios.loc[portfolios["factor_id"].eq("log_market_cap")]
@@ -335,7 +396,7 @@ def test_phase3_excludes_non_estimable_sparse_factor_dates() -> None:
     ].index
     sparse = portfolios.drop(drop_index)
     panel = build_research_panel(factors, sparse, {"SMB": "log_market_cap"})
-    assert sparse_date not in set(panel["date"])
+    assert pd.Timestamp(sparse_date) not in set(panel["date"])
     assert not panel.empty
 
 

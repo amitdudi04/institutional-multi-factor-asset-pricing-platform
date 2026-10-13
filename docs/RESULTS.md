@@ -1,6 +1,6 @@
 # Research Results
 
-This document is the public numerical record for the current research repository. The values below correspond to the frozen empirical release identified in [REPRODUCIBILITY.md](REPRODUCIBILITY.md).
+> **Historical snapshot — not yet recalculated.** The tables below reproduce the prior empirical release identified in [REPRODUCIBILITY.md](REPRODUCIBILITY.md). Code review found a daily/monthly return-frequency mismatch in asset-pricing inputs, risk-free returns that were not compounded to portfolio holding periods, a Jensen-alpha calculation that did not use excess returns, and a constant-score ML baseline vulnerable to row-order selection. The audit branch corrects these calculations and adds tests, but the raw provider data are not included in Git and the empirical outputs have not been regenerated. Do not cite these values as results of the corrected implementation. Regenerate all dependent outputs and update the paper before treating the numerical study as final.
 
 ## 1. Universe and Data
 
@@ -51,12 +51,12 @@ Each configured model is evaluated on 123 diagnostic portfolios. Intercept infer
 | Model | N | Mean adj. R² | Median adj. R² | Mean monthly alpha | Median monthly alpha | Mean HAC t | p<0.05 share | Mean market beta |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | CAPM | 123 | 0.063 | 0.061 | 0.01187 | 0.01128 | 2.467 | 85.4% | 1.402 |
-| Fama-French 3 | 123 | 0.259 | 0.247 | 0.00923 | 0.00937 | 2.146 | 58.5% | 1.421 |
-| Carhart 4 | 123 | 0.277 | 0.261 | 0.00899 | 0.00910 | 2.048 | 52.8% | 1.408 |
-| Fama-French 5 | 123 | 0.301 | 0.281 | 0.01056 | 0.01026 | 2.569 | 92.7% | 1.284 |
-| Configured q mapping | 123 | 0.296 | 0.295 | 0.00875 | 0.00876 | 2.090 | 58.5% | 1.291 |
+| FF3-style project factors | 123 | 0.259 | 0.247 | 0.00923 | 0.00937 | 2.146 | 58.5% | 1.421 |
+| Carhart-style project factors | 123 | 0.277 | 0.261 | 0.00899 | 0.00910 | 2.048 | 52.8% | 1.408 |
+| FF5-style project factors | 123 | 0.301 | 0.281 | 0.01056 | 0.01026 | 2.569 | 92.7% | 1.284 |
+| q-style project mapping | 123 | 0.296 | 0.295 | 0.00875 | 0.00876 | 2.090 | 58.5% | 1.291 |
 
-Fama-French 5 exceeds CAPM by 0.238 in mean adjusted R² (0.301 - 0.063). This supports greater in-sample explanatory fit, not persistent alpha, causality, or future performance.
+The FF5-style project specification exceeds CAPM by 0.238 in the prior-release mean adjusted R² (0.301 - 0.063). This supports greater in-sample explanatory fit, not persistent alpha, causality, or future performance.
 
 ## 4. Portfolio, Cost and Risk Results
 

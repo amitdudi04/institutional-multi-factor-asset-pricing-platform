@@ -259,8 +259,11 @@ class AssetPricingResearchService:
                     "portfolio simple return minus authenticated risk-free simple return"
                 ),
                 "factor_construction": (
-                    "date-aligned high-minus-low Phase 2 quantile returns; "
-                    "market excess from Phase 2 characteristic"
+                    "holding-period-aligned high-minus-low spreads from project characteristics, "
+                    "not official provider factor series; market excess equals compounded market "
+                    "total return minus compounded risk-free return over the same formation-to-"
+                    "realization interval; RMW uses gross profitability, CMA/IA use asset growth, "
+                    "and q-style ROE uses the ROE characteristic"
                 ),
                 "inference": f"Newey-West HAC with {self.config.hac_lags} lags",
                 "confidence_level": self.config.confidence_level,
