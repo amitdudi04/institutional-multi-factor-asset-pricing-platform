@@ -1,0 +1,522 @@
+Phase 1 test evidence — 1 November 2026, Asia/Calcutta
+Run ID: institutional-phase1-2026-11-01
+Baseline: 4e7fbdc380b8042db72e9c628260f60077a205ef
+Initial tracker: ea2846d
+Final source checkpoint: ef339ab1a7805242e67284cd54fbcf23fae86da1
+Environment: Windows, CPython 3.12.13, uv 0.11.2, pytest 9.1.1,
+pytest-cov 6.3.0; dependency identity is the preserved uv.lock SHA256
+in PHASE1_SOURCE_MANIFEST.json. Dependency sync installed 92 packages.
+
+1. BEFORE corrections, with initial independent regression fixtures added:
+   uv run pytest tests/test_research_phase1_audit.py --no-cov -q
+   Observed: 8 failed, 16 passed in 17.31s.
+   Failures:
+   test_drawdown_from_initial_nav[returns0]
+   test_drawdown_from_initial_nav[returns1]
+   test_drawdown_from_initial_nav[returns2]
+   test_drawdown_from_initial_nav[returns4]
+   test_factor_portfolio_rejects_incomplete_formed_holding[first]
+   test_factor_portfolio_rejects_incomplete_formed_holding[last]
+   test_factor_portfolio_rejects_incomplete_formed_holding[all]
+   test_factor_portfolio_rejects_incomplete_formed_holding[null]
+   The first four disagreed with independent initial-NAV reference values;
+   the last four failed to reject incomplete evidence. They are confirmed
+   baseline implementation failures, not claimed empirical paper errors.
+
+2. AFTER initial source corrections:
+   uv run pytest tests/test_research_phase1_audit.py
+     tests/test_phase2_factor_engine.py tests/test_phase4_portfolio_risk.py
+     tests/test_sec_projection.py tests/test_sec_listing.py
+     tests/test_sec_submissions.py --no-cov -q
+   Observed: 88 passed in 40.87s (before expanding the independent suite).
+   No repository-wide coverage claim is made for targeted --no-cov runs.
+
+3. Expanded independent arithmetic/definition/breadth suite:
+   uv run pytest tests/test_research_phase1_audit.py --no-cov -q
+   Observed: 29 passed in 3.96s.
+   Includes scalar NAV reference calculations, per-trade L1 fee sums,
+   deployment/drift ledger identities, missing constituent evidence,
+   12-1 momentum, leverage/liquidity values, beta aliases and breadth1–4.
+
+4. AFTER preserving the original formation calendar in final source:
+   uv run pytest tests/test_research_phase1_audit.py
+     tests/test_phase2_factor_engine.py --no-cov -q
+   Observed: 50 passed in 21.08s.
+   The first full-suite attempt was stopped following this source
+   refinement; no outcome is claimed for that interrupted attempt.
+
+5. Final full phase-level software verification:
+   uv run pytest
+   Final observed result is appended after completion below.
+
+6. Other checks actually executed:
+   uv sync --all-groups: PASS, 96 packages resolved, 92 installed.
+   uv run ruff check . outputs/audit/phase1/reproduce_numerical_evidence.py:
+     PASS after formatting the new evidence script.
+   uv run ruff format --check . outputs/audit/phase1/reproduce_numerical_evidence.py:
+     PASS, 152 files formatted.
+   uv run mypy src: PASS, 113 source files, rerun after final source edit.
+   uv lock --check: PASS; uv.lock not changed.
+   uv run institutional-factor-platform validate-config: PASS.
+   uv run institutional-factor-platform validate-delivery-config: PASS.
+   uv run institutional-factor-platform verify-delivery-platform: PASS,
+     READY, authenticated_publications=0, empty_state=true.
+     This empty-state software check is not empirical publication validation.
+   uv run python outputs/audit/phase1/reproduce_numerical_evidence.py:
+     PASS, 31 reconciliation rows and 48 registry entries generated.
+   git diff --check: PASS.
+
+7. Remote software CI observed at baseline:
+   main 4e7fbdc: run37338079331 success.
+   draft PR8 ce36c39: run38409266153 success.
+   PR7 51ae028: run38303222633 failure.
+   Full branch/PR/run URLs and identities are in the source manifest.
+   The current workflow triggers push CI only for main and phase/**;
+   research/** push alone does not imply an Actions run. No new remote
+   CI success is claimed for this audit branch without an observed run.
+
+8. Not executed or unavailable:
+   No original empirical replay, eight frozen drawdown-path reconciliation,
+   historical trade-ledger reconciliation, live provider market download,
+   external manuscript verification, Docker build, or vulnerability audit.
+   Existing synthetic integration tests may exercise later software modules;
+   that is software phase-level verification, not authorization to start
+   Phase2–5 research investigations or publish their empirical results.
+
+Original stdout SHA256: dd7ee9fed75ca950df8c3069b891ff799506d3ca944ed44097491469c614086b
+Embedded rendering normalizes line endings and trailing whitespace. Raw stdout is preserved in the local audit work area.
+--- BEGIN ORIGINAL BASELINE REGRESSION OUTPUT ---
+FFF.F...............FFFF                                                 [100%]
+================================== FAILURES ===================================
+__________________ test_drawdown_from_initial_nav[returns0] ___________________
+
+returns = [-0.2, 0.1]
+
+    @pytest.mark.parametrize(
+        "returns",
+        [[-0.2, 0.1], [-0.1, -0.1, -0.1], [-0.2, 0.25, -0.1],
+         [0.02, 0.02], [-0.02, -0.02], [0.0, 0.0], [0.1, -0.2, 0.3]],
+    )
+    def test_drawdown_from_initial_nav(returns: list[float]) -> None:
+        wealth, peak = 1.0, 1.0
+        reference = []
+        for value in returns:
+            wealth *= 1 + value
+            peak = max(peak, wealth)
+            reference.append(wealth / peak - 1)
+        series = pd.Series(returns, index=pd.date_range("2020-01-01", periods=len(returns)))
+>       np.testing.assert_allclose(drawdown(series), reference, atol=1e-14)
+E       AssertionError:
+E       Not equal to tolerance rtol=1e-07, atol=1e-14
+E
+E       Mismatched elements: 2 / 2 (100%)
+E       Max absolute difference among violations: 0.2
+E       Max relative difference among violations: 1.
+E        ACTUAL: array([0., 0.])
+E        DESIRED: array([-0.2 , -0.12])
+
+tests\test_research_phase1_audit.py:30: AssertionError
+__________________ test_drawdown_from_initial_nav[returns1] ___________________
+
+returns = [-0.1, -0.1, -0.1]
+
+    @pytest.mark.parametrize(
+        "returns",
+        [[-0.2, 0.1], [-0.1, -0.1, -0.1], [-0.2, 0.25, -0.1],
+         [0.02, 0.02], [-0.02, -0.02], [0.0, 0.0], [0.1, -0.2, 0.3]],
+    )
+    def test_drawdown_from_initial_nav(returns: list[float]) -> None:
+        wealth, peak = 1.0, 1.0
+        reference = []
+        for value in returns:
+            wealth *= 1 + value
+            peak = max(peak, wealth)
+            reference.append(wealth / peak - 1)
+        series = pd.Series(returns, index=pd.date_range("2020-01-01", periods=len(returns)))
+>       np.testing.assert_allclose(drawdown(series), reference, atol=1e-14)
+E       AssertionError:
+E       Not equal to tolerance rtol=1e-07, atol=1e-14
+E
+E       Mismatched elements: 3 / 3 (100%)
+E       Max absolute difference among violations: 0.1
+E       Max relative difference among violations: 1.
+E        ACTUAL: array([ 0.  , -0.1 , -0.19])
+E        DESIRED: array([-0.1  , -0.19 , -0.271])
+
+tests\test_research_phase1_audit.py:30: AssertionError
+__________________ test_drawdown_from_initial_nav[returns2] ___________________
+
+returns = [-0.2, 0.25, -0.1]
+
+    @pytest.mark.parametrize(
+        "returns",
+        [[-0.2, 0.1], [-0.1, -0.1, -0.1], [-0.2, 0.25, -0.1],
+         [0.02, 0.02], [-0.02, -0.02], [0.0, 0.0], [0.1, -0.2, 0.3]],
+    )
+    def test_drawdown_from_initial_nav(returns: list[float]) -> None:
+        wealth, peak = 1.0, 1.0
+        reference = []
+        for value in returns:
+            wealth *= 1 + value
+            peak = max(peak, wealth)
+            reference.append(wealth / peak - 1)
+        series = pd.Series(returns, index=pd.date_range("2020-01-01", periods=len(returns)))
+>       np.testing.assert_allclose(drawdown(series), reference, atol=1e-14)
+E       AssertionError:
+E       Not equal to tolerance rtol=1e-07, atol=1e-14
+E
+E       Mismatched elements: 1 / 3 (33.3%)
+E       Max absolute difference among violations: 0.2
+E       Max relative difference among violations: 1.
+E        ACTUAL: array([ 0. ,  0. , -0.1])
+E        DESIRED: array([-0.2,  0. , -0.1])
+
+tests\test_research_phase1_audit.py:30: AssertionError
+__________________ test_drawdown_from_initial_nav[returns4] ___________________
+
+returns = [-0.02, -0.02]
+
+    @pytest.mark.parametrize(
+        "returns",
+        [[-0.2, 0.1], [-0.1, -0.1, -0.1], [-0.2, 0.25, -0.1],
+         [0.02, 0.02], [-0.02, -0.02], [0.0, 0.0], [0.1, -0.2, 0.3]],
+    )
+    def test_drawdown_from_initial_nav(returns: list[float]) -> None:
+        wealth, peak = 1.0, 1.0
+        reference = []
+        for value in returns:
+            wealth *= 1 + value
+            peak = max(peak, wealth)
+            reference.append(wealth / peak - 1)
+        series = pd.Series(returns, index=pd.date_range("2020-01-01", periods=len(returns)))
+>       np.testing.assert_allclose(drawdown(series), reference, atol=1e-14)
+E       AssertionError:
+E       Not equal to tolerance rtol=1e-07, atol=1e-14
+E
+E       Mismatched elements: 2 / 2 (100%)
+E       Max absolute difference among violations: 0.02
+E       Max relative difference among violations: 1.
+E        ACTUAL: array([ 0.  , -0.02])
+E        DESIRED: array([-0.02  , -0.0396])
+
+tests\test_research_phase1_audit.py:30: AssertionError
+_______ test_factor_portfolio_rejects_incomplete_formed_holding[first] ________
+
+missing = 'first'
+
+    @pytest.mark.parametrize("missing", ["first", "last", "all", "null"])
+    def test_factor_portfolio_rejects_incomplete_formed_holding(missing: str) -> None:
+        formation = date(2020, 1, 31)
+        factors = pd.DataFrame([
+            {"security_id": s, "date": formation, "factor_id": "book_to_market", "score_value": i}
+            for i, s in enumerate(["A", "B", "C"])
+        ])
+        characteristics = factors[["security_id", "date"]].assign(market_cap=100.0)
+        rows = []
+        for day in [date(2020, 2, 3), date(2020, 2, 4)]:
+            for security in ["A", "B", "C"]:
+                if security == "C" and (
+                    missing == "all" or (missing == "first" and day.day == 3)
+                    or (missing == "last" and day.day == 4)
+                ):
+                    continue
+                rows.append({"security_id": security, "date": day,
+                             "return": np.nan if missing == "null" and security == "C" else 0.01,
+                             "benchmark_return": 0.01,
+                             "available_at": datetime.combine(day, datetime.min.time(), tzinfo=UTC)})
+>       with pytest.raises(DataQualityError, match="Incomplete holding-period"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE DataQualityError
+
+tests\test_research_phase1_audit.py:87: Failed
+________ test_factor_portfolio_rejects_incomplete_formed_holding[last] ________
+
+missing = 'last'
+
+    @pytest.mark.parametrize("missing", ["first", "last", "all", "null"])
+    def test_factor_portfolio_rejects_incomplete_formed_holding(missing: str) -> None:
+        formation = date(2020, 1, 31)
+        factors = pd.DataFrame([
+            {"security_id": s, "date": formation, "factor_id": "book_to_market", "score_value": i}
+            for i, s in enumerate(["A", "B", "C"])
+        ])
+        characteristics = factors[["security_id", "date"]].assign(market_cap=100.0)
+        rows = []
+        for day in [date(2020, 2, 3), date(2020, 2, 4)]:
+            for security in ["A", "B", "C"]:
+                if security == "C" and (
+                    missing == "all" or (missing == "first" and day.day == 3)
+                    or (missing == "last" and day.day == 4)
+                ):
+                    continue
+                rows.append({"security_id": security, "date": day,
+                             "return": np.nan if missing == "null" and security == "C" else 0.01,
+                             "benchmark_return": 0.01,
+                             "available_at": datetime.combine(day, datetime.min.time(), tzinfo=UTC)})
+>       with pytest.raises(DataQualityError, match="Incomplete holding-period"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE DataQualityError
+
+tests\test_research_phase1_audit.py:87: Failed
+________ test_factor_portfolio_rejects_incomplete_formed_holding[all] _________
+
+missing = 'all'
+
+    @pytest.mark.parametrize("missing", ["first", "last", "all", "null"])
+    def test_factor_portfolio_rejects_incomplete_formed_holding(missing: str) -> None:
+        formation = date(2020, 1, 31)
+        factors = pd.DataFrame([
+            {"security_id": s, "date": formation, "factor_id": "book_to_market", "score_value": i}
+            for i, s in enumerate(["A", "B", "C"])
+        ])
+        characteristics = factors[["security_id", "date"]].assign(market_cap=100.0)
+        rows = []
+        for day in [date(2020, 2, 3), date(2020, 2, 4)]:
+            for security in ["A", "B", "C"]:
+                if security == "C" and (
+                    missing == "all" or (missing == "first" and day.day == 3)
+                    or (missing == "last" and day.day == 4)
+                ):
+                    continue
+                rows.append({"security_id": security, "date": day,
+                             "return": np.nan if missing == "null" and security == "C" else 0.01,
+                             "benchmark_return": 0.01,
+                             "available_at": datetime.combine(day, datetime.min.time(), tzinfo=UTC)})
+>       with pytest.raises(DataQualityError, match="Incomplete holding-period"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE DataQualityError
+
+tests\test_research_phase1_audit.py:87: Failed
+________ test_factor_portfolio_rejects_incomplete_formed_holding[null] ________
+
+missing = 'null'
+
+    @pytest.mark.parametrize("missing", ["first", "last", "all", "null"])
+    def test_factor_portfolio_rejects_incomplete_formed_holding(missing: str) -> None:
+        formation = date(2020, 1, 31)
+        factors = pd.DataFrame([
+            {"security_id": s, "date": formation, "factor_id": "book_to_market", "score_value": i}
+            for i, s in enumerate(["A", "B", "C"])
+        ])
+        characteristics = factors[["security_id", "date"]].assign(market_cap=100.0)
+        rows = []
+        for day in [date(2020, 2, 3), date(2020, 2, 4)]:
+            for security in ["A", "B", "C"]:
+                if security == "C" and (
+                    missing == "all" or (missing == "first" and day.day == 3)
+                    or (missing == "last" and day.day == 4)
+                ):
+                    continue
+                rows.append({"security_id": security, "date": day,
+                             "return": np.nan if missing == "null" and security == "C" else 0.01,
+                             "benchmark_return": 0.01,
+                             "available_at": datetime.combine(day, datetime.min.time(), tzinfo=UTC)})
+>       with pytest.raises(DataQualityError, match="Incomplete holding-period"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE DataQualityError
+
+tests\test_research_phase1_audit.py:87: Failed
+=========================== short test summary info ===========================
+FAILED tests/test_research_phase1_audit.py::test_drawdown_from_initial_nav[returns0]
+FAILED tests/test_research_phase1_audit.py::test_drawdown_from_initial_nav[returns1]
+FAILED tests/test_research_phase1_audit.py::test_drawdown_from_initial_nav[returns2]
+FAILED tests/test_research_phase1_audit.py::test_drawdown_from_initial_nav[returns4]
+FAILED tests/test_research_phase1_audit.py::test_factor_portfolio_rejects_incomplete_formed_holding[first]
+FAILED tests/test_research_phase1_audit.py::test_factor_portfolio_rejects_incomplete_formed_holding[last]
+FAILED tests/test_research_phase1_audit.py::test_factor_portfolio_rejects_incomplete_formed_holding[all]
+FAILED tests/test_research_phase1_audit.py::test_factor_portfolio_rejects_incomplete_formed_holding[null]
+8 failed, 16 passed in 17.31s
+
+--- END ORIGINAL BASELINE REGRESSION OUTPUT ---
+
+FINAL FULL-SUITE RESULT: 330 passed, 115 warnings in 1444.39s (24m04s); 90.52% branch-aware coverage; pytest exit0; separate coverage report --fail-under=90 exit0
+Final stdout SHA256: 631ac6611960b41d1cefa8eea1380eed9327efbc385ceac8d3f055e00cf4d982
+Normalized rendering follows; original stdout retained in the local audit work area.
+--- BEGIN FINAL FULL-SUITE OUTPUT ---
+============================= test session starts =============================
+platform win32 -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0
+rootdir: C:\Users\amitk\Documents\Codex\2026-11-01\codex-master-prompt-institutional-multi-factor\work\repo
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.14.2, cov-6.3.0
+collected 330 items
+
+tests\test_configuration.py ......                                       [  1%]
+tests\test_full_platform_connected.py .                                  [  2%]
+tests\test_integrity_controls.py ...................                     [  7%]
+tests\test_logging.py ......                                             [  9%]
+tests\test_manifests_storage.py ...........                              [ 13%]
+tests\test_package.py .                                                  [ 13%]
+tests\test_phase1_config_domain.py ..............                        [ 17%]
+tests\test_phase2_factor_engine.py .....................                 [ 23%]
+tests\test_phase3_asset_pricing.py ......................                [ 30%]
+tests\test_phase4_portfolio_risk.py ...........................          [ 38%]
+tests\test_phase5_ml.py ................................................ [ 53%]
+..........                                                               [ 56%]
+tests\test_phase6_delivery.py .............                              [ 60%]
+tests\test_phase6_deployment.py ...                                      [ 61%]
+tests\test_project.py ..                                                 [ 61%]
+tests\test_recovery_and_lineage.py ..............................        [ 70%]
+tests\test_research_phase1_audit.py .............................        [ 79%]
+tests\test_sec_concepts.py ..                                            [ 80%]
+tests\test_sec_inline_xbrl.py ...                                        [ 81%]
+tests\test_sec_legacy_xbrl.py .......                                    [ 83%]
+tests\test_sec_listing.py .....                                          [ 84%]
+tests\test_sec_projection.py .......                                     [ 86%]
+tests\test_sec_submissions.py ....                                       [ 88%]
+tests\test_service_cli_calendar.py .....................                 [ 94%]
+tests\test_validation_adapters.py ..................                     [100%]
+
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\amitk\Documents\Codex\2026-11-01\codex-master-prompt-institutional-multi-factor\work\repo\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+tests/test_full_platform_connected.py: 4 warnings
+tests/test_phase5_ml.py: 102 warnings
+  C:\Users\amitk\Documents\Codex\2026-11-01\codex-master-prompt-institutional-multi-factor\work\repo\.venv\Lib\site-packages\pandas\core\nanops.py:1632: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
+    return spearmanr(a, b)[0]
+
+tests/test_phase5_ml.py::test_service_trains_publishes_and_restarts_authenticated_bundle
+tests/test_phase5_ml.py::test_service_trains_publishes_and_restarts_authenticated_bundle
+tests/test_phase5_ml.py::test_service_baseline_explainability_is_explicitly_not_applicable
+tests/test_phase5_ml.py::test_service_executes_remaining_temporal_split_modes[walk_forward-2]
+tests/test_phase5_ml.py::test_service_economic_evaluation_reuses_authenticated_phase4_engine_and_costs
+tests/test_phase5_ml.py::test_service_tree_model_persists_permutation_and_local_shap_evidence
+  C:\Users\amitk\Documents\Codex\2026-11-01\codex-master-prompt-institutional-multi-factor\work\repo\src\institutional_factor_platform\ml\evaluation.py:155: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
+    result = function(left, right)  # type: ignore[operator]
+
+tests/test_phase5_ml.py::test_service_classifier_calibrates_only_on_validation_and_persists_identity
+  C:\Users\amitk\Documents\Codex\2026-11-01\codex-master-prompt-institutional-multi-factor\work\repo\.venv\Lib\site-packages\sklearn\model_selection\_split.py:812: UserWarning: The least populated class in y has only 4 members, which is less than n_splits=5.
+    warnings.warn(
+
+tests/test_phase5_ml.py::test_service_classifier_calibrates_only_on_validation_and_persists_identity
+  C:\Users\amitk\Documents\Codex\2026-11-01\codex-master-prompt-institutional-multi-factor\work\repo\.venv\Lib\site-packages\sklearn\model_selection\_split.py:812: UserWarning: The least populated class in y has only 3 members, which is less than n_splits=5.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=============================== tests coverage ================================
+______________ coverage: platform win32, python 3.12.13-final-0 _______________
+
+Name                                                                      Stmts   Miss Branch BrPart  Cover   Missing
+---------------------------------------------------------------------------------------------------------------------
+src\institutional_factor_platform\__init__.py                                 6      2      0      0    67%   7-8
+src\institutional_factor_platform\api\__init__.py                             2      0      0      0   100%
+src\institutional_factor_platform\api\app.py                                126      3     12      1    97%   70-71, 158
+src\institutional_factor_platform\api\middleware.py                          82      3     28      3    95%   49, 85, 101
+src\institutional_factor_platform\asset_pricing\__init__.py                   2      0      0      0   100%
+src\institutional_factor_platform\asset_pricing\config.py                    54      0     14      0   100%
+src\institutional_factor_platform\asset_pricing\inputs.py                    51      5     20      5    86%   25, 40, 51, 65, 92
+src\institutional_factor_platform\asset_pricing\models.py                    22      0      8      0   100%
+src\institutional_factor_platform\asset_pricing\service.py                  128     11     22      2    91%   54, 56, 366-368, 391-392, 424-429
+src\institutional_factor_platform\backtest\__init__.py                        2      0      0      0   100%
+src\institutional_factor_platform\backtest\costs.py                          25      2      8      2    88%   27, 40
+src\institutional_factor_platform\backtest\engine.py                         48      3     16      3    91%   38, 40, 58
+src\institutional_factor_platform\cli.py                                    365     46    124     15    85%   297, 311-315, 342, 503-508, 515-517, 555, 574-577, 585-586, 594-595, 603-604, 612-620, 628-636, 644-650, 660-674, 691-710
+src\institutional_factor_platform\configuration.py                           37      1      8      0    98%   37
+src\institutional_factor_platform\constraints\__init__.py                     2      0      0      0   100%
+src\institutional_factor_platform\constraints\models.py                      63      1     44      2    97%   63, 81->80
+src\institutional_factor_platform\dashboard\__init__.py                       2      0      0      0   100%
+src\institutional_factor_platform\dashboard\app.py                           85      4     22      3    93%   34-36, 72->74, 162
+src\institutional_factor_platform\dashboard\client.py                        53      7     18      4    79%   38->40, 59, 64-69
+src\institutional_factor_platform\dashboard\launcher.py                      21      0      4      1    96%   18->20
+src\institutional_factor_platform\dashboard\presentation.py                  35      0     10      0   100%
+src\institutional_factor_platform\data\__init__.py                            0      0      0      0   100%
+src\institutional_factor_platform\data\access.py                            143      9     30      4    92%   83-84, 139->119, 143->175, 169-170, 248-252
+src\institutional_factor_platform\data\calendar.py                           11      0      0      0   100%
+src\institutional_factor_platform\data\config.py                            209      8     40     10    93%   89, 119, 133, 179, 241->243, 244->246, 247->249, 255-256, 265->278, 273->275, 276->278, 279-280
+src\institutional_factor_platform\data\contracts.py                          32      2      2      0    94%   26-27
+src\institutional_factor_platform\data\domain.py                            265     18     46     15    88%   131, 174, 176, 178, 182, 197, 199, 201, 203, 233-236, 302, 304, 306, 308, 310
+src\institutional_factor_platform\data\evidence.py                           48      5      8      0    91%   61-66
+src\institutional_factor_platform\data\lineage.py                           244      0     66      0   100%
+src\institutional_factor_platform\data\manifests.py                         166      6     30      6    94%   52, 56, 160, 162, 166, 168
+src\institutional_factor_platform\data\sec_concepts.py                       24      0      2      0   100%
+src\institutional_factor_platform\data\sec_listing.py                       106      8     40      8    89%   79, 83, 85, 127, 136, 138, 141, 159
+src\institutional_factor_platform\data\sec_projection.py                    207     11    102     14    92%   49->48, 59, 63, 69, 73, 83, 257, 284->286, 288->290, 300-301, 313, 320, 364, 379->378
+src\institutional_factor_platform\data\security_master.py                   180      5     66      4    96%   57, 141, 217, 240, 370
+src\institutional_factor_platform\data\services.py                          376     38    114     21    86%   288, 406, 426->443, 458->470, 519->531, 606-610, 617-618, 645, 769, 772->771, 793, 820, 839, 849, 858-859, 895, 904, 913-919, 929, 933-937, 950, 952, 960->963, 1004-1005, 1018-1019
+src\institutional_factor_platform\data\sources\__init__.py                    0      0      0      0   100%
+src\institutional_factor_platform\data\sources\alpha_vantage.py              53      5     16      5    86%   32, 37->46, 40-41, 43, 51->53, 106
+src\institutional_factor_platform\data\sources\base.py                       69      3     10      2    94%   89, 93-94
+src\institutional_factor_platform\data\sources\fred.py                       41      6     12      1    83%   32-37
+src\institutional_factor_platform\data\sources\french.py                     50      6     16      6    82%   33-36, 45, 54, 60->82, 67, 83
+src\institutional_factor_platform\data\sources\hf_data_library.py            98     19     34     13    76%   35-36, 38, 42, 49, 64, 94, 98, 109-110, 112, 121-122, 124, 127, 138, 141, 164, 167, 170->165
+src\institutional_factor_platform\data\sources\owner_supplied.py             97     10     44      7    87%   100, 121, 126-129, 134-138, 168, 183
+src\institutional_factor_platform\data\sources\sec_edgar.py                  69     13     24      6    80%   31, 36, 38, 64, 67, 73, 79-80, 86-91, 123
+src\institutional_factor_platform\data\sources\sec_inline_xbrl.py           183     14     60     12    89%   70-71, 76, 130->exit, 144, 153->exit, 175->179, 177->179, 194, 197, 220, 222, 232, 249-250, 257, 271-272
+src\institutional_factor_platform\data\sources\sec_legacy_xbrl.py           170     22     66     16    84%   112, 115, 118, 136, 139-140, 152, 164, 167, 173, 177-179, 202, 205, 212, 223, 239, 262, 272, 275-276
+src\institutional_factor_platform\data\sources\sec_submissions.py           111     17     32     10    81%   32, 43-44, 48, 57, 73, 81, 104, 115, 118-119, 151, 157-158, 160, 171->178, 174-175
+src\institutional_factor_platform\data\sources\yahoo.py                      60      7     18      3    87%   33, 37, 69-70, 82-83, 108
+src\institutional_factor_platform\data\storage.py                           458     49    168     33    87%   118, 146, 165, 174, 187, 219, 268, 277-278, 294, 296, 310, 326-327, 352, 430-431, 466, 468, 470, 518, 522, 547-548, 594, 626, 630, 665-666, 680, 683, 686-687, 702, 715, 717, 732, 733->742, 736, 741, 798, 819, 826-827, 835, 844, 874, 878-886
+src\institutional_factor_platform\data\validation.py                        180      7     80     11    93%   100, 109, 163->166, 188, 205->130, 237->235, 294, 321->318, 338, 348, 386
+src\institutional_factor_platform\delivery\__init__.py                        2      0      0      0   100%
+src\institutional_factor_platform\delivery\catalog.py                       132      3     50      3    97%   147, 190, 195
+src\institutional_factor_platform\delivery\config.py                        101      1     14      0    99%   129
+src\institutional_factor_platform\delivery\provenance.py                     24      2      4      0    93%   26-27
+src\institutional_factor_platform\delivery\reporting.py                     110      9     26      3    91%   41-42, 46, 103-104, 120, 139-140, 274
+src\institutional_factor_platform\delivery\schemas.py                        33      0      0      0   100%
+src\institutional_factor_platform\delivery\service.py                        31      0      0      0   100%
+src\institutional_factor_platform\diagnostics\__init__.py                     2      0      0      0   100%
+src\institutional_factor_platform\diagnostics\regression.py                  17      0      0      0   100%
+src\institutional_factor_platform\exceptions.py                              20      0      0      0   100%
+src\institutional_factor_platform\factors\__init__.py                         3      0      0      0   100%
+src\institutional_factor_platform\factors\config.py                          83      4     10      4    91%   32, 34, 49, 78
+src\institutional_factor_platform\factors\contracts.py                        8      0      0      0   100%
+src\institutional_factor_platform\factors\definitions.py                     89      0      8      0   100%
+src\institutional_factor_platform\factors\diagnostics.py                     48      1     14      1    97%   151
+src\institutional_factor_platform\factors\portfolio.py                       69      4     28      4    92%   29, 46, 58, 98
+src\institutional_factor_platform\factors\preprocessing.py                   44      1     20      1    97%   50
+src\institutional_factor_platform\factors\service.py                        189     10     42      6    93%   93-94, 171, 348, 371, 386, 405, 439-441, 455
+src\institutional_factor_platform\factors\storage.py                        192     12     36     10    90%   139, 190-191, 196, 201, 203, 210, 216, 223, 226, 239, 279
+src\institutional_factor_platform\factors\temporal.py                       102      5     56      4    94%   123, 154-156, 171->173, 175
+src\institutional_factor_platform\factors\validation.py                      60      1     28      1    98%   112
+src\institutional_factor_platform\logging.py                                 20      1      6      1    92%   23
+src\institutional_factor_platform\ml\__init__.py                              2      0      0      0   100%
+src\institutional_factor_platform\ml\config.py                              115      2     12      2    97%   58, 81
+src\institutional_factor_platform\ml\contracts.py                           121      0      4      0   100%
+src\institutional_factor_platform\ml\economic.py                             33      6     14      6    74%   23, 27, 35, 37, 40, 43
+src\institutional_factor_platform\ml\evaluation.py                           65      1     22      1    98%   80
+src\institutional_factor_platform\ml\features.py                             56      2     20      2    95%   114, 131
+src\institutional_factor_platform\ml\models.py                              103      6     44      6    92%   33, 63, 74, 82, 85, 101
+src\institutional_factor_platform\ml\preprocessing.py                        78      6     36      7    89%   33, 47, 55, 57, 69, 74->78, 82
+src\institutional_factor_platform\ml\publication.py                         164     16     50     11    86%   114, 119, 130, 134-135, 140, 148, 150, 157, 161, 183, 196-197, 225-226, 247
+src\institutional_factor_platform\ml\service.py                             295     20     72     16    90%   82, 96, 102, 105, 108, 131, 296, 561, 572, 577, 592, 608, 612, 629, 709, 849, 874-879
+src\institutional_factor_platform\ml\splits.py                               68      4     22      6    89%   51, 54, 67->73, 75, 81, 89->exit
+src\institutional_factor_platform\ml\targets.py                              93      8     54      8    89%   31, 33, 45, 60, 87, 138, 150, 161
+src\institutional_factor_platform\ml\validation.py                          113      9     38      7    89%   94-95, 97, 113, 125, 161, 164, 166, 185
+src\institutional_factor_platform\model_validation\__init__.py                2      0      0      0   100%
+src\institutional_factor_platform\model_validation\inputs.py                 29      2     14      2    91%   20, 31
+src\institutional_factor_platform\numeric.py                                  3      0      0      0   100%
+src\institutional_factor_platform\observability\__init__.py                   2      0      0      0   100%
+src\institutional_factor_platform\observability\logging.py                   10      0      0      0   100%
+src\institutional_factor_platform\observability\metrics.py                   15      0      0      0   100%
+src\institutional_factor_platform\optimization\__init__.py                    2      0      0      0   100%
+src\institutional_factor_platform\optimization\black_litterman.py            26      1      4      1    93%   50
+src\institutional_factor_platform\optimization\covariance.py                 40      3     18      3    90%   15, 48, 50
+src\institutional_factor_platform\optimization\engine.py                    149     19     56     14    83%   63, 102->122, 133, 138, 160, 161->158, 212-213, 215-223, 225, 275, 279-281, 293, 308, 336
+src\institutional_factor_platform\optimization\hrp.py                        32      0      6      0   100%
+src\institutional_factor_platform\performance\__init__.py                     2      0      0      0   100%
+src\institutional_factor_platform\performance\metrics.py                     13      1      6      1    89%   21
+src\institutional_factor_platform\portfolio\__init__.py                       2      0      0      0   100%
+src\institutional_factor_platform\portfolio\allocations.py                   11      0      4      0   100%
+src\institutional_factor_platform\portfolio\config.py                        63      2      8      2    94%   45, 59
+src\institutional_factor_platform\portfolio\service.py                      166     19     36     11    85%   65, 74, 202, 203->205, 295-297, 303, 322, 325, 328, 331, 338-339, 384, 388, 420-425
+src\institutional_factor_platform\project.py                                 17      2      6      0    91%   38-39
+src\institutional_factor_platform\regression\__init__.py                      2      0      0      0   100%
+src\institutional_factor_platform\regression\engine.py                       88      2     32      2    97%   110, 165
+src\institutional_factor_platform\research_outputs\__init__.py                2      0      0      0   100%
+src\institutional_factor_platform\research_outputs\portfolio_storage.py      88      6     20      6    89%   89, 93, 107, 111, 113, 126
+src\institutional_factor_platform\research_outputs\storage.py               127     16     28      9    83%   129-130, 152, 156, 161-162, 173-174, 179, 183-184, 187, 201, 214, 232, 237
+src\institutional_factor_platform\risk\__init__.py                            2      0      0      0   100%
+src\institutional_factor_platform\risk\metrics.py                            79      3     18      3    94%   13, 75, 117
+src\institutional_factor_platform\scenarios\__init__.py                       2      0      0      0   100%
+src\institutional_factor_platform\scenarios\engine.py                        27      1      8      1    94%   46
+src\institutional_factor_platform\statistical_tests\__init__.py               2      0      0      0   100%
+src\institutional_factor_platform\statistical_tests\tests.py                 26      2      4      2    87%   17, 31
+---------------------------------------------------------------------------------------------------------------------
+TOTAL                                                                      8575    589   2482    415    91%
+Required test coverage of 90% reached. Total coverage: 90.52%
+=============== 330 passed, 115 warnings in 1444.39s (0:24:04) ================
+--- END FINAL FULL-SUITE OUTPUT ---
+Additional evidence checks: all 50 IDs stable/unchecked; 12 Phase1 records; 38 untouched; 48 factor inventory entries; 31 numerical reconciliation rows; 8 unavailable empirical paths; 160 working source hashes authenticated; main/README/config/data/paper history preserved.
+PDF inventory: two 30-page historical Git PDFs recovered, hashed and text-inspected; no editing or visual QA claimed. Published Table8 LOW/BASE/HIGH components additionally checked by the numerical evidence script. Documentary identity48*715447=34341456 checked; not a valid-value count verification.
