@@ -266,6 +266,8 @@ class AssetPricingResearchService:
                 "confidence_level": self.config.confidence_level,
                 "limitations": [
                     "Project-specific characteristic spreads are not official provider factors.",
+                    "Historical hou_xue_zhang_q is a study-specific q-style mapping; "
+                    "interpret ROE using bound factor_mappings, not as an exact HXZ replication.",
                     "Statistical association is not causal evidence.",
                 ],
                 "model_specifications": {

@@ -70,6 +70,13 @@ def _phase2_tables(periods: int = 20) -> tuple[pd.DataFrame, pd.DataFrame]:
                     {
                         "security_id": security,
                         "date": current,
+                        "factor_id": "market_return",
+                        "raw_value": market + risk_free,
+                        "available_at": available,
+                    },
+                    {
+                        "security_id": security,
+                        "date": current,
                         "factor_id": "excess_return",
                         "raw_value": market,
                         "available_at": available,
