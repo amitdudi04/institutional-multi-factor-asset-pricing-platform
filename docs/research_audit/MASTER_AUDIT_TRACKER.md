@@ -689,3 +689,11 @@ Judge **financial accuracy, point-in-time validity, source-vintage clarity, pric
 - No prior master tracker exists in current main. Earlier engineering audit reports survive in the research tag, including `docs/PHASE1_AUDIT_REPORT.md`, `docs/PHASE1_REAUDIT_REPORT.md`, `docs/PHASE1_FINAL_REAUDIT_REPORT.md`; these use a different historical engineering phase taxonomy. Their unique evidence is retained in Git history and is not automatically treated as financial-issue closure.
 - No pre-existing uncommitted changes in this fresh clone. Other user checkouts were not altered or assumed clean.
 - This initial commit establishes all 50 issue IDs unchanged. Phase 1 investigation follows this commit; no issue is yet resolved.
+
+## Phase 1 calculation checkpoint — 1 November 2026
+
+P1: confirmed function defect in `risk/metrics.py::drawdown`: the initial peak omitted NAV=1. Synthetic [-0.2,0.1] originally returned 0 drawdown, independently expected -0.2. Running peak now has a floor of 1.0. The seven path regressions include falling, recovery, positive/negative constant and flat paths. Published strategy effects remain SOURCE_EVIDENCE_BLOCKED; no frozen net paths are present.
+
+D8: confirmed incomplete-history publication defect in `factors/portfolio.py::compute_factor_portfolios`: constituent returns could cover fewer sessions, or an inner join could remove a formed security. Added a fail-closed check for every formed member against the supplied common benchmark calendar, including duplicate or null returns. No synthetic terminal return is inserted. The benchmark-calendar test now uses complete security histories; four additional regressions reject first/last/all/null missing evidence. A missing session for the entire supplied panel remains undetectable without the external trading calendar, and a final truncated sample is not established as a full monthly observation.
+
+Before correction: `uv run pytest tests/test_research_phase1_audit.py --no-cov -q` produced 8 failed / 16 passed (four initial-loss cases and four incomplete-holding cases failed). After correction: six targeted modules produced 88 passed; expanded independent reference suite produced 29 passed. Full phase verification is pending. No historical numerical output was recalculated or overwritten. Complete issue records and unresolved acceptance gates follow in the phase report.

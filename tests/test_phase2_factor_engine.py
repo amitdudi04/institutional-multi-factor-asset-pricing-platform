@@ -443,7 +443,6 @@ def test_factor_portfolio_uses_one_authenticated_benchmark_calendar() -> None:
             }
             for current in (date(2020, 2, 3), date(2020, 2, 4), date(2020, 3, 2))
             for number, security_id in enumerate(securities, start=1)
-            if not (current == date(2020, 2, 3) and security_id == securities[-1])
         ]
     )
     portfolios = compute_factor_portfolios(factors, characteristics, market)

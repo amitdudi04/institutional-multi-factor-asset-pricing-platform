@@ -47,7 +47,8 @@ def rolling_beta(returns: pd.Series, benchmark: pd.Series, window: int) -> pd.Se
 
 def drawdown(returns: pd.Series) -> pd.Series:
     wealth = (1.0 + returns).cumprod()
-    return wealth / wealth.cummax() - 1.0
+    # Initial capital is a peak even when the first observed period loses money.
+    return wealth / wealth.cummax().clip(lower=1.0) - 1.0
 
 
 def maximum_drawdown(returns: pd.Series) -> float:
