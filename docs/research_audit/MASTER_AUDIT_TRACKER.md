@@ -1,0 +1,691 @@
+# Institutional Multi-Factor Asset Pricing Platform — Master Audit and Phase Tracker
+
+> **WORKING RESEARCH CONTROL DOCUMENT — NOT A CLAIM OF COMPLETED VALIDATION**  
+> Source: attached 1 November 2026 professor audit. Repo: https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform  
+> This file catalogs **49 numbered A–E audit issues (D1–D9, AP1–AP10, P1–P12, ML1–ML10, R1–R8)** plus **V1** (provider-vintage issue). Each starts **unchecked / UNASSESSED** until Codex collects evidence. Earlier audit severities are hypotheses; they are not automatic proof that all publication metrics are wrong.
+
+## Rules of engagement
+
+1. **Git safety:** record current `main` SHA; create `research/institutional-phase1-financial-audit` from it. Later phases use separate branches chained from accepted prior phase commits. No edits to `main`, force-push, deleted branches, source-vintage replacement, manuscripts or old CSVs until final review/authorized merge.
+2. **Immutability:** preserve original manuscript, frozen public research outputs, all original manifests, price data and configuration hashes. Corrected evidence gets a new version and traceable before/after records. Do not make historical paper numbers silently match new computations.
+3. **One issue at a time:** check this file at the start; choose first unresolved issue whose dependencies are ready; search for existing verified evidence first; run only missing targeted diagnostics; write evidence artifacts; mark and commit completion; continue. Avoid reading entire codebase every run. Full final tests once per accepted phase, not after each issue.
+4. **Status vocabulary:** `UNASSESSED`, `IN_PROGRESS`, `VERIFIED_CORRECT`, `CONFIRMED_ERROR_FIXED`, `RESEARCH_LIMITATION_DISCLOSED`, `SOURCE_EVIDENCE_BLOCKED`, `NEEDS_REVIEW`. A checked box means evidence and acceptance criteria have been recorded, **not necessarily that an inherent limitation was eliminated**. Blocked items stay unchecked unless the evidence limitation and manuscript-safe wording were specifically reviewed and approved; then use `RESEARCH_LIMITATION_DISCLOSED`, not `VERIFIED_CORRECT`.
+5. **Evidence minimum:** include source paths and relevant functions/lines, exact original and corrected formula/units, independent reference calculation when numerical, dated run ID, git SHA, input/source hashes, tests, output file(s), scientific consequence and reviewer rationale. No unsubstantiated "fixed" claims.
+6. **Fail-fast gates:** stop dependent stages for a genuine uncorrected lookahead leak, invalid NAV/cost accounting, mismatched publication hashes or unresolved changed principal outputs. Do not upgrade unresolved results to supported claims.
+7. **Research integrity:** no fake factor signals, backfilled delisted prices, fabricated SEC evidence, invented shareholder classes, parameter tuning for improved Sharpe, manufactured significant p-values or misleading AI/author attestations.
+8. **Scope:** the research question remains public-source US equity factors, point-in-time data, asset pricing, portfolios and ML. Additional experiments must directly answer a listed issue and have a written ex-ante rationale.
+
+## Frozen historical claims requiring source-level reconciliation
+
+| Claim | Historical reported value | Final verification required |
+|---|---:|---|
+| Candidate / accepted / rejected securities | 822 / 487 / 335 | Screening tables and rejection reasons |
+| Daily market / PIT fundamental rows | 715,447 / 37,273 | Source and deduplication keys; availability |
+| Configured / estimable factor definitions | 48 / 47 | Registry and authenticated factor outputs |
+| Factor long-form rows | 34,341,456 | Output schema and hashes |
+| Asset pricing model test assets | 123 | Constituents, dates, independence and model intersection |
+| CAPM / FF3 / Carhart / FF5 / configured q mean adjusted R² | .063 / .259 / .277 / .301 / .296 | Independent OLS and matched samples |
+| Minimum-variance volatility | 10.00% | Monthly net return path / frequency |
+| Maximum-diversification MDD | −5.43% | **Initial NAV=1** computation |
+| CVaR cumulative net return / Sharpe | 83.17% / 1.667 | Trades, fees, NAV, risk-free series and constraints |
+| ML observations / months / completed folds | 27,640 / 91 / 17 | Authenticated chronological fold files |
+| Software tests | 301 passing, 90.52% branch-aware coverage | Re-run on exact code+environment; not proof of empirical reproduction |
+
+## Dependency map and phase gates
+
+| Phase | Work | Must be complete before next phase |
+|---|---|---|
+| 0 | Snapshot main, inventory source/vintages, file hashes, existing output and test manifests; create branch | Baseline manifest and immutable source IDs |
+| 1 | D1–D9, V1, **early P1/P2 financial blockers** | Verified data dates/conventions and reported NAV/cost effect; versioned corrections |
+| 2 | AP1–AP10 | Five model family comparisons checked against factors and matched portfolio samples |
+| 3 | Remaining P1–P12, ML1–ML10 | Eight portfolio result paths and all 17 ML folds reconciled |
+| 4 | R1–R8 | Paper vs source traceability; empirical corrections frozen; author-only declarations separated |
+| 5 | README + clean GitHub publication | Only approved outputs, no lost provenance, CI and documentation pass |
+
+**Do not automatically start Phase 2 from this first Codex prompt.** First create/commit this living tracker, then carry out Phase 1 and return the evidence and updated tracker for independent review. Subsequent phases should use the same tracker without restarting the review.
+
+## Completion checklist index
+
+- **Phase 1 — Raw financial integrity, point-in-time data and provenance** — D1–D9, V1, plus early escalation of P1/P2
+- **Phase 2 — Factors and five asset-pricing models** — AP1–AP10 and Phase 1 dependencies
+- **Phase 3 — Eight portfolios and walk-forward ML** — P1–P12, ML1–ML10
+- **Phase 4 — Manuscript/results reconciliation and publication integrity** — R1–R8
+- **Phase 5 — Final README and repository publication** — Only after Phase 1–4 signoff
+
+## Issue register and detailed instructions
+
+
+### Phase 1 — Raw financial integrity, point-in-time data and provenance
+
+#### [ ] D1 — The initial 822 securities come from a source-selected universe, not a reconstructed historical US equity universe. How severe is the survivorship bias?
+
+- **Phase / severity from initial audit:** 1 / High; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** The initial 822 securities come from a source-selected universe, not a reconstructed historical US equity universe. How severe is the survivorship bias? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `data universe screening manifests; docs/DATA_AND_SOURCES.md`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Compare acceptance/rejection by calendar year and delisting status; quantify source-selected coverage, the number of terminal-event exclusions and the sensitivity of factor findings to later, deeper-coverage years. Never call this a CRSP-like historical universe.
+- **Initial audit requested:** Check delisted-firm coverage and period-specific selection.
+- **Deliverable:** `outputs/audit/yearly_screening_and_lifecycle.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** A defensible selection-bias diagnostic is filed; if original rejects cannot be reconstructed, mark SOURCE_BLOCKED and qualify population claims.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] D2 — The data provider switches from PiTrading consolidated evidence to IEX around March 2022. Does this distort liquidity factors?
+
+- **Phase / severity from initial audit:** 1 / High; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** The data provider switches from PiTrading consolidated evidence to IEX around March 2022. Does this distort liquidity factors? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `data provenance; factor liquidity definitions; docs/DATA_AND_SOURCES.md`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Identify the PiTrading→IEX boundary and compare matched securities, adjusted price/volume continuity, bid/ask or turnover proxies where available; do not misinterpret a change in venue coverage as changed market liquidity. Quantify before/after factor coverage and structural jumps using frozen data.
+- **Initial audit requested:** Compare liquidity-factor behavior before and after the source break.
+- **Deliverable:** `outputs/audit/source_transition_comparison.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** Demonstrate which factor conclusions remain comparable across the source break, or limit them to source-consistent periods.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] D3 — The market panel has only 1–4 securities on some 2018 dates. Can meaningful cross-sectional factors be constructed then?
+
+- **Phase / severity from initial audit:** 1 / High; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** The market panel has only 1–4 securities on some 2018 dates. Can meaningful cross-sectional factors be constructed then? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `factor portfolios; factors/portfolio.py; factor preprocessing configuration`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Compute each date’s eligible-security count, each factor’s formation-date breadth, quantile occupancy and earliest valid date. Compare early sparse years with 2020+; reject tiny or single-name quantiles if the declared formation standard requires it.
+- **Initial audit requested:** Identify the first valid formation date for each factor and exclude inadequate breadth.
+- **Deliverable:** `outputs/audit/factor_breadth_by_date.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** Every reported factor observation has sufficient authenticated breadth under its stated rule; exceptions are labeled.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] D4 — Are SEC fundamental facts joined using filing acceptance and actual tradable availability, rather than fiscal period end?
+
+- **Phase / severity from initial audit:** 1 / High; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Are SEC fundamental facts joined using filing acceptance and actual tradable availability, rather than fiscal period end? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `SEC acquisition/normalization; factors/temporal.py; source manifests`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Sample original EDGAR accession/acceptance timestamps, fiscal period ends, amendments, effective-dated security joins and first eligible trade sessions. Test same-day/after-close availability and reject stale hindsight replacement.
+- **Initial audit requested:** Audit several securities and amendments independently.
+- **Deliverable:** `outputs/audit/sec_pit_case_studies.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** All sampled features are available strictly before their claimed decisions, or affected values are corrected and propagated.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] D5 — Are share classes, ticker changes and issuer-level SEC facts properly separated?
+
+- **Phase / severity from initial audit:** 1 / High; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Are share classes, ticker changes and issuer-level SEC facts properly separated? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `universe security mapping code; listing and CIK audit files`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Select difficult ticker changes, delistings, multiple listed classes and multiple CIK/listing associations. Trace permanent keys and date-effective joins; reject a CIK used as a unique tradable share-class key.
+- **Initial audit requested:** Verify difficult CIK/listing examples.
+- **Deliverable:** `outputs/audit/identity_case_studies.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** No unsupported issuer-to-security lookahead mapping persists in the validated sample.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] D6 — Could requiring complete shares, fundamentals and terminal-event evidence select financially healthier firms?
+
+- **Phase / severity from initial audit:** 1 / High; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Could requiring complete shares, fundamentals and terminal-event evidence select financially healthier firms? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `screening decisions; rejection evidence; annual breadth`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Quantify rejected-versus-accepted groups by reason, time, industry, known lifecycle and available risk/returns; measure potential survivorship and selection bias, not assume missing returns are zero.
+- **Initial audit requested:** Analyze rejection characteristics and missingness.
+- **Deliverable:** `outputs/audit/selection_bias_report.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** Selection effects and excluded populations are explicitly bounded; missing comparisons are identified.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] D7 — Why is the equity_issuance factor non-estimable?
+
+- **Phase / severity from initial audit:** 1 / Medium; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Why is the equity_issuance factor non-estimable? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `factor definitions; SEC concept mappings`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Inspect equity issuance formula, required input concepts, amendments and share-equity reconciliation. Give concrete rejected data examples; do not impute missing issuance or count 48 as 48 estimable.
+- **Initial audit requested:** Provide concrete missing-source examples; retain the negative result.
+- **Deliverable:** `outputs/audit/equity_issuance_evidence.md` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** 47 estimable and one not-estimable remain consistently identified unless genuinely corrected source evidence changes status.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] D8 — Could partial holding-period observations create biased factor portfolio returns?
+
+- **Phase / severity from initial audit:** 1 / High; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Could partial holding-period observations create biased factor portfolio returns? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `src/institutional_factor_platform/factors/portfolio.py; holding-period market rows`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** For every formed quantile, compare scheduled formation/exit dates and constituent realized-return coverage. Identify securities ending early, missing terminal-event returns, partial holding periods, and whether aggregation mistakenly treats them as full-period investments. Test synthetic delisting/partial-history cases.
+- **Initial audit requested:** Verify common holding calendars and incomplete histories.
+- **Deliverable:** `outputs/audit/holding_period_coverage.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** A matched holding-calendar accounting rule is validated; any corrected factor series receives versioned outputs.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] D9 — Are the 48 factor definitions genuinely distinct and point-in-time?
+
+- **Phase / severity from initial audit:** 1 / High; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Are the 48 factor definitions genuinely distinct and point-in-time? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `factor definitions; config/factors.yaml or actual configuration`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** List all 48 factor IDs, economic formula, units, required inputs, lookback, availability lag, direction, duplicate proxies and dates with valid cross-sections. Independently reproduce representative calculations including 12–1 momentum, leverage and liquidity.
+- **Initial audit requested:** Audit definitions, timing, annualization and duplicate economic exposures.
+- **Deliverable:** `outputs/audit/factor_definition_inventory.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** All 48 registry entries are distinct as defined, 47 estimable status is supported, and no lookahead/units error remains.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] V1 — HF Data Library historical price-adjustment vintage may differ from current files
+
+- **Phase / severity from initial audit:** 1 / High; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** HF Data Library historical price-adjustment vintage may differ from current files A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `HF Data Library archives; acquisition checksums; provider release history`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Inspect HF Data Library original retrieval manifests and source archives to identify adjusted-vs-split-adjusted-vs-dividend-total-return vintage. Compare provider change documentation only as a source-version risk; never replace historical files with fresh download. Quantify sensitivity where paired legitimate frozen vintages exist.
+- **Initial audit requested:** Check original archived return basis.
+- **Deliverable:** `outputs/audit/price_vintage_verification.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** The price-return convention and archived source vintage are proved, or manuscript return labels are limited accordingly.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+
+### Phase 2 — Factors and five asset-pricing models
+
+#### [ ] AP1 — Why is mean CAPM adjusted R² only 0.063?
+
+- **Phase / severity from initial audit:** 2 / High; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Why is mean CAPM adjusted R² only 0.063? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `src/institutional_factor_platform/asset_pricing/inputs.py; regression engine; config/asset_pricing.yaml`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Reconstruct CAPM regressions for selected test assets from frozen monthly excess returns and market_excess. Check dates, benchmark composition, decimal units, missingness, adjusted R² calculation and 24-observation minimum.
+- **Initial audit requested:** Inspect benchmark definition, portfolio return units and aligned regression samples.
+- **Deliverable:** `outputs/audit/capm_regression_reproduction.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** Explain or correct the mean adjusted R²=0.063 from independent aligned samples.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] AP2 — Are all 123 diagnostic portfolios valid, sufficiently populated and independently informative?
+
+- **Phase / severity from initial audit:** 2 / High; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Are all 123 diagnostic portfolios valid, sufficiently populated and independently informative? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `factor portfolio publication; asset pricing comparisons`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Inventory all 123 dependent portfolios: unique underlying factor/quantile, holdings, overlap, observation counts, formation timing and effective exposure. Identify reused or highly correlated test assets.
+- **Initial audit requested:** Inspect asset IDs, formation dates and overlap.
+- **Deliverable:** `outputs/audit/test_asset_inventory.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** 123 counts and effective degrees of independence are transparently described.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] AP3 — Are some explanatory factors constructed using securities that also define the dependent test portfolios?
+
+- **Phase / severity from initial audit:** 2 / High; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Are some explanatory factors constructed using securities that also define the dependent test portfolios? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `asset_pricing/inputs.py; factor portfolio memberships`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Trace test-portfolio holdings and explanatory H–L factor long/short legs to the same source membership. Quantify overlap and evaluate feasible leave-one-group-out or externally published factor benchmarks without searching for better performance.
+- **Initial audit requested:** Assess mechanical overlap and propose a disjoint-universe or external-factor check.
+- **Deliverable:** `outputs/audit/factor_test_asset_overlap.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** Mechanical common-composition effects are quantified or expressly acknowledged.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] AP4 — Does the study's “q mapping” genuinely represent the Hou–Xue–Zhang model?
+
+- **Phase / severity from initial audit:** 2 / High; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Does the study's “q mapping” genuinely represent the Hou–Xue–Zhang model? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `config/asset_pricing.yaml; cited q factor literature`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** For each configured q mapping, compare research-defined ME, IA and ROE with published q-factor definitions. Specifically establish that earnings_yield is not accounting ROE, and that log market cap is not necessarily the published q-size return factor. Rename the specification when appropriate.
+- **Initial audit requested:** Retain study-specific labeling; clarify earnings yield versus return on equity.
+- **Deliverable:** `outputs/audit/q_mapping_definition_audit.md` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** No claim of exact Hou–Xue–Zhang factor replication remains without matching methodology.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] AP5 — Why do 85.4% of CAPM portfolio intercept tests and 92.7% of FF5 tests have unadjusted p-values below 0.05?
+
+- **Phase / severity from initial audit:** 2 / High; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Why do 85.4% of CAPM portfolio intercept tests and 92.7% of FF5 tests have unadjusted p-values below 0.05? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `regression engine, diagnostics, asset pricing coefficient parquet`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Recompute HAC intercept estimate, SE, t, p and monthly alpha for each of 123×5 tests. Check intercept reference return, lags and two-sided p distribution; report multiplicity-aware exploratory summaries and dependence caveats.
+- **Initial audit requested:** Reconstruct intercept tests, factor alignments and multiplicity.
+- **Deliverable:** `outputs/audit/intercept_significance_audit.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** 85.4% and 92.7% nominal rejection shares are reconciled or corrected; no unadjusted evidence called FDR-controlled.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] AP6 — Why does FF5 improve adjusted R² but have a higher mean alpha and higher share of nominally significant intercepts than several other models?
+
+- **Phase / severity from initial audit:** 2 / High; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Why does FF5 improve adjusted R² but have a higher mean alpha and higher share of nominally significant intercepts than several other models? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `asset pricing comparisons and coefficients`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Compare matched-sample adjusted R² against pricing-error magnitudes: signed alpha, absolute alpha, RMSE and nominal/adjusted rejection shares. Identify why FF5 may fit better while leaving larger intercept errors; separate descriptive fit from pricing success.
+- **Initial audit requested:** Discuss model fit and pricing errors as separate criteria.
+- **Deliverable:** `outputs/audit/pricing_fit_vs_alpha.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** Model comparison explains, rather than conceals, the conflicting rankings.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] AP7 — Is Newey–West lag 3 appropriate for these monthly series?
+
+- **Phase / severity from initial audit:** 2 / High; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Is Newey–West lag 3 appropriate for these monthly series? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `regression/engine.py, diagnostics and dated residual series`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Check monthly residual ACF and HAC choices 0,3,6 and 12 where enough observations exist. Record estimator implementation, finite sample and differences in t/p values without choosing lags based on desired significance.
+- **Initial audit requested:** Examine residual autocorrelation and lag sensitivity.
+- **Deliverable:** `outputs/audit/hac_lag_sensitivity.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** Inference robustness is reported alongside the pre-existing lag-3 choice.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] AP8 — Do the 123 tests share correlated test assets?
+
+- **Phase / severity from initial audit:** 2 / High; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Do the 123 tests share correlated test assets? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `asset pricing residual series; factor holdings`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Compute return/residual correlation between the 123 overlapping portfolios, identify repeated constituents and correlated test errors, and explain why the shares of significant intercepts are not independent trials.
+- **Initial audit requested:** Evaluate cross-portfolio dependence and reject naïve independent-test interpretations.
+- **Deliverable:** `outputs/audit/test_asset_dependence.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** Inference discussion reflects correlation and effective test-family structure.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] AP9 — Are the FF5, Carhart and q specifications actually estimated on identical dates and portfolio populations?
+
+- **Phase / severity from initial audit:** 2 / Medium; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Are the FF5, Carhart and q specifications actually estimated on identical dates and portfolio populations? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `asset pricing model comparisons`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Match portfolio IDs, sample start/end, observation counts, risk-free rate and input timestamps across CAPM/FF3/Carhart/FF5/q; provide complete-case intersection comparison where required.
+- **Initial audit requested:** Confirm matched-sample comparison.
+- **Deliverable:** `outputs/audit/model_common_sample_audit.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** Fit comparisons reflect genuinely matched assets and dates or are labeled non-comparable.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] AP10 — Why do H1 and H3 remain inconclusive despite the project containing a large factor registry and rolling regressions?
+
+- **Phase / severity from initial audit:** 2 / High; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Why do H1 and H3 remain inconclusive despite the project containing a large factor registry and rolling regressions? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `hypothesis registry; rolling regressions; original manifests`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Find the frozen hypothesis definitions, complete factor-level cost comparisons and original rolling-decision rules for H1/H3. Recover authentic artifacts; do not recreate a preregistration after observing results.
+- **Initial audit requested:** Recover original decision artifacts if possible, without inventing tests.
+- **Deliverable:** `outputs/audit/hypothesis_h1_h3_provenance.md` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** H1/H3 become supported/not-supported only with reconstructable preregistered criteria; otherwise remain inconclusive.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+
+### Phase 3 — Eight portfolios and walk-forward ML
+
+#### [ ] P1 — Does maximum drawdown include initial wealth?
+
+- **Phase / severity from initial audit:** 3 / Critical; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Does maximum drawdown include initial wealth? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `src/institutional_factor_platform/risk/metrics.py; monthly portfolio return parquet`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Construct initial NAV=1 before return observations; test [-20%,+10%], strictly falling, flat and rebound paths. Independently recompute eight strategies from frozen net returns, compare old/new max drawdown and propagate genuine changes into a new output version.
+- **Initial audit requested:** Correct and independently rerun the risk metric.
+- **Deliverable:** `outputs/audit/mdd_before_after.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** Both function tests and all eight authentic empirical MDDs reconcile; historical published numbers remain archived.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] P2 — Do the stated one-way transaction costs match the actual L1 implementation?
+
+- **Phase / severity from initial audit:** 3 / Critical; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Do the stated one-way transaction costs match the actual L1 implementation? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `src/institutional_factor_platform/backtest/costs.py; config/portfolio.yaml; frozen transaction parquet`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Define one-way turnover=0.5×sum(abs(trade)) for fully invested rebalances; compare current cost expression commission*L1 + half-spread*L1 + slippage*L1 with claimed 5/10/20-bps cost labels. Show buy, sell, full switch, initial deployment, and drift rebalance examples. Reconcile the original trade-by-trade fees without automatically halving costs or retuning.
+- **Initial audit requested:** Derive and test the fee convention.
+- **Deliverable:** `outputs/audit/fee_units_and_reconciliation.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** Cost convention is explicit and every fee equals the recorded trades, with any convention error versioned and propagated.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] P3 — Are eight strategies evaluated on exactly the same portfolio returns and rebalance dates?
+
+- **Phase / severity from initial audit:** 3 / High; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Are eight strategies evaluated on exactly the same portfolio returns and rebalance dates? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `portfolio manifests; src/institutional_factor_platform/portfolio/service.py`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Compare all eight strategy return matrices, factor-asset IDs, calendar dates, training windows, rebalance dates, benchmark and risk-free settings. Detect asset drift and unequal time horizons.
+- **Initial audit requested:** Verify matched data and accounting.
+- **Deliverable:** `outputs/audit/strategy_calendar_comparison.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** Like-for-like comparison is verified or incomparable strategies are labeled.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] P4 — Do factor-portfolio test assets represent investable returns?
+
+- **Phase / severity from initial audit:** 3 / High; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Do factor-portfolio test assets represent investable returns? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `factor portfolio definitions, portfolio service, docs/LIMITATIONS.md`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Identify portfolio building blocks as research factor quantiles rather than directly traded products. Document whether each quantile requires short legs, stale weights, infeasible component trades or omitted constituent transaction costs.
+- **Initial audit requested:** Disclose constituent and short-leg implementation constraints.
+- **Deliverable:** `outputs/audit/factor_portfolio_investability.md` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** Reported results are correctly labeled diagnostic/theoretical rather than implementable alpha absent execution evidence.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] P5 — Are equal-weight and optimized strategies evaluated with identical costs and initial deployment?
+
+- **Phase / severity from initial audit:** 3 / High; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Are equal-weight and optimized strategies evaluated with identical costs and initial deployment? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `backtest/engine.py, costs.py and allocations/transactions files`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Confirm initial cash→weights, rebalance pretrade drift, one-way trade notional, cost deduction, buy/hold cash assumptions, budget balance and equivalent costs for 1/N and optimized methods. Test a 2-asset hand-calculated path.
+- **Initial audit requested:** Reconcile trading decisions, pretrade holdings and fees.
+- **Deliverable:** `outputs/audit/portfolio_accounting_identity.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** All eight reconciled NAV paths match modeled fees; treatment is consistent.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] P6 — Why does CVaR have the highest observed cumulative return, 83.17%, despite not optimizing mean return?
+
+- **Phase / severity from initial audit:** 3 / High; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Why does CVaR have the highest observed cumulative return, 83.17%, despite not optimizing mean return? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `optimization/engine.py; portfolio weights; scenarios`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Reconstruct CVaR weights, factor exposures, turnover and worst-case outcomes by date; verify optimizer only minimizes trailing historical tail-loss and did not use future window scenarios. Attribute 83.17% gain to observed exposures rather than assuming objective rewards return.
+- **Initial audit requested:** Review allocation concentration and the short sample's historical exposures.
+- **Deliverable:** `outputs/audit/cvar_exposure_attribution.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** CVaR return and risk are reconciled and short-sample interpretation is qualified.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] P7 — Why is the portfolio test only about 32 months?
+
+- **Phase / severity from initial audit:** 3 / High; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Why is the portfolio test only about 32 months? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `portfolio dates and net paths`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Calculate portfolio test sample duration/effective rebalance count; compare ranking stability by calendar segments or subperiods only where observations suffice. Avoid unjustified bootstrap precision from 32 months.
+- **Initial audit requested:** Evaluate statistical power and regime dependence.
+- **Deliverable:** `outputs/audit/portfolio_sample_uncertainty.md` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** Rankings are treated as sample-specific rather than persistent outperformance.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] P8 — Does the CVaR optimizer use genuine past observations exclusively?
+
+- **Phase / severity from initial audit:** 3 / Medium; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Does the CVaR optimizer use genuine past observations exclusively? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `portfolio/service.py; optimizer/engine.py`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** For every rebalance, verify optimizer scenario matrix and risk estimates use returns strictly before trading date; inject a future observation as an adversarial temporal test.
+- **Initial audit requested:** Check scenario timing at every rebalance.
+- **Deliverable:** `outputs/audit/cvar_timing_test_record.md` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** No forward scenario leaks into investment decisions.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] P9 — Are maximum-Sharpe and mean–variance optimizers subject to identical feasible sets?
+
+- **Phase / severity from initial audit:** 3 / Medium; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Are maximum-Sharpe and mean–variance optimizers subject to identical feasible sets? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `optimization/engine.py; config/portfolio.yaml`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Inspect constraint sets, objectives, estimation windows, annualization, risk-free input and optimizer convergence for all eight models. Compare feasible sets explicitly; avoid presenting different objectives as a controlled single-variable experiment.
+- **Initial audit requested:** Inspect objectives, risk-free assumptions and constraints.
+- **Deliverable:** `outputs/audit/optimizer_fairness_matrix.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** Constraint/frequency differences are justified and documented.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] P10 — Is “fixed impact allowance” an empirical market-impact estimate?
+
+- **Phase / severity from initial audit:** 3 / Medium; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Is “fixed impact allowance” an empirical market-impact estimate? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `costs.py, config/portfolio.yaml, README and paper`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Identify fixed impact allowance as a flat modeled bps assumption folded into slippage, not estimated square-root market impact. Check no text claims nonlinear observed execution.
+- **Initial audit requested:** Clarify that it is only a cost assumption.
+- **Deliverable:** `outputs/audit/impact_assumption_audit.md` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** Cost wording matches implementation and capacity is not claimed.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] P11 — Are VaR and CVaR reported for monthly returns with the correct horizon labels?
+
+- **Phase / severity from initial audit:** 3 / Medium; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Are VaR and CVaR reported for monthly returns with the correct horizon labels? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `risk/metrics.py and portfolio returns`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Independently recompute monthly VaR95/ES95 on net monthly portfolio returns, check 5% tail sample size, unit signs and distinction from daily risk horizons.
+- **Initial audit requested:** Verify return frequency and quantile definitions.
+- **Deliverable:** `outputs/audit/var_es_horizon_audit.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** Risk labels specify frequency and the positive-loss convention.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] P12 — Does the paper include sufficient uncertainty around portfolio performance rankings?
+
+- **Phase / severity from initial audit:** 3 / High; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Does the paper include sufficient uncertainty around portfolio performance rankings? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `portfolio monthly return parquet`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Compute same-date paired performance differences and confidence bounds on 8 strategy returns where feasible; account for small 32-month sample and multiplicity. Keep otherwise descriptive ranks.
+- **Initial audit requested:** Use appropriate paired tests or state that rankings are descriptive.
+- **Deliverable:** `outputs/audit/portfolio_rank_uncertainty.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** No strategy proclaimed superior solely on point estimates.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] ML1 — Are there truly 91 usable monthly dates but only 17 complete final folds?
+
+- **Phase / severity from initial audit:** 3 / High; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Are there truly 91 usable monthly dates but only 17 complete final folds? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `ml/splits.py; ML manifest; feature target dates`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Rebuild all monthly decision and 60/12/1 fold boundaries with 1-month embargo; count 91 months, excluded months, 17 complete tests and any gaps.
+- **Initial audit requested:** Reconstruct the exact fold schedule.
+- **Deliverable:** `outputs/audit/ml_fold_calendar.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** Every claimed fold is derived from actual dated observations.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] ML2 — Does label purging eliminate every 21-session overlap at train/validation/test boundaries?
+
+- **Phase / severity from initial audit:** 3 / High; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Does label purging eliminate every 21-session overlap at train/validation/test boundaries? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `ml/splits.py; ml/targets.py`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** For each fold intersect target [start,end] intervals with validation/test dates; assert training targets cannot overlap later partitions and validate boundary inclusivity on month ends.
+- **Initial audit requested:** Test interval intersections.
+- **Deliverable:** `outputs/audit/ml_purge_interval_tests.md` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** No label leakage at partition boundaries.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] ML3 — Is the one-month embargo consistently applied without unnecessary use of later information?
+
+- **Phase / severity from initial audit:** 3 / High; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Is the one-month embargo consistently applied without unnecessary use of later information? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `ML split config; preprocessing/model selection`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Compute effective embargo durations relative to the 21-session target horizon; test first/last eligible training observations and ensure no future validation metric enters training.
+- **Initial audit requested:** Check boundary dates and feature timestamps.
+- **Deliverable:** `outputs/audit/ml_embargo_audit.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** Embargo and purging constraints protect each test decision.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] ML4 — Are all cross-sectional input features available before the monthly investment decision?
+
+- **Phase / severity from initial audit:** 3 / High; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Are all cross-sectional input features available before the monthly investment decision? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `features provenance; ml feature table; factors/temporal.py`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Trace book-to-market SEC availability and 12–1 momentum formation dates to prediction timestamps; inspect securities with amendments, holidays, after-close filings, missing-price histories.
+- **Initial audit requested:** Independently sample point-in-time feature rows.
+- **Deliverable:** `outputs/audit/ml_feature_pit_samples.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** No feature timestamp after the decision is used.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] ML5 — Is the reported economic strategy constructed only from predictions actually generated before the corresponding holding period?
+
+- **Phase / severity from initial audit:** 3 / High; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Is the reported economic strategy constructed only from predictions actually generated before the corresponding holding period? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `ml/economic.py; predictions; folds; costs`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** For representative folds verify prediction file is authenticated, generated at or before decision, joined only to future realized returns, and ranking allocator does not use future outcomes. Reconcile selected assets with economic portfolio trades.
+- **Initial audit requested:** Reconcile decisions, forecasts and realized returns.
+- **Deliverable:** `outputs/audit/ml_prediction_to_pnl_trace.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** Forecast-to-trade-to-PnL chain is reproducible without future information.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] ML6 — Why do linear and factor-composite ICs match to six decimals?
+
+- **Phase / severity from initial audit:** 3 / Medium; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Why do linear and factor-composite ICs match to six decimals? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `ML predictions, model fits and benchmark outputs`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Compare factor composite and linear predictions vector-by-vector, coefficients, training design matrix and rank transformation; explain exact six-decimal IC identity and check duplicate output artifacts.
+- **Initial audit requested:** Verify whether they are identical or nearly equivalent forecasts.
+- **Deliverable:** `outputs/audit/ml_linear_composite_equivalence.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** Identical results are explained by identical rankings or traced to a real duplication defect.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] ML7 — Why is Ridge almost identical to linear?
+
+- **Phase / severity from initial audit:** 3 / Medium; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Why is Ridge almost identical to linear? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `ML model settings and fit records`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Measure Ridge vs linear coefficient/forecast/rank differences under scaling, feature collinearity and chosen alpha. Test that regularization was implemented and applied to training folds only.
+- **Initial audit requested:** Inspect standardized feature distributions and regularization strength.
+- **Deliverable:** `outputs/audit/ml_ridge_linear_check.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** Near-matching results are explained and correctly labeled.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] ML8 — Are the 17 fold-level ICs independent enough for ordinary bootstrap resampling?
+
+- **Phase / severity from initial audit:** 3 / High; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Are the 17 fold-level ICs independent enough for ordinary bootstrap resampling? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `fold metrics and resampling code`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Examine serial dependence of 17 fold ICs; compare basic bootstrap with conservative block-based or leave-period-out sensitivity when sample size permits, without promising strong significance.
+- **Initial audit requested:** Evaluate temporal dependence and alternative uncertainty reporting.
+- **Deliverable:** `outputs/audit/ml_ic_uncertainty_sensitivity.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** IC intervals and limits are accurately communicated.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] ML9 — Are economic gains compared on a consistent capital-allocation and transaction-cost basis?
+
+- **Phase / severity from initial audit:** 3 / High; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Are economic gains compared on a consistent capital-allocation and transaction-cost basis? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `ml/economic.py; backtest engine; economic folds`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Reconcile one-period selected holdings, gross/net return, transaction costs, ranking selection fraction, benchmark exposure, zero/historical-mean baselines and cumulative effect across folds.
+- **Initial audit requested:** Verify actual portfolio turnover and benchmark returns.
+- **Deliverable:** `outputs/audit/ml_after_cost_reconciliation.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** The reported economic signals correspond to actual out-of-sample decisions and fees.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] ML10 — Can the SHAP versus permutation-importance disagreement be explained by feature correlation and sample size?
+
+- **Phase / severity from initial audit:** 3 / Medium; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Can the SHAP versus permutation-importance disagreement be explained by feature correlation and sample size? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `ml explainability outputs and configurations`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Trace SHAP/permutation/coefficient definitions; compare feature correlations, fold sample sizes and model stability; distinguish model diagnostics from causal factor importance.
+- **Initial audit requested:** Inspect attribution definitions and stability.
+- **Deliverable:** `outputs/audit/ml_explainability_comparison.md` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** Different rankings are explained or labeled inconclusive, not causal.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+
+### Phase 4 — Manuscript/results reconciliation and publication integrity
+
+#### [ ] R1 — Does the tagged research commit reproduce every manuscript table?
+
+- **Phase / severity from initial audit:** 4 / High; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Does the tagged research commit reproduce every manuscript table? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `research paper PDF; docs/RESULTS.md; published manifests`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Map each manuscript number, table and figure to frozen publication ID, source file, sha256, transform and display precision. Check contradictions including 487/715447/37273, R², 83.17%, MDD and ML folds.
+- **Initial audit requested:** Generate a source-to-table evidence matrix.
+- **Deliverable:** `outputs/audit/paper_to_source_traceability.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** Every material manuscript claim is reproducible or explicitly marked pending.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] R2 — Are frozen raw inputs and complete manifests available to an independent authorized researcher?
+
+- **Phase / severity from initial audit:** 4 / High; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Are frozen raw inputs and complete manifests available to an independent authorized researcher? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `source catalogs; manifests; docs/REPRODUCIBILITY.md`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** List raw/provider files, hash, retrieved date, license and lawful availability; test original-input provenance without redistributing restricted bytes.
+- **Initial audit requested:** Check archival inventory and data access.
+- **Deliverable:** `outputs/audit/frozen_inputs_and_rights.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** A third party can distinguish reproducible code from unavailable raw data.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] R3 — Does 301 passing tests prove empirical correctness?
+
+- **Phase / severity from initial audit:** 4 / Medium; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Does 301 passing tests prove empirical correctness? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `pytest/CI reports; run manifests`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Separate synthetic correctness tests, CI, integrity hashes, archived data reconstruction and full empirical rerun. Test selected arithmetic identities independently.
+- **Initial audit requested:** Distinguish software tests from financial-result reproduction.
+- **Deliverable:** `outputs/audit/validation_coverage_matrix.md` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** 301 tests never described as proof of independent empirical correctness.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] R4 — Are the factor, portfolio and ML result IDs tied to exact parent data hashes?
+
+- **Phase / severity from initial audit:** 4 / Medium; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Are the factor, portfolio and ML result IDs tied to exact parent data hashes? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `publication manifests, source lineage`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Trace source market/fundamental hashes through factor, asset-pricing, portfolio and ML publications; check each parent-child ID and stale cache rejection.
+- **Initial audit requested:** Authenticate complete lineage.
+- **Deliverable:** `outputs/audit/publication_lineage_graph.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** Every output has a valid immutable parent chain or an explicit blocker.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] R5 — Are the README and paper using the same nomenclature, windows, and units?
+
+- **Phase / severity from initial audit:** 4 / Medium; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Are the README and paper using the same nomenclature, windows, and units? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `README.md; docs; PDF; config`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Search README, methods, results, paper and configs for mismatch in annualized vs cumulative, gross vs net, cost bps, sample dates, q label, significant alpha and point-in-time terms.
+- **Initial audit requested:** Audit sentence-level claims.
+- **Deliverable:** `outputs/audit/claims_consistency_register.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** No unresolved substantive internal wording or value contradiction.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] R6 — Are the author funding, conflict, supervisory and AI-assistance statements fully verified?
+
+- **Phase / severity from initial audit:** 4 / High; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Are the author funding, conflict, supervisory and AI-assistance statements fully verified? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `manuscript declarations and relevant publisher policy`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Prepare author-only attestation checklist for funding, conflicts, supervision, AI assistance, actual consulted sources and independent human review; never auto-sign or silently delete material disclosure.
+- **Initial audit requested:** Confirm personally; do not invent declarations.
+- **Deliverable:** `outputs/audit/author_attestations_pending.md` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** Personal facts remain pending until verified by the author.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] R7 — Are the paper's IEEE-style figure and table layouts sufficiently readable?
+
+- **Phase / severity from initial audit:** 4 / Medium; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Are the paper's IEEE-style figure and table layouts sufficiently readable? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `paper DOCX/PDF and figure sources`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Render all paper pages, inspect dense tables, formulas, references and appendix; preserve editable version, ensure no clipping or unreadable legends.
+- **Initial audit requested:** Inspect all pages and legends.
+- **Deliverable:** `outputs/audit/manuscript_visual_qc.md` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** Every page is visually checked only when actually rendered and inspected.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+#### [ ] R8 — Are all references and dataset DOIs correct and accessible?
+
+- **Phase / severity from initial audit:** 4 / Medium; **status:** `UNASSESSED`.
+- **Why this matters / failure mode:** Are all references and dataset DOIs correct and accessible? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
+- **Inspect first:** `bibliography and provider docs`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
+- **Detailed verification and candidate correction:** Verify references, provider URLs and DOIs against authoritative sources; correct metadata without inventing consulted editions or author claims.
+- **Initial audit requested:** Verify publisher/provider metadata.
+- **Deliverable:** `outputs/audit/reference_verification.csv` (or an equivalent, documented path); record source input hashes, exact calculations and explanatory caveats. **Never overwrite old frozen result artifacts.**
+- **Acceptance gate:** Citations are complete, relevant and supported.
+- **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
+
+## Mandatory cross-cutting corrections and adversarial tests
+
+- **Initial-NAV drawdown (early blocker P1):** test `[-0.2,+0.1]` against an expected −20% drawdown, strictly declining series, first-period losses, all-positive and zero-return paths. Include starting wealth in running peak. Report whether each published portfolio MDD actually changes; do not extrapolate from a synthetic test.
+- **Fee convention (early blocker P2):** define `L1 = Σ|Δw|` and one-way notional `½L1` for self-financing rebalances. Current code uses spread/2 and slippage per absolute traded-weight unit. A 100% A→B switch has `L1=2`, so a quoted 10 bps per traded side can produce 20 bps NAV fee. That is not automatically an error: independently reconcile all 5/10/20 bps definitions, including initial deployment and observed archived trade logs, before changing costs.
+- **Horizon consistency:** factor portfolios must not silently use only the returns available for securities that disappear before the common exit date. Check terminal events, delisting risk, constituent source gaps and treatment of monthly factor portfolios as non-investable research building blocks.
+- **Price adjustments:** verify actual acquisition vintage, split/dividend conventions, source-change date and hashes. Claims about an external October 2026 provider change must be checked against primary provider documentation before being treated as established. Never assume present-day provider data equal the original vintage.
+- **Pricing factor definition:** a project-specific q-factor mapping based on `earnings_yield` is not accounting ROE; a high-minus-low characteristic spread is not automatically the published factor portfolio definition. Check units, signs and paired sample alignment.
+- **Multiple comparisons:** report number of regression alphas and inferential dependencies; 85.4% CAPM and 92.7% FF5 *nominal* significant shares cannot by themselves support a pricing discovery. Adjusted R² improvement need not imply lower pricing errors.
+- **ML economics:** a 21-session forward target requires timestamp-aware purging, month-close/market-close availability validation and predictions frozen before the holding window. Check fold calendar and economic strategy fills separately.
+- **Publication controls:** original manuscript remains historical; any corrected output must have a new manifest, before/after comparison and author-approved wording. The author, not Codex, must verify actual funding, conflicts, supervision and AI-assisted work.
+
+## Checkpoint template — append once per completed issue
+
+```
+Issue: <ID>
+Status: <one permitted status>
+Phase: <1-5>
+Observed failure / verified-correct behavior: <specific evidence>
+Original code/output hash: <sha256 or N/A with explanation>
+Independent numerical calculation: <formula, values, units, test>
+Source files and lines: <paths + symbol/line>
+Changed files: <minimal diff>
+Historical value -> corrected value: <both, or unchanged>
+Empirical impact: <what findings change, and what does not>
+Paper claim / table impact: <table/section and proposed correction>
+CI and test evidence: <command, observed outcome, run URL>
+Residual limitation: <what still cannot be known>
+Commit SHA and validation date: <value>
+Reviewer approval / next blocker: <result>
+```
+
+## Per-phase signoff template
+
+```
+Phase number:
+Branch and baseline SHA:
+Issue IDs completed / unresolved:
+Before/after outputs and publication IDs:
+True implementation errors fixed:
+Items still source blocked or research-limited:
+Exact tests actually run (with counts):
+Verified immutable original evidence:
+Files changed and justification:
+Paper/README intentionally not edited? [yes/no]
+Next dependency gate: PASS / PASS_WITH_LIMITATIONS / BLOCKED
+```
+
+## Final professor/committee gate
+
+Judge **financial accuracy, point-in-time validity, source-vintage clarity, pricing-test independence, investability of factor portfolios, net portfolio accounting, valid ML chronology, inference and claims**. Passing software tests alone does not satisfy any empirical gate. Favor precise negative or inconclusive results over artificially high metrics. No applicant-specific admissions score or claimed university endorsement is part of the empirical audit.
+
+## Final Git safety and publication gate
+
+- Commit all tracker updates and versioned evidence to phase-specific working branches. `main` remains unchanged during Phases 1–4.
+- Preserve original empirical source hashes, old manuscript, and evidence history. Avoid deleting artifacts that have provenance value.
+- Only an explicitly authorized, reviewed Phase 5 PR may update the public `main` branch after all critical issues are resolved or accurately bounded.
+- A concise README should link to the final verified sources and distinguish paper-vintage results from later revised study results. No paper changes silently applied to the already-posted SSRN version.
+
+## Verified repository baseline — 1 November 2026
+
+- Live GitHub main and clean fresh clone: `4e7fbdc380b8042db72e9c628260f60077a205ef`.
+- Working branch: `research/institutional-phase1-financial-audit`, created directly from that main.
+- Other remote branches: `audit/fix-period-alignment-risk-metrics` at `ce36c399c1e64686de25d3f5702e22cd13647b8b`; `research/correct-return-frequency-and-risk-metrics-2026-10-13` at `51ae02815b20c1c857d17b243023847b32ad2934`.
+- Open PRs: #8 (draft, ce36c39) and #7 (51ae028); both propose financial corrections, neither merged. Closed PRs #2–6 merged; #1 closed unmerged. Existing PR evidence must be independently checked before reuse.
+- Baseline Actions run 37338079331: completed/success. PR #8 run 38409266153 success; PR #7 run 38303222633 failure. These are software CI observations, not independent empirical reproduction.
+- README and methodology: `README.md`, `docs/METHODOLOGY.md`, `docs/DATA_AND_SOURCES.md`, `docs/RESULTS.md`, `docs/LIMITATIONS.md`, `docs/REPRODUCIBILITY.md`.
+- Structure: `src/institutional_factor_platform` data/adapters, factors, asset pricing, backtest, portfolio, risk, ML, research-output storage and delivery; `tests/`, `config/`, `.github/workflows/quality.yml`.
+- Both research tags resolve to the historical empirical release identified as `5a3e930665756fa7aaedeceb5f9ab90792bcf849` (tag target verification recorded in Phase 1 manifest).
+- Current main contains no original PDF/DOCX/TeX manuscript or empirical source/output files. Historical `docs/FINAL_RESEARCH_PAPER.md` is available through the research tag; it names factor publication `factor-5a73616f131fca2102fa2ca4141ad64f` and pricing publication `asset-pricing-c0a72fae5349f1048e18557250da1927`. Names alone do not authenticate absent publications.
+- `data/` contains only access notes; third-party data, generated Parquet, manifests and outputs are excluded by `.gitignore`. No original market/fundamental observations, frozen portfolio net paths or transactions are supplied in the clean clone. Existing source hashes/manifests cannot be validated until their actual bytes are located.
+- No prior master tracker exists in current main. Earlier engineering audit reports survive in the research tag, including `docs/PHASE1_AUDIT_REPORT.md`, `docs/PHASE1_REAUDIT_REPORT.md`, `docs/PHASE1_FINAL_REAUDIT_REPORT.md`; these use a different historical engineering phase taxonomy. Their unique evidence is retained in Git history and is not automatically treated as financial-issue closure.
+- No pre-existing uncommitted changes in this fresh clone. Other user checkouts were not altered or assumed clean.
+- This initial commit establishes all 50 issue IDs unchanged. Phase 1 investigation follows this commit; no issue is yet resolved.
