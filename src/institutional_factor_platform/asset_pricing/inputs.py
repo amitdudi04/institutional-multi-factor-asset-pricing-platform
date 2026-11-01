@@ -127,10 +127,10 @@ def build_research_panel(
             .agg(min_quantile="min", max_quantile="max")
             .reset_index()
         )
-        complete = bounds.loc[bounds["min_quantile"] != bounds["max_quantile"]]
+        complete = bounds.loc[bounds["min_quantile"].eq(1) & bounds["max_quantile"].eq(3)]
         if complete.empty:
             raise DataQualityError(f"Factor {factor_id} lacks both extreme portfolios")
-        # Early formation intervals may contain only one quantile. Exclude those intervals.
+        # Missing extremes never turn a surviving middle quantile into an extreme.
         selected = selected.merge(complete[keys], on=keys, validate="many_to_one")
         low = selected.merge(
             complete[[*keys, "min_quantile"]], on=keys, validate="many_to_one"
