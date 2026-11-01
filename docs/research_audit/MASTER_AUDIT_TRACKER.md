@@ -660,9 +660,9 @@
 
 - **Phase3 complete validation (1 November2026):** previous `UNASSESSED`; current `RESEARCH_LIMITATION_DISCLOSED`. Exact source `ml/validation.py::tree_explanations` under `src/institutional_factor_platform` unless explicitly scripts/config. Permutation uses validation prediction loss; SHAP explains test predictions with historical background. Top disagreement RF7/17→7/15;XGB10/17→6/15; feature correlation≈-.1875. Limit/manuscript consequence: Different estimands/samples and instability can disagree; causal explanation/importance is not established. Evidence `../../outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md`, issue/reconciliation files and full source manifest. Portfolio/MLfit source `0fe382f`; MLmetric-only source `9df5455`; final evidence is the containing commit.6new regressions,91targeted and372full pass/90.62%; originals preserved; all before/after values and hashes recorded. Reviewer `PENDING`.
 
-#### [ ] R1 — Does the tagged research commit reproduce every manuscript table?
+#### [x] R1 — Does the tagged research commit reproduce every manuscript table?
 
-- **Phase / severity from initial audit:** 4 / High; **status:** `UNASSESSED`.
+- **Phase / severity from initial audit:** 4 / High; **status:** `RESEARCH_LIMITATION_DISCLOSED`.
 - **Why this matters / failure mode:** Does the tagged research commit reproduce every manuscript table? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
 - **Inspect first:** `research paper PDF; docs/RESULTS.md; published manifests`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
 - **Detailed verification and candidate correction:** Map each manuscript number, table and figure to frozen publication ID, source file, sha256, transform and display precision. Check contradictions including 487/715447/37273, R², 83.17%, MDD and ML folds.
@@ -671,9 +671,12 @@
 - **Acceptance gate:** Every material manuscript claim is reproducible or explicitly marked pending.
 - **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
 
-#### [ ] R2 — Are frozen raw inputs and complete manifests available to an independent authorized researcher?
 
-- **Phase / severity from initial audit:** 4 / High; **status:** `UNASSESSED`.
+- **Phase4 manuscript reconciliation (1 November2026):** previous `UNASSESSED`; current `RESEARCH_LIMITATION_DISCLOSED`. All359 digit-containing original PDF passages inventoried;249 legacy field records inspected;222 revised table rows,81 numerical narrative paragraphs and26equations mapped. Unsupported scenario/legacy-only risk cells omitted explicitly. Original hypotheses preserved; author statements pending. Evidence: `../../outputs/audit/phase4/PHASE4_MANUSCRIPT_VALIDATION.md`, `PHASE4_CLAIM_TRACEABILITY.csv; manuscript Tables I-XV and Appendices A-L` and source/checksum manifest. Source baseline `f22f5cbe365e98c8d5fef6b5308ff765703df173`; new manuscript `IMFP-P4-2026-11-01`; exact review checkpoint is the containing Phase4 commit. Tests:27rendered pages/26tables/6figures/26equations;843cells and all corrected table/interval values pass;27reference identities; author preservation PASS. Remaining limitation and paper consequence: Every material claim is reproducible within stated evidence or explicitly qualified/pending; missing H1/H3 approval is not repaired. Independent human review `PENDING`.
+
+#### [x] R2 — Are frozen raw inputs and complete manifests available to an independent authorized researcher?
+
+- **Phase / severity from initial audit:** 4 / High; **status:** `RESEARCH_LIMITATION_DISCLOSED`.
 - **Why this matters / failure mode:** Are frozen raw inputs and complete manifests available to an independent authorized researcher? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
 - **Inspect first:** `source catalogs; manifests; docs/REPRODUCIBILITY.md`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
 - **Detailed verification and candidate correction:** List raw/provider files, hash, retrieved date, license and lawful availability; test original-input provenance without redistributing restricted bytes.
@@ -682,9 +685,12 @@
 - **Acceptance gate:** A third party can distinguish reproducible code from unavailable raw data.
 - **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
 
-#### [ ] R3 — Does 301 passing tests prove empirical correctness?
 
-- **Phase / severity from initial audit:** 4 / Medium; **status:** `UNASSESSED`.
+- **Phase4 manuscript reconciliation (1 November2026):** previous `UNASSESSED`; current `RESEARCH_LIMITATION_DISCLOSED`. Public code/configuration/audit evidence separated from private frozen Parquet and model bundles. Lawful original-input access is required; current vendor downloads do not reproduce source vintage. Evidence: `../../outputs/audit/phase4/PHASE4_MANUSCRIPT_VALIDATION.md`, `Manuscript Data and code availability; PHASE4_PUBLICATION_SOURCE_MANIFEST.json` and source/checksum manifest. Source baseline `f22f5cbe365e98c8d5fef6b5308ff765703df173`; new manuscript `IMFP-P4-2026-11-01`; exact review checkpoint is the containing Phase4 commit. Tests:27rendered pages/26tables/6figures/26equations;843cells and all corrected table/interval values pass;27reference identities; author preservation PASS. Remaining limitation and paper consequence: Original vendor retrieval/adjustment and redistribution permissions remain bounded; no private raw data published. Independent human review `PENDING`.
+
+#### [x] R3 — Does 301 passing tests prove empirical correctness?
+
+- **Phase / severity from initial audit:** 4 / Medium; **status:** `VERIFIED_CORRECT`.
 - **Why this matters / failure mode:** Does 301 passing tests prove empirical correctness? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
 - **Inspect first:** `pytest/CI reports; run manifests`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
 - **Detailed verification and candidate correction:** Separate synthetic correctness tests, CI, integrity hashes, archived data reconstruction and full empirical rerun. Test selected arithmetic identities independently.
@@ -693,9 +699,12 @@
 - **Acceptance gate:** 301 tests never described as proof of independent empirical correctness.
 - **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
 
-#### [ ] R4 — Are the factor, portfolio and ML result IDs tied to exact parent data hashes?
 
-- **Phase / severity from initial audit:** 4 / Medium; **status:** `UNASSESSED`.
+- **Phase4 manuscript reconciliation (1 November2026):** previous `UNASSESSED`; current `VERIFIED_CORRECT`. 372tests/90.62%coverage are attributed to accepted Phase3,not new Phase4 execution or proof of causality/PIT/investability. Document checks independently verify843table cells and corrected values. Evidence: `../../outputs/audit/phase4/PHASE4_MANUSCRIPT_VALIDATION.md`, `Manuscript Section X/Appendix J; PHASE4_TEST_AND_FORMAT_QA.txt` and source/checksum manifest. Source baseline `f22f5cbe365e98c8d5fef6b5308ff765703df173`; new manuscript `IMFP-P4-2026-11-01`; exact review checkpoint is the containing Phase4 commit. Tests:27rendered pages/26tables/6figures/26equations;843cells and all corrected table/interval values pass;27reference identities; author preservation PASS. Remaining limitation and paper consequence: Software assurance is distinct from empirical provenance and economic generalizability. Independent human review `PENDING`.
+
+#### [x] R4 — Are the factor, portfolio and ML result IDs tied to exact parent data hashes?
+
+- **Phase / severity from initial audit:** 4 / Medium; **status:** `VERIFIED_CORRECT`.
 - **Why this matters / failure mode:** Are the factor, portfolio and ML result IDs tied to exact parent data hashes? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
 - **Inspect first:** `publication manifests, source lineage`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
 - **Detailed verification and candidate correction:** Trace source market/fundamental hashes through factor, asset-pricing, portfolio and ML publications; check each parent-child ID and stale cache rejection.
@@ -704,9 +713,12 @@
 - **Acceptance gate:** Every output has a valid immutable parent chain or an explicit blocker.
 - **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
 
+
+- **Phase4 manuscript reconciliation (1 November2026):** previous `UNASSESSED`; current `VERIFIED_CORRECT`. 32final accepted corrected portfolio/ML authority pairs and264smallJSON artifacts authenticate against stored hashes. Corrected factor/pricing parents retained; ML actual historical raw-score/cost dependencies distinguished from quantile returns. Evidence: `../../outputs/audit/phase4/PHASE4_MANUSCRIPT_VALIDATION.md`, `Manuscript Appendix H; PHASE4_PUBLICATION_SOURCE_MANIFEST.json` and source/checksum manifest. Source baseline `f22f5cbe365e98c8d5fef6b5308ff765703df173`; new manuscript `IMFP-P4-2026-11-01`; exact review checkpoint is the containing Phase4 commit. Tests:27rendered pages/26tables/6figures/26equations;843cells and all corrected table/interval values pass;27reference identities; author preservation PASS. Remaining limitation and paper consequence: No result IDs regenerated; final ML IDs exclude superseded intermediates. Large source hashes reused through540stat guards. Independent human review `PENDING`.
+
 #### [ ] R5 — Are the README and paper using the same nomenclature, windows, and units?
 
-- **Phase / severity from initial audit:** 4 / Medium; **status:** `UNASSESSED`.
+- **Phase / severity from initial audit:** 4 / Medium; **status:** `RESEARCH_LIMITATION_DISCLOSED`.
 - **Why this matters / failure mode:** Are the README and paper using the same nomenclature, windows, and units? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
 - **Inspect first:** `README.md; docs; PDF; config`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
 - **Detailed verification and candidate correction:** Search README, methods, results, paper and configs for mismatch in annualized vs cumulative, gross vs net, cost bps, sample dates, q label, significant alpha and point-in-time terms.
@@ -715,9 +727,12 @@
 - **Acceptance gate:** No unresolved substantive internal wording or value contradiction.
 - **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
 
+
+- **Phase4 manuscript reconciliation (1 November2026):** previous `UNASSESSED`; current `RESEARCH_LIMITATION_DISCLOSED`. Revised manuscript consistently uses matched cycle alphas,31portfolio cycles,89common monthly dates/15folds,internal q-style mapping and L1 fees. README lines17,19-22 retain historical/conflicting wording; deferred to Phase5 by instruction. Evidence: `../../outputs/audit/phase4/PHASE4_MANUSCRIPT_VALIDATION.md`, `Manuscript Tables VI-XIV; Phase4 validation report README conflict register` and source/checksum manifest. Source baseline `f22f5cbe365e98c8d5fef6b5308ff765703df173`; new manuscript `IMFP-P4-2026-11-01`; exact review checkpoint is the containing Phase4 commit. Tests:27rendered pages/26tables/6figures/26equations;843cells and all corrected table/interval values pass;27reference identities; author preservation PASS. Remaining limitation and paper consequence: Cross-document acceptance remains open because README must remain unchanged; this checkbox stays unchecked. Independent human review `PENDING`.
+
 #### [ ] R6 — Are the author funding, conflict, supervisory and AI-assistance statements fully verified?
 
-- **Phase / severity from initial audit:** 4 / High; **status:** `UNASSESSED`.
+- **Phase / severity from initial audit:** 4 / High; **status:** `SOURCE_EVIDENCE_BLOCKED`.
 - **Why this matters / failure mode:** Are the author funding, conflict, supervisory and AI-assistance statements fully verified? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
 - **Inspect first:** `manuscript declarations and relevant publisher policy`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
 - **Detailed verification and candidate correction:** Prepare author-only attestation checklist for funding, conflicts, supervision, AI assistance, actual consulted sources and independent human review; never auto-sign or silently delete material disclosure.
@@ -726,9 +741,12 @@
 - **Acceptance gate:** Personal facts remain pending until verified by the author.
 - **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
 
-#### [ ] R7 — Are the paper's IEEE-style figure and table layouts sufficiently readable?
 
-- **Phase / severity from initial audit:** 4 / Medium; **status:** `UNASSESSED`.
+- **Phase4 manuscript reconciliation (1 November2026):** previous `UNASSESSED`; current `SOURCE_EVIDENCE_BLOCKED`. User explicitly authorizes supplied14pageSSRN source and instructs verbatim preservation of author name,SRM/contact,funding,conflicts,supervision and other declarations. Native-text comparison confirms all4declaration blocks/headings unchanged after whitespace normalization. Evidence: `../../outputs/audit/phase4/PHASE4_MANUSCRIPT_VALIDATION.md`, `PHASE4_AUTHOR_CONFIRMATIONS.md; PHASE4_CLAIM_TRACEABILITY.csv author records` and source/checksum manifest. Source baseline `f22f5cbe365e98c8d5fef6b5308ff765703df173`; new manuscript `IMFP-P4-2026-11-01`; exact review checkpoint is the containing Phase4 commit. Tests:27rendered pages/26tables/6figures/26equations;843cells and all corrected table/interval values pass;27reference identities; author preservation PASS. Remaining limitation and paper consequence: Preservation instruction is not independent verification or final author attestation. AI wording is retained verbatim; actual audit/revision assistance and human review require author assessment. No venue selected. Independent human review `PENDING`.
+
+#### [x] R7 — Are the paper's IEEE-style figure and table layouts sufficiently readable?
+
+- **Phase / severity from initial audit:** 4 / Medium; **status:** `VERIFIED_CORRECT`.
 - **Why this matters / failure mode:** Are the paper's IEEE-style figure and table layouts sufficiently readable? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
 - **Inspect first:** `paper DOCX/PDF and figure sources`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
 - **Detailed verification and candidate correction:** Render all paper pages, inspect dense tables, formulas, references and appendix; preserve editable version, ensure no clipping or unreadable legends.
@@ -737,9 +755,12 @@
 - **Acceptance gate:** Every page is visually checked only when actually rendered and inspected.
 - **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
 
-#### [ ] R8 — Are all references and dataset DOIs correct and accessible?
 
-- **Phase / severity from initial audit:** 4 / Medium; **status:** `UNASSESSED`.
+- **Phase4 manuscript reconciliation (1 November2026):** previous `UNASSESSED`; current `VERIFIED_CORRECT`. Final27pages rendered via native Word PDF export and bundled Poppler;allpages visually inspected. Final pages1-26are pixel-byte-identical to inspected pages;final27reinspected.26tables/6figures/26editableOMML equations;no clipped or missing content. Evidence: `../../outputs/audit/phase4/PHASE4_MANUSCRIPT_VALIDATION.md`, `FINAL_REVISED_MANUSCRIPT.pdf; PHASE4_TEST_AND_FORMAT_QA.txt` and source/checksum manifest. Source baseline `f22f5cbe365e98c8d5fef6b5308ff765703df173`; new manuscript `IMFP-P4-2026-11-01`; exact review checkpoint is the containing Phase4 commit. Tests:27rendered pages/26tables/6figures/26equations;843cells and all corrected table/interval values pass;27reference identities; author preservation PASS. Remaining limitation and paper consequence: Packaged render_docx failed because LibreOffice unavailable; native Word fallback and PNG review are recorded. Neutral academic review format,no invented journal template. Independent human review `PENDING`.
+
+#### [x] R8 — Are all references and dataset DOIs correct and accessible?
+
+- **Phase / severity from initial audit:** 4 / Medium; **status:** `VERIFIED_CORRECT`.
 - **Why this matters / failure mode:** Are all references and dataset DOIs correct and accessible? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
 - **Inspect first:** `bibliography and provider docs`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
 - **Detailed verification and candidate correction:** Verify references, provider URLs and DOIs against authoritative sources; correct metadata without inventing consulted editions or author claims.
@@ -890,3 +911,10 @@ D3tiny samples,D4complete PIT,D5exhaustive class attribution,V1exact return basi
 ## Phase3 complete signoff — 1 November2026
 
 `PHASE3_VERIFIED_WITH_LIMITATIONS`. Branch `research/institutional-phase3-validation`, exact base277c95bd4ba7279e6863bc3acc026d406a8ad482. AllP1-P12/ML1-ML10 investigated:7verified,4fixed issues covering5distinct defects,8disclosed limitations,3source-blocked. All50IDs retained. Historical maximum-diversification MDD-5.43%is verified; initial-NAV effect0 for all8historical maxima.24new portfolio publications preserve8methods and3fee scenarios;32old cycles become31full cycles. CVaR83.17%/Sharpe1.667 becomes73.68%/1.252; cash-only repair on old path gives1.379. Corrected ML has27632rows/89true monthly dates/15folds,not27640/91distinct dates/17folds. Eight existing families retrained only for confirmed calendar/label changes; later metric-only republishing does not refit models. Positive nominal IC intervals do not establish stable economic value; economic checks remain isolated1-session resets,not21-session investments. Final372tests pass/90.62%;91targeted pass. Preliminary broad run interrupted58%after an actual-data constant-IC defect; one complete final run after the final core correction. Accepted1230regressions and11352factor-return experiment were not repeated. P8/ML4/ML5source-blocked;D4/V1unchanged. Main,previousbranches,originalpapers/README/data/publications preserved. NoPhase4editing orPhase5cleanup.
+
+- **Phase4 manuscript reconciliation (1 November2026):** previous `UNASSESSED`; current `VERIFIED_CORRECT`. All27 materially used reference identities checked against DOI registry/publisher/provider metadata. Corrected dataset title/explicitURLs and current access dates; historical consultation not retroactively attested. Evidence: `../../outputs/audit/phase4/PHASE4_MANUSCRIPT_VALIDATION.md`, `References; PHASE4_PUBLICATION_SOURCE_MANIFEST.json reference_verification` and source/checksum manifest. Source baseline `f22f5cbe365e98c8d5fef6b5308ff765703df173`; new manuscript `IMFP-P4-2026-11-01`; exact review checkpoint is the containing Phase4 commit. Tests:27rendered pages/26tables/6figures/26equations;843cells and all corrected table/interval values pass;27reference identities; author preservation PASS. Remaining limitation and paper consequence: Current HF documentation/Zenodo record describes October2026 restructuring; not a replacement for frozen historical-vintage evidence. Bibliographic checks do not attest author consultation. Independent human review `PENDING`.
+
+
+## Phase4 manuscript signoff — 1 November2026
+
+`PHASE4_READY_WITH_AUTHOR_CONFIRMATIONS`. Branch `research/institutional-phase4-manuscript-revision`, exact base `f22f5cbe365e98c8d5fef6b5308ff765703df173`. AllR1-R8 investigated;4verified-correct,3disclosed limitations,1source-blocked. R5(deferredREADME) andR6(author attestation) remain unchecked. All50stable IDs retained; upstream source/timing/hypothesis blockers unchanged. New27page revision has26tables,6figures and26editable equations;843cells checked and allpages rendered/inspected.954traceability records include359original digit-containing passages. Author-designated14page SSRN text governs; author details and4declaration blocks preserved verbatim. Manuscript hash/delivery boundaries and source identities are in the Phase4manifest. No financial-code/model/main/README/historical-manuscript change or new research experiment. Human review pending; stop beforePhase5.

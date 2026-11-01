@@ -10,3 +10,9 @@
 /scripts/research_phase3*.py text eol=lf
 /tests/test_research_phase3_audit.py text eol=lf
 /outputs/audit/phase3/** text eol=lf
+
+# Canonical bytes for Phase4 text evidence; manuscript binaries stay binary.
+/outputs/audit/phase4/*.md text eol=lf
+/outputs/audit/phase4/*.csv text eol=lf
+/outputs/audit/phase4/*.json text eol=lf
+/outputs/audit/phase4/*.txt text eol=lf
