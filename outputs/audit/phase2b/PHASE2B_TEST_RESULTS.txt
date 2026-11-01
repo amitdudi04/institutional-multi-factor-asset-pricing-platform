@@ -1,0 +1,173 @@
+Phase2B final verification 2026-11-01
+Empirical source checkpoint 291447199fe603f0168d972ee77b88c4d949f205
+uv run pytest tests/test_phase2b_holding.py tests/test_phase3_asset_pricing.py -q --no-cov:37passed/7.32s
+Baseline extreme-regression:original accepted240rows;corrected rejects absent genuineQ1.
+uv run mypy src:PASS115files
+uv run ruff check .:PASS
+uv run ruff format --check .:PASS156files
+uv lock --check:PASS96packages
+uv run institutional-factor-platform validate-delivery-config:PASS
+uv run institutional-factor-platform verify-delivery-platform:PASS
+uv run python scripts/research_phase2b.py:PASS source gate,new factor,primary/supplementary pricing
+Independent11352returns max8.33e-17;1230fits max6.48e-14(tolerance1e-8).
+Independent spread/market/cash/dependentexcess max0;CI/t/R2/RSE exact;AIC/BICmax1.71e-13.
+Original/new publication,source/supplementary hashes PASS;main/Phase1/2/older remoteheads unchanged.
+PandasPeriod metadata warning disclosed;independent month ordinals confirm no primary gaps.
+Full suite(executed once):
+........................................................................ [ 20%]
+........................................................................ [ 40%]
+........................................................................ [ 60%]
+........................................................................ [ 80%]
+......................................................................   [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\amitk\Documents\Codex\2026-11-01\codex-master-prompt-institutional-multi-factor\work\repo\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+tests/test_full_platform_connected.py: 4 warnings
+tests/test_phase5_ml.py: 102 warnings
+  C:\Users\amitk\Documents\Codex\2026-11-01\codex-master-prompt-institutional-multi-factor\work\repo\.venv\Lib\site-packages\pandas\core\nanops.py:1632: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
+    return spearmanr(a, b)[0]
+
+tests/test_phase5_ml.py::test_service_trains_publishes_and_restarts_authenticated_bundle
+tests/test_phase5_ml.py::test_service_trains_publishes_and_restarts_authenticated_bundle
+tests/test_phase5_ml.py::test_service_baseline_explainability_is_explicitly_not_applicable
+tests/test_phase5_ml.py::test_service_executes_remaining_temporal_split_modes[walk_forward-2]
+tests/test_phase5_ml.py::test_service_economic_evaluation_reuses_authenticated_phase4_engine_and_costs
+tests/test_phase5_ml.py::test_service_tree_model_persists_permutation_and_local_shap_evidence
+  C:\Users\amitk\Documents\Codex\2026-11-01\codex-master-prompt-institutional-multi-factor\work\repo\src\institutional_factor_platform\ml\evaluation.py:155: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
+    result = function(left, right)  # type: ignore[operator]
+
+tests/test_phase5_ml.py::test_service_classifier_calibrates_only_on_validation_and_persists_identity
+  C:\Users\amitk\Documents\Codex\2026-11-01\codex-master-prompt-institutional-multi-factor\work\repo\.venv\Lib\site-packages\sklearn\model_selection\_split.py:812: UserWarning: The least populated class in y has only 4 members, which is less than n_splits=5.
+    warnings.warn(
+
+tests/test_phase5_ml.py::test_service_classifier_calibrates_only_on_validation_and_persists_identity
+  C:\Users\amitk\Documents\Codex\2026-11-01\codex-master-prompt-institutional-multi-factor\work\repo\.venv\Lib\site-packages\sklearn\model_selection\_split.py:812: UserWarning: The least populated class in y has only 3 members, which is less than n_splits=5.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=============================== tests coverage ================================
+______________ coverage: platform win32, python 3.12.13-final-0 _______________
+
+Name                                                                      Stmts   Miss Branch BrPart  Cover   Missing
+---------------------------------------------------------------------------------------------------------------------
+src\institutional_factor_platform\__init__.py                                 6      2      0      0    67%   7-8
+src\institutional_factor_platform\api\__init__.py                             2      0      0      0   100%
+src\institutional_factor_platform\api\app.py                                126      3     12      1    97%   70-71, 158
+src\institutional_factor_platform\api\middleware.py                          82      3     28      3    95%   49, 85, 101
+src\institutional_factor_platform\asset_pricing\__init__.py                   2      0      0      0   100%
+src\institutional_factor_platform\asset_pricing\config.py                    54      0     14      0   100%
+src\institutional_factor_platform\asset_pricing\inputs.py                    92      3     38      4    95%   46->60, 106, 142, 170
+src\institutional_factor_platform\asset_pricing\models.py                    22      0      8      0   100%
+src\institutional_factor_platform\asset_pricing\service.py                  128     11     22      2    91%   54, 56, 368-370, 393-394, 426-431
+src\institutional_factor_platform\backtest\__init__.py                        2      0      0      0   100%
+src\institutional_factor_platform\backtest\costs.py                          25      2      8      2    88%   27, 40
+src\institutional_factor_platform\backtest\engine.py                         48      3     16      3    91%   38, 40, 58
+src\institutional_factor_platform\cli.py                                    365     46    124     15    85%   297, 311-315, 342, 503-508, 515-517, 555, 574-577, 585-586, 594-595, 603-604, 612-620, 628-636, 644-650, 660-674, 691-710
+src\institutional_factor_platform\configuration.py                           37      1      8      0    98%   37
+src\institutional_factor_platform\constraints\__init__.py                     2      0      0      0   100%
+src\institutional_factor_platform\constraints\models.py                      63      1     44      2    97%   63, 81->80
+src\institutional_factor_platform\dashboard\__init__.py                       2      0      0      0   100%
+src\institutional_factor_platform\dashboard\app.py                           85      4     22      3    93%   34-36, 72->74, 162
+src\institutional_factor_platform\dashboard\client.py                        53      7     18      4    79%   38->40, 59, 64-69
+src\institutional_factor_platform\dashboard\launcher.py                      21      0      4      1    96%   18->20
+src\institutional_factor_platform\dashboard\presentation.py                  35      0     10      0   100%
+src\institutional_factor_platform\data\__init__.py                            0      0      0      0   100%
+src\institutional_factor_platform\data\access.py                            143      9     30      4    92%   83-84, 139->119, 143->175, 169-170, 248-252
+src\institutional_factor_platform\data\bound.py                              17      0      6      0   100%
+src\institutional_factor_platform\data\calendar.py                           11      0      0      0   100%
+src\institutional_factor_platform\data\config.py                            209      8     40     10    93%   89, 119, 133, 179, 241->243, 244->246, 247->249, 255-256, 265->278, 273->275, 276->278, 279-280
+src\institutional_factor_platform\data\contracts.py                          32      2      2      0    94%   26-27
+src\institutional_factor_platform\data\domain.py                            265     18     46     15    88%   131, 174, 176, 178, 182, 197, 199, 201, 203, 233-236, 302, 304, 306, 308, 310
+src\institutional_factor_platform\data\evidence.py                           48      5      8      0    91%   61-66
+src\institutional_factor_platform\data\lineage.py                           244      0     66      0   100%
+src\institutional_factor_platform\data\manifests.py                         166      6     30      6    94%   52, 56, 160, 162, 166, 168
+src\institutional_factor_platform\data\sec_concepts.py                       24      0      2      0   100%
+src\institutional_factor_platform\data\sec_listing.py                       106      8     40      8    89%   79, 83, 85, 127, 136, 138, 141, 159
+src\institutional_factor_platform\data\sec_projection.py                    207     11    102     14    92%   49->48, 59, 63, 69, 73, 83, 257, 284->286, 288->290, 300-301, 313, 320, 364, 379->378
+src\institutional_factor_platform\data\security_master.py                   180      5     66      4    96%   57, 141, 217, 240, 370
+src\institutional_factor_platform\data\services.py                          376     38    114     21    86%   288, 406, 426->443, 458->470, 519->531, 606-610, 617-618, 645, 769, 772->771, 793, 820, 839, 849, 858-859, 895, 904, 913-919, 929, 933-937, 950, 952, 960->963, 1004-1005, 1018-1019
+src\institutional_factor_platform\data\sources\__init__.py                    0      0      0      0   100%
+src\institutional_factor_platform\data\sources\alpha_vantage.py              53      5     16      5    86%   32, 37->46, 40-41, 43, 51->53, 106
+src\institutional_factor_platform\data\sources\base.py                       69      3     10      2    94%   89, 93-94
+src\institutional_factor_platform\data\sources\fred.py                       41      6     12      1    83%   32-37
+src\institutional_factor_platform\data\sources\french.py                     50      6     16      6    82%   33-36, 45, 54, 60->82, 67, 83
+src\institutional_factor_platform\data\sources\hf_data_library.py            98     19     34     13    76%   35-36, 38, 42, 49, 64, 94, 98, 109-110, 112, 121-122, 124, 127, 138, 141, 164, 167, 170->165
+src\institutional_factor_platform\data\sources\owner_supplied.py             97     10     44      7    87%   100, 121, 126-129, 134-138, 168, 183
+src\institutional_factor_platform\data\sources\sec_edgar.py                  69     13     24      6    80%   31, 36, 38, 64, 67, 73, 79-80, 86-91, 123
+src\institutional_factor_platform\data\sources\sec_inline_xbrl.py           183     14     60     12    89%   70-71, 76, 130->exit, 144, 153->exit, 175->179, 177->179, 194, 197, 220, 222, 232, 249-250, 257, 271-272
+src\institutional_factor_platform\data\sources\sec_legacy_xbrl.py           170     22     66     16    84%   112, 115, 118, 136, 139-140, 152, 164, 167, 173, 177-179, 202, 205, 212, 223, 239, 262, 272, 275-276
+src\institutional_factor_platform\data\sources\sec_submissions.py           111     17     32     10    81%   32, 43-44, 48, 57, 73, 81, 104, 115, 118-119, 151, 157-158, 160, 171->178, 174-175
+src\institutional_factor_platform\data\sources\yahoo.py                      60      7     18      3    87%   33, 37, 69-70, 82-83, 108
+src\institutional_factor_platform\data\storage.py                           458     49    168     33    87%   118, 146, 165, 174, 187, 219, 268, 277-278, 294, 296, 310, 326-327, 352, 430-431, 466, 468, 470, 518, 522, 547-548, 594, 626, 630, 665-666, 680, 683, 686-687, 702, 715, 717, 732, 733->742, 736, 741, 798, 819, 826-827, 835, 844, 874, 878-886
+src\institutional_factor_platform\data\validation.py                        180      7     80     11    93%   100, 109, 163->166, 188, 205->130, 237->235, 294, 321->318, 338, 348, 386
+src\institutional_factor_platform\delivery\__init__.py                        2      0      0      0   100%
+src\institutional_factor_platform\delivery\catalog.py                       132      3     50      3    97%   147, 190, 195
+src\institutional_factor_platform\delivery\config.py                        101      1     14      0    99%   129
+src\institutional_factor_platform\delivery\provenance.py                     24      2      4      0    93%   26-27
+src\institutional_factor_platform\delivery\reporting.py                     110      9     26      3    91%   41-42, 46, 103-104, 120, 139-140, 274
+src\institutional_factor_platform\delivery\schemas.py                        33      0      0      0   100%
+src\institutional_factor_platform\delivery\service.py                        31      0      0      0   100%
+src\institutional_factor_platform\diagnostics\__init__.py                     2      0      0      0   100%
+src\institutional_factor_platform\diagnostics\regression.py                  17      0      0      0   100%
+src\institutional_factor_platform\exceptions.py                              20      0      0      0   100%
+src\institutional_factor_platform\factors\__init__.py                         3      0      0      0   100%
+src\institutional_factor_platform\factors\config.py                          83      4     10      4    91%   32, 34, 49, 78
+src\institutional_factor_platform\factors\contracts.py                        8      0      0      0   100%
+src\institutional_factor_platform\factors\definitions.py                     89      0      8      0   100%
+src\institutional_factor_platform\factors\diagnostics.py                     48      1     14      1    97%   151
+src\institutional_factor_platform\factors\holding.py                         62      1     24      1    98%   79
+src\institutional_factor_platform\factors\portfolio.py                       69      4     28      4    92%   29, 46, 58, 98
+src\institutional_factor_platform\factors\preprocessing.py                   44      1     20      1    97%   50
+src\institutional_factor_platform\factors\service.py                        189     10     42      6    93%   93-94, 171, 348, 371, 386, 405, 439-441, 455
+src\institutional_factor_platform\factors\storage.py                        194     12     36     10    90%   139, 190-191, 196, 201, 203, 210, 216, 223, 229, 242, 282
+src\institutional_factor_platform\factors\temporal.py                       102      5     56      4    94%   123, 154-156, 171->173, 175
+src\institutional_factor_platform\factors\validation.py                      60      1     28      1    98%   112
+src\institutional_factor_platform\logging.py                                 20      1      6      1    92%   23
+src\institutional_factor_platform\ml\__init__.py                              2      0      0      0   100%
+src\institutional_factor_platform\ml\config.py                              115      2     12      2    97%   58, 81
+src\institutional_factor_platform\ml\contracts.py                           121      0      4      0   100%
+src\institutional_factor_platform\ml\economic.py                             33      6     14      6    74%   23, 27, 35, 37, 40, 43
+src\institutional_factor_platform\ml\evaluation.py                           65      1     22      1    98%   80
+src\institutional_factor_platform\ml\features.py                             56      2     20      2    95%   114, 131
+src\institutional_factor_platform\ml\models.py                              103      6     44      6    92%   33, 63, 74, 82, 85, 101
+src\institutional_factor_platform\ml\preprocessing.py                        78      6     36      7    89%   33, 47, 55, 57, 69, 74->78, 82
+src\institutional_factor_platform\ml\publication.py                         164     16     50     11    86%   114, 119, 130, 134-135, 140, 148, 150, 157, 161, 183, 196-197, 225-226, 247
+src\institutional_factor_platform\ml\service.py                             295     20     72     16    90%   82, 96, 102, 105, 108, 131, 296, 561, 572, 577, 592, 608, 612, 629, 709, 849, 874-879
+src\institutional_factor_platform\ml\splits.py                               68      4     22      6    89%   51, 54, 67->73, 75, 81, 89->exit
+src\institutional_factor_platform\ml\targets.py                              93      8     54      8    89%   31, 33, 45, 60, 87, 138, 150, 161
+src\institutional_factor_platform\ml\validation.py                          113      9     38      7    89%   94-95, 97, 113, 125, 161, 164, 166, 185
+src\institutional_factor_platform\model_validation\__init__.py                2      0      0      0   100%
+src\institutional_factor_platform\model_validation\inputs.py                 29      2     14      2    91%   20, 31
+src\institutional_factor_platform\numeric.py                                  3      0      0      0   100%
+src\institutional_factor_platform\observability\__init__.py                   2      0      0      0   100%
+src\institutional_factor_platform\observability\logging.py                   10      0      0      0   100%
+src\institutional_factor_platform\observability\metrics.py                   15      0      0      0   100%
+src\institutional_factor_platform\optimization\__init__.py                    2      0      0      0   100%
+src\institutional_factor_platform\optimization\black_litterman.py            26      1      4      1    93%   50
+src\institutional_factor_platform\optimization\covariance.py                 40      3     18      3    90%   15, 48, 50
+src\institutional_factor_platform\optimization\engine.py                    149     19     56     14    83%   63, 102->122, 133, 138, 160, 161->158, 212-213, 215-223, 225, 275, 279-281, 293, 308, 336
+src\institutional_factor_platform\optimization\hrp.py                        32      0      6      0   100%
+src\institutional_factor_platform\performance\__init__.py                     2      0      0      0   100%
+src\institutional_factor_platform\performance\metrics.py                     13      1      6      1    89%   21
+src\institutional_factor_platform\portfolio\__init__.py                       2      0      0      0   100%
+src\institutional_factor_platform\portfolio\allocations.py                   11      0      4      0   100%
+src\institutional_factor_platform\portfolio\config.py                        63      2      8      2    94%   45, 59
+src\institutional_factor_platform\portfolio\service.py                      166     19     36     11    85%   65, 74, 202, 203->205, 295-297, 303, 322, 325, 328, 331, 338-339, 384, 388, 420-425
+src\institutional_factor_platform\project.py                                 17      2      6      0    91%   38-39
+src\institutional_factor_platform\regression\__init__.py                      2      0      0      0   100%
+src\institutional_factor_platform\regression\engine.py                       88      2     32      2    97%   110, 165
+src\institutional_factor_platform\research_outputs\__init__.py                2      0      0      0   100%
+src\institutional_factor_platform\research_outputs\portfolio_storage.py      88      6     20      6    89%   89, 93, 107, 111, 113, 126
+src\institutional_factor_platform\research_outputs\storage.py               130     16     30      9    83%   129-130, 152, 156, 161-162, 173-174, 183, 187-188, 191, 205, 218, 236, 241
+src\institutional_factor_platform\risk\__init__.py                            2      0      0      0   100%
+src\institutional_factor_platform\risk\metrics.py                            79      3     18      3    94%   13, 75, 117
+src\institutional_factor_platform\scenarios\__init__.py                       2      0      0      0   100%
+src\institutional_factor_platform\scenarios\engine.py                        27      1      8      1    94%   46
+src\institutional_factor_platform\statistical_tests\__init__.py               2      0      0      0   100%
+src\institutional_factor_platform\statistical_tests\tests.py                 26      2      4      2    87%   17, 31
+---------------------------------------------------------------------------------------------------------------------
+TOTAL                                                                      8700    588   2532    415    91%
+Required test coverage of 90% reached. Total coverage: 90.68%
+358 passed, 115 warnings in 461.28s (0:07:41)

@@ -555,7 +555,7 @@ def main():
     # Accepted Phase2 evidence supplies these two unchanged, independently reconciled families.
     for label, filename in prior_families:
         path = ROOT.parent / "phase2" / filename
-        frame = pd.read_csv(path)
+        frame = pd.read_csv(path).rename(columns={"adj": "adjusted_r_squared", "p": "alpha_p"})
         frame["sample"] = label
         summary.append(frame)
     summary += [fits, supplement]

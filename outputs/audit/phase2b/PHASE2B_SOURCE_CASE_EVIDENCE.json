@@ -1,0 +1,764 @@
+{
+  "pit_traces": [
+    {
+      "ticker": "AAPL",
+      "security_id": "sec_3bf387a8c5e54d4d8a01ea3781add7a7",
+      "signal": "2023-11-30",
+      "signal_cutoff_utc": "2023-11-30 23:59:59.999999+00:00",
+      "market_available_at": "2023-11-30 23:59:59.999999+00:00",
+      "shares": 15552752000.0,
+      "share_fact_matches": [
+        {
+          "namespace": "dei",
+          "concept": "EntityCommonStockSharesOutstanding",
+          "end": "2023-10-20",
+          "val": 15552752000,
+          "accn": "0000320193-23-000106",
+          "fy": 2023,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2023-11-03",
+          "frame": "CY2023Q3I"
+        }
+      ],
+      "share_availability_limitation": "Market schema has no per-share accession or standalone publication timestamp; value match is not exhaustive share/PIT proof",
+      "listing_valid_from": "2020-10-30",
+      "listing_valid_to": "2026-08-18",
+      "security_mapping": {
+        "cik": "0000320193",
+        "evidence": "SEC_FILING",
+        "exchange": "XNAS",
+        "mic": "XNAS",
+        "provenance": "HF CC BY 4.0 market file plus exact SEC tagged 10-K anchors 0000320193-19-000119,0000320193-25-000079",
+        "retrieval_timestamp": "2026-08-18T13:09:11.204528+00:00",
+        "security_id": "sec_3bf387a8c5e54d4d8a01ea3781add7a7",
+        "source": "hf_data_library",
+        "source_identifier": "AAPL",
+        "status": "RESOLVED",
+        "ticker": "AAPL",
+        "valid_from": "2020-10-30",
+        "valid_to": "2026-08-18"
+      },
+      "observations": [
+        {
+          "field": "book_equity",
+          "source_concept": "StockholdersEquity",
+          "period_end": "2023-09-30",
+          "value": 62146000000.0,
+          "normalized_available_at": "2023-11-03 23:59:59.999999+00:00",
+          "accession": "0000320193-23-000106",
+          "form": "10-K",
+          "filed": "2023-11-03",
+          "accepted_utc": "2023-11-02 22:08:27+00:00",
+          "raw_ratio": 0.021258307331217297,
+          "frozen_raw_ratio": 0.021258307331217297,
+          "frozen_score": -0.9207025321869561,
+          "quantile": 1,
+          "weight": 0.24852809318264832,
+          "execution": "2023-12-01 00:00:00",
+          "exit": "2024-01-02 00:00:00",
+          "realized_return": -0.0296082664068813
+        },
+        {
+          "field": "net_income",
+          "source_concept": "NetIncomeLoss",
+          "period_end": "2023-09-30",
+          "value": 96995000000.0,
+          "normalized_available_at": "2023-11-03 23:59:59.999999+00:00",
+          "accession": "0000320193-23-000106",
+          "form": "10-K",
+          "filed": "2023-11-03",
+          "accepted_utc": "2023-11-02 22:08:27+00:00",
+          "raw_ratio": 0.03317911884258716,
+          "frozen_raw_ratio": 0.03317911884258716,
+          "frozen_score": -0.18722239598550172,
+          "quantile": 2,
+          "weight": 0.28628519320630547,
+          "execution": "2023-12-01 00:00:00",
+          "exit": "2024-01-02 00:00:00",
+          "realized_return": -0.0296082664068813
+        }
+      ],
+      "amendments": []
+    },
+    {
+      "ticker": "AAPL",
+      "security_id": "sec_3bf387a8c5e54d4d8a01ea3781add7a7",
+      "signal": "2024-11-29",
+      "signal_cutoff_utc": "2024-11-29 23:59:59.999999+00:00",
+      "market_available_at": "2024-11-29 23:59:59.999999+00:00",
+      "shares": 15115823000.0,
+      "share_fact_matches": [
+        {
+          "namespace": "dei",
+          "concept": "EntityCommonStockSharesOutstanding",
+          "end": "2024-10-18",
+          "val": 15115823000,
+          "accn": "0000320193-24-000123",
+          "fy": 2024,
+          "fp": "FY",
+          "form": "10-K",
+          "filed": "2024-11-01",
+          "frame": "CY2024Q3I"
+        }
+      ],
+      "share_availability_limitation": "Market schema has no per-share accession or standalone publication timestamp; value match is not exhaustive share/PIT proof",
+      "listing_valid_from": "2020-10-30",
+      "listing_valid_to": "2026-08-18",
+      "security_mapping": {
+        "cik": "0000320193",
+        "evidence": "SEC_FILING",
+        "exchange": "XNAS",
+        "mic": "XNAS",
+        "provenance": "HF CC BY 4.0 market file plus exact SEC tagged 10-K anchors 0000320193-19-000119,0000320193-25-000079",
+        "retrieval_timestamp": "2026-08-18T13:09:11.204528+00:00",
+        "security_id": "sec_3bf387a8c5e54d4d8a01ea3781add7a7",
+        "source": "hf_data_library",
+        "source_identifier": "AAPL",
+        "status": "RESOLVED",
+        "ticker": "AAPL",
+        "valid_from": "2020-10-30",
+        "valid_to": "2026-08-18"
+      },
+      "observations": [
+        {
+          "field": "book_equity",
+          "source_concept": "StockholdersEquity",
+          "period_end": "2024-09-28",
+          "value": 56950000000.0,
+          "normalized_available_at": "2024-11-01 23:59:59.999999+00:00",
+          "accession": "0000320193-24-000123",
+          "form": "10-K",
+          "filed": "2024-11-01",
+          "accepted_utc": "2024-11-01 10:01:36+00:00",
+          "raw_ratio": 0.0159564981945259,
+          "frozen_raw_ratio": 0.0159564981945259,
+          "frozen_score": -0.9203853102809428,
+          "quantile": 1,
+          "weight": 0.19405651819954622,
+          "execution": "2024-12-02 00:00:00",
+          "exit": "2025-01-02 00:00:00",
+          "realized_return": 0.0174771524843369
+        },
+        {
+          "field": "net_income",
+          "source_concept": "NetIncomeLoss",
+          "period_end": "2024-09-28",
+          "value": 93736000000.0,
+          "normalized_available_at": "2024-11-01 23:59:59.999999+00:00",
+          "accession": "0000320193-24-000123",
+          "form": "10-K",
+          "filed": "2024-11-01",
+          "accepted_utc": "2024-11-01 10:01:36+00:00",
+          "raw_ratio": 0.026263359346129583,
+          "frozen_raw_ratio": 0.026263359346129583,
+          "frozen_score": -0.31805536801942075,
+          "quantile": 2,
+          "weight": 0.22024123551432037,
+          "execution": "2024-12-02 00:00:00",
+          "exit": "2025-01-02 00:00:00",
+          "realized_return": 0.0174771524843369
+        }
+      ],
+      "amendments": []
+    },
+    {
+      "ticker": "AAP",
+      "security_id": "sec_e4909408ae1e48c5b7228a11e4167229",
+      "signal": "2024-05-31",
+      "signal_cutoff_utc": "2024-05-31 23:59:59.999999+00:00",
+      "market_available_at": "2024-05-31 23:59:59.999999+00:00",
+      "shares": 59622297.0,
+      "share_fact_matches": [
+        {
+          "namespace": "dei",
+          "concept": "EntityCommonStockSharesOutstanding",
+          "end": "2024-05-24",
+          "val": 59622297,
+          "accn": "0001158449-24-000132",
+          "fy": 2024,
+          "fp": "Q1",
+          "form": "10-Q",
+          "filed": "2024-05-30",
+          "frame": "CY2024Q2I"
+        }
+      ],
+      "share_availability_limitation": "Market schema has no per-share accession or standalone publication timestamp; value match is not exhaustive share/PIT proof",
+      "listing_valid_from": "2020-02-18",
+      "listing_valid_to": "2026-08-18",
+      "security_mapping": {
+        "cik": "0001158449",
+        "evidence": "SEC_FILING",
+        "exchange": "XNYS",
+        "mic": "XNYS",
+        "provenance": "HF CC BY 4.0 market file plus exact SEC tagged 10-K anchors 0001158449-20-000035,0001193125-26-051305",
+        "retrieval_timestamp": "2026-08-18T13:09:05.546478+00:00",
+        "security_id": "sec_e4909408ae1e48c5b7228a11e4167229",
+        "source": "hf_data_library",
+        "source_identifier": "AAP",
+        "status": "RESOLVED",
+        "ticker": "AAP",
+        "valid_from": "2020-02-18",
+        "valid_to": "2026-08-18"
+      },
+      "observations": [
+        {
+          "field": "book_equity",
+          "source_concept": "StockholdersEquity",
+          "period_end": "2023-12-30",
+          "value": 2519728000.0,
+          "normalized_available_at": "2024-05-30 23:59:59.999999+00:00",
+          "accession": "0001158449-24-000128",
+          "form": "10-K/A",
+          "filed": "2024-05-30",
+          "accepted_utc": "2024-05-30 01:01:16+00:00",
+          "raw_ratio": 0.6217149098406274,
+          "frozen_raw_ratio": 0.6217149098406274,
+          "frozen_score": 1.033487301353172,
+          "quantile": 3,
+          "weight": 0.0010413417066193467,
+          "execution": "2024-06-03 00:00:00",
+          "exit": "2024-07-01 00:00:00",
+          "realized_return": -0.1067788853677003
+        },
+        {
+          "field": "net_income",
+          "source_concept": "NetIncomeLoss",
+          "period_end": "2023-12-30",
+          "value": 29735000.0,
+          "normalized_available_at": "2024-05-30 23:59:59.999999+00:00",
+          "accession": "0001158449-24-000128",
+          "form": "10-K/A",
+          "filed": "2024-05-30",
+          "accepted_utc": "2024-05-30 01:01:16+00:00",
+          "raw_ratio": 0.007336781130388302,
+          "frozen_raw_ratio": 0.007336781130388302,
+          "frozen_score": -0.9812668680039504,
+          "quantile": 1,
+          "weight": 0.000535229547278679,
+          "execution": "2024-06-03 00:00:00",
+          "exit": "2024-07-01 00:00:00",
+          "realized_return": -0.1067788853677003
+        }
+      ],
+      "amendments": [
+        {
+          "accessionNumber": "0001158449-24-000128",
+          "filingDate": "2024-05-30",
+          "reportDate": "2023-12-30",
+          "acceptanceDateTime": "2024-05-30T01:01:16.000Z",
+          "act": "34",
+          "form": "10-K/A",
+          "fileNumber": "001-16797",
+          "filmNumber": "241000484",
+          "items": "",
+          "core_type": "XBRL",
+          "size": 11002103,
+          "isXBRL": 1,
+          "isInlineXBRL": 1,
+          "isXBRLNumeric": null,
+          "primaryDocument": "aap-20231230.htm",
+          "primaryDocDescription": "10-K/A"
+        }
+      ]
+    }
+  ],
+  "additional_sources": [
+    {
+      "path": "G:\\4- Institutional Multi-Factor Asset Pricing & Portfolio Analytics Platform\\data\\interim\\phase23-822-screen\\sec-companyfacts\\0000320193.json",
+      "sha256": "73a86c6aedc31f77cac2ea4df5f80f0b3bd7e6eb58bb4e01444fbedf3afb9c43",
+      "bytes": 3789099,
+      "authority": "Frozen SEC cache; hash fixed now, original capture timestamp not independently attested"
+    },
+    {
+      "path": "G:\\4- Institutional Multi-Factor Asset Pricing & Portfolio Analytics Platform\\data\\interim\\phase23-822-screen\\sec-submissions\\0000320193.json",
+      "sha256": "9ce67c0a62345214dd42434cbacfa70dad226e679c6ce752281578b1cfd2fac4",
+      "bytes": 164300,
+      "authority": "Frozen SEC cache; hash fixed now, original capture timestamp not independently attested"
+    },
+    {
+      "path": "G:\\4- Institutional Multi-Factor Asset Pricing & Portfolio Analytics Platform\\data\\interim\\phase23-822-screen\\sec-companyfacts\\0000320193.json",
+      "sha256": "73a86c6aedc31f77cac2ea4df5f80f0b3bd7e6eb58bb4e01444fbedf3afb9c43",
+      "bytes": 3789099,
+      "authority": "Frozen SEC cache; hash fixed now, original capture timestamp not independently attested"
+    },
+    {
+      "path": "G:\\4- Institutional Multi-Factor Asset Pricing & Portfolio Analytics Platform\\data\\interim\\phase23-822-screen\\sec-submissions\\0000320193.json",
+      "sha256": "9ce67c0a62345214dd42434cbacfa70dad226e679c6ce752281578b1cfd2fac4",
+      "bytes": 164300,
+      "authority": "Frozen SEC cache; hash fixed now, original capture timestamp not independently attested"
+    },
+    {
+      "path": "G:\\4- Institutional Multi-Factor Asset Pricing & Portfolio Analytics Platform\\data\\interim\\phase23-822-screen\\sec-companyfacts\\0001158449.json",
+      "sha256": "aa31570cee5fe95c9d4a1763f524c452777731024ff4c5553d56fca7c4c7ab0e",
+      "bytes": 3455158,
+      "authority": "Frozen SEC cache; hash fixed now, original capture timestamp not independently attested"
+    },
+    {
+      "path": "G:\\4- Institutional Multi-Factor Asset Pricing & Portfolio Analytics Platform\\data\\interim\\phase23-822-screen\\sec-submissions\\0001158449.json",
+      "sha256": "af41296460f8d5534e432912f4aba1ac92533a35b0d3b9d3d4ab258b833e9e80",
+      "bytes": 162717,
+      "authority": "Frozen SEC cache; hash fixed now, original capture timestamp not independently attested"
+    }
+  ],
+  "formed_member_listing_violations": [],
+  "factor_counts": [
+    {
+      "factor_id": "accruals",
+      "rows": 715447,
+      "nonmissing_raw": 578085,
+      "nonmissing_score": 578081
+    },
+    {
+      "factor_id": "amihud_illiquidity",
+      "rows": 715447,
+      "nonmissing_raw": 715447,
+      "nonmissing_score": 715441
+    },
+    {
+      "factor_id": "asset_growth",
+      "rows": 715447,
+      "nonmissing_raw": 584516,
+      "nonmissing_score": 584512
+    },
+    {
+      "factor_id": "asset_turnover",
+      "rows": 715447,
+      "nonmissing_raw": 547996,
+      "nonmissing_score": 547992
+    },
+    {
+      "factor_id": "average_dollar_volume",
+      "rows": 715447,
+      "nonmissing_raw": 706194,
+      "nonmissing_score": 706188
+    },
+    {
+      "factor_id": "beta",
+      "rows": 715447,
+      "nonmissing_raw": 706194,
+      "nonmissing_score": 706188
+    },
+    {
+      "factor_id": "bid_ask_proxy",
+      "rows": 715447,
+      "nonmissing_raw": 715447,
+      "nonmissing_score": 715441
+    },
+    {
+      "factor_id": "book_to_market",
+      "rows": 715447,
+      "nonmissing_raw": 585078,
+      "nonmissing_score": 585074
+    },
+    {
+      "factor_id": "capex_growth",
+      "rows": 715447,
+      "nonmissing_raw": 416323,
+      "nonmissing_score": 415839
+    },
+    {
+      "factor_id": "cash_flow_yield",
+      "rows": 715447,
+      "nonmissing_raw": 574875,
+      "nonmissing_score": 574871
+    },
+    {
+      "factor_id": "debt_to_equity",
+      "rows": 715447,
+      "nonmissing_raw": 234090,
+      "nonmissing_score": 233586
+    },
+    {
+      "factor_id": "dividend_yield",
+      "rows": 715447,
+      "nonmissing_raw": 432383,
+      "nonmissing_score": 432379
+    },
+    {
+      "factor_id": "downside_beta",
+      "rows": 715447,
+      "nonmissing_raw": 696221,
+      "nonmissing_score": 696214
+    },
+    {
+      "factor_id": "downside_volatility",
+      "rows": 715447,
+      "nonmissing_raw": 696970,
+      "nonmissing_score": 696958
+    },
+    {
+      "factor_id": "earnings_yield",
+      "rows": 715447,
+      "nonmissing_raw": 583071,
+      "nonmissing_score": 583067
+    },
+    {
+      "factor_id": "equity_issuance",
+      "rows": 715447,
+      "nonmissing_raw": 0,
+      "nonmissing_score": 0
+    },
+    {
+      "factor_id": "excess_return",
+      "rows": 715447,
+      "nonmissing_raw": 715447,
+      "nonmissing_score": 0
+    },
+    {
+      "factor_id": "gross_profitability",
+      "rows": 715447,
+      "nonmissing_raw": 228792,
+      "nonmissing_score": 228540
+    },
+    {
+      "factor_id": "idiosyncratic_volatility",
+      "rows": 715447,
+      "nonmissing_raw": 696941,
+      "nonmissing_score": 696935
+    },
+    {
+      "factor_id": "interest_coverage",
+      "rows": 715447,
+      "nonmissing_raw": 29285,
+      "nonmissing_score": 29070
+    },
+    {
+      "factor_id": "leverage",
+      "rows": 715447,
+      "nonmissing_raw": 234592,
+      "nonmissing_score": 234088
+    },
+    {
+      "factor_id": "log_market_cap",
+      "rows": 715447,
+      "nonmissing_raw": 706285,
+      "nonmissing_score": 706279
+    },
+    {
+      "factor_id": "market_cap",
+      "rows": 715447,
+      "nonmissing_raw": 706285,
+      "nonmissing_score": 706279
+    },
+    {
+      "factor_id": "market_return",
+      "rows": 715447,
+      "nonmissing_raw": 715447,
+      "nonmissing_score": 0
+    },
+    {
+      "factor_id": "momentum_12_1m",
+      "rows": 715447,
+      "nonmissing_raw": 593210,
+      "nonmissing_score": 593204
+    },
+    {
+      "factor_id": "momentum_12m",
+      "rows": 715447,
+      "nonmissing_raw": 706194,
+      "nonmissing_score": 706188
+    },
+    {
+      "factor_id": "momentum_1m",
+      "rows": 715447,
+      "nonmissing_raw": 706194,
+      "nonmissing_score": 706188
+    },
+    {
+      "factor_id": "momentum_24m",
+      "rows": 715447,
+      "nonmissing_raw": 706194,
+      "nonmissing_score": 706188
+    },
+    {
+      "factor_id": "momentum_3m",
+      "rows": 715447,
+      "nonmissing_raw": 706194,
+      "nonmissing_score": 706188
+    },
+    {
+      "factor_id": "momentum_6m",
+      "rows": 715447,
+      "nonmissing_raw": 706194,
+      "nonmissing_score": 706188
+    },
+    {
+      "factor_id": "net_margin",
+      "rows": 715447,
+      "nonmissing_raw": 550675,
+      "nonmissing_score": 550671
+    },
+    {
+      "factor_id": "operating_margin",
+      "rows": 715447,
+      "nonmissing_raw": 435265,
+      "nonmissing_score": 434783
+    },
+    {
+      "factor_id": "price_to_book",
+      "rows": 715447,
+      "nonmissing_raw": 585078,
+      "nonmissing_score": 585074
+    },
+    {
+      "factor_id": "residual_momentum",
+      "rows": 715447,
+      "nonmissing_raw": 583957,
+      "nonmissing_score": 583951
+    },
+    {
+      "factor_id": "risk_free_rate",
+      "rows": 715447,
+      "nonmissing_raw": 715447,
+      "nonmissing_score": 0
+    },
+    {
+      "factor_id": "roa",
+      "rows": 715447,
+      "nonmissing_raw": 588790,
+      "nonmissing_score": 588786
+    },
+    {
+      "factor_id": "roe",
+      "rows": 715447,
+      "nonmissing_raw": 588288,
+      "nonmissing_score": 588284
+    },
+    {
+      "factor_id": "rolling_beta",
+      "rows": 715447,
+      "nonmissing_raw": 706194,
+      "nonmissing_score": 706188
+    },
+    {
+      "factor_id": "rolling_correlation",
+      "rows": 715447,
+      "nonmissing_raw": 706194,
+      "nonmissing_score": 706188
+    },
+    {
+      "factor_id": "rolling_market_beta",
+      "rows": 715447,
+      "nonmissing_raw": 706194,
+      "nonmissing_score": 706188
+    },
+    {
+      "factor_id": "rolling_volatility",
+      "rows": 715447,
+      "nonmissing_raw": 706194,
+      "nonmissing_score": 706188
+    },
+    {
+      "factor_id": "semi_variance",
+      "rows": 715447,
+      "nonmissing_raw": 696970,
+      "nonmissing_score": 696958
+    },
+    {
+      "factor_id": "size_large",
+      "rows": 715447,
+      "nonmissing_raw": 715447,
+      "nonmissing_score": 18
+    },
+    {
+      "factor_id": "size_mid",
+      "rows": 715447,
+      "nonmissing_raw": 715447,
+      "nonmissing_score": 752
+    },
+    {
+      "factor_id": "size_small",
+      "rows": 715447,
+      "nonmissing_raw": 715447,
+      "nonmissing_score": 0
+    },
+    {
+      "factor_id": "tracking_error",
+      "rows": 715447,
+      "nonmissing_raw": 706194,
+      "nonmissing_score": 706188
+    },
+    {
+      "factor_id": "turnover",
+      "rows": 715447,
+      "nonmissing_raw": 706285,
+      "nonmissing_score": 706279
+    },
+    {
+      "factor_id": "working_capital_growth",
+      "rows": 715447,
+      "nonmissing_raw": 492379,
+      "nonmissing_score": 491897
+    }
+  ],
+  "vintage_examples": [
+    {
+      "ticker": "AAPL",
+      "path": "G:\\4- Institutional Multi-Factor Asset Pricing & Portfolio Analytics Platform\\data\\interim\\phase23-822-screen\\hf-raw\\AAPL.parquet",
+      "sha256": "d6cd7cbebc7523ac8737e47d8601557cba026d82496c4008b2558f3767335cc6",
+      "metadata": {
+        "citation": "Elkassabgi, A. (2026). HF Data Library: Free 1-Minute Intraday U.S. Equity Data. Zenodo. https://doi.org/10.5281/zenodo.19501605",
+        "iex_attribution": "Post-March-2022 bars: Data provided for free by IEX. By accessing or using IEX Historical Data, you agree to the IEX Historical Data Terms of Use. https://www.iex.io/legal/hist-data-terms"
+      },
+      "raw_columns": [
+        "datetime",
+        "Open",
+        "High",
+        "Low",
+        "Close",
+        "Volume",
+        "source",
+        "d"
+      ],
+      "normalized_quote_overlap_rows": 1445,
+      "maximum_quote_difference": 0.0,
+      "events": [
+        {
+          "event": "Issuer 4-for-1 split, trading split-adjusted Aug31",
+          "observations": [
+            {
+              "d": "2020-08-28",
+              "Close": 123.59,
+              "source": "pitrading"
+            },
+            {
+              "d": "2020-08-31",
+              "Close": 127.68,
+              "source": "pitrading"
+            }
+          ],
+          "quote_ratio": 0.03309329233756775
+        },
+        {
+          "event": "Issuer $0.25 dividend, record Aug12/payAug15; ex-date basis not inferred solely from this announcement",
+          "observations": [
+            {
+              "d": "2024-08-09",
+              "Close": 214.514748,
+              "source": "iex"
+            },
+            {
+              "d": "2024-08-12",
+              "Close": 216.193926,
+              "source": "iex"
+            }
+          ],
+          "quote_ratio": 0.007827797462205188
+        },
+        {
+          "event": "PiTrading/IEX source transition",
+          "observations": [
+            {
+              "d": "2022-03-04",
+              "Close": 163.22,
+              "source": "pitrading"
+            },
+            {
+              "d": "2022-03-07",
+              "Close": 156.163286,
+              "source": "iex"
+            }
+          ],
+          "quote_ratio": -0.043234370787893606
+        }
+      ]
+    }
+  ],
+  "provider_symbol_reuse_screen": [
+    {
+      "ticker": "GOLD",
+      "screen_status": [
+        "REJECT_IDENTITY"
+      ],
+      "retained_mappings": []
+    },
+    {
+      "ticker": "STI",
+      "screen_status": [
+        "REJECT_HF_SPLICE"
+      ],
+      "retained_mappings": []
+    },
+    {
+      "ticker": "IPW",
+      "screen_status": [
+        "REJECT_HF_SPLICE"
+      ],
+      "retained_mappings": []
+    },
+    {
+      "ticker": "SKK",
+      "screen_status": [],
+      "retained_mappings": []
+    },
+    {
+      "ticker": "VRM",
+      "screen_status": [
+        "REJECT_HF_SPLICE"
+      ],
+      "retained_mappings": []
+    },
+    {
+      "ticker": "PARA",
+      "screen_status": [
+        "REJECT_IDENTITY"
+      ],
+      "retained_mappings": []
+    },
+    {
+      "ticker": "USLV",
+      "screen_status": [],
+      "retained_mappings": []
+    },
+    {
+      "ticker": "WOLF",
+      "screen_status": [
+        "REJECT_TERMINAL_EVENT"
+      ],
+      "retained_mappings": []
+    },
+    {
+      "ticker": "BBBY",
+      "screen_status": [
+        "REJECT_IDENTITY"
+      ],
+      "retained_mappings": []
+    },
+    {
+      "ticker": "RCD",
+      "screen_status": [],
+      "retained_mappings": []
+    },
+    {
+      "ticker": "FB",
+      "screen_status": [
+        "REJECT_ASSET_TYPE"
+      ],
+      "retained_mappings": []
+    },
+    {
+      "ticker": "INFO",
+      "screen_status": [
+        "REJECT_HF_SPLICE"
+      ],
+      "retained_mappings": []
+    },
+    {
+      "ticker": "UGLD",
+      "screen_status": [],
+      "retained_mappings": []
+    },
+    {
+      "ticker": "KNOW",
+      "screen_status": [],
+      "retained_mappings": []
+    },
+    {
+      "ticker": "CRED",
+      "screen_status": [],
+      "retained_mappings": []
+    }
+  ],
+  "case_limitations": "Representative raw source traces do not prove all economic fields, amendments, retrieval chronology, split-adjusted shares, or exact close execution availability"
+}
