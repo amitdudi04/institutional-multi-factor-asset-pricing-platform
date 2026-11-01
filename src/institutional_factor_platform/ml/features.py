@@ -108,13 +108,18 @@ def add_interactions(
 
 
 def monthly_decision_features(frame: pd.DataFrame) -> pd.DataFrame:
-    """Select the last authenticated decision observation per security/month."""
+    """Use one common month-end decision; never substitute an earlier security quote."""
     required = {"security_id", "formation_date", "decision_time", "feature_available_at"}
     if frame.empty or required - set(frame):
         raise DataQualityError("Monthly feature sampling requires decision-time identity")
     result = frame.copy()
     result["formation_date"] = pd.to_datetime(result["formation_date"], utc=True)
     result["_decision_month"] = result["formation_date"].dt.tz_localize(None).dt.to_period("M")
+    result = result.loc[
+        result["formation_date"].eq(
+            result.groupby("_decision_month")["formation_date"].transform("max")
+        )
+    ].copy()
     result = (
         result.sort_values(["security_id", "formation_date"], kind="stable")
         .groupby(["security_id", "_decision_month"], sort=True, as_index=False)

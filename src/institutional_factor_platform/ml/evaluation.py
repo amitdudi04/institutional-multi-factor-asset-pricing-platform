@@ -114,7 +114,16 @@ def block_bootstrap_ic(
 ) -> dict[str, float | None]:
     if block_length < 1 or resamples < 10:
         raise DataQualityError("Bootstrap budget is invalid")
-    dates = np.array(sorted(frame["formation_date"].unique()))
+    per_date = {
+        date: _correlation(
+            spearmanr, group["target"].to_numpy(float), group["prediction"].to_numpy(float)
+        )
+        for date, group in frame.groupby("formation_date", sort=True)
+    }
+    dates = np.array(sorted(per_date), dtype=object)
+    observed = [value for value in per_date.values() if value is not None]
+    if not observed:
+        return {"estimate": None, "lower": None, "upper": None}
     rng = np.random.default_rng(seed)
     values = []
     for _ in range(resamples):
@@ -122,15 +131,13 @@ def block_bootstrap_ic(
         while len(sampled) < len(dates):
             start = int(rng.integers(0, max(1, len(dates) - block_length + 1)))
             sampled.extend(dates[start : start + block_length])
-        parts = [frame.loc[frame["formation_date"].eq(d)] for d in sampled[: len(dates)]]
-        sample = pd.concat(parts)
-        value = sample["target"].corr(sample["prediction"], method="spearman")
-        if pd.notna(value):
-            values.append(float(value))
+        selected = [per_date[d] for d in sampled[: len(dates)] if per_date[d] is not None]
+        if selected:
+            values.append(float(np.mean(selected)))
     if not values:
         return {"estimate": None, "lower": None, "upper": None}
     return {
-        "estimate": float(np.mean(values)),
+        "estimate": float(np.mean(observed)),
         "lower": float(np.quantile(values, 0.025)),
         "upper": float(np.quantile(values, 0.975)),
     }
