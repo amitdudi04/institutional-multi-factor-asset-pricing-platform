@@ -80,3 +80,15 @@ def test_bootstrap_constant_prediction_is_not_zero_ic() -> None:
         "lower": None,
         "upper": None,
     }
+
+
+def test_nonzero_constant_forecast_ic_stays_unavailable_despite_roundoff() -> None:
+    from institutional_factor_platform.ml.evaluation import regression_metrics
+
+    prediction = np.full(3, 0.1)
+    metrics = regression_metrics(np.arange(3.0), prediction)
+    assert metrics["information_coefficient"] is None
+    frame = pd.DataFrame(
+        {"formation_date": [0] * 3, "prediction": prediction, "target": np.arange(3.0)}
+    )
+    assert block_bootstrap_ic(frame, block_length=1, resamples=10, seed=17)["estimate"] is None

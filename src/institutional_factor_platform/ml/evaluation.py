@@ -157,10 +157,11 @@ def _aligned(left: NDArray[np.float64], right: NDArray[np.float64]) -> None:
 def _correlation(
     function: object, left: NDArray[np.float64], right: NDArray[np.float64]
 ) -> float | None:
-    if len(left) < 2 or np.std(left) == 0 or np.std(right) == 0:
+    # A mathematically constant array can have a tiny nonzero computed std.
+    if len(left) < 2 or np.ptp(left) == 0 or np.ptp(right) == 0:
         return None
     result = function(left, right)  # type: ignore[operator]
-    return float(result.statistic)
+    return float(result.statistic) if np.isfinite(result.statistic) else None
 
 
 def _rank_turnover(frame: pd.DataFrame, prediction: str) -> float | None:
