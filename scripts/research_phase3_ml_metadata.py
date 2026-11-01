@@ -64,7 +64,10 @@ def main():
             training_source_commit=manifest["git_commit"],
             analytics_source_commit=commit,
             preceding_publication=manifest["publication_id"],
-            correction="Undefined constant-forecast correlations are unavailable, not NaN/zero; no model refit",
+            correction=(
+                "Undefined constant-forecast correlations are unavailable, "
+                "not NaN/zero; no model refit"
+            ),
         )
         contents = {}
         for name, artifact in by.items():

@@ -23,6 +23,7 @@ def read(path):
 
 def main():
     prior = read(ROOT / "outputs/audit/phase2c/PHASE2C_SOURCE_MANIFEST.json")
+    anchors = {p["publication_id"]: p["manifest_hash"] for p in prior["publications"]}
     records, publications = {}, []
 
     def record(path, checksum=None):
@@ -46,6 +47,8 @@ def main():
         (ARCHIVE, "factor-5a73616f131fca2102fa2ca4141ad64f"),
     ]:
         manifest = FactorRepository(base, base / "data/factor_manifests").authenticate(fid)
+        if fid in anchors:
+            assert manifest.content_hash() == anchors[fid]
         publications.append(manifest.model_dump(mode="json"))
         record(base / manifest.artifact_path, manifest.artifact_checksum)
         record(base / manifest.portfolio_artifact_path, manifest.portfolio_artifact_checksum)
@@ -73,6 +76,8 @@ def main():
         repository = AssetPricingRepository(base, base / "data/asset_pricing_manifests")
         for pid in ids:
             manifest = repository.authenticate(pid)
+            if pid in anchors:
+                assert manifest.content_hash() == anchors[pid]
             publications.append(manifest.model_dump(mode="json"))
             for artifact in manifest.artifacts:
                 record(base / artifact.path, artifact.checksum)

@@ -5,3 +5,8 @@
 /scripts/research_phase2c.py text eol=lf
 /tests/test_phase2c_reference.py text eol=lf
 /outputs/audit/phase2c/** text eol=lf
+# Scope the same canonical-byte policy to newly generated Phase 3 evidence.
+/config/research_phase3.yaml text eol=lf
+/scripts/research_phase3*.py text eol=lf
+/tests/test_research_phase3_audit.py text eol=lf
+/outputs/audit/phase3/** text eol=lf

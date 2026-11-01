@@ -349,9 +349,9 @@
 
 - **Phase2B evidence (1 November2026):** previous `SOURCE_EVIDENCE_BLOCKED`; current `SOURCE_EVIDENCE_BLOCKED`. Source `unchanged Phase2 H1/H3 original-record evidence`; empirical source commit `291447199fe603f0168d972ee77b88c4d949f205`. No authentic new owner approval or original H1/H3 decision evidence located. Remaining limitation/manuscript consequence: New regressions cannot invent missing authority or retrospective hypothesis success. Evidence: `../../outputs/audit/phase2b/PHASE2B_EMPIRICAL_CORRECTION_REPORT.md`, issue CSV, source manifest and bound numerical/case evidence. Tests37targeted/358full PASS,90.68%coverage; independent returns/regressions/hashes PASS. New factor `factor-4ddee9ac6fb45cedfd62a2cc68676b58`; primary pricing `asset-pricing-d60bee7310b34976c80372a0f0f29e21`. Original hashes and values preserved; exact before/after/horizon distinctions in reconciliation CSVs. Reviewer `PENDING`.
 
-#### [ ] P1 — Does maximum drawdown include initial wealth?
+#### [x] P1 — Does maximum drawdown include initial wealth?
 
-- **Phase / severity from initial audit:** 3 / Critical; **status:** `SOURCE_EVIDENCE_BLOCKED`.
+- **Phase / severity from initial audit:** 3 / Critical; **status:** `VERIFIED_CORRECT`.
 - **Why this matters / failure mode:** Does maximum drawdown include initial wealth? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
 - **Inspect first:** `src/institutional_factor_platform/risk/metrics.py; monthly portfolio return parquet`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
 - **Detailed verification and candidate correction:** Construct initial NAV=1 before return observations; test [-20%,+10%], strictly falling, flat and rebound paths. Independently recompute eight strategies from frozen net returns, compare old/new max drawdown and propagate genuine changes into a new output version.
@@ -360,9 +360,12 @@
 - **Acceptance gate:** Both function tests and all eight authentic empirical MDDs reconcile; historical published numbers remain archived.
 - **Progress record:** owner `Codex`; result `SOURCE_EVIDENCE_BLOCKED`; baseline SHA `4e7fbdc380b8042db72e9c628260f60077a205ef`; code/evidence checkpoint `ef339ab`; tests `PHASE1_TEST_RESULTS.txt`; evidence `../../outputs/audit/phase1/PHASE1_FINANCIAL_DATA_VALIDATION.md#p1`; numerical change `no historical before/after available; see reconciliation CSV`; research-paper impact `Published maximum-diversification -5.43% is neither disproved nor verified. Related Calmar may change only if actual path establishes changed MDD.`; independent reviewer `PENDING`.
 
-#### [ ] P2 — Do the stated one-way transaction costs match the actual L1 implementation?
 
-- **Phase / severity from initial audit:** 3 / Critical; **status:** `SOURCE_EVIDENCE_BLOCKED`.
+- **Phase3 complete validation (1 November2026):** previous `SOURCE_EVIDENCE_BLOCKED`; current `VERIFIED_CORRECT`. Exact source `risk/metrics.py::drawdown,maximum_drawdown` under `src/institutional_factor_platform` unless explicitly scripts/config. All8actual BASE paths reconcile from NAV1; initial-NAV effect0 for all historical minima. Original maximum-diversification MDD-.05432343856 is correct on its historical path. Limit/manuscript consequence: New MDD belongs to changed inputs/sample; do not claim -5.43%was disproved. Evidence `../../outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md`, issue/reconciliation files and full source manifest. Portfolio/MLfit source `0fe382f`; MLmetric-only source `9df5455`; final evidence is the containing commit.6new regressions,91targeted and372full pass/90.62%; originals preserved; all before/after values and hashes recorded. Reviewer `PENDING`.
+
+#### [x] P2 — Do the stated one-way transaction costs match the actual L1 implementation?
+
+- **Phase / severity from initial audit:** 3 / Critical; **status:** `VERIFIED_CORRECT`.
 - **Why this matters / failure mode:** Do the stated one-way transaction costs match the actual L1 implementation? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
 - **Inspect first:** `src/institutional_factor_platform/backtest/costs.py; config/portfolio.yaml; frozen transaction parquet`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
 - **Detailed verification and candidate correction:** Define one-way turnover=0.5×sum(abs(trade)) for fully invested rebalances; compare current cost expression commission*L1 + half-spread*L1 + slippage*L1 with claimed 5/10/20-bps cost labels. Show buy, sell, full switch, initial deployment, and drift rebalance examples. Reconcile the original trade-by-trade fees without automatically halving costs or retuning.
@@ -371,9 +374,12 @@
 - **Acceptance gate:** Cost convention is explicit and every fee equals the recorded trades, with any convention error versioned and propagated.
 - **Progress record:** owner `Codex`; result `SOURCE_EVIDENCE_BLOCKED`; baseline SHA `4e7fbdc380b8042db72e9c628260f60077a205ef`; code/evidence checkpoint `ef339ab`; tests `PHASE1_TEST_RESULTS.txt`; evidence `../../outputs/audit/phase1/PHASE1_FINANCIAL_DATA_VALIDATION.md#p2`; numerical change `no historical before/after available; see reconciliation CSV`; research-paper impact `Use explicit per-traded-side rate; half-L1 is one-way rebalance turnover only for self-financing trades, not initial cash deployment. Fixed impact is bundled flat slippage, nonlinear impact0.`; independent reviewer `PENDING`.
 
-#### [ ] P3 — Are eight strategies evaluated on exactly the same portfolio returns and rebalance dates?
 
-- **Phase / severity from initial audit:** 3 / High; **status:** `UNASSESSED`.
+- **Phase3 complete validation (1 November2026):** previous `SOURCE_EVIDENCE_BLOCKED`; current `VERIFIED_CORRECT`. Exact source `backtest/costs.py::TransactionCostModel.estimate;backtest/engine.py::run_backtest` under `src/institutional_factor_platform` unless explicitly scripts/config. Actual old/new trade,fee,drift and NAV identities reconcile for all5/10/20bps scenarios. InitialL1=1,BASEfee=.001; full switchL1=2 costs20bps. Limit/manuscript consequence: Half-L1 is self-financing one-way turnover, not initial deployment. Rates are per-L1/per-traded-side; no unjustified halving. Evidence `../../outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md`, issue/reconciliation files and full source manifest. Portfolio/MLfit source `0fe382f`; MLmetric-only source `9df5455`; final evidence is the containing commit.6new regressions,91targeted and372full pass/90.62%; originals preserved; all before/after values and hashes recorded. Reviewer `PENDING`.
+
+#### [x] P3 — Are eight strategies evaluated on exactly the same portfolio returns and rebalance dates?
+
+- **Phase / severity from initial audit:** 3 / High; **status:** `VERIFIED_CORRECT`.
 - **Why this matters / failure mode:** Are eight strategies evaluated on exactly the same portfolio returns and rebalance dates? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
 - **Inspect first:** `portfolio manifests; src/institutional_factor_platform/portfolio/service.py`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
 - **Detailed verification and candidate correction:** Compare all eight strategy return matrices, factor-asset IDs, calendar dates, training windows, rebalance dates, benchmark and risk-free settings. Detect asset drift and unequal time horizons.
@@ -382,9 +388,12 @@
 - **Acceptance gate:** Like-for-like comparison is verified or incomparable strategies are labeled.
 - **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
 
-#### [ ] P4 — Do factor-portfolio test assets represent investable returns?
 
-- **Phase / severity from initial audit:** 3 / High; **status:** `UNASSESSED`.
+- **Phase3 complete validation (1 November2026):** previous `UNASSESSED`; current `VERIFIED_CORRECT`. Exact source `portfolio/service.py::_return_matrix,compute_and_publish` under `src/institutional_factor_platform` unless explicitly scripts/config. Eight methods share123sleeves,36-cycle history and identical32original/31corrected test cycles; objectives legitimately differ. Limit/manuscript consequence: Input/sample/cash changes must not be attributed to a single metric fix; pricing coefficients are not optimizer inputs. Evidence `../../outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md`, issue/reconciliation files and full source manifest. Portfolio/MLfit source `0fe382f`; MLmetric-only source `9df5455`; final evidence is the containing commit.6new regressions,91targeted and372full pass/90.62%; originals preserved; all before/after values and hashes recorded. Reviewer `PENDING`.
+
+#### [x] P4 — Do factor-portfolio test assets represent investable returns?
+
+- **Phase / severity from initial audit:** 3 / High; **status:** `RESEARCH_LIMITATION_DISCLOSED`.
 - **Why this matters / failure mode:** Do factor-portfolio test assets represent investable returns? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
 - **Inspect first:** `factor portfolio definitions, portfolio service, docs/LIMITATIONS.md`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
 - **Detailed verification and candidate correction:** Identify portfolio building blocks as research factor quantiles rather than directly traded products. Document whether each quantile requires short legs, stale weights, infeasible component trades or omitted constituent transaction costs.
@@ -393,9 +402,12 @@
 - **Acceptance gate:** Reported results are correctly labeled diagnostic/theoretical rather than implementable alpha absent execution evidence.
 - **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
 
-#### [ ] P5 — Are equal-weight and optimized strategies evaluated with identical costs and initial deployment?
 
-- **Phase / severity from initial audit:** 3 / High; **status:** `UNASSESSED`.
+- **Phase3 complete validation (1 November2026):** previous `UNASSESSED`; current `RESEARCH_LIMITATION_DISCLOSED`. Exact source `portfolio/service.py::_return_matrix` under `src/institutional_factor_platform` unless explicitly scripts/config. Optimizer invests in123constructed long-only quantiles, not direct487equities or long-short spreads. Limit/manuscript consequence: Overlapping sleeves and omitted inner constituent fees,liquidity/capacity prevent an executable-alpha claim. Evidence `../../outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md`, issue/reconciliation files and full source manifest. Portfolio/MLfit source `0fe382f`; MLmetric-only source `9df5455`; final evidence is the containing commit.6new regressions,91targeted and372full pass/90.62%; originals preserved; all before/after values and hashes recorded. Reviewer `PENDING`.
+
+#### [x] P5 — Are equal-weight and optimized strategies evaluated with identical costs and initial deployment?
+
+- **Phase / severity from initial audit:** 3 / High; **status:** `VERIFIED_CORRECT`.
 - **Why this matters / failure mode:** Are equal-weight and optimized strategies evaluated with identical costs and initial deployment? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
 - **Inspect first:** `backtest/engine.py, costs.py and allocations/transactions files`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
 - **Detailed verification and candidate correction:** Confirm initial cash→weights, rebalance pretrade drift, one-way trade notional, cost deduction, buy/hold cash assumptions, budget balance and equivalent costs for 1/N and optimized methods. Test a 2-asset hand-calculated path.
@@ -404,9 +416,12 @@
 - **Acceptance gate:** All eight reconciled NAV paths match modeled fees; treatment is consistent.
 - **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
 
-#### [ ] P6 — Why does CVaR have the highest observed cumulative return, 83.17%, despite not optimizing mean return?
 
-- **Phase / severity from initial audit:** 3 / High; **status:** `UNASSESSED`.
+- **Phase3 complete validation (1 November2026):** previous `UNASSESSED`; current `VERIFIED_CORRECT`. Exact source `backtest/engine.py::run_backtest;portfolio/allocations.py::equal_weight` under `src/institutional_factor_platform` unless explicitly scripts/config. EW and optimized methods start from cash/NAV1, charge initial deployment and use identical drift/fees. All16old/new method scenario comparisons have identical weights and monotonic fee effects. Limit/manuscript consequence: External SPY is an uncosted proxy, not an executed net benchmark. Evidence `../../outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md`, issue/reconciliation files and full source manifest. Portfolio/MLfit source `0fe382f`; MLmetric-only source `9df5455`; final evidence is the containing commit.6new regressions,91targeted and372full pass/90.62%; originals preserved; all before/after values and hashes recorded. Reviewer `PENDING`.
+
+#### [x] P6 — Why does CVaR have the highest observed cumulative return, 83.17%, despite not optimizing mean return?
+
+- **Phase / severity from initial audit:** 3 / High; **status:** `RESEARCH_LIMITATION_DISCLOSED`.
 - **Why this matters / failure mode:** Why does CVaR have the highest observed cumulative return, 83.17%, despite not optimizing mean return? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
 - **Inspect first:** `optimization/engine.py; portfolio weights; scenarios`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
 - **Detailed verification and candidate correction:** Reconstruct CVaR weights, factor exposures, turnover and worst-case outcomes by date; verify optimizer only minimizes trailing historical tail-loss and did not use future window scenarios. Attribute 83.17% gain to observed exposures rather than assuming objective rewards return.
@@ -415,9 +430,12 @@
 - **Acceptance gate:** CVaR return and risk are reconciled and short-sample interpretation is qualified.
 - **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
 
-#### [ ] P7 — Why is the portfolio test only about 32 months?
 
-- **Phase / severity from initial audit:** 3 / High; **status:** `UNASSESSED`.
+- **Phase3 complete validation (1 November2026):** previous `UNASSESSED`; current `RESEARCH_LIMITATION_DISCLOSED`. Exact source `optimization/engine.py::_cvar,optimize` under `src/institutional_factor_platform` unless explicitly scripts/config. Original CVaR.83173655874/Sharpe1.666656947 reproduces; cash-only repair on old path1.378572122; corrected inputs.73684195642/1.252326967. Scenario objectives and feasible weights reconcile. Limit/manuscript consequence: High observed return does not show future information or a return-maximizing CVaR objective; short-window ranking remains descriptive. Evidence `../../outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md`, issue/reconciliation files and full source manifest. Portfolio/MLfit source `0fe382f`; MLmetric-only source `9df5455`; final evidence is the containing commit.6new regressions,91targeted and372full pass/90.62%; originals preserved; all before/after values and hashes recorded. Reviewer `PENDING`.
+
+#### [x] P7 — Why is the portfolio test only about 32 months?
+
+- **Phase / severity from initial audit:** 3 / High; **status:** `RESEARCH_LIMITATION_DISCLOSED`.
 - **Why this matters / failure mode:** Why is the portfolio test only about 32 months? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
 - **Inspect first:** `portfolio dates and net paths`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
 - **Detailed verification and candidate correction:** Calculate portfolio test sample duration/effective rebalance count; compare ranking stability by calendar segments or subperiods only where observations suffice. Avoid unjustified bootstrap precision from 32 months.
@@ -426,9 +444,12 @@
 - **Acceptance gate:** Rankings are treated as sample-specific rather than persistent outperformance.
 - **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
 
+
+- **Phase3 complete validation (1 November2026):** previous `UNASSESSED`; current `RESEARCH_LIMITATION_DISCLOSED`. Exact source `portfolio/service.py;authenticated net-return paths` under `src/institutional_factor_platform` unless explicitly scripts/config. Original32cycles become31full corrected cycles after terminal partial exclusion. Limit/manuscript consequence: Short selected window cannot establish persistence; no new history or bootstrap grid. Evidence `../../outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md`, issue/reconciliation files and full source manifest. Portfolio/MLfit source `0fe382f`; MLmetric-only source `9df5455`; final evidence is the containing commit.6new regressions,91targeted and372full pass/90.62%; originals preserved; all before/after values and hashes recorded. Reviewer `PENDING`.
+
 #### [ ] P8 — Does the CVaR optimizer use genuine past observations exclusively?
 
-- **Phase / severity from initial audit:** 3 / Medium; **status:** `UNASSESSED`.
+- **Phase / severity from initial audit:** 3 / Medium; **status:** `SOURCE_EVIDENCE_BLOCKED`.
 - **Why this matters / failure mode:** Does the CVaR optimizer use genuine past observations exclusively? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
 - **Inspect first:** `portfolio/service.py; optimizer/engine.py`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
 - **Detailed verification and candidate correction:** For every rebalance, verify optimizer scenario matrix and risk estimates use returns strictly before trading date; inject a future observation as an adversarial temporal test.
@@ -437,9 +458,12 @@
 - **Acceptance gate:** No forward scenario leaks into investment decisions.
 - **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
 
-#### [ ] P9 — Are maximum-Sharpe and mean–variance optimizers subject to identical feasible sets?
 
-- **Phase / severity from initial audit:** 3 / Medium; **status:** `UNASSESSED`.
+- **Phase3 complete validation (1 November2026):** previous `UNASSESSED`; current `SOURCE_EVIDENCE_BLOCKED`. Exact source `portfolio/service.py::allocator;backtest/engine.py::run_backtest` under `src/institutional_factor_platform` unless explicitly scripts/config. Every optimizer uses36observations before evaluated return; training_end<=holding_start and no future array row. Limit/manuscript consequence: Strict pre-close availability/execution not proved: latest training mark can equal holding start; allocations label exits and sources use UTC-day availability. D4/V1remain. Evidence `../../outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md`, issue/reconciliation files and full source manifest. Portfolio/MLfit source `0fe382f`; MLmetric-only source `9df5455`; final evidence is the containing commit.6new regressions,91targeted and372full pass/90.62%; originals preserved; all before/after values and hashes recorded. Reviewer `PENDING`.
+
+#### [x] P9 — Are maximum-Sharpe and mean–variance optimizers subject to identical feasible sets?
+
+- **Phase / severity from initial audit:** 3 / Medium; **status:** `VERIFIED_CORRECT`.
 - **Why this matters / failure mode:** Are maximum-Sharpe and mean–variance optimizers subject to identical feasible sets? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
 - **Inspect first:** `optimization/engine.py; config/portfolio.yaml`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
 - **Detailed verification and candidate correction:** Inspect constraint sets, objectives, estimation windows, annualization, risk-free input and optimizer convergence for all eight models. Compare feasible sets explicitly; avoid presenting different objectives as a controlled single-variable experiment.
@@ -448,9 +472,12 @@
 - **Acceptance gate:** Constraint/frequency differences are justified and documented.
 - **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
 
-#### [ ] P10 — Is “fixed impact allowance” an empirical market-impact estimate?
 
-- **Phase / severity from initial audit:** 3 / Medium; **status:** `UNASSESSED`.
+- **Phase3 complete validation (1 November2026):** previous `UNASSESSED`; current `VERIFIED_CORRECT`. Exact source `optimization/engine.py::optimize;constraints/models.py;optimization/covariance.py` under `src/institutional_factor_platform` unless explicitly scripts/config. Feasible long-only fully-invested weights,positive Ledoit-Wolf covariances and all expected-return/volatility/objective identities reconcile. Limit/manuscript consequence: Optimizer maximum-Sharpe defaultRF0 retained; performance cash differs. No global-optimum certificate for every nonconvex solver. Evidence `../../outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md`, issue/reconciliation files and full source manifest. Portfolio/MLfit source `0fe382f`; MLmetric-only source `9df5455`; final evidence is the containing commit.6new regressions,91targeted and372full pass/90.62%; originals preserved; all before/after values and hashes recorded. Reviewer `PENDING`.
+
+#### [x] P10 — Is “fixed impact allowance” an empirical market-impact estimate?
+
+- **Phase / severity from initial audit:** 3 / Medium; **status:** `RESEARCH_LIMITATION_DISCLOSED`.
 - **Why this matters / failure mode:** Is “fixed impact allowance” an empirical market-impact estimate? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
 - **Inspect first:** `costs.py, config/portfolio.yaml, README and paper`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
 - **Detailed verification and candidate correction:** Identify fixed impact allowance as a flat modeled bps assumption folded into slippage, not estimated square-root market impact. Check no text claims nonlinear observed execution.
@@ -459,9 +486,12 @@
 - **Acceptance gate:** Cost wording matches implementation and capacity is not claimed.
 - **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
 
-#### [ ] P11 — Are VaR and CVaR reported for monthly returns with the correct horizon labels?
 
-- **Phase / severity from initial audit:** 3 / Medium; **status:** `UNASSESSED`.
+- **Phase3 complete validation (1 November2026):** previous `UNASSESSED`; current `RESEARCH_LIMITATION_DISCLOSED`. Exact source `backtest/costs.py::estimate;config/portfolio.yaml` under `src/institutional_factor_platform` unless explicitly scripts/config. BASE half-spread5bps plus modeled5bps slippage(2slippage+3fixed allowance),commission0,nonlinear impact0. Limit/manuscript consequence: Flat allowance is not measured order-book impact or capacity calibration. Evidence `../../outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md`, issue/reconciliation files and full source manifest. Portfolio/MLfit source `0fe382f`; MLmetric-only source `9df5455`; final evidence is the containing commit.6new regressions,91targeted and372full pass/90.62%; originals preserved; all before/after values and hashes recorded. Reviewer `PENDING`.
+
+#### [x] P11 — Are VaR and CVaR reported for monthly returns with the correct horizon labels?
+
+- **Phase / severity from initial audit:** 3 / Medium; **status:** `CONFIRMED_ERROR_FIXED`.
 - **Why this matters / failure mode:** Are VaR and CVaR reported for monthly returns with the correct horizon labels? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
 - **Inspect first:** `risk/metrics.py and portfolio returns`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
 - **Detailed verification and candidate correction:** Independently recompute monthly VaR95/ES95 on net monthly portfolio returns, check 5% tail sample size, unit signs and distinction from daily risk horizons.
@@ -470,9 +500,12 @@
 - **Acceptance gate:** Risk labels specify frequency and the positive-loss convention.
 - **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
 
-#### [ ] P12 — Does the paper include sufficient uncertainty around portfolio performance rankings?
 
-- **Phase / severity from initial audit:** 3 / High; **status:** `UNASSESSED`.
+- **Phase3 complete validation (1 November2026):** previous `UNASSESSED`; current `CONFIRMED_ERROR_FIXED`. Exact source `portfolio/service.py::_risk_free_series;risk/metrics.py::risk_summary,value_at_risk,expected_shortfall` under `src/institutional_factor_platform` unless explicitly scripts/config. Confirmed daily-cash/monthly-return mismatch fixed by exact interval compounding. Independent Sharpe,volatility,NAV,VaR95/ES95 reconcile. Limit/manuscript consequence: Unannualized monthly-cycle positive-loss quantiles; two realized tail observations. Inclusive tail mean differs from fractional training-LP tail. Evidence `../../outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md`, issue/reconciliation files and full source manifest. Portfolio/MLfit source `0fe382f`; MLmetric-only source `9df5455`; final evidence is the containing commit.6new regressions,91targeted and372full pass/90.62%; originals preserved; all before/after values and hashes recorded. Reviewer `PENDING`.
+
+#### [x] P12 — Does the paper include sufficient uncertainty around portfolio performance rankings?
+
+- **Phase / severity from initial audit:** 3 / High; **status:** `RESEARCH_LIMITATION_DISCLOSED`.
 - **Why this matters / failure mode:** Does the paper include sufficient uncertainty around portfolio performance rankings? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
 - **Inspect first:** `portfolio monthly return parquet`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
 - **Detailed verification and candidate correction:** Compute same-date paired performance differences and confidence bounds on 8 strategy returns where feasible; account for small 32-month sample and multiplicity. Keep otherwise descriptive ranks.
@@ -481,9 +514,12 @@
 - **Acceptance gate:** No strategy proclaimed superior solely on point estimates.
 - **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
 
-#### [ ] ML1 — Are there truly 91 usable monthly dates but only 17 complete final folds?
 
-- **Phase / severity from initial audit:** 3 / High; **status:** `UNASSESSED`.
+- **Phase3 complete validation (1 November2026):** previous `UNASSESSED`; current `RESEARCH_LIMITATION_DISCLOSED`. Exact source `scripts/research_phase3_verify.py::portfolio_audit` under `src/institutional_factor_platform` unless explicitly scripts/config. One predeclared paired CVaR-EW mean:original.00689120060,LOO.00508077666-.00980775974; corrected.00598371896,LOO.00408710902-.00875998275. Limit/manuscript consequence: LOO ranges are descriptive, not confidence intervals,superiority tests or persistence proof. Evidence `../../outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md`, issue/reconciliation files and full source manifest. Portfolio/MLfit source `0fe382f`; MLmetric-only source `9df5455`; final evidence is the containing commit.6new regressions,91targeted and372full pass/90.62%; originals preserved; all before/after values and hashes recorded. Reviewer `PENDING`.
+
+#### [x] ML1 — Are there truly 91 usable monthly dates but only 17 complete final folds?
+
+- **Phase / severity from initial audit:** 3 / High; **status:** `CONFIRMED_ERROR_FIXED`.
 - **Why this matters / failure mode:** Are there truly 91 usable monthly dates but only 17 complete final folds? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
 - **Inspect first:** `ml/splits.py; ML manifest; feature target dates`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
 - **Detailed verification and candidate correction:** Rebuild all monthly decision and 60/12/1 fold boundaries with 1-month embargo; count 91 months, excluded months, 17 complete tests and any gaps.
@@ -492,9 +528,12 @@
 - **Acceptance gate:** Every claimed fold is derived from actual dated observations.
 - **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
 
-#### [ ] ML2 — Does label purging eliminate every 21-session overlap at train/validation/test boundaries?
 
-- **Phase / severity from initial audit:** 3 / High; **status:** `UNASSESSED`.
+- **Phase3 complete validation (1 November2026):** previous `UNASSESSED`; current `CONFIRMED_ERROR_FIXED`. Exact source `ml/features.py::monthly_decision_features;ml/splits.py::temporal_folds` under `src/institutional_factor_platform` unless explicitly scripts/config. 91original distinct dates=89months+2earlier security dates. Corrected27632rows/89common dates/15complete folds rather than27640/91/17. Limit/manuscript consequence: Preserve old publications. Original initial60date labels represented58months; corrected training60expands to74months. Evidence `../../outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md`, issue/reconciliation files and full source manifest. Portfolio/MLfit source `0fe382f`; MLmetric-only source `9df5455`; final evidence is the containing commit.6new regressions,91targeted and372full pass/90.62%; originals preserved; all before/after values and hashes recorded. Reviewer `PENDING`.
+
+#### [x] ML2 — Does label purging eliminate every 21-session overlap at train/validation/test boundaries?
+
+- **Phase / severity from initial audit:** 3 / High; **status:** `CONFIRMED_ERROR_FIXED`.
 - **Why this matters / failure mode:** Does label purging eliminate every 21-session overlap at train/validation/test boundaries? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
 - **Inspect first:** `ml/splits.py; ml/targets.py`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
 - **Detailed verification and candidate correction:** For each fold intersect target [start,end] intervals with validation/test dates; assert training targets cannot overlap later partitions and validate boundary inclusivity on month ends.
@@ -503,9 +542,12 @@
 - **Acceptance gate:** No label leakage at partition boundaries.
 - **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
 
-#### [ ] ML3 — Is the one-month embargo consistently applied without unnecessary use of later information?
 
-- **Phase / severity from initial audit:** 3 / High; **status:** `UNASSESSED`.
+- **Phase3 complete validation (1 November2026):** previous `UNASSESSED`; current `CONFIRMED_ERROR_FIXED`. Exact source `ml/targets.py::build_targets;ml/splits.py::assign_and_purge` under `src/institutional_factor_platform` unless explicitly scripts/config. 8original ends violate common21-session horizon. Remove2off-month-end features and exclude6incomplete labels; every retained corrected window is21complete sessions. Partition interval checks pass. Limit/manuscript consequence: No missing observation was recovered,filled,extended or made cash. Evidence `../../outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md`, issue/reconciliation files and full source manifest. Portfolio/MLfit source `0fe382f`; MLmetric-only source `9df5455`; final evidence is the containing commit.6new regressions,91targeted and372full pass/90.62%; originals preserved; all before/after values and hashes recorded. Reviewer `PENDING`.
+
+#### [x] ML3 — Is the one-month embargo consistently applied without unnecessary use of later information?
+
+- **Phase / severity from initial audit:** 3 / High; **status:** `VERIFIED_CORRECT`.
 - **Why this matters / failure mode:** Is the one-month embargo consistently applied without unnecessary use of later information? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
 - **Inspect first:** `ML split config; preprocessing/model selection`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
 - **Detailed verification and candidate correction:** Compute effective embargo durations relative to the 21-session target horizon; test first/last eligible training observations and ensure no future validation metric enters training.
@@ -514,9 +556,12 @@
 - **Acceptance gate:** Embargo and purging constraints protect each test decision.
 - **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
 
+
+- **Phase3 complete validation (1 November2026):** previous `UNASSESSED`; current `VERIFIED_CORRECT`. Exact source `ml/splits.py::temporal_folds,assign_and_purge` under `src/institutional_factor_platform` unless explicitly scripts/config. All17original/15corrected folds preserve1-month embargo at both boundaries; train/validation label ends precede later formation. Limit/manuscript consequence: Adjacent OOS targets overlap6/16original and5/14corrected pairs; folds are not independent. Evidence `../../outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md`, issue/reconciliation files and full source manifest. Portfolio/MLfit source `0fe382f`; MLmetric-only source `9df5455`; final evidence is the containing commit.6new regressions,91targeted and372full pass/90.62%; originals preserved; all before/after values and hashes recorded. Reviewer `PENDING`.
+
 #### [ ] ML4 — Are all cross-sectional input features available before the monthly investment decision?
 
-- **Phase / severity from initial audit:** 3 / High; **status:** `UNASSESSED`.
+- **Phase / severity from initial audit:** 3 / High; **status:** `SOURCE_EVIDENCE_BLOCKED`.
 - **Why this matters / failure mode:** Are all cross-sectional input features available before the monthly investment decision? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
 - **Inspect first:** `features provenance; ml feature table; factors/temporal.py`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
 - **Detailed verification and candidate correction:** Trace book-to-market SEC availability and 12–1 momentum formation dates to prediction timestamps; inspect securities with amendments, holidays, after-close filings, missing-price histories.
@@ -525,9 +570,12 @@
 - **Acceptance gate:** No feature timestamp after the decision is used.
 - **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
 
+
+- **Phase3 complete validation (1 November2026):** previous `UNASSESSED`; current `SOURCE_EVIDENCE_BLOCKED`. Exact source `ml/features.py::assemble_factor_features;ml/preprocessing.py::SafePreprocessor` under `src/institutional_factor_platform` unless explicitly scripts/config. Only frozen book-to-market and12-1momentum reused. UTC-day gate passes; final scalers match permitted training data; independent linear/Ridge/baseline forecasts and coefficients match all folds. Limit/manuscript consequence: Complete actual filing/share capture/pre-trade timing remains D4/V1-qualified. Earlier fitted tree objects are not retained independently. Evidence `../../outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md`, issue/reconciliation files and full source manifest. Portfolio/MLfit source `0fe382f`; MLmetric-only source `9df5455`; final evidence is the containing commit.6new regressions,91targeted and372full pass/90.62%; originals preserved; all before/after values and hashes recorded. Reviewer `PENDING`.
+
 #### [ ] ML5 — Is the reported economic strategy constructed only from predictions actually generated before the corresponding holding period?
 
-- **Phase / severity from initial audit:** 3 / High; **status:** `UNASSESSED`.
+- **Phase / severity from initial audit:** 3 / High; **status:** `SOURCE_EVIDENCE_BLOCKED`.
 - **Why this matters / failure mode:** Is the reported economic strategy constructed only from predictions actually generated before the corresponding holding period? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
 - **Inspect first:** `ml/economic.py; predictions; folds; costs`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
 - **Detailed verification and candidate correction:** For representative folds verify prediction file is authenticated, generated at or before decision, joined only to future realized returns, and ranking allocator does not use future outcomes. Reconcile selected assets with economic portfolio trades.
@@ -536,9 +584,12 @@
 - **Acceptance gate:** Forecast-to-trade-to-PnL chain is reproducible without future information.
 - **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
 
-#### [ ] ML6 — Why do linear and factor-composite ICs match to six decimals?
 
-- **Phase / severity from initial audit:** 3 / Medium; **status:** `UNASSESSED`.
+- **Phase3 complete validation (1 November2026):** previous `UNASSESSED`; current `SOURCE_EVIDENCE_BLOCKED`. Exact source `ml/service.py::_economic_evaluation;ml/economic.py::evaluate_ranked_signal` under `src/institutional_factor_platform` unless explicitly scripts/config. Held-out predictions map to next common session without realized return entering ranking. Limit/manuscript consequence: Retrospective output is not historical live-forecast evidence. Same-close acquisition versus UTC-day cutoff/intraday availability remains unresolved; target21sessions versus economic1session. Evidence `../../outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md`, issue/reconciliation files and full source manifest. Portfolio/MLfit source `0fe382f`; MLmetric-only source `9df5455`; final evidence is the containing commit.6new regressions,91targeted and372full pass/90.62%; originals preserved; all before/after values and hashes recorded. Reviewer `PENDING`.
+
+#### [x] ML6 — Why do linear and factor-composite ICs match to six decimals?
+
+- **Phase / severity from initial audit:** 3 / Medium; **status:** `RESEARCH_LIMITATION_DISCLOSED`.
 - **Why this matters / failure mode:** Why do linear and factor-composite ICs match to six decimals? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
 - **Inspect first:** `ML predictions, model fits and benchmark outputs`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
 - **Detailed verification and candidate correction:** Compare factor composite and linear predictions vector-by-vector, coefficients, training design matrix and rank transformation; explain exact six-decimal IC identity and check duplicate output artifacts.
@@ -547,9 +598,12 @@
 - **Acceptance gate:** Identical results are explained by identical rankings or traced to a real duplication defect.
 - **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
 
-#### [ ] ML7 — Why is Ridge almost identical to linear?
 
-- **Phase / severity from initial audit:** 3 / Medium; **status:** `UNASSESSED`.
+- **Phase3 complete validation (1 November2026):** previous `UNASSESSED`; current `RESEARCH_LIMITATION_DISCLOSED`. Exact source `ml/models.py::create_model` under `src/institutional_factor_platform` unless explicitly scripts/config. factor_composite and linear both use LinearRegression; vectors/ranks exactly identical in all32original+corrected folds. Limit/manuscript consequence: Intentional estimator alias;8names are not8independent methods. No artificial differences introduced. Evidence `../../outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md`, issue/reconciliation files and full source manifest. Portfolio/MLfit source `0fe382f`; MLmetric-only source `9df5455`; final evidence is the containing commit.6new regressions,91targeted and372full pass/90.62%; originals preserved; all before/after values and hashes recorded. Reviewer `PENDING`.
+
+#### [x] ML7 — Why is Ridge almost identical to linear?
+
+- **Phase / severity from initial audit:** 3 / Medium; **status:** `VERIFIED_CORRECT`.
 - **Why this matters / failure mode:** Why is Ridge almost identical to linear? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
 - **Inspect first:** `ML model settings and fit records`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
 - **Detailed verification and candidate correction:** Measure Ridge vs linear coefficient/forecast/rank differences under scaling, feature collinearity and chosen alpha. Test that regularization was implemented and applied to training folds only.
@@ -558,9 +612,12 @@
 - **Acceptance gate:** Near-matching results are explained and correctly labeled.
 - **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
 
-#### [ ] ML8 — Are the 17 fold-level ICs independent enough for ordinary bootstrap resampling?
 
-- **Phase / severity from initial audit:** 3 / High; **status:** `UNASSESSED`.
+- **Phase3 complete validation (1 November2026):** previous `UNASSESSED`; current `VERIFIED_CORRECT`. Exact source `ml/models.py::create_model;hyperparameter_trials` under `src/institutional_factor_platform` unless explicitly scripts/config. Ridge grid.1/1/10 and training-only scaling preserved; finalalpha.1. Penalized normal equations reproduce fold forecasts/coefficients; max linear-Ridge gap7.66e-6. Limit/manuscript consequence: Weak penalty relative to training Gram matrix explains similarity; some rankings differ. No retuning. Evidence `../../outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md`, issue/reconciliation files and full source manifest. Portfolio/MLfit source `0fe382f`; MLmetric-only source `9df5455`; final evidence is the containing commit.6new regressions,91targeted and372full pass/90.62%; originals preserved; all before/after values and hashes recorded. Reviewer `PENDING`.
+
+#### [x] ML8 — Are the 17 fold-level ICs independent enough for ordinary bootstrap resampling?
+
+- **Phase / severity from initial audit:** 3 / High; **status:** `CONFIRMED_ERROR_FIXED`.
 - **Why this matters / failure mode:** Are the 17 fold-level ICs independent enough for ordinary bootstrap resampling? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
 - **Inspect first:** `fold metrics and resampling code`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
 - **Detailed verification and candidate correction:** Examine serial dependence of 17 fold ICs; compare basic bootstrap with conservative block-based or leave-period-out sensitivity when sample size permits, without promising strong significance.
@@ -569,9 +626,12 @@
 - **Acceptance gate:** IC intervals and limits are accurately communicated.
 - **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
 
-#### [ ] ML9 — Are economic gains compared on a consistent capital-allocation and transaction-cost basis?
 
-- **Phase / severity from initial audit:** 3 / High; **status:** `UNASSESSED`.
+- **Phase3 complete validation (1 November2026):** previous `UNASSESSED`; current `CONFIRMED_ERROR_FIXED`. Exact source `ml/evaluation.py::block_bootstrap_ic,_correlation` under `src/institutional_factor_platform` unless explicitly scripts/config. Bootstrap now targets observed mean date IC instead of pooled ranks/bootstrap mean. Constant nonzero forecasts now yield unavailable IC rather thanNaN. Same block3/100resamples/seed17. Limit/manuscript consequence: 15dependent folds and overlapping outcomes limit interval coverage; nominal positive/negative intervals are not robust discoveries. Evidence `../../outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md`, issue/reconciliation files and full source manifest. Portfolio/MLfit source `0fe382f`; MLmetric-only source `9df5455`; final evidence is the containing commit.6new regressions,91targeted and372full pass/90.62%; originals preserved; all before/after values and hashes recorded. Reviewer `PENDING`.
+
+#### [x] ML9 — Are economic gains compared on a consistent capital-allocation and transaction-cost basis?
+
+- **Phase / severity from initial audit:** 3 / High; **status:** `RESEARCH_LIMITATION_DISCLOSED`.
 - **Why this matters / failure mode:** Are economic gains compared on a consistent capital-allocation and transaction-cost basis? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
 - **Inspect first:** `ml/economic.py; backtest engine; economic folds`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
 - **Detailed verification and candidate correction:** Reconcile one-period selected holdings, gross/net return, transaction costs, ranking selection fraction, benchmark exposure, zero/historical-mean baselines and cumulative effect across folds.
@@ -580,9 +640,12 @@
 - **Acceptance gate:** The reported economic signals correspond to actual out-of-sample decisions and fees.
 - **Progress record:** owner `Codex`; result `UNASSESSED`; baseline SHA `TBD`; updated SHA `TBD`; test `TBD`; evidence link `TBD`; numerical change `TBD`; research-paper impact `TBD`; independent reviewer `PENDING`.
 
-#### [ ] ML10 — Can the SHAP versus permutation-importance disagreement be explained by feature correlation and sample size?
 
-- **Phase / severity from initial audit:** 3 / Medium; **status:** `UNASSESSED`.
+- **Phase3 complete validation (1 November2026):** previous `UNASSESSED`; current `RESEARCH_LIMITATION_DISCLOSED`. Exact source `ml/economic.py::evaluate_ranked_signal;ml/service.py::_economic_evaluation` under `src/institutional_factor_platform` unless explicitly scripts/config. Every family uses20%equal-weight selected equities,cash reset,one next session and10bps initialL1fee; all economic identities reconcile. Limit/manuscript consequence: Not a continuous21-session strategy; no exit liquidation charge or capital chain. Constant ties select arbitrary IDs. Stable incremental after-cost value remains unestablished. Evidence `../../outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md`, issue/reconciliation files and full source manifest. Portfolio/MLfit source `0fe382f`; MLmetric-only source `9df5455`; final evidence is the containing commit.6new regressions,91targeted and372full pass/90.62%; originals preserved; all before/after values and hashes recorded. Reviewer `PENDING`.
+
+#### [x] ML10 — Can the SHAP versus permutation-importance disagreement be explained by feature correlation and sample size?
+
+- **Phase / severity from initial audit:** 3 / Medium; **status:** `RESEARCH_LIMITATION_DISCLOSED`.
 - **Why this matters / failure mode:** Can the SHAP versus permutation-importance disagreement be explained by feature correlation and sample size? A mismatch can change empirical interpretation or make a paper claim stronger than the underlying data support; do not presume a defect before examining the archived outputs.
 - **Inspect first:** `ml explainability outputs and configurations`. Resolve these to actual paths on the checked-out commit; record function names/line ranges rather than assuming they are unchanged.
 - **Detailed verification and candidate correction:** Trace SHAP/permutation/coefficient definitions; compare feature correlations, fold sample sizes and model stability; distinguish model diagnostics from causal factor importance.
@@ -593,6 +656,9 @@
 
 
 ### Phase 4 — Manuscript/results reconciliation and publication integrity
+
+
+- **Phase3 complete validation (1 November2026):** previous `UNASSESSED`; current `RESEARCH_LIMITATION_DISCLOSED`. Exact source `ml/validation.py::tree_explanations` under `src/institutional_factor_platform` unless explicitly scripts/config. Permutation uses validation prediction loss; SHAP explains test predictions with historical background. Top disagreement RF7/17→7/15;XGB10/17→6/15; feature correlation≈-.1875. Limit/manuscript consequence: Different estimands/samples and instability can disagree; causal explanation/importance is not established. Evidence `../../outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md`, issue/reconciliation files and full source manifest. Portfolio/MLfit source `0fe382f`; MLmetric-only source `9df5455`; final evidence is the containing commit.6new regressions,91targeted and372full pass/90.62%; originals preserved; all before/after values and hashes recorded. Reviewer `PENDING`.
 
 #### [ ] R1 — Does the tagged research commit reproduce every manuscript table?
 
@@ -820,3 +886,7 @@ D3tiny samples,D4complete PIT,D5exhaustive class attribution,V1exact return basi
 ## Phase2C independent verification signoff — 1 November2026
 
 `PHASE2C_VERIFIED_WITH_ECONOMIC_LIMITATIONS`. Branch `research/institutional-phase2c-regression-verification` starts at exact94f347476c86962d2d7479a74b8fa915a5849668. All615primary and615supplementary regressions independently reproduced from complete reconstructed matrices; all11352returns and1,138,880formation memberships agree. Negative mean alphas and .76-.82mean adjustedR2 are verified; no Phase2B defect, numerical change or new official publication required. Full366tests pass at90.68%;45targeted and static/lock/hash checks pass. One frozen self-inclusion diagnostic retains109assets and excludes14empty-leg cases, without establishing external independence. OnlyAP3/AP5/AP6/AP7/AP8/AP9 interpretation records updated; all50IDs and prior statuses/checkboxes retained. Main, earlierbranches, historical publications/manuscripts/README and frozen inputs unchanged. Stop here; noPhase3 or paper rewrite.
+
+## Phase3 complete signoff — 1 November2026
+
+`PHASE3_VERIFIED_WITH_LIMITATIONS`. Branch `research/institutional-phase3-validation`, exact base277c95bd4ba7279e6863bc3acc026d406a8ad482. AllP1-P12/ML1-ML10 investigated:7verified,4fixed issues covering5distinct defects,8disclosed limitations,3source-blocked. All50IDs retained. Historical maximum-diversification MDD-5.43%is verified; initial-NAV effect0 for all8historical maxima.24new portfolio publications preserve8methods and3fee scenarios;32old cycles become31full cycles. CVaR83.17%/Sharpe1.667 becomes73.68%/1.252; cash-only repair on old path gives1.379. Corrected ML has27632rows/89true monthly dates/15folds,not27640/91distinct dates/17folds. Eight existing families retrained only for confirmed calendar/label changes; later metric-only republishing does not refit models. Positive nominal IC intervals do not establish stable economic value; economic checks remain isolated1-session resets,not21-session investments. Final372tests pass/90.62%;91targeted pass. Preliminary broad run interrupted58%after an actual-data constant-IC defect; one complete final run after the final core correction. Accepted1230regressions and11352factor-return experiment were not repeated. P8/ML4/ML5source-blocked;D4/V1unchanged. Main,previousbranches,originalpapers/README/data/publications preserved. NoPhase4editing orPhase5cleanup.
