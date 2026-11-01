@@ -168,7 +168,7 @@ def portfolio_corrections():
         diagnostics = pd.read_parquet(
             ROOT / next(a.path for a in corrected.artifacts if a.name == "optimization_diagnostics")
         )
-        for scenario, spread in [("LOW", 5.0), ("HIGH", 20.0)]:
+        for scenario, spread in [("LOW", 4.0), ("HIGH", 20.0)]:
             old = next(
                 m
                 for m in originals
@@ -358,6 +358,22 @@ class CachedML(MLResearchService):
 
 
 def ml_corrections():
+    # The historical portfolio is used only for its authenticated fee configuration.
+    # Mirror those exact small metadata bytes for the service's root-relative lookup;
+    # the source authority and all empirical data remain in the original archive.
+    parent = next(
+        m
+        for m in GATE["portfolio"]
+        if m["publication_id"] == "portfolio-dfef8d60d8a771e61224f0b314efd86c"
+    )
+    config_artifact = next(a for a in parent["artifacts"] if a["name"] == "configuration")
+    target = ROOT / config_artifact["path"]
+    content = (ARCHIVE / config_artifact["path"]).read_bytes()
+    if target.exists():
+        assert target.read_bytes() == content
+    else:
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(content)
     market = Market()
     dataset, metadata = corrected_ml_dataset(market)
     print(
