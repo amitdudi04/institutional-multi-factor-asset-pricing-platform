@@ -33,7 +33,7 @@ def load_json(path):
 
 
 def write_json(path, value):
-    Path(path).write_text(json.dumps(value, indent=2, default=str) + "\n", encoding="utf-8")
+    Path(path).write_bytes((json.dumps(value, indent=2, default=str) + "\n").encode("utf-8"))
 
 
 def authenticate():
@@ -160,7 +160,7 @@ def reconstruct(factor, parents, config, archive):
         np.max(np.abs(membership_check.reference_weight - membership_check.weight))
     )
     assert weight_error < 1e-12
-    # Genuine frozen endpoints; independent product of all observed quote links as extra check.
+    # Genuine frozen endpoints; unchanged Phase2B quote-chain evidence is reused.
     prices = market.set_index(["security_id", "date"]).price
     start = pd.MultiIndex.from_frame(members[["security_id", "formation_date"]])
     end = pd.MultiIndex.from_frame(members[["security_id", "exit_date"]])
@@ -456,7 +456,7 @@ def summaries(records):
             mean_dependent_excess=g.mean_dependent_excess.mean(),
             mean_fitted_factor_contribution=g.mean_fitted_factor_contribution.mean(),
         )
-        if "holm_within_model_p" in g:
+        if "holm_within_model_p" in g and g.holm_within_model_p.notna().all():
             row.update(
                 holm_within_model_rejections=int(g.holm_within_model_p.lt(0.05).sum()),
                 holm_across_615_rejections=int(g.holm_across_615_p.lt(0.05).sum()),
@@ -523,11 +523,20 @@ def dependence_diagnostics(members, port, panel, records, residuals, config):
             )
         )
     for model, g in residuals.groupby("model_id"):
-        corr = (
-            g.pivot(index="date", columns="asset_id", values="residual")
-            .corr(min_periods=24)
-            .to_numpy()
+        residual_matrix = g.pivot(index="date", columns="asset_id", values="residual")
+        common = residual_matrix.dropna()
+        centered = common.to_numpy() - common.to_numpy().mean(axis=0)
+        rows.append(
+            dict(
+                kind="joint_residual_covariance_support",
+                model_id=model,
+                complete_dates=len(common),
+                asset_dimension=len(common.columns),
+                centered_residual_rank=int(np.linalg.matrix_rank(centered)),
+                interpretation="Singular sample covariance; no naive inverse-covariance joint test",
+            )
         )
+        corr = residual_matrix.corr(min_periods=24).to_numpy()
         upper = corr[np.triu_indices_from(corr, 1)]
         rows.append(
             dict(
@@ -542,6 +551,19 @@ def dependence_diagnostics(members, port, panel, records, residuals, config):
             )
         )
     primary = records.loc[records.sample_family.eq("primary")]
+    for model, g in primary.groupby("model_id"):
+        rows.append(
+            dict(
+                kind="conditioning_summary",
+                model_id=model,
+                n=len(g),
+                raw_condition_max=g.raw_condition.max(),
+                standardized_condition_max=g.standardized_condition.max(),
+                max_vif=g.max_vif.max(),
+                full_rank_fits=len(g),
+                flagged_standardized_condition_gt30=int(g.standardized_condition.gt(30).sum()),
+            )
+        )
     for a, b in combinations(MODEL_SPECS, 2):
         x = primary.loc[primary.model_id.eq(a)].set_index("asset_id")
         y = primary.loc[primary.model_id.eq(b)].set_index("asset_id")
@@ -653,6 +675,25 @@ def main():
     extra, rejected = sensitivity(members, primary, config)
     depend += rejected
     all_records = pd.concat([records, extra], ignore_index=True)
+    original_n = (
+        records.loc[records.sample_family.eq("primary") & records.model_id.eq("capm")]
+        .set_index("asset_id")
+        .n
+    )
+    diagnostic = extra.loc[extra.sample_family.eq("self_exclusion") & extra.model_id.eq("capm")]
+    for row in diagnostic.itertuples():
+        depend.append(
+            dict(
+                kind="self_exclusion_sample",
+                asset_id=row.asset_id,
+                original_n=int(original_n.loc[row.asset_id]),
+                retained_n=row.n,
+                lost_asset_cycles=int(original_n.loc[row.asset_id]) - row.n,
+                retained_month_gaps=row.month_gaps,
+                start=row.start,
+                end=row.end,
+            )
+        )
     model_summary = summaries(all_records)
     baseline = pd.read_csv(ROOT / "outputs/audit/phase2b/PHASE2B_MODEL_COMPARISON.csv")
     for _, row in model_summary.loc[
@@ -683,10 +724,14 @@ def main():
             )
             assert error < 1e-12
         assert row.significantly_positive + row.significantly_negative == old.nominal_significant
-    all_records.to_csv(OUT / "PHASE2C_PORTFOLIO_LEVEL_CHECKS.csv", index=False)
-    model_summary.to_csv(OUT / "PHASE2C_MODEL_LEVEL_SUMMARY.csv", index=False)
-    pd.DataFrame(differences).to_csv(OUT / "PHASE2C_NUMERICAL_DIFFERENCES.csv", index=False)
-    pd.DataFrame(depend).to_csv(OUT / "PHASE2C_DEPENDENCE_AND_CONDITIONING.csv", index=False)
+    all_records.to_csv(OUT / "PHASE2C_PORTFOLIO_LEVEL_CHECKS.csv", index=False, lineterminator="\n")
+    model_summary.to_csv(OUT / "PHASE2C_MODEL_LEVEL_SUMMARY.csv", index=False, lineterminator="\n")
+    pd.DataFrame(differences).to_csv(
+        OUT / "PHASE2C_NUMERICAL_DIFFERENCES.csv", index=False, lineterminator="\n"
+    )
+    pd.DataFrame(depend).to_csv(
+        OUT / "PHASE2C_DEPENDENCE_AND_CONDITIONING.csv", index=False, lineterminator="\n"
+    )
     # Preserve exact source inventories, private paths and authority rather than copying data.
     source = dict(
         base_commit=policy["base_commit"],
