@@ -93,7 +93,9 @@ def authenticate():
 
 
 def build_factors(policy, archive, old, parents):
-    market = pd.read_parquet(parents["factor_market"])
+    market = pd.read_parquet(parents["factor_market"]).rename(
+        columns={"risk_free": "risk_free_rate"}
+    )
     market["date"] = pd.to_datetime(market["date"])
     calendar = xcals.get_calendar("XNYS", start="2017-01-01", end="2027-01-31")
     sessions = calendar.sessions.tz_localize(None)
