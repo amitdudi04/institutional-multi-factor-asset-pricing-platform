@@ -11,6 +11,7 @@ models:
   fama_french_3: [market_excess, SMB, HML]
   carhart_4: [market_excess, SMB, HML, MOM]
   fama_french_5: [market_excess, SMB, HML, RMW, CMA]
+  # Historical ID retained: study-specific q-style mapping, not an exact HXZ replication.
   hou_xue_zhang_q: [market_excess, ME, IA, ROE]
 factor_mappings:
   SMB: log_market_cap
@@ -20,6 +21,8 @@ factor_mappings:
   CMA: asset_growth
   ME: log_market_cap
   IA: asset_growth
+  # Historical alias ROE sorts earnings yield (net income / market cap), not accounting ROE.
+  # Retain this numerical specification; substituting roe requires a separate experiment.
   ROE: earnings_yield
 publication:
   output_root: data/asset_pricing

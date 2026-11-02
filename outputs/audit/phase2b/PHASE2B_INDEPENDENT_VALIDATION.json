@@ -1,0 +1,610 @@
+{
+  "independent_market_excess_max_error": 0.0,
+  "independent_cash_max_error": 0.0,
+  "independent_dependent_excess_max_error": 0.0,
+  "independent_factor_spread_max_error": 0.0,
+  "formation_membership_key_comparison": {
+    "both": 1138880,
+    "left_only": 18132,
+    "right_only": 0
+  },
+  "overlap": [
+    {
+      "alias": "CMA",
+      "observations": 10662,
+      "mean_shared_fraction": 0.5579923185090828,
+      "min_shared_fraction": 0.0,
+      "max_shared_fraction": 1.0,
+      "mean_dependent_weight_shared": 0.5457503075236476
+    },
+    {
+      "alias": "HML",
+      "observations": 10662,
+      "mean_shared_fraction": 0.577756668428806,
+      "min_shared_fraction": 0.0,
+      "max_shared_fraction": 1.0,
+      "mean_dependent_weight_shared": 0.6120765160581272
+    },
+    {
+      "alias": "IA",
+      "observations": 10662,
+      "mean_shared_fraction": 0.5579923185090828,
+      "min_shared_fraction": 0.0,
+      "max_shared_fraction": 1.0,
+      "mean_dependent_weight_shared": 0.5457503075236476
+    },
+    {
+      "alias": "ME",
+      "observations": 11352,
+      "mean_shared_fraction": 0.6817163795160235,
+      "min_shared_fraction": 0.0,
+      "max_shared_fraction": 1.0,
+      "mean_dependent_weight_shared": 0.8030850333884838
+    },
+    {
+      "alias": "MOM",
+      "observations": 10662,
+      "mean_shared_fraction": 0.5744227092088338,
+      "min_shared_fraction": 0.0,
+      "max_shared_fraction": 1.0,
+      "mean_dependent_weight_shared": 0.5405333469347748
+    },
+    {
+      "alias": "RMW",
+      "observations": 9441,
+      "mean_shared_fraction": 0.25076375441169246,
+      "min_shared_fraction": 0.0,
+      "max_shared_fraction": 1.0,
+      "mean_dependent_weight_shared": 0.2637379268051442
+    },
+    {
+      "alias": "ROE",
+      "observations": 10662,
+      "mean_shared_fraction": 0.5714972193851287,
+      "min_shared_fraction": 0.0,
+      "max_shared_fraction": 1.0,
+      "mean_dependent_weight_shared": 0.48495663274570733
+    },
+    {
+      "alias": "SMB",
+      "observations": 11352,
+      "mean_shared_fraction": 0.6817163795160235,
+      "min_shared_fraction": 0.0,
+      "max_shared_fraction": 1.0,
+      "mean_dependent_weight_shared": 0.8030850333884838
+    }
+  ],
+  "return_correlation": {
+    "mean": 0.7762740106477789,
+    "median": 0.7922587105422043,
+    "pairs_gt_095": 51,
+    "pairs": 7503
+  },
+  "exact_repeated_series": [
+    [
+      "log_market_cap:Q1",
+      "market_cap:Q1",
+      101
+    ],
+    [
+      "log_market_cap:Q2",
+      "market_cap:Q2",
+      101
+    ],
+    [
+      "log_market_cap:Q3",
+      "market_cap:Q3",
+      101
+    ],
+    [
+      "rolling_beta:Q1",
+      "rolling_market_beta:Q1",
+      100
+    ],
+    [
+      "rolling_beta:Q2",
+      "rolling_market_beta:Q2",
+      100
+    ],
+    [
+      "rolling_beta:Q3",
+      "rolling_market_beta:Q3",
+      100
+    ]
+  ],
+  "residual_correlation": [
+    {
+      "model_id": "capm",
+      "mean_pairwise_correlation": 0.2930137013832385,
+      "median_pairwise_correlation": 0.30232767476547484,
+      "pairs_gt_095": 18
+    },
+    {
+      "model_id": "carhart_4",
+      "mean_pairwise_correlation": 0.3214494845095601,
+      "median_pairwise_correlation": 0.3462308339307319,
+      "pairs_gt_095": 27
+    },
+    {
+      "model_id": "fama_french_3",
+      "mean_pairwise_correlation": 0.3037177526925632,
+      "median_pairwise_correlation": 0.3267251169529063,
+      "pairs_gt_095": 25
+    },
+    {
+      "model_id": "fama_french_5",
+      "mean_pairwise_correlation": 0.33228933526347404,
+      "median_pairwise_correlation": 0.34983441985368324,
+      "pairs_gt_095": 26
+    },
+    {
+      "model_id": "hou_xue_zhang_q",
+      "mean_pairwise_correlation": 0.3294340070704384,
+      "median_pairwise_correlation": 0.3362098304526725,
+      "pairs_gt_095": 24
+    }
+  ],
+  "hac_sensitivity": [
+    {
+      "model_id": "capm",
+      "hac_lag": 0,
+      "assets": 123,
+      "nominal_significant": 7,
+      "mean_alpha_se": 0.0032091585768617386
+    },
+    {
+      "model_id": "capm",
+      "hac_lag": 3,
+      "assets": 123,
+      "nominal_significant": 8,
+      "mean_alpha_se": 0.003146925101100616
+    },
+    {
+      "model_id": "capm",
+      "hac_lag": 6,
+      "assets": 123,
+      "nominal_significant": 10,
+      "mean_alpha_se": 0.003045581699907338
+    },
+    {
+      "model_id": "capm",
+      "hac_lag": 12,
+      "assets": 123,
+      "nominal_significant": 15,
+      "mean_alpha_se": 0.0027590247602697717
+    },
+    {
+      "model_id": "carhart_4",
+      "hac_lag": 0,
+      "assets": 123,
+      "nominal_significant": 10,
+      "mean_alpha_se": 0.002767593921906154
+    },
+    {
+      "model_id": "carhart_4",
+      "hac_lag": 3,
+      "assets": 123,
+      "nominal_significant": 14,
+      "mean_alpha_se": 0.002719763818237489
+    },
+    {
+      "model_id": "carhart_4",
+      "hac_lag": 6,
+      "assets": 123,
+      "nominal_significant": 20,
+      "mean_alpha_se": 0.002562341846763002
+    },
+    {
+      "model_id": "carhart_4",
+      "hac_lag": 12,
+      "assets": 123,
+      "nominal_significant": 21,
+      "mean_alpha_se": 0.0023551950415756687
+    },
+    {
+      "model_id": "fama_french_3",
+      "hac_lag": 0,
+      "assets": 123,
+      "nominal_significant": 9,
+      "mean_alpha_se": 0.002840085543102411
+    },
+    {
+      "model_id": "fama_french_3",
+      "hac_lag": 3,
+      "assets": 123,
+      "nominal_significant": 12,
+      "mean_alpha_se": 0.002778954286204859
+    },
+    {
+      "model_id": "fama_french_3",
+      "hac_lag": 6,
+      "assets": 123,
+      "nominal_significant": 18,
+      "mean_alpha_se": 0.002605981778825905
+    },
+    {
+      "model_id": "fama_french_3",
+      "hac_lag": 12,
+      "assets": 123,
+      "nominal_significant": 21,
+      "mean_alpha_se": 0.0023684181288939304
+    },
+    {
+      "model_id": "fama_french_5",
+      "hac_lag": 0,
+      "assets": 123,
+      "nominal_significant": 6,
+      "mean_alpha_se": 0.0028270198096306564
+    },
+    {
+      "model_id": "fama_french_5",
+      "hac_lag": 3,
+      "assets": 123,
+      "nominal_significant": 8,
+      "mean_alpha_se": 0.0028088217497292387
+    },
+    {
+      "model_id": "fama_french_5",
+      "hac_lag": 6,
+      "assets": 123,
+      "nominal_significant": 16,
+      "mean_alpha_se": 0.0026100568979461605
+    },
+    {
+      "model_id": "fama_french_5",
+      "hac_lag": 12,
+      "assets": 123,
+      "nominal_significant": 22,
+      "mean_alpha_se": 0.0023355755705092114
+    },
+    {
+      "model_id": "hou_xue_zhang_q",
+      "hac_lag": 0,
+      "assets": 123,
+      "nominal_significant": 5,
+      "mean_alpha_se": 0.0029825471314894234
+    },
+    {
+      "model_id": "hou_xue_zhang_q",
+      "hac_lag": 3,
+      "assets": 123,
+      "nominal_significant": 9,
+      "mean_alpha_se": 0.002996077476443729
+    },
+    {
+      "model_id": "hou_xue_zhang_q",
+      "hac_lag": 6,
+      "assets": 123,
+      "nominal_significant": 13,
+      "mean_alpha_se": 0.002872883241856626
+    },
+    {
+      "model_id": "hou_xue_zhang_q",
+      "hac_lag": 12,
+      "assets": 123,
+      "nominal_significant": 20,
+      "mean_alpha_se": 0.002579591627565346
+    }
+  ],
+  "matched_sample_assets": 123,
+  "matched_sample_date_hashes_equal": true,
+  "primary_gaps": {
+    "0": 615
+  },
+  "old_new_comparison": {
+    "original_rows": 11545,
+    "matched_rows": 11422,
+    "unmatched_old": 123,
+    "unmatched_new": 0,
+    "mean_signed_difference": 0.0011244620660179523,
+    "mean_absolute_difference": 0.01329831480250114,
+    "max_absolute_difference": 0.2263790432565293,
+    "comparison_rows_with_new_return": 11422,
+    "corrected_physical_rows": 11352,
+    "note": "One corrected group maps to both historical split-end rows in 70 cases; comparisons are not counts of unique corrected outputs."
+  },
+  "earliest_valid": [
+    {
+      "factor_id": "accruals",
+      "first_signal": "2019-02-28 00:00:00",
+      "first_execution": "2019-03-01 00:00:00",
+      "first_exit": "2019-04-01 00:00:00",
+      "rows": 267
+    },
+    {
+      "factor_id": "amihud_illiquidity",
+      "first_signal": "2018-02-28 00:00:00",
+      "first_execution": "2018-03-01 00:00:00",
+      "first_exit": "2018-04-02 00:00:00",
+      "rows": 303
+    },
+    {
+      "factor_id": "asset_growth",
+      "first_signal": "2019-02-28 00:00:00",
+      "first_execution": "2019-03-01 00:00:00",
+      "first_exit": "2019-04-01 00:00:00",
+      "rows": 267
+    },
+    {
+      "factor_id": "asset_turnover",
+      "first_signal": "2019-02-28 00:00:00",
+      "first_execution": "2019-03-01 00:00:00",
+      "first_exit": "2019-04-01 00:00:00",
+      "rows": 267
+    },
+    {
+      "factor_id": "average_dollar_volume",
+      "first_signal": "2018-03-29 00:00:00",
+      "first_execution": "2018-04-02 00:00:00",
+      "first_exit": "2018-05-01 00:00:00",
+      "rows": 300
+    },
+    {
+      "factor_id": "beta",
+      "first_signal": "2018-03-29 00:00:00",
+      "first_execution": "2018-04-02 00:00:00",
+      "first_exit": "2018-05-01 00:00:00",
+      "rows": 300
+    },
+    {
+      "factor_id": "bid_ask_proxy",
+      "first_signal": "2018-02-28 00:00:00",
+      "first_execution": "2018-03-01 00:00:00",
+      "first_exit": "2018-04-02 00:00:00",
+      "rows": 303
+    },
+    {
+      "factor_id": "book_to_market",
+      "first_signal": "2019-02-28 00:00:00",
+      "first_execution": "2019-03-01 00:00:00",
+      "first_exit": "2019-04-01 00:00:00",
+      "rows": 267
+    },
+    {
+      "factor_id": "capex_growth",
+      "first_signal": "2020-02-28 00:00:00",
+      "first_execution": "2020-03-02 00:00:00",
+      "first_exit": "2020-04-01 00:00:00",
+      "rows": 231
+    },
+    {
+      "factor_id": "cash_flow_yield",
+      "first_signal": "2019-02-28 00:00:00",
+      "first_execution": "2019-03-01 00:00:00",
+      "first_exit": "2019-04-01 00:00:00",
+      "rows": 267
+    },
+    {
+      "factor_id": "debt_to_equity",
+      "first_signal": "2020-02-28 00:00:00",
+      "first_execution": "2020-03-02 00:00:00",
+      "first_exit": "2020-04-01 00:00:00",
+      "rows": 231
+    },
+    {
+      "factor_id": "dividend_yield",
+      "first_signal": "2019-02-28 00:00:00",
+      "first_execution": "2019-03-01 00:00:00",
+      "first_exit": "2019-04-01 00:00:00",
+      "rows": 267
+    },
+    {
+      "factor_id": "downside_beta",
+      "first_signal": "2018-04-30 00:00:00",
+      "first_execution": "2018-05-01 00:00:00",
+      "first_exit": "2018-06-01 00:00:00",
+      "rows": 297
+    },
+    {
+      "factor_id": "downside_volatility",
+      "first_signal": "2018-05-31 00:00:00",
+      "first_execution": "2018-06-01 00:00:00",
+      "first_exit": "2018-07-02 00:00:00",
+      "rows": 294
+    },
+    {
+      "factor_id": "earnings_yield",
+      "first_signal": "2019-02-28 00:00:00",
+      "first_execution": "2019-03-01 00:00:00",
+      "first_exit": "2019-04-01 00:00:00",
+      "rows": 267
+    },
+    {
+      "factor_id": "gross_profitability",
+      "first_signal": "2020-02-28 00:00:00",
+      "first_execution": "2020-03-02 00:00:00",
+      "first_exit": "2020-04-01 00:00:00",
+      "rows": 231
+    },
+    {
+      "factor_id": "idiosyncratic_volatility",
+      "first_signal": "2018-04-30 00:00:00",
+      "first_execution": "2018-05-01 00:00:00",
+      "first_exit": "2018-06-01 00:00:00",
+      "rows": 297
+    },
+    {
+      "factor_id": "interest_coverage",
+      "first_signal": "2020-12-31 00:00:00",
+      "first_execution": "2021-01-04 00:00:00",
+      "first_exit": "2021-02-01 00:00:00",
+      "rows": 201
+    },
+    {
+      "factor_id": "leverage",
+      "first_signal": "2020-02-28 00:00:00",
+      "first_execution": "2020-03-02 00:00:00",
+      "first_exit": "2020-04-01 00:00:00",
+      "rows": 231
+    },
+    {
+      "factor_id": "log_market_cap",
+      "first_signal": "2018-02-28 00:00:00",
+      "first_execution": "2018-03-01 00:00:00",
+      "first_exit": "2018-04-02 00:00:00",
+      "rows": 303
+    },
+    {
+      "factor_id": "market_cap",
+      "first_signal": "2018-02-28 00:00:00",
+      "first_execution": "2018-03-01 00:00:00",
+      "first_exit": "2018-04-02 00:00:00",
+      "rows": 303
+    },
+    {
+      "factor_id": "momentum_12_1m",
+      "first_signal": "2019-02-28 00:00:00",
+      "first_execution": "2019-03-01 00:00:00",
+      "first_exit": "2019-04-01 00:00:00",
+      "rows": 267
+    },
+    {
+      "factor_id": "momentum_12m",
+      "first_signal": "2018-03-29 00:00:00",
+      "first_execution": "2018-04-02 00:00:00",
+      "first_exit": "2018-05-01 00:00:00",
+      "rows": 300
+    },
+    {
+      "factor_id": "momentum_1m",
+      "first_signal": "2018-03-29 00:00:00",
+      "first_execution": "2018-04-02 00:00:00",
+      "first_exit": "2018-05-01 00:00:00",
+      "rows": 300
+    },
+    {
+      "factor_id": "momentum_24m",
+      "first_signal": "2018-03-29 00:00:00",
+      "first_execution": "2018-04-02 00:00:00",
+      "first_exit": "2018-05-01 00:00:00",
+      "rows": 300
+    },
+    {
+      "factor_id": "momentum_3m",
+      "first_signal": "2018-03-29 00:00:00",
+      "first_execution": "2018-04-02 00:00:00",
+      "first_exit": "2018-05-01 00:00:00",
+      "rows": 300
+    },
+    {
+      "factor_id": "momentum_6m",
+      "first_signal": "2018-03-29 00:00:00",
+      "first_execution": "2018-04-02 00:00:00",
+      "first_exit": "2018-05-01 00:00:00",
+      "rows": 300
+    },
+    {
+      "factor_id": "net_margin",
+      "first_signal": "2019-02-28 00:00:00",
+      "first_execution": "2019-03-01 00:00:00",
+      "first_exit": "2019-04-01 00:00:00",
+      "rows": 267
+    },
+    {
+      "factor_id": "operating_margin",
+      "first_signal": "2020-02-28 00:00:00",
+      "first_execution": "2020-03-02 00:00:00",
+      "first_exit": "2020-04-01 00:00:00",
+      "rows": 231
+    },
+    {
+      "factor_id": "price_to_book",
+      "first_signal": "2019-02-28 00:00:00",
+      "first_execution": "2019-03-01 00:00:00",
+      "first_exit": "2019-04-01 00:00:00",
+      "rows": 267
+    },
+    {
+      "factor_id": "residual_momentum",
+      "first_signal": "2019-03-29 00:00:00",
+      "first_execution": "2019-04-01 00:00:00",
+      "first_exit": "2019-05-01 00:00:00",
+      "rows": 264
+    },
+    {
+      "factor_id": "roa",
+      "first_signal": "2019-02-28 00:00:00",
+      "first_execution": "2019-03-01 00:00:00",
+      "first_exit": "2019-04-01 00:00:00",
+      "rows": 267
+    },
+    {
+      "factor_id": "roe",
+      "first_signal": "2019-02-28 00:00:00",
+      "first_execution": "2019-03-01 00:00:00",
+      "first_exit": "2019-04-01 00:00:00",
+      "rows": 267
+    },
+    {
+      "factor_id": "rolling_beta",
+      "first_signal": "2018-03-29 00:00:00",
+      "first_execution": "2018-04-02 00:00:00",
+      "first_exit": "2018-05-01 00:00:00",
+      "rows": 300
+    },
+    {
+      "factor_id": "rolling_correlation",
+      "first_signal": "2018-03-29 00:00:00",
+      "first_execution": "2018-04-02 00:00:00",
+      "first_exit": "2018-05-01 00:00:00",
+      "rows": 300
+    },
+    {
+      "factor_id": "rolling_market_beta",
+      "first_signal": "2018-03-29 00:00:00",
+      "first_execution": "2018-04-02 00:00:00",
+      "first_exit": "2018-05-01 00:00:00",
+      "rows": 300
+    },
+    {
+      "factor_id": "rolling_volatility",
+      "first_signal": "2018-03-29 00:00:00",
+      "first_execution": "2018-04-02 00:00:00",
+      "first_exit": "2018-05-01 00:00:00",
+      "rows": 300
+    },
+    {
+      "factor_id": "semi_variance",
+      "first_signal": "2018-05-31 00:00:00",
+      "first_execution": "2018-06-01 00:00:00",
+      "first_exit": "2018-07-02 00:00:00",
+      "rows": 294
+    },
+    {
+      "factor_id": "tracking_error",
+      "first_signal": "2018-03-29 00:00:00",
+      "first_execution": "2018-04-02 00:00:00",
+      "first_exit": "2018-05-01 00:00:00",
+      "rows": 300
+    },
+    {
+      "factor_id": "turnover",
+      "first_signal": "2018-02-28 00:00:00",
+      "first_execution": "2018-03-01 00:00:00",
+      "first_exit": "2018-04-02 00:00:00",
+      "rows": 303
+    },
+    {
+      "factor_id": "working_capital_growth",
+      "first_signal": "2020-02-28 00:00:00",
+      "first_execution": "2020-03-02 00:00:00",
+      "first_exit": "2020-04-01 00:00:00",
+      "rows": 231
+    }
+  ],
+  "frequency": {
+    "min_sessions": 19,
+    "max_sessions": 23,
+    "first_execution": "2018-03-01 00:00:00",
+    "last_exit": "2026-08-03 00:00:00"
+  },
+  "additional_published_scalar_max_errors": {
+    "t_statistic": 0.0,
+    "confidence_interval": 0.0,
+    "r_squared": 0.0,
+    "aic": 1.7053025658242404e-13,
+    "bic": 1.7053025658242404e-13,
+    "residual_standard_error": 0.0
+  },
+  "final_hash_validation": "PASS: all 76 historical sources, both original publications/parents, new factor and two pricing publications, bound membership/admissibility and matrix/sensitivity/reference artifacts; additional cached SEC/HF cases checked"
+}

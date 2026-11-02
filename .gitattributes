@@ -1,0 +1,18 @@
+# Preserve exact Phase 2C evidence bytes across Windows/Linux checkouts.
+/.gitattributes text eol=lf
+/config/research_phase2c.yaml text eol=lf
+/scripts/phase2c_reference.py text eol=lf
+/scripts/research_phase2c.py text eol=lf
+/tests/test_phase2c_reference.py text eol=lf
+/outputs/audit/phase2c/** text eol=lf
+# Scope the same canonical-byte policy to newly generated Phase 3 evidence.
+/config/research_phase3.yaml text eol=lf
+/scripts/research_phase3*.py text eol=lf
+/tests/test_research_phase3_audit.py text eol=lf
+/outputs/audit/phase3/** text eol=lf
+
+# Canonical bytes for Phase4 text evidence; manuscript binaries stay binary.
+/outputs/audit/phase4/*.md text eol=lf
+/outputs/audit/phase4/*.csv text eol=lf
+/outputs/audit/phase4/*.json text eol=lf
+/outputs/audit/phase4/*.txt text eol=lf

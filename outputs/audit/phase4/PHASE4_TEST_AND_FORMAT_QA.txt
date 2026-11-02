@@ -1,0 +1,14 @@
+Phase4 manuscript QA
+Status PHASE4_READY_WITH_AUTHOR_CONFIRMATIONS; base f22f5cbe365e98c8d5fef6b5308ff765703df173; branch research/institutional-phase4-manuscript-revision.
+Source gate PASS:7Phase3evidenceSHA256 bindings;540cached original stat guards;32final pointer/manifest pairs;264small correctedJSON artifact hashes;accepted upstream identities unchanged.
+No pricing/model/portfolio/factor/SEC experimental reruns. Limited descriptive column tabulation only for previously unbound descriptive/breadth manuscript claims.
+Document numeric/structural PASS:27pages;26tables;843native cells;6figures;26nativeOMML equations;5primarypricingmodels;8BASEmethods/24feeidentities;8MLfamilies/6finiteintervals/2undefinedbaselines;27bibliographicidentities.
+DOCX/PDF paragraph consistency PASS after removing PDF page-number footers and layout whitespace. Numeric anchor checks PASS. PDF safe-bounds checks PASS allpages.
+Author preservation PASS:5identity/contact strings and all4declaration blocks/headings equal suppliedPDF after whitespace normalization. No independent author attestation inferred; no venue selected.
+Render:packaged render_docx.py attempted;FileNotFoundError LibreOffice soffice.exe. NativeWord COM isolated empty automation instance exported exactDOCX read-only toPDF;no otherdocuments changed. BundledPoppler renderedallpages100dpi. Allpagesvisuallyinspected. Finalpages1-26PNGbytes identical to inspected pages;final27reinspected. No remaining visualdefects.
+Original3PDFSHA256 identities unchanged;related older editable sources/ledgers preserved. Final large sources use cachedhashes+statguards,not repeatedrehashing.
+No fullsoftware suite executedinPhase4:documentationonly. AcceptedPhase3 suite372passed/105warnings/90.62%coverage;91targetedpassed/6newregressions. Theseareprecedingphase results,not empirical certification.
+Reconciliationcommands: bundledPython work/phase4/authenticate.py,descriptives via uv runPython,reference registry/provider checks,build_doc.py,native export_word.ps1,render_pdf.py,qa.py,author_check.py,final_page_check.py,claims.py. Scratch files are not claimed public deliverables.
+Staged-byte/diff/protected-ref final checks recorded by signoff command. No sourcecode/config/readme changes permitted. No merge,forcepush or Phase5 execution.
+
+Final integrity PASS: protected remote branch heads unchanged;all previous tracked audit evidence hashes unchanged;all3originalPDFs and26relatedhistoricalsources unchanged;540sourceguards/32authoritypairs revalidated;Phase1-3ancestry verified;50trackerIDs;954uniqueclaimrecords;no src/config/README working-tree changes.

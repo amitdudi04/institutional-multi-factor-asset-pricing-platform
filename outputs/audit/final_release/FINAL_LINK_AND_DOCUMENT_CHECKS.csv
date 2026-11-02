@@ -1,0 +1,130 @@
+file,check,target,status,evidence,qualification
+README.md,relative link,outputs/audit/final_correction/FINAL_CANDIDATE_MANUSCRIPT.pdf,PASS,outputs\audit\final_correction\FINAL_CANDIDATE_MANUSCRIPT.pdf,Target exists; research outputs unchanged
+README.md,relative link,outputs/audit/final_correction/DEFERRED_AUTHOR_REVIEW.md,PASS,outputs\audit\final_correction\DEFERRED_AUTHOR_REVIEW.md,Target exists; research outputs unchanged
+README.md,relative link,docs/METHODOLOGY.md,PASS,docs\METHODOLOGY.md,Target exists; research outputs unchanged
+README.md,relative link,docs/RESULTS.md,PASS,docs\RESULTS.md,Target exists; research outputs unchanged
+README.md,relative link,docs/research_audit/MASTER_AUDIT_TRACKER.md,PASS,docs\research_audit\MASTER_AUDIT_TRACKER.md,Target exists; research outputs unchanged
+README.md,relative link,outputs/audit/final_correction/FINAL_CORRECTION_REPORT.md,PASS,outputs\audit\final_correction\FINAL_CORRECTION_REPORT.md,Target exists; research outputs unchanged
+README.md,relative link,outputs/audit/final_release/FINAL_RELEASE_REVIEW.md,PASS,outputs\audit\final_release\FINAL_RELEASE_REVIEW.md,Target exists; research outputs unchanged
+README.md,relative link,docs/RESULTS.md,PASS,docs\RESULTS.md,Target exists; research outputs unchanged
+README.md,relative link,docs/DATA_AND_SOURCES.md,PASS,docs\DATA_AND_SOURCES.md,Target exists; research outputs unchanged
+README.md,relative link,docs/METHODOLOGY.md,PASS,docs\METHODOLOGY.md,Target exists; research outputs unchanged
+README.md,relative link,outputs/audit/final_release/FINAL_TEST_AND_CI_RESULTS.txt,PASS,outputs\audit\final_release\FINAL_TEST_AND_CI_RESULTS.txt,Target exists; research outputs unchanged
+README.md,relative link,docs/SOFTWARE_USAGE.md,PASS,docs\SOFTWARE_USAGE.md,Target exists; research outputs unchanged
+README.md,relative link,docs/REPRODUCIBILITY.md,PASS,docs\REPRODUCIBILITY.md,Target exists; research outputs unchanged
+README.md,relative link,docs/LIMITATIONS.md,PASS,docs\LIMITATIONS.md,Target exists; research outputs unchanged
+README.md,relative link,LICENSE,PASS,LICENSE,Target exists; research outputs unchanged
+README.md,relative link,CITATION.cff,PASS,CITATION.cff,Target exists; research outputs unchanged
+README.md,pinned Git path,f22f5cbe365e98c8d5fef6b5308ff765703df173:outputs/audit,PASS,git cat-file -e,Exact accepted Git authority; not historical main
+README.md,pinned Git path,f22f5cbe365e98c8d5fef6b5308ff765703df173:outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md,PASS,git cat-file -e,Exact accepted Git authority; not historical main
+README.md,pinned Git path,f22f5cbe365e98c8d5fef6b5308ff765703df173:outputs/audit/phase2c/PHASE2C_REGRESSION_VERIFICATION.md,PASS,git cat-file -e,Exact accepted Git authority; not historical main
+docs/RESULTS.md,pinned Git path,f22f5cbe365e98c8d5fef6b5308ff765703df173:outputs/audit,PASS,git cat-file -e,Exact accepted Git authority; not historical main
+docs/RESULTS.md,pinned Git path,f22f5cbe365e98c8d5fef6b5308ff765703df173:outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md,PASS,git cat-file -e,Exact accepted Git authority; not historical main
+docs/RESULTS.md,pinned Git path,f22f5cbe365e98c8d5fef6b5308ff765703df173:outputs/audit/phase2c/PHASE2C_REGRESSION_VERIFICATION.md,PASS,git cat-file -e,Exact accepted Git authority; not historical main
+docs/RESULTS.md,pinned Git path,7726cec06fc75ea0a1858842d0f6a761c162fe12:docs/RESULTS.md,PASS,git cat-file -e,Exact accepted Git authority; not historical main
+docs/METHODOLOGY.md,pinned Git path,f22f5cbe365e98c8d5fef6b5308ff765703df173:outputs/audit,PASS,git cat-file -e,Exact accepted Git authority; not historical main
+docs/METHODOLOGY.md,pinned Git path,f22f5cbe365e98c8d5fef6b5308ff765703df173:outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md,PASS,git cat-file -e,Exact accepted Git authority; not historical main
+docs/METHODOLOGY.md,pinned Git path,f22f5cbe365e98c8d5fef6b5308ff765703df173:outputs/audit/phase2c/PHASE2C_REGRESSION_VERIFICATION.md,PASS,git cat-file -e,Exact accepted Git authority; not historical main
+docs/DATA_AND_SOURCES.md,relative link,technical/SEC_XBRL_MAPPING.md,PASS,docs\technical\SEC_XBRL_MAPPING.md,Target exists; research outputs unchanged
+docs/DATA_AND_SOURCES.md,pinned Git path,f22f5cbe365e98c8d5fef6b5308ff765703df173:outputs/audit,PASS,git cat-file -e,Exact accepted Git authority; not historical main
+docs/DATA_AND_SOURCES.md,pinned Git path,f22f5cbe365e98c8d5fef6b5308ff765703df173:outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md,PASS,git cat-file -e,Exact accepted Git authority; not historical main
+docs/DATA_AND_SOURCES.md,pinned Git path,f22f5cbe365e98c8d5fef6b5308ff765703df173:outputs/audit/phase2c/PHASE2C_REGRESSION_VERIFICATION.md,PASS,git cat-file -e,Exact accepted Git authority; not historical main
+docs/LIMITATIONS.md,relative link,RESULTS.md,PASS,docs\RESULTS.md,Target exists; research outputs unchanged
+docs/LIMITATIONS.md,pinned Git path,f22f5cbe365e98c8d5fef6b5308ff765703df173:outputs/audit,PASS,git cat-file -e,Exact accepted Git authority; not historical main
+docs/LIMITATIONS.md,pinned Git path,f22f5cbe365e98c8d5fef6b5308ff765703df173:outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md,PASS,git cat-file -e,Exact accepted Git authority; not historical main
+docs/LIMITATIONS.md,pinned Git path,f22f5cbe365e98c8d5fef6b5308ff765703df173:outputs/audit/phase2c/PHASE2C_REGRESSION_VERIFICATION.md,PASS,git cat-file -e,Exact accepted Git authority; not historical main
+docs/REPRODUCIBILITY.md,relative link,../outputs/audit/final_correction/,PASS,docs\..\outputs\audit\final_correction,Target exists; research outputs unchanged
+docs/REPRODUCIBILITY.md,relative link,DATA_AND_SOURCES.md,PASS,docs\DATA_AND_SOURCES.md,Target exists; research outputs unchanged
+docs/REPRODUCIBILITY.md,pinned Git path,f22f5cbe365e98c8d5fef6b5308ff765703df173:outputs/audit,PASS,git cat-file -e,Exact accepted Git authority; not historical main
+docs/REPRODUCIBILITY.md,pinned Git path,f22f5cbe365e98c8d5fef6b5308ff765703df173:outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md,PASS,git cat-file -e,Exact accepted Git authority; not historical main
+docs/REPRODUCIBILITY.md,pinned Git path,f22f5cbe365e98c8d5fef6b5308ff765703df173:outputs/audit/phase2c/PHASE2C_REGRESSION_VERIFICATION.md,PASS,git cat-file -e,Exact accepted Git authority; not historical main
+docs/REPRODUCIBILITY.md,pinned Git path,f22f5cbe365e98c8d5fef6b5308ff765703df173:outputs/audit/phase3/PHASE3_SOURCE_MANIFEST.json,PASS,git cat-file -e,Exact accepted Git authority; not historical main
+README.md,interpretation review,current vs historical; PIT/source; internal fit; units;dependent ML;one-session economics,PASS,Targeted text review against accepted final authority,Existing complete limitations retained; no wholesale rewrite
+docs/RESULTS.md,interpretation review,current vs historical; PIT/source; internal fit; units;dependent ML;one-session economics,PASS,Targeted text review against accepted final authority,Existing complete limitations retained; no wholesale rewrite
+docs/METHODOLOGY.md,interpretation review,current vs historical; PIT/source; internal fit; units;dependent ML;one-session economics,PASS,Targeted text review against accepted final authority,Existing complete limitations retained; no wholesale rewrite
+docs/DATA_AND_SOURCES.md,interpretation review,current vs historical; PIT/source; internal fit; units;dependent ML;one-session economics,PASS,Targeted text review against accepted final authority,Existing complete limitations retained; no wholesale rewrite
+docs/LIMITATIONS.md,interpretation review,current vs historical; PIT/source; internal fit; units;dependent ML;one-session economics,PASS,Targeted text review against accepted final authority,Existing complete limitations retained; no wholesale rewrite
+docs/REPRODUCIBILITY.md,interpretation review,current vs historical; PIT/source; internal fit; units;dependent ML;one-session economics,PASS,Targeted text review against accepted final authority,Existing complete limitations retained; no wholesale rewrite
+docs/SOFTWARE_USAGE.md,interpretation review,current vs historical; PIT/source; internal fit; units;dependent ML;one-session economics,PASS,Targeted text review against accepted final authority,Existing complete limitations retained; no wholesale rewrite
+README.md;docs/RESULTS.md,matched pricing value,capm/mean_adjusted_r_squared,PASS,0.760818,Accepted Phase2C primary sample; unchanged
+README.md;docs/RESULTS.md,matched pricing value,capm/mean_alpha,PASS,-0.001658,Accepted Phase2C primary sample; unchanged
+README.md;docs/RESULTS.md,matched pricing value,carhart_4/mean_adjusted_r_squared,PASS,0.811021,Accepted Phase2C primary sample; unchanged
+README.md;docs/RESULTS.md,matched pricing value,carhart_4/mean_alpha,PASS,-0.001879,Accepted Phase2C primary sample; unchanged
+README.md;docs/RESULTS.md,matched pricing value,fama_french_3/mean_adjusted_r_squared,PASS,0.802438,Accepted Phase2C primary sample; unchanged
+README.md;docs/RESULTS.md,matched pricing value,fama_french_3/mean_alpha,PASS,-0.001967,Accepted Phase2C primary sample; unchanged
+README.md;docs/RESULTS.md,matched pricing value,fama_french_5/mean_adjusted_r_squared,PASS,0.817658,Accepted Phase2C primary sample; unchanged
+README.md;docs/RESULTS.md,matched pricing value,fama_french_5/mean_alpha,PASS,-0.002008,Accepted Phase2C primary sample; unchanged
+README.md;docs/RESULTS.md,matched pricing value,hou_xue_zhang_q/mean_adjusted_r_squared,PASS,0.814361,Accepted Phase2C primary sample; unchanged
+README.md;docs/RESULTS.md,matched pricing value,hou_xue_zhang_q/mean_alpha,PASS,-0.002227,Accepted Phase2C primary sample; unchanged
+docs/RESULTS.md,24scenario publication,equal_weight/BASE,PASS,portfolio-56ff12e1590325ab00bdd65e67bdc83e; cumulative=46.3133%,Existing immutable Phase3CSV;no recalculation
+docs/RESULTS.md,24scenario publication,equal_weight/LOW,PASS,portfolio-11709b3a14018e43df2bf8e1d2718c91; cumulative=46.4222%,Existing immutable Phase3CSV;no recalculation
+docs/RESULTS.md,24scenario publication,equal_weight/HIGH,PASS,portfolio-46f99762b2a9b628e2646a277a409df0; cumulative=46.0958%,Existing immutable Phase3CSV;no recalculation
+docs/RESULTS.md,24scenario publication,minimum_variance/BASE,PASS,portfolio-da8cd6b77d46e57138a924a8c9d106eb; cumulative=45.0930%,Existing immutable Phase3CSV;no recalculation
+docs/RESULTS.md,24scenario publication,minimum_variance/LOW,PASS,portfolio-db82d1daea8b14a78d8ca1ad62fc4f10; cumulative=45.7155%,Existing immutable Phase3CSV;no recalculation
+docs/RESULTS.md,24scenario publication,minimum_variance/HIGH,PASS,portfolio-0f33c5f2bdfc6c53bd3fdcfc37443e31; cumulative=43.8555%,Existing immutable Phase3CSV;no recalculation
+docs/RESULTS.md,24scenario publication,mean_variance/BASE,PASS,portfolio-99d63f9cb5aecc834329df585ebc2577; cumulative=29.2761%,Existing immutable Phase3CSV;no recalculation
+docs/RESULTS.md,24scenario publication,mean_variance/LOW,PASS,portfolio-f9af93e679dc89edcf678e1152c76966; cumulative=31.0333%,Existing immutable Phase3CSV;no recalculation
+docs/RESULTS.md,24scenario publication,mean_variance/HIGH,PASS,portfolio-679edfb80b2d261518cddabc748e87a8; cumulative=25.8288%,Existing immutable Phase3CSV;no recalculation
+docs/RESULTS.md,24scenario publication,maximum_sharpe/BASE,PASS,portfolio-bb374ca488687ec7e964587f30e3bd15; cumulative=66.5591%,Existing immutable Phase3CSV;no recalculation
+docs/RESULTS.md,24scenario publication,maximum_sharpe/LOW,PASS,portfolio-9a62cedf9b5baa43a9da6007ed619a49; cumulative=67.6265%,Existing immutable Phase3CSV;no recalculation
+docs/RESULTS.md,24scenario publication,maximum_sharpe/HIGH,PASS,portfolio-97707e729b6f181beb475c101d84c6e5; cumulative=64.4435%,Existing immutable Phase3CSV;no recalculation
+docs/RESULTS.md,24scenario publication,maximum_diversification/BASE,PASS,portfolio-af2465790ec1d893a2f71af83b3cfc4d; cumulative=58.9082%,Existing immutable Phase3CSV;no recalculation
+docs/RESULTS.md,24scenario publication,maximum_diversification/LOW,PASS,portfolio-82915787237332d51851eac12ae03fc5; cumulative=59.5321%,Existing immutable Phase3CSV;no recalculation
+docs/RESULTS.md,24scenario publication,maximum_diversification/HIGH,PASS,portfolio-dbc423d7ffbb7e16cb206b235ba8fa46; cumulative=57.6673%,Existing immutable Phase3CSV;no recalculation
+docs/RESULTS.md,24scenario publication,risk_parity/BASE,PASS,portfolio-102f3597c9fdfe7e17e7e910ec1173cd; cumulative=45.4247%,Existing immutable Phase3CSV;no recalculation
+docs/RESULTS.md,24scenario publication,risk_parity/LOW,PASS,portfolio-e56cddb97819bad16b4ef99a6be46184; cumulative=45.5492%,Existing immutable Phase3CSV;no recalculation
+docs/RESULTS.md,24scenario publication,risk_parity/HIGH,PASS,portfolio-9a112be955a1bfe41b0afaedd1918588; cumulative=45.1758%,Existing immutable Phase3CSV;no recalculation
+docs/RESULTS.md,24scenario publication,hrp/BASE,PASS,portfolio-66f902bdd7cf1bfb2b8c250de9717e8f; cumulative=43.8413%,Existing immutable Phase3CSV;no recalculation
+docs/RESULTS.md,24scenario publication,hrp/LOW,PASS,portfolio-76342a886b06a0812512cb13cb4a372f; cumulative=44.1355%,Existing immutable Phase3CSV;no recalculation
+docs/RESULTS.md,24scenario publication,hrp/HIGH,PASS,portfolio-8f21debde1810a36b38ccbb8fee59d27; cumulative=43.2544%,Existing immutable Phase3CSV;no recalculation
+docs/RESULTS.md,24scenario publication,cvar/BASE,PASS,portfolio-87fa6e8666cac548ba3c936ef55cb733; cumulative=73.6842%,Existing immutable Phase3CSV;no recalculation
+docs/RESULTS.md,24scenario publication,cvar/LOW,PASS,portfolio-2d158887153105a965bebd1478ac735b; cumulative=74.2559%,Existing immutable Phase3CSV;no recalculation
+docs/RESULTS.md,24scenario publication,cvar/HIGH,PASS,portfolio-732b4e4da91d4adfa23ea3c69720421b; cumulative=72.5457%,Existing immutable Phase3CSV;no recalculation
+docs/RESULTS.md,ML IC/interval,zero/mean_ic,PASS,Undefined,Existing frozen Phase3CSV;6finite/2undefined;dependent exploratory intervals
+docs/RESULTS.md,ML IC/interval,zero/bootstrap_lower,PASS,Undefined,Existing frozen Phase3CSV;6finite/2undefined;dependent exploratory intervals
+docs/RESULTS.md,ML IC/interval,zero/bootstrap_upper,PASS,Undefined,Existing frozen Phase3CSV;6finite/2undefined;dependent exploratory intervals
+docs/RESULTS.md,ML IC/interval,historical_mean/mean_ic,PASS,Undefined,Existing frozen Phase3CSV;6finite/2undefined;dependent exploratory intervals
+docs/RESULTS.md,ML IC/interval,historical_mean/bootstrap_lower,PASS,Undefined,Existing frozen Phase3CSV;6finite/2undefined;dependent exploratory intervals
+docs/RESULTS.md,ML IC/interval,historical_mean/bootstrap_upper,PASS,Undefined,Existing frozen Phase3CSV;6finite/2undefined;dependent exploratory intervals
+docs/RESULTS.md,ML IC/interval,factor_composite/mean_ic,PASS,0.034430,Existing frozen Phase3CSV;6finite/2undefined;dependent exploratory intervals
+docs/RESULTS.md,ML IC/interval,factor_composite/bootstrap_lower,PASS,0.010731,Existing frozen Phase3CSV;6finite/2undefined;dependent exploratory intervals
+docs/RESULTS.md,ML IC/interval,factor_composite/bootstrap_upper,PASS,0.084270,Existing frozen Phase3CSV;6finite/2undefined;dependent exploratory intervals
+docs/RESULTS.md,ML IC/interval,linear/mean_ic,PASS,0.034430,Existing frozen Phase3CSV;6finite/2undefined;dependent exploratory intervals
+docs/RESULTS.md,ML IC/interval,linear/bootstrap_lower,PASS,0.010731,Existing frozen Phase3CSV;6finite/2undefined;dependent exploratory intervals
+docs/RESULTS.md,ML IC/interval,linear/bootstrap_upper,PASS,0.084270,Existing frozen Phase3CSV;6finite/2undefined;dependent exploratory intervals
+docs/RESULTS.md,ML IC/interval,ridge/mean_ic,PASS,0.034434,Existing frozen Phase3CSV;6finite/2undefined;dependent exploratory intervals
+docs/RESULTS.md,ML IC/interval,ridge/bootstrap_lower,PASS,0.010735,Existing frozen Phase3CSV;6finite/2undefined;dependent exploratory intervals
+docs/RESULTS.md,ML IC/interval,ridge/bootstrap_upper,PASS,0.084272,Existing frozen Phase3CSV;6finite/2undefined;dependent exploratory intervals
+docs/RESULTS.md,ML IC/interval,elastic_net/mean_ic,PASS,0.044609,Existing frozen Phase3CSV;6finite/2undefined;dependent exploratory intervals
+docs/RESULTS.md,ML IC/interval,elastic_net/bootstrap_lower,PASS,0.016324,Existing frozen Phase3CSV;6finite/2undefined;dependent exploratory intervals
+docs/RESULTS.md,ML IC/interval,elastic_net/bootstrap_upper,PASS,0.096766,Existing frozen Phase3CSV;6finite/2undefined;dependent exploratory intervals
+docs/RESULTS.md,ML IC/interval,random_forest/mean_ic,PASS,-0.002641,Existing frozen Phase3CSV;6finite/2undefined;dependent exploratory intervals
+docs/RESULTS.md,ML IC/interval,random_forest/bootstrap_lower,PASS,-0.017721,Existing frozen Phase3CSV;6finite/2undefined;dependent exploratory intervals
+docs/RESULTS.md,ML IC/interval,random_forest/bootstrap_upper,PASS,0.015985,Existing frozen Phase3CSV;6finite/2undefined;dependent exploratory intervals
+docs/RESULTS.md,ML IC/interval,xgboost/mean_ic,PASS,-0.023285,Existing frozen Phase3CSV;6finite/2undefined;dependent exploratory intervals
+docs/RESULTS.md,ML IC/interval,xgboost/bootstrap_lower,PASS,-0.038821,Existing frozen Phase3CSV;6finite/2undefined;dependent exploratory intervals
+docs/RESULTS.md,ML IC/interval,xgboost/bootstrap_upper,PASS,-0.005015,Existing frozen Phase3CSV;6finite/2undefined;dependent exploratory intervals
+docs/RESULTS.md,headline count,822,PASS,"Accepted final 178-row claim matrix, authenticated before edits",Different denominators remain explicit
+docs/RESULTS.md,headline count,487,PASS,"Accepted final 178-row claim matrix, authenticated before edits",Different denominators remain explicit
+docs/RESULTS.md,headline count,335,PASS,"Accepted final 178-row claim matrix, authenticated before edits",Different denominators remain explicit
+docs/RESULTS.md,headline count,"715,447",PASS,"Accepted final 178-row claim matrix, authenticated before edits",Different denominators remain explicit
+docs/RESULTS.md,headline count,"37,273",PASS,"Accepted final 178-row claim matrix, authenticated before edits",Different denominators remain explicit
+docs/RESULTS.md,headline count,48,PASS,"Accepted final 178-row claim matrix, authenticated before edits",Different denominators remain explicit
+docs/RESULTS.md,headline count,47,PASS,"Accepted final 178-row claim matrix, authenticated before edits",Different denominators remain explicit
+docs/RESULTS.md,headline count,"34,341,456",PASS,"Accepted final 178-row claim matrix, authenticated before edits",Different denominators remain explicit
+docs/RESULTS.md,headline count,"28,550,589",PASS,"Accepted final 178-row claim matrix, authenticated before edits",Different denominators remain explicit
+docs/RESULTS.md,headline count,"24,255,559",PASS,"Accepted final 178-row claim matrix, authenticated before edits",Different denominators remain explicit
+docs/RESULTS.md,headline count,41,PASS,"Accepted final 178-row claim matrix, authenticated before edits",Different denominators remain explicit
+docs/RESULTS.md,headline count,123,PASS,"Accepted final 178-row claim matrix, authenticated before edits",Different denominators remain explicit
+docs/RESULTS.md,headline count,"11,352",PASS,"Accepted final 178-row claim matrix, authenticated before edits",Different denominators remain explicit
+docs/RESULTS.md,headline count,956,PASS,"Accepted final 178-row claim matrix, authenticated before edits",Different denominators remain explicit
+docs/RESULTS.md,headline count,"27,632",PASS,"Accepted final 178-row claim matrix, authenticated before edits",Different denominators remain explicit
+docs/RESULTS.md,headline count,89,PASS,"Accepted final 178-row claim matrix, authenticated before edits",Different denominators remain explicit
+docs/RESULTS.md,headline count,15,PASS,"Accepted final 178-row claim matrix, authenticated before edits",Different denominators remain explicit
+docs/RESULTS.md,headline count,"7,286",PASS,"Accepted final 178-row claim matrix, authenticated before edits",Different denominators remain explicit
+current docs,external link HEAD,https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/blob/7726cec06fc75ea0a1858842d0f6a761c162fe12/docs/RESULTS.md,PASS,200,Live URL; no vendor input download
+current docs,external link HEAD,https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/028dfd9cd18bcd6ef8114d829cc789d5bffacc61,PASS,200,Live URL; no vendor input download
+current docs,external link HEAD,https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit,PASS,200,Live URL; no vendor input download
+current docs,external link HEAD,https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit/phase2c/PHASE2C_REGRESSION_VERIFICATION.md,PASS,200,Live URL; no vendor input download
+current docs,external link HEAD,https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md,PASS,200,Live URL; no vendor input download
+current docs,external link HEAD,https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit/phase3/PHASE3_SOURCE_MANIFEST.json,PASS,200,Live URL; no vendor input download

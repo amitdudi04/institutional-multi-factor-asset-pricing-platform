@@ -1,0 +1,24 @@
+schema_version: 1.0.0
+base_commit: 94f347476c86962d2d7479a74b8fa915a5849668
+factor_publication: factor-4ddee9ac6fb45cedfd62a2cc68676b58
+primary_pricing: asset-pricing-d60bee7310b34976c80372a0f0f29e21
+supplementary_pricing: asset-pricing-8c2396179c4b509796b2cab043ec31d2
+reference_method: pivoted Householder QR; triangular solves; independently accumulated Bartlett sandwich
+return_absolute_tolerance: 1.0e-12
+regression_absolute_tolerance: 1.0e-8
+normal_equation_scaled_tolerance: 1.0e-10
+nominal_significance: 0.05
+confidence: 0.95
+hac_lags: [0, 3, 6, 12]
+minimum_observations: 24
+standardized_condition_flag: 30
+primary_sample: independently reconstruct all five-model complete-case dates per asset
+limited_sensitivity:
+  id: dependent-constituent-excluded-legs-v1
+  rule: exclude every dependent-portfolio constituent from each characteristic factor leg at signal formation; renormalize remaining positive original cap weights within the same original leg; never rerank
+  missing_rule: missing or empty leg is unavailable; no synthetic return, cash or fallback
+  sample: restrict to original primary dates and all-five-model complete cases; at least 24 observations and full rank in all models; refit unchanged baseline on identical retained dates/assets
+  market: retain the authenticated SPY proxy; its underlying constituent exclusions cannot be verified with available inputs
+  interpretation: predetermined diagnostic reducing direct characteristic-leg self-inclusion; not an independent external-factor study or replacement publication
+  no_tuning: one specification only; report all exclusions and outcomes without choosing favorable rankings
+multiplicity: Holm familywise adjustment within each model and across all 615 primary intercepts; valid under arbitrary test dependence conditional on valid marginal p-values; exploratory and does not repair HAC assumptions

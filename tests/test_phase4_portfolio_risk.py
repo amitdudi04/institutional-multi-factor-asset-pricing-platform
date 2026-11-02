@@ -415,6 +415,11 @@ class _Factors:
     def __init__(self) -> None:
         self.manifest = SimpleNamespace(publication_id="phase2", content_hash=lambda: "a" * 64)
         portfolio_frame = _factor_portfolios()
+        # Synthetic one-observation intervals carry the same explicit contract
+        # as genuine factor publications; no cash start date may be inferred.
+        portfolio_frame["formation_date"] = (
+            pd.to_datetime(portfolio_frame["date"]) - pd.Timedelta(days=1)
+        ).dt.date
         self.table = pa.Table.from_pandas(portfolio_frame, preserve_index=False)
         self.factors = pa.Table.from_pandas(
             pd.DataFrame(

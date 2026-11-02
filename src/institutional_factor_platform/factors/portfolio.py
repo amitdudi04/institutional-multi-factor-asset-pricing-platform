@@ -56,6 +56,31 @@ def compute_factor_portfolios(
         ]
         if benchmark_holding.empty:
             raise DataQualityError("Authenticated benchmark holding period is empty")
+        # Fix membership at formation. Never discard a disappearing security or
+        # compound a shortened path as though it covered the common interval.
+        members = formation.loc[
+            formation["date"].eq(formation_date)
+            & formation["score_value"].notna()
+            & formation["market_cap"].gt(0),
+            "security_id",
+        ].unique()
+        member_holding = holding.loc[holding["security_id"].isin(members)]
+        coverage = (
+            member_holding.groupby("security_id")
+            .agg(
+                sessions=("date", "nunique"),
+                observations=("return", "count"),
+            )
+            .reindex(members, fill_value=0)
+        )
+        if (
+            member_holding.duplicated(["security_id", "date"]).any()
+            or coverage.ne(len(benchmark_holding)).any().any()
+        ):
+            raise DataQualityError(
+                "Incomplete holding-period evidence for formed securities; "
+                "authenticated common-calendar returns or terminal-event accounting required"
+            )
         period_benchmark = float((1.0 + benchmark_holding).prod() - 1.0)
         realized = (
             holding.groupby("security_id")

@@ -222,6 +222,9 @@ def authenticate_factor_publication(publication_path: Path, project_root: Path) 
     ):
         raise EvidenceIntegrityError("Factor validation identity differs from manifest.")
     diagnostics = json.loads(bound_content["factor diagnostics"].decode())
+    from institutional_factor_platform.data.bound import authenticate_supplementary
+
+    authenticate_supplementary(diagnostics, root)
     if diagnostics.get("publication_id") != manifest.publication_id:
         raise EvidenceIntegrityError("Factor diagnostics identity differs from manifest.")
     lineage = json.loads(bound_content["factor lineage"].decode())

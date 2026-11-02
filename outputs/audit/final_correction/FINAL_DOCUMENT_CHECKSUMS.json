@@ -1,0 +1,109 @@
+{
+  "schema": "IMFP_FINAL_DOC_CHECKSUMS_V1",
+  "baseline": "7726cec06fc75ea0a1858842d0f6a761c162fe12",
+  "branch": "research/institutional-final-documentation-corrections",
+  "numerical_authority": "f22f5cbe365e98c8d5fef6b5308ff765703df173",
+  "self_hash": "excluded to avoid recursion",
+  "text_encoding": "UTF-8 LF; SHA256 binds delivered bytes and canonical Git blobs",
+  "prompt_sha256": "6e5c3fe3cf384f67cc5a17e86bc54f06847c672482e1cc0edad68c0e6d08f2cb",
+  "phase4_source_docx_sha256": "0da93eec4680750af67daeaa6980da8a1a9a3f15cbf7644514b9a51c5a8493f2",
+  "phase4_source_pdf_sha256": "0adee943bac3d4c15610045712fb226985e48707442ddd1e61f60b94b733c96f",
+  "phase4_source_manifest_sha256": "983c07d7470bb55350aa2d5de3a870fae845ad5b84705a31734bd8ace309f3c0",
+  "protected_author_xml_sha256": {
+    "declarations_xml_sha256": "3a717734f3cd8f7b1c80311edabd2da94b36e1ecd78434f4bd08fa171a04190a",
+    "identity_xml_sha256": "f90710d2af96bd53efc3a5c7809b07471532018468feccedec8c575fa65d31ac",
+    "figure_media": {
+      "word/media/image1.png": "32b9d1e9d61de3f04aedab6b2c453ce30e0b4cafbf073a7c35caeb0c6eeb291c",
+      "word/media/image2.png": "97b0cc553b9e51dbc5c9512b0b2ea57a9c4cc5c056e6cf0c5f73e7c7ac72a00b",
+      "word/media/image3.png": "fb7b85249a6f3273ecf0f3445beb9d220d23649d8e050581af6242890dc97f88",
+      "word/media/image4.png": "c9bc949cfab4bde166a7aef796c273408ed62fa48f798b30e084d228969a89b8",
+      "word/media/image5.png": "0f9cee692c63c7a054343d85b9b52af4b3de6dbc363728522b675880aa3ca9c9",
+      "word/media/image6.png": "fa03e68382bc7646157f4c6783e363886fea09b3a817d4a2e4612ac1edcd7c14"
+    },
+    "tables_before": 26,
+    "tables_after": 25,
+    "equations": 26,
+    "figures": 6
+  },
+  "files": {
+    "CROSS_DOCUMENT_CLAIM_MATRIX.csv": {
+      "controlled_delivery_path": "C:\\Users\\amitk\\Documents\\Codex\\2026-11-01\\codex-master-prompt-institutional-multi-factor\\outputs\\audit\\final_correction\\CROSS_DOCUMENT_CLAIM_MATRIX.csv",
+      "public_repository_path": "outputs/audit/final_correction/CROSS_DOCUMENT_CLAIM_MATRIX.csv",
+      "public": true,
+      "bytes": 68268,
+      "sha256": "046242eb0d8df10dfe7fc196bdb194518cbad5e9ac97de4a8c88ce44af2926f9"
+    },
+    "DEFERRED_AUTHOR_REVIEW.md": {
+      "controlled_delivery_path": "C:\\Users\\amitk\\Documents\\Codex\\2026-11-01\\codex-master-prompt-institutional-multi-factor\\outputs\\audit\\final_correction\\DEFERRED_AUTHOR_REVIEW.md",
+      "public_repository_path": "outputs/audit/final_correction/DEFERRED_AUTHOR_REVIEW.md",
+      "public": true,
+      "bytes": 702,
+      "sha256": "0efc77272ad8497f30d97d535076f142a70d6fd09f1fa369ef2d58caf9f3bbea"
+    },
+    "FINAL_CANDIDATE_MANUSCRIPT.docx": {
+      "controlled_delivery_path": "C:\\Users\\amitk\\Documents\\Codex\\2026-11-01\\codex-master-prompt-institutional-multi-factor\\outputs\\audit\\final_correction\\FINAL_CANDIDATE_MANUSCRIPT.docx",
+      "public_repository_path": null,
+      "public": false,
+      "bytes": 319156,
+      "sha256": "da35f355c301680760b22ad6aabbe9c87362f062f9096b151ba4a35e5e9557f2"
+    },
+    "FINAL_CANDIDATE_MANUSCRIPT.pdf": {
+      "controlled_delivery_path": "C:\\Users\\amitk\\Documents\\Codex\\2026-11-01\\codex-master-prompt-institutional-multi-factor\\outputs\\audit\\final_correction\\FINAL_CANDIDATE_MANUSCRIPT.pdf",
+      "public_repository_path": "outputs/audit/final_correction/FINAL_CANDIDATE_MANUSCRIPT.pdf",
+      "public": true,
+      "bytes": 720293,
+      "sha256": "ad558e75af0546ef6cfe417514d9a0d83fc556012f77227ac5c1e0a897476b52"
+    },
+    "FINAL_CORRECTION_REPORT.md": {
+      "controlled_delivery_path": "C:\\Users\\amitk\\Documents\\Codex\\2026-11-01\\codex-master-prompt-institutional-multi-factor\\outputs\\audit\\final_correction\\FINAL_CORRECTION_REPORT.md",
+      "public_repository_path": "outputs/audit/final_correction/FINAL_CORRECTION_REPORT.md",
+      "public": true,
+      "bytes": 19795,
+      "sha256": "50474b0c780ac6decc1935e6920ba50198620ea6a4fb55fe6c43f8eb5b32cdb4"
+    },
+    "FINAL_DOC_QA.txt": {
+      "controlled_delivery_path": "C:\\Users\\amitk\\Documents\\Codex\\2026-11-01\\codex-master-prompt-institutional-multi-factor\\outputs\\audit\\final_correction\\FINAL_DOC_QA.txt",
+      "public_repository_path": "outputs/audit/final_correction/FINAL_DOC_QA.txt",
+      "public": true,
+      "bytes": 5028,
+      "sha256": "6450e4048b27c2fee08ac80b24c4bca43f576f86db28995680ad28dca319eb32"
+    },
+    "ISSUE_RESOLUTION_MATRIX.csv": {
+      "controlled_delivery_path": "C:\\Users\\amitk\\Documents\\Codex\\2026-11-01\\codex-master-prompt-institutional-multi-factor\\outputs\\audit\\final_correction\\ISSUE_RESOLUTION_MATRIX.csv",
+      "public_repository_path": "outputs/audit/final_correction/ISSUE_RESOLUTION_MATRIX.csv",
+      "public": true,
+      "bytes": 30481,
+      "sha256": "f285d14608bd371e758a3116f7b78e69120e4079bf6c8733e080aeda96a828ef"
+    }
+  },
+  "current_documentation": {
+    "README.md": {
+      "sha256": "b01b03a957fa8bc56e3801bfe3faa093184313e442c042c1f44609fdd743d930",
+      "bytes": 12691
+    },
+    "docs/RESULTS.md": {
+      "sha256": "835494cab9f716104390c87713688a7def97cbefb419560cb7658b697ad96f88",
+      "bytes": 14589
+    },
+    "docs/METHODOLOGY.md": {
+      "sha256": "fb845e6bff7466b857255b2d2b66305c6018a15b870d54bd766825b60b5ca7bf",
+      "bytes": 9634
+    },
+    "docs/DATA_AND_SOURCES.md": {
+      "sha256": "cec7c03c3a7d1a96f7c7ed21d66687e4ccce9beaee9fc4c9faafd402e995d6bb",
+      "bytes": 5946
+    },
+    "docs/LIMITATIONS.md": {
+      "sha256": "6486fb64a66bc6b23c5871d2a7aa286f007b6307c93f6e0b3e3c969ff9d5df0c",
+      "bytes": 6084
+    },
+    "docs/REPRODUCIBILITY.md": {
+      "sha256": "2f28d791d020ee5cf8fa3421afbd27f3da20455a535a7bc237cd214a537c077e",
+      "bytes": 5446
+    },
+    "docs/research_audit/MASTER_AUDIT_TRACKER.md": {
+      "sha256": "a68578d2a93501399a5ec0fc92930b87001b35066f1ca66408d11a7e24d42b13",
+      "bytes": 175464
+    }
+  }
+}

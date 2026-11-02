@@ -1,0 +1,47 @@
+FINAL DOCUMENT QA — PASS
+Revision IMFP-FINAL-DOC-2026-11-02; exact source baseline 7726cec06fc75ea0a1858842d0f6a761c162fe12
+Branch research/institutional-final-documentation-corrections; containing commit provides final Git identity.
+Authentic DOCX edited directly; Phase4 DOCX/PDF hashes unchanged.
+26 final PDF pages vs 27 source pages; ALL26 final pages individually visually inspected at100dpi. Original27pages reviewed using baseline renders and retained-content comparison.
+25 tables /809 cells /6 byte-identical figure media /26 native equations.
+All retained scientific table body values unchanged except16 percent-to-decimal risk display conversions independently checked against frozen Phase3CSV. Repetitive ID tables condensed; all32 full IDs remain in pinned Phase3manifest.
+All non-equation DOCX paragraphs and all table cells present in PDF after Unicode/whitespace/page-number normalization: PASS. Native equations independently checked visually;25 unchanged OOXML and full2row CarhartEq5 PASS.
+PDF page bounds and replacement-glyph checks: PASS. 27 reference identities unchanged. Author identity and declaration OOXML exact equality: PASS. R6 block byte-equivalent and unchecked;all50trackerIDs retained;onlyR5 block changed.
+Cross-document numeric claim checks: 178 PASS;5pricing rows/8BASE/24fee scenario IDs/8ML families;6finite intervals and2undefined;956/11352 frozen-ledger singleton count. No financial results recalculated.
+Git-pinned URL path checks using git cat-file: 22 PASS. Native Word links: 3;public candidate links verified after push in commit delivery verification.
+Prior audit hashes preserved;32authority pointer/manifest pairs unchanged;540cached source file size/mtime guards unchanged. Protected remote heads unchanged,includingmain4e7fbdc380b8042db72e9c628260f60077a205ef.
+Scope diff: README,5authoritative docs,existingtracker,newfinal evidence only;zero modified src/config/scripts/tests/data/historical-output paths.
+Checks executed: pre_export_qa.py (cell/math/media/declaration comparisons);finalize.py (CSV exact display,paragraph/cell PDF transfer,PDFbounds,refs,Unicode,Git authority/link/50ID/scope/hash gates);nativeWordPDFexport and Poppler render;manualallpageinspection.
+Packaged render_docx.py failed: soffice.exe unavailable (packaged_renderer.log). Used isolated native Word read-only own document export; closed only own doc/application. Four exports were necessary for genuine orphan-header/table-chain/provenance pagination defects, not financial experiments or arbitrary cosmetic tuning. Final export26pages; final render used for QA. Scratch intermediates are not delivered as competing candidates.
+Encoding static gate found and corrected transient UTF8/Windows decoding corruption in scratch-edited Markdown before delivery;all6current docs nowUTF8LF and no mojibake markers.
+No full financial suite rerun:372passed/90.62%coverage and91targeted are accepted PRIOR Phase3results only. No new training/regression/factor/portfolio/bootstrap run;no new software functions/features/tests added to project.
+Independent human review remains pending;no fabricated faculty score,venue,attestation or empirical cure.
+Final staging gates: git diff --cached --check;exact staged Git blob SHA256 versus final checksum manifest;protected refs and remote branch SHA verification. Results are recorded in delivery verification.
+Page correspondence (new:old; shared content, not pixel-identity):
+1: previous page(s) 1; 30 shared line anchors
+2: previous page(s) 2; 35 shared line anchors
+3: previous page(s) 3; 27 shared line anchors
+4: previous page(s) 4; 5 shared line anchors
+5: previous page(s) 5; 29 shared line anchors
+6: previous page(s) 6; 21 shared line anchors
+7: previous page(s) 7; 16 shared line anchors
+8: previous page(s) 8; 17 shared line anchors
+9: previous page(s) 8; 8 shared line anchors
+10: previous page(s) 9; 6 shared line anchors
+11: previous page(s) 11; 15 shared line anchors
+12: previous page(s) 11; 20 shared line anchors
+13: previous page(s) 13; 7 shared line anchors
+14: previous page(s) 14; 21 shared line anchors
+15: previous page(s) 15; 15 shared line anchors
+16: previous page(s) 16; 24 shared line anchors
+17: previous page(s) 17; 26 shared line anchors
+18: previous page(s) 18; 33 shared line anchors
+19: previous page(s) 19; 23 shared line anchors
+20: previous page(s) 20; 16 shared line anchors
+21: previous page(s) 21; 20 shared line anchors
+22: previous page(s) 22; 19 shared line anchors
+23: previous page(s) 24; 15 shared line anchors
+24: previous page(s) 25; 21 shared line anchors
+25: previous page(s) 26; 15 shared line anchors
+26: previous page(s) 27; 24 shared line anchors
+Precommit delivery verification PASS: all14staged paths allowed; all13non-self public/documentation Git blob hashes match manifest; controlled DOCX hash matches; git diff --cached --check passed;12relative documentation links resolve. No source/config/data paths staged. Post-push remote SHA/protected-ref result is recorded in the final delivery response.

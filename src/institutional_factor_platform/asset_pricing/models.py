@@ -44,6 +44,8 @@ MODEL_SPECS: dict[str, ModelSpec] = {
         ("market_excess", "SMB", "HML", "RMW", "CMA"),
         "R_i-R_f = alpha + beta_m MKT + beta_s SMB + beta_h HML + beta_r RMW + beta_c CMA + e",
     ),
+    # Study-specific q-style mapping. The frozen ROE alias maps to earnings_yield;
+    # it is not accounting ROE or an exact Hou-Xue-Zhang portfolio construction.
     "hou_xue_zhang_q": ModelSpec(
         "hou_xue_zhang_q",
         ("market_excess", "ME", "IA", "ROE"),

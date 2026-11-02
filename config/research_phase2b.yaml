@@ -1,0 +1,50 @@
+schema_version: 1.0.0
+study_id: phase2b-empirical-correction-2026-11-01
+archive_root: G:\4- Institutional Multi-Factor Asset Pricing & Portfolio Analytics
+  Platform
+historical_factor_publication_id: factor-5a73616f131fca2102fa2ca4141ad64f
+historical_factor_manifest_hash: 9fc526c05fb1c63e1d04a4322f7779c40b877674a82d056ed0d3390afc78567f
+historical_pricing_publication_id: asset-pricing-c0a72fae5349f1048e18557250da1927
+historical_pricing_manifest_hash: 995e2f8870de9717b0f205cb6693157f02285efeeb332b729a2fe8726e7c8b06
+methodology_id: full-xnys-delayed-close-endpoint-v2
+calendar: XNYS
+signal: last XNYS session of each calendar month; frozen score available_at at or
+  before UTC date end
+execution: close of next XNYS session after signal; no formation-to-execution return
+  included
+exit: close of next monthly execution; reject entire terminal partial cycle
+admissibility: fix membership and positive normalized cap weights at signal before
+  future inspection; at least 3 eligible names and all3 quantiles; require observed
+  execution and common-exit quotes and an authenticated same-listing quote-return
+  chain spanning the full XNYS interval
+missing_policy: exclude whole quantile with an explicit reason; do not re-rank survivors,
+  reweight survivors, assume cash, stale-price carry, or zero missing return
+recovery_policy: only original frozen same-vintage, date-effective same-listing observations;
+  verify raw checksum and price-basis identity; any recovered data require explicit
+  parent provenance; no newer downloads
+terminal_policy: no terminal payout without authenticated dated security-specific
+  evidence and explicit cash settlement accounting; otherwise reject group
+price_return_label: frozen provider-vintage adjusted-quote returns; dividend-total-return
+  basis not independently established
+score_policy: reuse authenticated frozen characteristic scores unchanged; independently
+  verify used formation availability and representative source formulas; no factor-definition
+  or numerical-threshold tuning
+primary_pricing_sample: per-asset complete-case intersection of all five models; minimum
+  24 observations and full-rank design for every model; report omitted assets and
+  month gaps
+supplementary_pricing_sample: model-specific complete cases; clearly separate from
+  primary common calendar
+inference: original OLS intercept and Bartlett HAC lag3 with finite-sample correction
+  and two-sided t inference; predefined lags0/3/6/12; lag counts retained observations
+  if calendar gaps exist; no significance tuning or FDR-valid claim
+historical_q_mapping: retain ROE alias earnings_yield and all original model IDs;
+  study-specific q-style mapping
+factor_output_root: data/factors
+factor_manifest_root: data/factor_manifests
+pricing_output_root: data/asset_pricing
+pricing_manifest_root: data/asset_pricing_manifests
+interior_gap_policy: 'a missing interior daily quote is not itself a missing buy-and-hold
+  return: retain only when every consecutive observed return reconciles to its archived
+  quote ratio, these links cover the entire interval, and compounded return matches
+  endpoint ratio; insert no price, daily zero, stale valuation or cash assumption;
+  disclose gaps and make no intraperiod NAV claim'

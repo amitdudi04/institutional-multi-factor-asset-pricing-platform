@@ -70,6 +70,13 @@ def _phase2_tables(periods: int = 20) -> tuple[pd.DataFrame, pd.DataFrame]:
                     {
                         "security_id": security,
                         "date": current,
+                        "factor_id": "market_return",
+                        "raw_value": market + risk_free,
+                        "available_at": available,
+                    },
+                    {
+                        "security_id": security,
+                        "date": current,
                         "factor_id": "excess_return",
                         "raw_value": market,
                         "available_at": available,
@@ -119,6 +126,15 @@ def _small_config(tmp_path: Path) -> AssetPricingConfig:
             ),
         }
     )
+
+
+def test_missing_q1_never_substitutes_q2_for_low_extreme() -> None:
+    factors, portfolios = _phase2_tables()
+    config = load_asset_pricing_config()
+    target = next(iter(config.factor_mappings.values()))
+    portfolios.loc[portfolios.factor_id.eq(target) & portfolios["quantile"].eq(1), "quantile"] = 2
+    with pytest.raises(DataQualityError, match="extreme"):
+        build_research_panel(factors, portfolios, config.factor_mappings)
 
 
 def test_approved_models_and_configuration_are_explicit(tmp_path: Path) -> None:

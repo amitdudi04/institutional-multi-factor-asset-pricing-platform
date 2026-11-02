@@ -1,0 +1,1548 @@
+{
+  "run_id": "institutional-phase1-2026-11-01",
+  "validation_date": "2026-11-01",
+  "timezone": "Asia/Calcutta",
+  "repository": "https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform",
+  "baseline_sha": "4e7fbdc380b8042db72e9c628260f60077a205ef",
+  "branch": "research/institutional-phase1-financial-audit",
+  "tracker_initial_commit": "ea2846d",
+  "code_correction_commit": "ef339ab1a7805242e67284cd54fbcf23fae86da1",
+  "phase_status": "PHASE1_BLOCKED_BY_SOURCE_EVIDENCE",
+  "github_snapshot": {
+    "branches": [
+      {
+        "name": "audit/fix-period-alignment-risk-metrics",
+        "commit": {
+          "sha": "ce36c399c1e64686de25d3f5702e22cd13647b8b",
+          "url": "https://api.github.com/repos/amitdudi04/institutional-multi-factor-asset-pricing-platform/commits/ce36c399c1e64686de25d3f5702e22cd13647b8b"
+        },
+        "protected": false
+      },
+      {
+        "name": "main",
+        "commit": {
+          "sha": "4e7fbdc380b8042db72e9c628260f60077a205ef",
+          "url": "https://api.github.com/repos/amitdudi04/institutional-multi-factor-asset-pricing-platform/commits/4e7fbdc380b8042db72e9c628260f60077a205ef"
+        },
+        "protected": false
+      },
+      {
+        "name": "research/correct-return-frequency-and-risk-metrics-2026-10-13",
+        "commit": {
+          "sha": "51ae02815b20c1c857d17b243023847b32ad2934",
+          "url": "https://api.github.com/repos/amitdudi04/institutional-multi-factor-asset-pricing-platform/commits/51ae02815b20c1c857d17b243023847b32ad2934"
+        },
+        "protected": false
+      }
+    ],
+    "pull_requests": [
+      {
+        "number": 8,
+        "title": "Fix holding-period alignment and risk metrics",
+        "state": "open",
+        "head_sha": "ce36c399c1e64686de25d3f5702e22cd13647b8b",
+        "head_ref": "audit/fix-period-alignment-risk-metrics",
+        "merged_at": null,
+        "draft": true,
+        "url": "https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/pull/8"
+      },
+      {
+        "number": 7,
+        "title": "Correct holding-period alignment and finance risk metrics",
+        "state": "open",
+        "head_sha": "51ae02815b20c1c857d17b243023847b32ad2934",
+        "head_ref": "research/correct-return-frequency-and-risk-metrics-2026-10-13",
+        "merged_at": null,
+        "draft": false,
+        "url": "https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/pull/7"
+      },
+      {
+        "number": 6,
+        "title": "Polish README wording",
+        "state": "closed",
+        "head_sha": "89cb4da2f2b226ed335e94fbd0a31fbbb3878a8c",
+        "head_ref": "readme/minimal-polish",
+        "merged_at": "2026-10-05T16:05:22Z",
+        "draft": false,
+        "url": "https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/pull/6"
+      },
+      {
+        "number": 5,
+        "title": "Consolidate public empirical record",
+        "state": "closed",
+        "head_sha": "418277fabc920da3c0a64fedeafd1e888d6cae68",
+        "head_ref": "paperless/results-alignment",
+        "merged_at": "2026-10-05T10:15:28Z",
+        "draft": false,
+        "url": "https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/pull/5"
+      },
+      {
+        "number": 4,
+        "title": "Finalize reviewer-facing metadata",
+        "state": "closed",
+        "head_sha": "19f021b7060a69f63a3c6a0d132cd7286a095090",
+        "head_ref": "part3/final-readiness",
+        "merged_at": "2026-10-05T09:20:58Z",
+        "draft": false,
+        "url": "https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/pull/4"
+      },
+      {
+        "number": 3,
+        "title": "Align manuscript and repository presentation",
+        "state": "closed",
+        "head_sha": "ad26a671bae72be02cae95815f464098cf5cbf36",
+        "head_ref": "part1/final-main-audit",
+        "merged_at": "2026-10-05T08:30:40Z",
+        "draft": false,
+        "url": "https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/pull/3"
+      },
+      {
+        "number": 2,
+        "title": "Consolidate public research documentation",
+        "state": "closed",
+        "head_sha": "9aee238484e22ee69ec5d306e5c9ca841d89f9b0",
+        "head_ref": "phase/research-facing-final4",
+        "merged_at": "2026-10-05T07:13:12Z",
+        "draft": false,
+        "url": "https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/pull/2"
+      },
+      {
+        "number": 1,
+        "title": "Superseded repository presentation draft",
+        "state": "closed",
+        "head_sha": "5e4b88e89bf1663fba6ad5cfec770754221fdc9f",
+        "head_ref": "phase/research-facing-v9",
+        "merged_at": null,
+        "draft": false,
+        "url": "https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/pull/1"
+      }
+    ],
+    "workflow_runs": [
+      {
+        "id": 38409266153,
+        "head_sha": "ce36c399c1e64686de25d3f5702e22cd13647b8b",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/actions/runs/38409266153"
+      },
+      {
+        "id": 38392999096,
+        "head_sha": "1681e9c3f25dfa42197a519aee8a918183def0e0",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/actions/runs/38392999096"
+      },
+      {
+        "id": 38366001608,
+        "head_sha": "c7bfca833332dcbf3dfa68f4015378ac9c885011",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/actions/runs/38366001608"
+      },
+      {
+        "id": 38303222633,
+        "head_sha": "51ae02815b20c1c857d17b243023847b32ad2934",
+        "conclusion": "failure",
+        "status": "completed",
+        "url": "https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/actions/runs/38303222633"
+      },
+      {
+        "id": 38303106270,
+        "head_sha": "c9991109d7f1271d21d1cd3efcd2046f0c540dae",
+        "conclusion": "failure",
+        "status": "completed",
+        "url": "https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/actions/runs/38303106270"
+      },
+      {
+        "id": 38303090524,
+        "head_sha": "34d8ac390140e28f8fd100766dda26304ba870f6",
+        "conclusion": "failure",
+        "status": "completed",
+        "url": "https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/actions/runs/38303090524"
+      },
+      {
+        "id": 38302794406,
+        "head_sha": "317f2f870e507faedfdfc2019c25983bf589c392",
+        "conclusion": "failure",
+        "status": "completed",
+        "url": "https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/actions/runs/38302794406"
+      },
+      {
+        "id": 38302766649,
+        "head_sha": "c74c8e4c379b3429a6384bf7401f7c5e2fae47f1",
+        "conclusion": "failure",
+        "status": "completed",
+        "url": "https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/actions/runs/38302766649"
+      },
+      {
+        "id": 38302758094,
+        "head_sha": "fcfc3646cdf089f421829e1570872859f2a89705",
+        "conclusion": "failure",
+        "status": "completed",
+        "url": "https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/actions/runs/38302758094"
+      },
+      {
+        "id": 38302752591,
+        "head_sha": "225d6962f9ebbede2e7be7328ef1569389bd4597",
+        "conclusion": "failure",
+        "status": "completed",
+        "url": "https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/actions/runs/38302752591"
+      },
+      {
+        "id": 38302709978,
+        "head_sha": "22f0c8eddd6a9fe69f5b865e58e1b5311b3e64e9",
+        "conclusion": "failure",
+        "status": "completed",
+        "url": "https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/actions/runs/38302709978"
+      },
+      {
+        "id": 38302477083,
+        "head_sha": "e096e826e00702e29588751896a36d3eb2871563",
+        "conclusion": "failure",
+        "status": "completed",
+        "url": "https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/actions/runs/38302477083"
+      },
+      {
+        "id": 38302444459,
+        "head_sha": "6a55ff3a827e7e95f344e83325c7311b41ef9962",
+        "conclusion": "failure",
+        "status": "completed",
+        "url": "https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/actions/runs/38302444459"
+      },
+      {
+        "id": 38301462674,
+        "head_sha": "a19b545f39424ebf97a8e4a073866d4e5af0f303",
+        "conclusion": "failure",
+        "status": "completed",
+        "url": "https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/actions/runs/38301462674"
+      },
+      {
+        "id": 37338079331,
+        "head_sha": "4e7fbdc380b8042db72e9c628260f60077a205ef",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/actions/runs/37338079331"
+      },
+      {
+        "id": 37337704728,
+        "head_sha": "89cb4da2f2b226ed335e94fbd0a31fbbb3878a8c",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/actions/runs/37337704728"
+      },
+      {
+        "id": 37295416508,
+        "head_sha": "4a419f7d86996b80b1a98f73a8e4b4998bf675ea",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/actions/runs/37295416508"
+      },
+      {
+        "id": 37294604750,
+        "head_sha": "418277fabc920da3c0a64fedeafd1e888d6cae68",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/actions/runs/37294604750"
+      },
+      {
+        "id": 37294126589,
+        "head_sha": "cc7f5bb86cca0e11538c56dbc3172eb786f0614d",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/actions/runs/37294126589"
+      },
+      {
+        "id": 37289445983,
+        "head_sha": "929df72453dd96ae072114e0afe078c6a9bd929c",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/actions/runs/37289445983"
+      }
+    ],
+    "releases": []
+  },
+  "original_attachment": {
+    "path": "G:\\downloads\\INSTITUTIONAL_MULTIFACTOR_MASTER_AUDIT_TRACKER.md",
+    "sha256": "972c6233452e89730d8d279ca08ab95cd49973db499428b0cba0604b16b80318"
+  },
+  "manuscript_inventory": {
+    "current_main_editable_manuscripts": [],
+    "release_assets": [],
+    "historical_markdown": "project-complete-public-data-v1:docs/FINAL_RESEARCH_PAPER.md",
+    "historical_pdfs": [
+      {
+        "ref": "c778a12404596a1a936ec58ddba7750b8795a8c4",
+        "path": "paper/Institutional_Multi_Factor_Asset_Pricing_Research_Paper.pdf",
+        "sha256": "ab9bbbbdd5ddef1b84c46667fd4f02f5ee717ac5178761f79e7c95a4cdad4251",
+        "bytes": 1546889,
+        "pages": 30,
+        "git_blob_sha": "8417463c920ddb629fef3abba15d5840229ed30d",
+        "phase1_claim_pages": [
+          2,
+          7,
+          9,
+          13,
+          14,
+          15,
+          23,
+          24,
+          25
+        ],
+        "external_publication_identity": "not established by Git version alone"
+      },
+      {
+        "ref": "868baa9dd2770f118c30706ed37f62451aae9f38",
+        "path": "paper/An_Auditable_Public_Data_US_Equity_Research_Pipeline.pdf",
+        "sha256": "2ea1a0767030e8693a91695940795996329302e898ac47163b3b395672e70a64",
+        "bytes": 1065757,
+        "pages": 30,
+        "git_blob_sha": "8183df27257142cb085d2d82d2dce5887275cde7",
+        "phase1_claim_pages": [
+          2,
+          7,
+          9,
+          13,
+          14,
+          15,
+          23,
+          24,
+          25
+        ],
+        "external_publication_identity": "not established by Git version alone"
+      }
+    ],
+    "editable_docx_tex_bib": "none found in reachable history",
+    "original_external_publication": "Git PDF versions recovered; identity with any external posted version not established"
+  },
+  "source_files": [
+    {
+      "path": ".github/workflows/quality.yml",
+      "baseline_git_blob_sha": "861e68ba7ceb71aaa85e9348b49c8ddb9a375477",
+      "baseline_git_bytes_sha256": "cc528a1b58f6d48d9220dea1736e1a4b46d56d06bbe6774e565d62e202a664b2",
+      "working_file_bytes_sha256": "f87d41bb306c4cf1ee20282d27f672d9f9d2f406098b5e66e83b43deed5c267f",
+      "bytes": 1252
+    },
+    {
+      "path": ".gitignore",
+      "baseline_git_blob_sha": "0c7f3246fe29f20b60255c8532af77af310d0a32",
+      "baseline_git_bytes_sha256": "316a6ca4a54302f6b3c7583fc628d1ac285b07037bc798bc744975c3b59f2513",
+      "working_file_bytes_sha256": "e0d4cca586730b1c7286388fe518757bc3c6ceca65eff227b357846e3eacaa26",
+      "bytes": 1245
+    },
+    {
+      "path": "CITATION.cff",
+      "baseline_git_blob_sha": "8db9ad4f37069d9523423ba896371a0144f02366",
+      "baseline_git_bytes_sha256": "7f644a16b8e0bb207c73fac6b1144cfef8b63c1534c94a2f9c806a3f78f9b2d5",
+      "working_file_bytes_sha256": "fbf52755f319b2bae3944ee2e302814a08b019606d43cec947fbd3a74f86a5fc",
+      "bytes": 972
+    },
+    {
+      "path": "README.md",
+      "baseline_git_blob_sha": "d32ba29d3628ef2a14c1f83538e262eccc571565",
+      "baseline_git_bytes_sha256": "1e4d4d481617531dded44e9bba5ff04d48feb80ec2db960a187ca8dad8f3f55f",
+      "working_file_bytes_sha256": "84d3b3e03370ab5b7c46cf331f3d9e66b2a4df235e763a318ecd1d49ad773494",
+      "bytes": 9802
+    },
+    {
+      "path": "config/asset_pricing.yaml",
+      "baseline_git_blob_sha": "f2c89116b0d149ad9b6a84ac6f34780ab910abb7",
+      "baseline_git_bytes_sha256": "28534363f8b824ed67487bf330e9677874003bc2ac24d86a99f9d8ec17cf5dcc",
+      "working_file_bytes_sha256": "2ca22f31298832bd2d07c5c708d80f78ef225386e415f4b7e6375c3e2de8a493",
+      "bytes": 675
+    },
+    {
+      "path": "config/base.yaml",
+      "baseline_git_blob_sha": "e6efeff7449bf8c824b09fdff6bb7dbf91f031a6",
+      "baseline_git_bytes_sha256": "6885408368d23a1bc549feda82ecd820b1c397ababf1acf5406d99c7753f39d5",
+      "working_file_bytes_sha256": "14a4bf8cede62d9d14d2751cf25a4a532f5ce0cf7ac74de35b310c951036bae0",
+      "bytes": 2040
+    },
+    {
+      "path": "config/delivery.container.yaml",
+      "baseline_git_blob_sha": "02244097380d810e93001d694f40b3d1b380027d",
+      "baseline_git_bytes_sha256": "8b894e5a7f2f15e6e779d9b049b65ffcde65237174f5b26b88758afbc28696a5",
+      "working_file_bytes_sha256": "c816b47e866864f3741c68e870863ec64da3b417e4a19600ca2a5c2e0bb318ce",
+      "bytes": 786
+    },
+    {
+      "path": "config/delivery.yaml",
+      "baseline_git_blob_sha": "2c648f797e1d2b183599f22a1992909051f669d6",
+      "baseline_git_bytes_sha256": "2efaaf68ca83e6cea0336054e4bf758ea519be7a8ceac0dece96fdbd9c9dab2a",
+      "working_file_bytes_sha256": "e498fc122456917bb140f88bfc541aabc3a5518caa87aae0173b5300e1b13ec6",
+      "bytes": 789
+    },
+    {
+      "path": "config/factors.yaml",
+      "baseline_git_blob_sha": "c68d0ec942ce016ec89f8c97e1ece4fb0053e1d5",
+      "baseline_git_bytes_sha256": "3137f380f9be72b341918a8a176bfa97323b912cc8269e8327dbf65dd9b49981",
+      "working_file_bytes_sha256": "54b120f2165e44ee18674b21b4cccd276c3bf3cbf735c87382e7173c63a17a77",
+      "bytes": 673
+    },
+    {
+      "path": "config/machine_learning.yaml",
+      "baseline_git_blob_sha": "df496704a29a2581bbb9afef43c9f17e62de68ab",
+      "baseline_git_bytes_sha256": "b9844d33d37fc979f5145d381eaee47f3f209255d57a6cdefdce36cfcd9ff3de",
+      "working_file_bytes_sha256": "1218a76c6b694f43eaf9a8669e017e8925844e6e746bd8a01a8ecc8d4a4b0941",
+      "bytes": 1937
+    },
+    {
+      "path": "config/portfolio.yaml",
+      "baseline_git_blob_sha": "0ef1b476c90894b515e63d1eb6271cf464bfcb2b",
+      "baseline_git_bytes_sha256": "1e4d7de0a2e65aa58a95bc6bc54b60a857e1454fd9a4865245263112fbc0a970",
+      "working_file_bytes_sha256": "a96f336a52cd31daaf43a9fecd9cc5c590de576a2df14aa96b85f17787150a2d",
+      "bytes": 982
+    },
+    {
+      "path": "data/README.md",
+      "baseline_git_blob_sha": "d969e850ba2d4d65100a70087d75618d05335fce",
+      "baseline_git_bytes_sha256": "2a2270ae0694a654dffbda654f290fb9eea70352ff246cd59780ba844fed18af",
+      "working_file_bytes_sha256": "4ff85d3fb1405728a4dc4883e6ba73e522cc311a97955fdc4384daf9bdfd671f",
+      "bytes": 499
+    },
+    {
+      "path": "docs/ARCHITECTURE.md",
+      "baseline_git_blob_sha": "7c1a172698919915933e537eb4495a4d4cd50fdf",
+      "baseline_git_bytes_sha256": "12ab5f30b5207d8ad045f771370e74a8b9701dc180770cca9b04652e4432c5d2",
+      "working_file_bytes_sha256": "e4f83d1888657e1ba9369cc15f3bdb7b9d6b6281b979415e9f725e95fda5477d",
+      "bytes": 2650
+    },
+    {
+      "path": "docs/DATA_AND_SOURCES.md",
+      "baseline_git_blob_sha": "c852ba7de7ca5d156232053a739e303e205600cb",
+      "baseline_git_bytes_sha256": "35d824936a80c573e0617a31068af36ed4b9c7cf83145e7616afb49d29174a26",
+      "working_file_bytes_sha256": "08316e5c2a73b3b22db999617c1f9fd3a4518edcf5f3b4dd7584432458189574",
+      "bytes": 4222
+    },
+    {
+      "path": "docs/LIMITATIONS.md",
+      "baseline_git_blob_sha": "43ab8d05e580a76d5c05b2c80bbca396672b0fb4",
+      "baseline_git_bytes_sha256": "d125f60fe0360d868748c5f994f159ccd354ba0d312ac10dc37070a1214c3023",
+      "working_file_bytes_sha256": "657a714dca018f65047c07f0b0dee60c21ce657428aafeb2030e633e4e9a35a9",
+      "bytes": 3458
+    },
+    {
+      "path": "docs/METHODOLOGY.md",
+      "baseline_git_blob_sha": "b3afe61f0fc23cda0d2c19d69c5a2618144ac620",
+      "baseline_git_bytes_sha256": "1178cf27c5e035cd3d0e35818d4225d11e93bb2fc67189f4c23c43caad0063b0",
+      "working_file_bytes_sha256": "4cbb7614a23ae6f2fbcd3d943c48b873d02cb85052fdee0ce466ca94c10c51f7",
+      "bytes": 5827
+    },
+    {
+      "path": "docs/REPRODUCIBILITY.md",
+      "baseline_git_blob_sha": "868c99a7b426a059cba0f155e6ed6b0a2733d93e",
+      "baseline_git_bytes_sha256": "a9c296ac2795bb92b74ec2824db525be75758f27c542464a8b4cf0c230822a66",
+      "working_file_bytes_sha256": "d7b107b8bb6200841e55ec09fef52818be176e6278ceff478036810b4c74bf2f",
+      "bytes": 2630
+    },
+    {
+      "path": "docs/RESULTS.md",
+      "baseline_git_blob_sha": "94cd63d4f5a5bfb4986a5a9b0154ea2b9450080c",
+      "baseline_git_bytes_sha256": "e037983e6a66b32f3387bae1705193ffd8e358e146e480a9a66619f3af2b2a46",
+      "working_file_bytes_sha256": "481f82376a393573d849123fbdbbfc27074c3bf073a40a140735c180637b7d25",
+      "bytes": 10671
+    },
+    {
+      "path": "docs/SOFTWARE_USAGE.md",
+      "baseline_git_blob_sha": "6c5d6a4af8832472fa28d0e0cc7eedf50d2d98ea",
+      "baseline_git_bytes_sha256": "e50692c8254d9dc6637581b247f32205264c89e1f032407aa862e46a559a9bf1",
+      "working_file_bytes_sha256": "d48773d4f8a5b4fe3777f627206d12a9da96798ed60da947ca2f1e752bbbd2d1",
+      "bytes": 2135
+    },
+    {
+      "path": "docs/technical/SEC_XBRL_MAPPING.md",
+      "baseline_git_blob_sha": "4d1e4f4af3e94547a805a3f4f6213a3a674335fe",
+      "baseline_git_bytes_sha256": "d8720bd6028a9989ef1dcc047708e98a38606b57febcad74ce19d7e46444aa67",
+      "working_file_bytes_sha256": "9bfe9724ca957bca776ecad3bbcfd21259e363b4f6f12b7495e6c50145ad816e",
+      "bytes": 2548
+    },
+    {
+      "path": "pyproject.toml",
+      "baseline_git_blob_sha": "5f5d21efca87cbcb6371afa2ef2472b162946116",
+      "baseline_git_bytes_sha256": "35adf02a6f0b6dd2eba6ec0089fa30b5222c37adca0f1ed08a0e15888ca6614f",
+      "working_file_bytes_sha256": "716ac5c3d3934a9ac5d1261f8a0872b6c1cb79089377e25d84dac55abe294fae",
+      "bytes": 2245
+    },
+    {
+      "path": "src/institutional_factor_platform/__init__.py",
+      "baseline_git_blob_sha": "82051e7015c673a629819ce8060be471812325a1",
+      "baseline_git_bytes_sha256": "ec909473e5c2bdd135ef94f3d83a1bc1c24ce9b66df9d65372c752ddde8ff238",
+      "working_file_bytes_sha256": "b5b00c74d18e67fc33e716e121ef0cf6d101ebe50c8588fdb2cc7a8b50e851e6",
+      "bytes": 312
+    },
+    {
+      "path": "src/institutional_factor_platform/api/__init__.py",
+      "baseline_git_blob_sha": "8e1340c9aa4eced02bb6ee4d4dee471ea92e8819",
+      "baseline_git_bytes_sha256": "66034da4d4aeb93e5ec9824d5a2040c1f060c2228f16454bf45ff32aac5cd6c2",
+      "working_file_bytes_sha256": "c0058f89dda4c4db0b209b985cd7f3bb6466c268831252e2c81beaf1ef3f8dff",
+      "bytes": 132
+    },
+    {
+      "path": "src/institutional_factor_platform/api/app.py",
+      "baseline_git_blob_sha": "044c5dd6473488cb7e3e010061454b77e284002b",
+      "baseline_git_bytes_sha256": "5d87310f992538fe201eee7a0b1f3a9537bd7736d94821742c7357dab90c371d",
+      "working_file_bytes_sha256": "935f58fe3bd186efa41b1e104b68b4c5ce6e5d058f75b923a6b155bb4863198a",
+      "bytes": 10623
+    },
+    {
+      "path": "src/institutional_factor_platform/api/middleware.py",
+      "baseline_git_blob_sha": "003ed158bd5cc864fd85ea601543264a56311416",
+      "baseline_git_bytes_sha256": "76c3d2bdb4087ae4146132450e24a9d90c9a7db61d67e83bb4b351f1336d5786",
+      "working_file_bytes_sha256": "f445f7997bb2716a567d741e26f3064eba7232c7040a31bc87b34f7f4c9e6ca6",
+      "bytes": 4937
+    },
+    {
+      "path": "src/institutional_factor_platform/asset_pricing/__init__.py",
+      "baseline_git_blob_sha": "a255ce4e48e6fcb1691fb5628df369b25f41db64",
+      "baseline_git_bytes_sha256": "4e5658420a91dc56c0717aa87c9f2043f09f22fdbad9e89801082c02b0d4761e",
+      "working_file_bytes_sha256": "6584ae49a1edf90fae6a64ff5f9b6e726e6b9a8e16e19933b222e2fc414b490c",
+      "bytes": 191
+    },
+    {
+      "path": "src/institutional_factor_platform/asset_pricing/config.py",
+      "baseline_git_blob_sha": "5934f38934b682b3617c6f786eec1d97a15e1317",
+      "baseline_git_bytes_sha256": "96dc50e4f5e6e6fbf0fd6b59347bfabf04a538d781d8b38a86274e1ce02a3ba9",
+      "working_file_bytes_sha256": "010d5306c22bfd8d2c156b2a186177c0261ebeffbdfb08cb56e48a0822e851bd",
+      "bytes": 2974
+    },
+    {
+      "path": "src/institutional_factor_platform/asset_pricing/inputs.py",
+      "baseline_git_blob_sha": "0502e2bc1dffbb7399bbc9913fc82b122e2b29fd",
+      "baseline_git_bytes_sha256": "d3b26a6e4efbb4a0c86feb45e9a5db1b8af16cd73b42479908ce889d245725b4",
+      "working_file_bytes_sha256": "cce6e4dcc875553f9561a85a469801fe4fa17dc9a0d29272e2f9143bc8ef96be",
+      "bytes": 4600
+    },
+    {
+      "path": "src/institutional_factor_platform/asset_pricing/models.py",
+      "baseline_git_blob_sha": "e9905d41c0997aaea84eaafa3c19cf9413e30d02",
+      "baseline_git_bytes_sha256": "e57965950bda6eefab409808d9146a7cb23172809e1c8fb9af1e54d350eb0254",
+      "working_file_bytes_sha256": "2cd40f563c7ebcd151108b754882d3bacd98e7c4be9c5072c91479fdc0d7d802",
+      "bytes": 2508
+    },
+    {
+      "path": "src/institutional_factor_platform/asset_pricing/service.py",
+      "baseline_git_blob_sha": "f83abdd8334eebf1b8151de3507502bd95a128b9",
+      "baseline_git_bytes_sha256": "6b77f40eec82b526ba80fa6140411944ee36c6c727a179e017eab98d9f34fbe7",
+      "working_file_bytes_sha256": "be37082dd3f2282a010cd0c47510633914007b182ed106a5838c069098f343b7",
+      "bytes": 18103
+    },
+    {
+      "path": "src/institutional_factor_platform/backtest/__init__.py",
+      "baseline_git_blob_sha": "315f94f4f3a8f448feefcc816bc9570a3efb1014",
+      "baseline_git_bytes_sha256": "02538873ab9e2d45db02aab33ae4c5da17099a09e579d972ed59e8f229d46c8c",
+      "working_file_bytes_sha256": "8948be91916d60631b71ccb067163165bc24408741f166edb809b8dea971cf0b",
+      "bytes": 185
+    },
+    {
+      "path": "src/institutional_factor_platform/backtest/costs.py",
+      "baseline_git_blob_sha": "919cf96852a7ea99b7e54bbf6c87b5540d25baed",
+      "baseline_git_bytes_sha256": "70c56748c199ff0a46b24858fb8b62bb641ebe04c1c6e88436776bb6f5a7e115",
+      "working_file_bytes_sha256": "69177cc186c2a323e81f3c666dc3099abc49015a89a8a17a06cf5753e5b307d0",
+      "bytes": 1884
+    },
+    {
+      "path": "src/institutional_factor_platform/backtest/engine.py",
+      "baseline_git_blob_sha": "8ae12cd1f9b175d884f5315fe49d218c0c1aba9d",
+      "baseline_git_bytes_sha256": "7a5bdd984d053e5b3ad15c16add2c9fdd407a5e1ad0e4b440aa4be0f6ab33a5e",
+      "working_file_bytes_sha256": "f37a921d2e802baa1d4ad575207f3628f8f9e5260359ee8162ab64704ecb01e8",
+      "bytes": 3766
+    },
+    {
+      "path": "src/institutional_factor_platform/cli.py",
+      "baseline_git_blob_sha": "c2a421d2b87a6e6401bc0c074aab6bd7951f1eee",
+      "baseline_git_bytes_sha256": "70778463477df2f17469b4075f537b581b6f84df80a0cdeb92994c6a9f5b9b15",
+      "working_file_bytes_sha256": "7cf223a5d077ecf4569a7d6ce5306bba2c2b09dfd897dd3def61ae680c532f79",
+      "bytes": 33235
+    },
+    {
+      "path": "src/institutional_factor_platform/configuration.py",
+      "baseline_git_blob_sha": "2ccf18c630b5d19c65ea1f378e3b371828c6837c",
+      "baseline_git_bytes_sha256": "7c450d7c7b8a19c1e5a1b8aa6468ea93b34ed04ac14e4b1c4713efcb455a069a",
+      "working_file_bytes_sha256": "f3353b755bc747e34cf1a8322959527f306b6962bc6693c304b1e0979605e0e5",
+      "bytes": 2276
+    },
+    {
+      "path": "src/institutional_factor_platform/constraints/__init__.py",
+      "baseline_git_blob_sha": "bb2a41cdfc0dcebde23334305341bbe29cd41196",
+      "baseline_git_bytes_sha256": "7ee1f5239fd937f9309f55203e30b84bc85ff97b42bcaa6eb1d63429b7167451",
+      "working_file_bytes_sha256": "b9a18da29910238a80ef1f16529933fd70a76831b8657a78913e8caab4c946e3",
+      "bytes": 151
+    },
+    {
+      "path": "src/institutional_factor_platform/constraints/models.py",
+      "baseline_git_blob_sha": "5a4f1e4df21d27886ca1dae59ddc4178e9955af7",
+      "baseline_git_bytes_sha256": "1dbbfdaadf3b64d6985c66226ca142068e8ac0ffcbd7fca9acbdcf10a5c7c516",
+      "working_file_bytes_sha256": "c2ba3df5ec5f4c0be0c8e8f738c94712604288a3f955bc8f24d963f0dc29a8b3",
+      "bytes": 4620
+    },
+    {
+      "path": "src/institutional_factor_platform/dashboard/__init__.py",
+      "baseline_git_blob_sha": "c227ee4888ed7467a9deff8daca4824c7aac3b96",
+      "baseline_git_bytes_sha256": "02cefea43d004fd8b44f7b030e69a6874cf290dd34a41ae2ee86caf8a1fdf594",
+      "working_file_bytes_sha256": "2b8685ae20ec0d2d6b9d945a0d6879bd390187a7b6c32e0022c37528f918c3ac",
+      "bytes": 148
+    },
+    {
+      "path": "src/institutional_factor_platform/dashboard/app.py",
+      "baseline_git_blob_sha": "6448024f1bddffd04bdf3da0670e0e759343a05f",
+      "baseline_git_bytes_sha256": "86c8f5d920942ada6cc5827e5504858d9a0c7fbcf44640221037ef06e75afc15",
+      "working_file_bytes_sha256": "3f347a8c1e3914ba31281871d79222011245111d493db1d4b45d9c274d157b73",
+      "bytes": 6169
+    },
+    {
+      "path": "src/institutional_factor_platform/dashboard/client.py",
+      "baseline_git_blob_sha": "25edc168d29315babae2f4570004f8c14c2bc8f2",
+      "baseline_git_bytes_sha256": "54a6a940240b8c5b2b0bc76f5ef51cc2743a55bb98e81b334240e623b80374ec",
+      "working_file_bytes_sha256": "2f1bfb5fcc1aea76ffdd5379e841bf33a26c60c6e7ca7396c57ee5396c503d88",
+      "bytes": 3100
+    },
+    {
+      "path": "src/institutional_factor_platform/dashboard/launcher.py",
+      "baseline_git_blob_sha": "42f05905987e085384235559f7b78f22f2c12fee",
+      "baseline_git_bytes_sha256": "c9b91b05173a510823f02a19d7cc16ca7257e0a54aac64bfd1c61f9516cfe6f1",
+      "working_file_bytes_sha256": "61dd75587552c91afe96741816e6bcf03d1d6e2f01244ff50b4613746aada43d",
+      "bytes": 1058
+    },
+    {
+      "path": "src/institutional_factor_platform/dashboard/presentation.py",
+      "baseline_git_blob_sha": "d86dbca22eaeec55b1214250528540a196dd08c8",
+      "baseline_git_bytes_sha256": "69aa35e2e5367617525e588e1709f42eb7d9f26da479829f69abaf565acf336f",
+      "working_file_bytes_sha256": "1d816cce80054024c898834a15171dffbfab58cbd2762259367e28e5ae71cd9a",
+      "bytes": 3191
+    },
+    {
+      "path": "src/institutional_factor_platform/data/__init__.py",
+      "baseline_git_blob_sha": "9f0e72e437ca65f62872c1b22398d4bf86e7102d",
+      "baseline_git_bytes_sha256": "b7f1826cf56b388dc71bc2e99540142a204c93c5819a3a35fb2504270e6568a2",
+      "working_file_bytes_sha256": "ee2dfb8876c75da73ae2dcb8b1778c342694cb64c38a145ca3de2a5399564014",
+      "bytes": 41
+    },
+    {
+      "path": "src/institutional_factor_platform/data/access.py",
+      "baseline_git_blob_sha": "5ee70a456dc0b39fc70b13c94ff390599f43d2b8",
+      "baseline_git_bytes_sha256": "60fc5d3d4fc96c4a3201476cd471253bd93bfa15c3cf95ccbd46f188e44f3822",
+      "working_file_bytes_sha256": "a11ce0caabd38c1db6940b93c1ab7e6a602690cce9f28486109fafb6ffe2f41f",
+      "bytes": 9960
+    },
+    {
+      "path": "src/institutional_factor_platform/data/calendar.py",
+      "baseline_git_blob_sha": "91c10ec01f1be564d2173d85f64e3454ce7799e5",
+      "baseline_git_bytes_sha256": "49495bd702488f9abaa58189cd5025294f09885b72306cfd59fef36443055f4d",
+      "working_file_bytes_sha256": "d0ea4e8ea112e06d5622ae25a8bec4e04ab5719cd2412ddf74d8de0e2e9fa28f",
+      "bytes": 722
+    },
+    {
+      "path": "src/institutional_factor_platform/data/config.py",
+      "baseline_git_blob_sha": "655fa2076eea52f7d7599d116883985198bce2e8",
+      "baseline_git_bytes_sha256": "5ae383d2aab4ef61267a14e1dc97691f852ddecbe7b7d6881cec32771c10f7e0",
+      "working_file_bytes_sha256": "411757cbc85602f65f3410d2e81f657dcf95e8a6c51312d89c110e1f45bc4a53",
+      "bytes": 10241
+    },
+    {
+      "path": "src/institutional_factor_platform/data/contracts.py",
+      "baseline_git_blob_sha": "6ecc0bc569cdb60512862b09a1045082f7a8e2b5",
+      "baseline_git_bytes_sha256": "999fe001cedbb7164d85159c1a926bcece88284d038887e8f60a4fcb5678d21e",
+      "working_file_bytes_sha256": "cf9ed3bf054a91f595751a3de47ad66872f8ebd00cf78bb37fa4cff7b087e995",
+      "bytes": 13617
+    },
+    {
+      "path": "src/institutional_factor_platform/data/domain.py",
+      "baseline_git_blob_sha": "989ae1986e953229ab5086cfa73337807cfd38f9",
+      "baseline_git_bytes_sha256": "b3210ca88e627dad1bfb852ee9105b85a5b6f627556614f2fde0ed5e238ef1d6",
+      "working_file_bytes_sha256": "5fad3453599b88d71b0d47198cf1018d55536b4f74fd7514fb71573b1e88adda",
+      "bytes": 10776
+    },
+    {
+      "path": "src/institutional_factor_platform/data/evidence.py",
+      "baseline_git_blob_sha": "cdd3d5b2a5b9a99653e15ecaf12889c5db576950",
+      "baseline_git_bytes_sha256": "1960f6307512133b0b545fac612e2106488a30dd0f78a4df02895247c41da073",
+      "working_file_bytes_sha256": "5d8b1554949fa3c787a21bd37350e4e75dcb887bad416b0ee5be1cad16125cd7",
+      "bytes": 2181
+    },
+    {
+      "path": "src/institutional_factor_platform/data/lineage.py",
+      "baseline_git_blob_sha": "80cdc4d2a6f278ed9fe3b92c3ce59188772300b3",
+      "baseline_git_bytes_sha256": "50edd9320eb66e34bfb16dd76aff0af022249763d6c62ccd2323e6f36384f124",
+      "working_file_bytes_sha256": "68947ce1882c232d54314544d45f52f52a9e58bb81d2de9a1d095e060d819773",
+      "bytes": 14061
+    },
+    {
+      "path": "src/institutional_factor_platform/data/manifests.py",
+      "baseline_git_blob_sha": "4057a3dbcae826f85d3e3c6ccf58bdbb3db4724d",
+      "baseline_git_bytes_sha256": "dd2b83fcb130f631533b7a13f598a5cbe5296576c32220a968179ee207a1a3e3",
+      "working_file_bytes_sha256": "c3c17b943d2a3210668d1369f3939fb477cb473772204e27c01e93a479605895",
+      "bytes": 8292
+    },
+    {
+      "path": "src/institutional_factor_platform/data/sec_concepts.py",
+      "baseline_git_blob_sha": "f75be034a1737a095884e6843e026207240f7c76",
+      "baseline_git_bytes_sha256": "012e6509ae8f3529bd40690a213c4e04faa4d617fbfa0f21f1685f0e315ec061",
+      "working_file_bytes_sha256": "982d9465c55a2f91af80cb265da1b86d68e0f9834db57e2a68328e4568ae8110",
+      "bytes": 5042
+    },
+    {
+      "path": "src/institutional_factor_platform/data/sec_listing.py",
+      "baseline_git_blob_sha": "6a3e9713aabda63fd2b65bb862cfa1fbd3076d51",
+      "baseline_git_bytes_sha256": "223bfd598380168ab7aac482975443c46170996e6bd55b9961f34885163a1d5e",
+      "working_file_bytes_sha256": "2a2af1661ff4026627f1b0dd0aefcbb0942cbfb4f8d86dc585ec48a01feac49d",
+      "bytes": 8698
+    },
+    {
+      "path": "src/institutional_factor_platform/data/sec_projection.py",
+      "baseline_git_blob_sha": "52c9f5422e1f7dea0750d6f049ed53de96465fc2",
+      "baseline_git_bytes_sha256": "0729c43c13006f7d3998c239fd9fd84ba1fd6057e9a83193840e5f28974f9082",
+      "working_file_bytes_sha256": "95cd684945b0e18636ab0885bab1bdb3e943162be9839629a366b655106fbf31",
+      "bytes": 16876
+    },
+    {
+      "path": "src/institutional_factor_platform/data/security_master.py",
+      "baseline_git_blob_sha": "f6565c33a1517b514e1c99441c2967b40baf7599",
+      "baseline_git_bytes_sha256": "8660434b2af5ef6618e71465583bf1eb0481ceb4cf8957bc95d781839e84fe7e",
+      "working_file_bytes_sha256": "7c46c9a5cd91fa67e7b9071a9317cdd83ccb2ad85845ba406f94c22f85151f63",
+      "bytes": 20095
+    },
+    {
+      "path": "src/institutional_factor_platform/data/services.py",
+      "baseline_git_blob_sha": "09d88bb0cd0a92c626489a87529537562b22110f",
+      "baseline_git_bytes_sha256": "9bcd8c06cd7a2cd21405f45c9e783fe2ebfdf883bf03035bb590dd10e7c6db01",
+      "working_file_bytes_sha256": "6f204fd83c515272ae6c90cfd9bffe1d270cbd9d0d7c7b426249b65382ed88bd",
+      "bytes": 42181
+    },
+    {
+      "path": "src/institutional_factor_platform/data/sources/__init__.py",
+      "baseline_git_blob_sha": "c391a6570a90fa35677684a00c2a4c8fbfc030ee",
+      "baseline_git_bytes_sha256": "2ecebcecdbadff772812b8510c46fbab4c8871572094d4c8d1e88171bc881133",
+      "working_file_bytes_sha256": "a3de2b7011b37fbf16da81b7658a4bc5ed7fec0a4878f105913bbc4e6dbb42f9",
+      "bytes": 37
+    },
+    {
+      "path": "src/institutional_factor_platform/data/sources/alpha_vantage.py",
+      "baseline_git_blob_sha": "268bdb83ff069db2b19136b9e0ea0a214238e4f1",
+      "baseline_git_bytes_sha256": "dc9ca87dd1999b8f5a048284ec557743f845d25ac241e575a2bcdc21bfeb0be0",
+      "working_file_bytes_sha256": "e78cae1a31d6487fa79038309b35783dd1da2cbb59c0d78e9a37507a4f8fd67e",
+      "bytes": 4380
+    },
+    {
+      "path": "src/institutional_factor_platform/data/sources/base.py",
+      "baseline_git_blob_sha": "90d2990db7666240cb8ef1e1d2b2e2ab724011d9",
+      "baseline_git_bytes_sha256": "28013d4727103736ddff27d0967607088006d1385f8822484b5c5d646dd3f628",
+      "working_file_bytes_sha256": "10f5b87f03a35f059a4a303f2e4f1a775e0a62f302c7c04bf1f142e482ec0aad",
+      "bytes": 4523
+    },
+    {
+      "path": "src/institutional_factor_platform/data/sources/fred.py",
+      "baseline_git_blob_sha": "a392929e8e92ac0e53575173436f85e794a4b976",
+      "baseline_git_bytes_sha256": "e50149cb34ea58776912a5b64166a408cd921c4ba4565710906cfc02952f15a9",
+      "working_file_bytes_sha256": "5716aec9757e0f11e2c188f89dfbb4bcac9f9b39087c0dccd12fc31751dcfff1",
+      "bytes": 3161
+    },
+    {
+      "path": "src/institutional_factor_platform/data/sources/french.py",
+      "baseline_git_blob_sha": "4d0f8e4b59121f371cbd179a1a921dcbad963e19",
+      "baseline_git_bytes_sha256": "ac7e7079f8a0a0d84e5053a766a5909a9dbc4b1da1eb286601d7cfb5f6cb6886",
+      "working_file_bytes_sha256": "bf540754e0d511f4c829ac84aeb86264eebee1a2200a861a23bf1d24bd65245f",
+      "bytes": 3613
+    },
+    {
+      "path": "src/institutional_factor_platform/data/sources/hf_data_library.py",
+      "baseline_git_blob_sha": "05afa5331b48fa45f28662d86e986f90d96f23bc",
+      "baseline_git_bytes_sha256": "3eb418cccca343906e86f70b4b8225d7e313f8f92f609bd4bafbc8f812772e4f",
+      "working_file_bytes_sha256": "48acccbe5a68cc3cd839bc091a274a8c3c1f0460d02f350a8065da9533b31622",
+      "bytes": 8462
+    },
+    {
+      "path": "src/institutional_factor_platform/data/sources/owner_supplied.py",
+      "baseline_git_blob_sha": "5cd95e3c1f6f73d1e0ff5bdba8049e7fc29b5fa2",
+      "baseline_git_bytes_sha256": "a46ce3e4780c898511272822b00dbbd63836814f8dd137c3179681b111e123fc",
+      "working_file_bytes_sha256": "778cbc2f802058065a7cc86fe3a3ddc1f90cc94f7e8731cb0bf7a7e1378a462d",
+      "bytes": 8973
+    },
+    {
+      "path": "src/institutional_factor_platform/data/sources/sec_edgar.py",
+      "baseline_git_blob_sha": "ed88bfc0ca861f8a0caaa28b761ab90d74c30dfc",
+      "baseline_git_bytes_sha256": "caaf3208c1c2d16dd4229d08ee8544c8cf1c0cdd817364772ad2b6b6fd9da4cb",
+      "working_file_bytes_sha256": "213a3c6b033b4ded440b946b9fd536390967f269fec7a6968f8e00e92d6303a7",
+      "bytes": 6427
+    },
+    {
+      "path": "src/institutional_factor_platform/data/sources/sec_inline_xbrl.py",
+      "baseline_git_blob_sha": "129d52e878512d807ef64bc5b86217d54821278e",
+      "baseline_git_bytes_sha256": "8de5cfc5e09cd11683b52efa410f039af8c3bf0099e0e3164b24640584d3ce53",
+      "working_file_bytes_sha256": "ad42e296feaaf3ad91cd6b0514d2da0d8fb8311c77eb243b6bd703465259c65b",
+      "bytes": 12233
+    },
+    {
+      "path": "src/institutional_factor_platform/data/sources/sec_legacy_xbrl.py",
+      "baseline_git_blob_sha": "f2dbb86fa1f18187467ded96144432e34ca390e8",
+      "baseline_git_bytes_sha256": "cbf49d01e1aae7c4f21c8ae8489d2605f810bdfffa1adddfb39b178a15e939e6",
+      "working_file_bytes_sha256": "595d1d73418e9aa2d91e61de51e0459847a34845e53521d917233c0b5ab14651",
+      "bytes": 12183
+    },
+    {
+      "path": "src/institutional_factor_platform/data/sources/sec_submissions.py",
+      "baseline_git_blob_sha": "04dedd047ff3c7183b1f77fec30de52aa8d241ac",
+      "baseline_git_bytes_sha256": "0e536faaaee630f968485c2639ee17b749f6d44290de854495d631834b96582f",
+      "working_file_bytes_sha256": "5ce131d25d7e04eeceea85fdd418028a2a46a0ec24afd93b0d4801291f6e21cf",
+      "bytes": 8035
+    },
+    {
+      "path": "src/institutional_factor_platform/data/sources/yahoo.py",
+      "baseline_git_blob_sha": "b4240819b282cd71306f4e826cfba67e507705d6",
+      "baseline_git_bytes_sha256": "3e529094007496316e15576e4519642baaeb6d715cc7f0fe7f8013e4f4657797",
+      "working_file_bytes_sha256": "5553972033ceb40725021ff35e79ddfa3629747802706b215e604e5f7c666317",
+      "bytes": 4956
+    },
+    {
+      "path": "src/institutional_factor_platform/data/storage.py",
+      "baseline_git_blob_sha": "371da41ffd223f08af8f59db71569759d58a1e2d",
+      "baseline_git_bytes_sha256": "da967a3cbecf3e0e6d7f825f5c16095f43e2b5e3d8ba5bed5bb2cb6f0686027b",
+      "working_file_bytes_sha256": "f5a7af12f2b9ebc4934e36bfd0132995719875377830e7b1eb6d22cfcf97585d",
+      "bytes": 41362
+    },
+    {
+      "path": "src/institutional_factor_platform/data/validation.py",
+      "baseline_git_blob_sha": "fba815a5278eb51f48c706cb419e46e923eef2ed",
+      "baseline_git_bytes_sha256": "5afaa1a0ba668f1b0c5fdc7eca2ff3eb6233557baa91f84f28409c9e5a6eaab7",
+      "working_file_bytes_sha256": "4316ff354296504ba70e79a7bda381cb915677a3e64390b16a05985bc649f50f",
+      "bytes": 15646
+    },
+    {
+      "path": "src/institutional_factor_platform/delivery/__init__.py",
+      "baseline_git_blob_sha": "a5408376185cb2fe3ffd8669dabf56f9b7f922d7",
+      "baseline_git_bytes_sha256": "ae587f148003cdf30b721c616ac6ae23b3230d47edcc6c35e2b7a2f83c14dbc9",
+      "working_file_bytes_sha256": "ea8ea7e69a0b26eb55f1482597972b205959b8eff74459f400919263771f5b66",
+      "bytes": 141
+    },
+    {
+      "path": "src/institutional_factor_platform/delivery/catalog.py",
+      "baseline_git_blob_sha": "e526ff8e05f957baae84929be11749fa9f21eecd",
+      "baseline_git_bytes_sha256": "9525a95648f49119acd2ece26adc6850eecf9ccbcab36c77aa1948bb43703ff2",
+      "working_file_bytes_sha256": "b606eec7809f6297d6bbcf2697bf09a2b19ef5bdfda3bb496acc254a59c85b99",
+      "bytes": 10451
+    },
+    {
+      "path": "src/institutional_factor_platform/delivery/config.py",
+      "baseline_git_blob_sha": "b41deb1c244264bb35c2d6c9e5770d1158347c9c",
+      "baseline_git_bytes_sha256": "b25d53f33a0b780ae1e868223ccd40273cdbe755f01561d041ee9c88715aa4c1",
+      "working_file_bytes_sha256": "06df5a4815bdcf770aff1efd01cd93e79df4f01d72e0963c2982478d7f4bf4eb",
+      "bytes": 4575
+    },
+    {
+      "path": "src/institutional_factor_platform/delivery/provenance.py",
+      "baseline_git_blob_sha": "33776faebf55f537673f0b1ede20dc0d41003ef9",
+      "baseline_git_bytes_sha256": "ee20302be539c474d4e5b3010110de929fb375cbbfe64b7fedb6fd18ef236320",
+      "working_file_bytes_sha256": "53992d4566aa458a8218b78d0d5987b9997cbafc89ecb4e65153c421df460084",
+      "bytes": 1154
+    },
+    {
+      "path": "src/institutional_factor_platform/delivery/reporting.py",
+      "baseline_git_blob_sha": "b6afde654fe0b801c2989b16db1c908b1cbfb2f3",
+      "baseline_git_bytes_sha256": "354e89350d49db3caa07f77ddc734175f20030ea5f1855b36f0d7b9fd71c6af6",
+      "working_file_bytes_sha256": "ad519f71fad425f9af88e7877fd914abc521996e7539f19949a22e967893d469",
+      "bytes": 12162
+    },
+    {
+      "path": "src/institutional_factor_platform/delivery/schemas.py",
+      "baseline_git_blob_sha": "63c8e0577f6b1e986e9d16f2ac19e230a8969b72",
+      "baseline_git_bytes_sha256": "e5562a0392ac7e49eb2f48f63f6abb38026de30ccbbd55e2f9f00533107389cc",
+      "working_file_bytes_sha256": "77212078ecef0e8d17136c5ed556deaae9dfb3bd344030d0d77736cee20f88f1",
+      "bytes": 1454
+    },
+    {
+      "path": "src/institutional_factor_platform/delivery/service.py",
+      "baseline_git_blob_sha": "37ed81647c4de57d5c00b38c109e69dee55766ea",
+      "baseline_git_bytes_sha256": "536bca8807de82e5c0f0ec02f4af18a3d7596d63ada16be19623224967e6677a",
+      "working_file_bytes_sha256": "5a5ed48db6c2055b11d41f4ca8c8098a618a34829fa841a4e8a3058d67cb84a4",
+      "bytes": 2085
+    },
+    {
+      "path": "src/institutional_factor_platform/diagnostics/__init__.py",
+      "baseline_git_blob_sha": "4c1ac682b0b6b058cb05486c9aecc930c0d3b7f5",
+      "baseline_git_bytes_sha256": "bccd2711af9f661685cad2d873fd4fcff4b18981813c9454940c7bcb472c75a9",
+      "working_file_bytes_sha256": "d6e52404946cd6141d116286298d63814f70aea50cdcf0a8484f213013af54f2",
+      "bytes": 164
+    },
+    {
+      "path": "src/institutional_factor_platform/diagnostics/regression.py",
+      "baseline_git_blob_sha": "da7711f2697c90ebf8a5857b12518f8f62db3f89",
+      "baseline_git_bytes_sha256": "cb02cbb285c909557c10e7ba31e20a2a4e32fb60c2e9a6363a9f82a75405cdda",
+      "working_file_bytes_sha256": "d77b6f7774865b01bd6a9218ced7e3f5b2a43067a3d02a07a52e5263ad5959ac",
+      "bytes": 1815
+    },
+    {
+      "path": "src/institutional_factor_platform/exceptions.py",
+      "baseline_git_blob_sha": "202a6dba9b3baaeb9138ce1d969981fd31d5a1ee",
+      "baseline_git_bytes_sha256": "393f52b48c93894efcbbbc8689323fc51cafb64610f9c0fb00febaeb743f2eaf",
+      "working_file_bytes_sha256": "609732dd81825709d613811ba4181cc38d3c9c2bcb3ceb1c9a0046dd9f7dc5ec",
+      "bytes": 2162
+    },
+    {
+      "path": "src/institutional_factor_platform/factors/__init__.py",
+      "baseline_git_blob_sha": "8d3408721162016e2c9867e84824deeef89a6e5c",
+      "baseline_git_bytes_sha256": "8b55e47980c3696b45e5327a1194246a8fb943003585dc0139897ea0bc3d450f",
+      "working_file_bytes_sha256": "8f94279679991e8945b528f2f2788e22238f8c376fd537a77eb666aaa549d7bd",
+      "bytes": 289
+    },
+    {
+      "path": "src/institutional_factor_platform/factors/config.py",
+      "baseline_git_blob_sha": "3067c927b691467f2343c1fea9af1f55dcb2426f",
+      "baseline_git_bytes_sha256": "afc3100ec49f611bcb8d88c814c5a0757707c403450c20ec70b23247b339ce35",
+      "working_file_bytes_sha256": "0193e2597459aeff8742cf07d9423a9cfaaeb60ee486443c651a0dca68a1cca2",
+      "bytes": 4079
+    },
+    {
+      "path": "src/institutional_factor_platform/factors/contracts.py",
+      "baseline_git_blob_sha": "36dd4490844b1e5ea9545ea670800bdfca96be87",
+      "baseline_git_bytes_sha256": "55eb570e1253b3d5b4c0c16b282a9ddb263031ed153458f57aa1ff69847cfd7d",
+      "working_file_bytes_sha256": "8b9a60519966167fe31a383d1d762d4e7feaf5cc4fa2a7a79fc4c53a8a6991bc",
+      "bytes": 2532
+    },
+    {
+      "path": "src/institutional_factor_platform/factors/definitions.py",
+      "baseline_git_blob_sha": "0a7b6a41b576f09f82553448882f59531e14a042",
+      "baseline_git_bytes_sha256": "4006107316e34cd273fff897d35f5a9afe96db7922d5d3412fb8f1ace0d7cad9",
+      "working_file_bytes_sha256": "653c9bff58b0cf51d3fc853c6c1a660516861e467a9853a9a67d22061dd35737",
+      "bytes": 18159
+    },
+    {
+      "path": "src/institutional_factor_platform/factors/diagnostics.py",
+      "baseline_git_blob_sha": "ee6b98ed9d04c9f91e6ee4b916d7a8967d12d6a8",
+      "baseline_git_bytes_sha256": "c01871988dd9b8b3b7c934e065ecb25dc739e9d0edad47dd48ef0f3d559d752f",
+      "working_file_bytes_sha256": "84f9234bfad858ad3d796f84a4b5a4dd1d9bedc3f407d8008b0d2cc66f8f4e43",
+      "bytes": 6049
+    },
+    {
+      "path": "src/institutional_factor_platform/factors/portfolio.py",
+      "baseline_git_blob_sha": "2cdbbf25fe81d75b4ee2b85824498c9d616ebce9",
+      "baseline_git_bytes_sha256": "6be1490196561431e484e81959420e56b99b9cc311fe437ca342a4a5014a8e65",
+      "working_file_bytes_sha256": "964b803c8fb6416694c6f85199283bda211d3db1a126ccdc8fb2ca4ad9b024c8",
+      "bytes": 6250
+    },
+    {
+      "path": "src/institutional_factor_platform/factors/preprocessing.py",
+      "baseline_git_blob_sha": "552c5a38aa503751573b2d7b9070c172bfaeb2f8",
+      "baseline_git_bytes_sha256": "a3291a879c59b83a4bf50505f8d99082c213d4f22c0051a2c8858746d5b48ce5",
+      "working_file_bytes_sha256": "d5983daee4a7b7c464ae2d7cad052128aa1aadfca8d7009fde448677b01cb8b4",
+      "bytes": 3362
+    },
+    {
+      "path": "src/institutional_factor_platform/factors/service.py",
+      "baseline_git_blob_sha": "8812c1401e2c4080456351efc19136aa9089ec51",
+      "baseline_git_bytes_sha256": "091133075abc98c73595b3a555db4f65a59c87edcdb2f28f6a9cbbf57314d093",
+      "working_file_bytes_sha256": "393addf0276dc596c413a5bdf698c9d187b3400cdf92b0aae67e4615a1a746fc",
+      "bytes": 20104
+    },
+    {
+      "path": "src/institutional_factor_platform/factors/storage.py",
+      "baseline_git_blob_sha": "a2ff9f14bdf6cf95797cf5b447a968ee7ae399cc",
+      "baseline_git_bytes_sha256": "28339d87e7218f9611880a2ba6ab5d55e2d4a2a5b3f32f08ca3661ae4556db42",
+      "working_file_bytes_sha256": "7cc465973fb2044d077ad27c6332d752a3903524687c0925c93894f8072f93a6",
+      "bytes": 12076
+    },
+    {
+      "path": "src/institutional_factor_platform/factors/temporal.py",
+      "baseline_git_blob_sha": "564bfa87e53f1beb45c6ed96b186dba048e34194",
+      "baseline_git_bytes_sha256": "a2d17c9e1d52a02b3b2e6e2514e869cb3fcb488b91be03bbdfbbb5c361828067",
+      "working_file_bytes_sha256": "b5cc363c78d2a580aa6460cb4f77526b4ec9c71c626326827002a3c6b9fd1113",
+      "bytes": 8725
+    },
+    {
+      "path": "src/institutional_factor_platform/factors/validation.py",
+      "baseline_git_blob_sha": "485511f03c3641a1872f0b58fd1aaac9cccd17d6",
+      "baseline_git_bytes_sha256": "a2fc2e4899ab21c681542d9677e9a2a67ac59707810f236284b9b3c119c285a3",
+      "working_file_bytes_sha256": "2c47b064546a68752efa768ddabf8acdc6ceb6ee24b06bf810c2a5b4040687f3",
+      "bytes": 4868
+    },
+    {
+      "path": "src/institutional_factor_platform/logging.py",
+      "baseline_git_blob_sha": "14ca7696af340aec68aedc4db3164dbb0c02ec11",
+      "baseline_git_bytes_sha256": "1ba755dcaf825dbb7ceaa3fd815c4b3579bfd3d7f9c493d7e27d8955eadf24ed",
+      "working_file_bytes_sha256": "f78218e5722ea5b6455dfb5155216e47a541719c77e46c15d8800b66720f02e4",
+      "bytes": 2337
+    },
+    {
+      "path": "src/institutional_factor_platform/ml/__init__.py",
+      "baseline_git_blob_sha": "2bc470e52a5bac8a2cc7794f1ccccb362b7e6cb9",
+      "baseline_git_bytes_sha256": "8a541dc0a4bbe019d16365d37c4812ea61a5e20174a44bf2c0e8f3af8d0722fa",
+      "working_file_bytes_sha256": "ee0cc34323842cc5eed6a7a0bce6584b58b6665b587f0f09472081ba5716b064",
+      "bytes": 206
+    },
+    {
+      "path": "src/institutional_factor_platform/ml/config.py",
+      "baseline_git_blob_sha": "ffc908cf4a24f330ddbebcd4445da578d64f755c",
+      "baseline_git_bytes_sha256": "7dadb205206c224d3a05e4594d931fdc0ef95e75d270cde2a6d08a330dcd8fe4",
+      "working_file_bytes_sha256": "74f3cc1626c8f2b132ae1c0b2b13c27f34a5dad9f5de00f1a94b368c85eda7f8",
+      "bytes": 6246
+    },
+    {
+      "path": "src/institutional_factor_platform/ml/contracts.py",
+      "baseline_git_blob_sha": "99ccb7bd75d01f5a51c33d601651bbd0ac870ecf",
+      "baseline_git_bytes_sha256": "7382d7a64895a7182896a1b29ebdd4cdc740c04c386b93c412a9106e165f7a6d",
+      "working_file_bytes_sha256": "6a2447cb6d21c05a09e92a487780e55ef9c91d4f9f14e444a9a22941ada11f25",
+      "bytes": 4767
+    },
+    {
+      "path": "src/institutional_factor_platform/ml/economic.py",
+      "baseline_git_blob_sha": "454594603256255424bf3303fff1e7fdaae35a4a",
+      "baseline_git_bytes_sha256": "4a51832a8b73d63e405b0bf47abd3a097f7f18f8f2dc2630360ad2759da7cd2b",
+      "working_file_bytes_sha256": "ce97a0d3c4fc7c833e1c52ada0a83e244177a34aa77d3eb884b4584898d31de0",
+      "bytes": 2630
+    },
+    {
+      "path": "src/institutional_factor_platform/ml/evaluation.py",
+      "baseline_git_blob_sha": "e939de94a113689f2d43247fc1811e697cfe37b4",
+      "baseline_git_bytes_sha256": "809a2fe18b24c73f9d1133c3bd349394a7dde4264b1437cc0cd24ecd417af81c",
+      "working_file_bytes_sha256": "fcd0d2dd038022189c5b5cfb4a469673f64eb8dd53caffe428b1a11c4ae10d91",
+      "bytes": 6442
+    },
+    {
+      "path": "src/institutional_factor_platform/ml/features.py",
+      "baseline_git_blob_sha": "1ced7c6e4d142dfc6e67d05f05f3d1bad302848d",
+      "baseline_git_bytes_sha256": "ac175677dea967bd63dd5a3c684e5f6b40c604561d790ae144e97f54a39bb7da",
+      "working_file_bytes_sha256": "d29b45d217920829d7e77bb255ad1d6a33f1fe7e3172439ba575ba604e2c5ce8",
+      "bytes": 5663
+    },
+    {
+      "path": "src/institutional_factor_platform/ml/models.py",
+      "baseline_git_blob_sha": "0b4050c29c2ad2732f3b4ac5433937b69db88540",
+      "baseline_git_bytes_sha256": "b23e2e3a620470f2a1bf700e40769205420c01ac71a11dbd549201315273963c",
+      "working_file_bytes_sha256": "ba3c6c10a3beccd9503ac41dafc1d2897f63f98f9f387f586e86613fd6279250",
+      "bytes": 6195
+    },
+    {
+      "path": "src/institutional_factor_platform/ml/preprocessing.py",
+      "baseline_git_blob_sha": "f7075673927ad9f41203625fc88ea01c3f2080ec",
+      "baseline_git_bytes_sha256": "387390e586d8ebd119486f3c035a67622f36152e5360572ef2ec25c01b0bc2da",
+      "working_file_bytes_sha256": "d5f3896c495e97ec2f288fb5161a560796e4a5fe5238d1e54175147be0b48c72",
+      "bytes": 4724
+    },
+    {
+      "path": "src/institutional_factor_platform/ml/publication.py",
+      "baseline_git_blob_sha": "d894a1609a1e7bad87faea3e89ffc1324c2948d2",
+      "baseline_git_bytes_sha256": "1dae92a2dee04566cb2a6211275e404aaca7ff03cb0b0a8c4182a7510f93e9a4",
+      "working_file_bytes_sha256": "1e25582832144c6b34a6eea9ef609a2cb0c58a83a1c90dc35a456655402c43dd",
+      "bytes": 11495
+    },
+    {
+      "path": "src/institutional_factor_platform/ml/service.py",
+      "baseline_git_blob_sha": "cfa247df073e60cf223af1c033587d9764e34cc7",
+      "baseline_git_bytes_sha256": "76ceedd70a237758a6ea30f8a93fff0b876b689382b28083a50e1bc2faab535a",
+      "working_file_bytes_sha256": "9e59cf980d07af2e0d750cf1db8324b4e550a8cfcb2e25c935224c0d2778b92b",
+      "bytes": 41213
+    },
+    {
+      "path": "src/institutional_factor_platform/ml/splits.py",
+      "baseline_git_blob_sha": "46769b0e4731c480ba7f4a856037276bfa7c05aa",
+      "baseline_git_bytes_sha256": "eaacaa35f5612fa6dea7af6c8d8c8de2a2302656ec3dc61342df17687ed5bd0f",
+      "working_file_bytes_sha256": "5d1bc2a9cdb1edf0d804ffb11b73bf7f1eef323168d4563c463363b28e5ef798",
+      "bytes": 4134
+    },
+    {
+      "path": "src/institutional_factor_platform/ml/targets.py",
+      "baseline_git_blob_sha": "61e51edc8fda657c67e26e72d9ec1c498e603753",
+      "baseline_git_bytes_sha256": "a6f7200263ec80eee74b7e0ff527bfe8e596ba660288a875f278cb55f9283c84",
+      "working_file_bytes_sha256": "8d9b64f0b97974f036d63cb58b3f4740c6336652bc4c3e306c5d7ebcd241b837",
+      "bytes": 8429
+    },
+    {
+      "path": "src/institutional_factor_platform/ml/validation.py",
+      "baseline_git_blob_sha": "5afe35b004573548fbba5de0b24c713f360dba8c",
+      "baseline_git_bytes_sha256": "c85f776fa88755b7db5a38e20ebb78c221a1dc79ba8baa5c25db3f7782db0832",
+      "working_file_bytes_sha256": "75c8c68d4778b1c73543be2d5208e8061dcc97a392b4d6dd392d0c1db1e39b3c",
+      "bytes": 8323
+    },
+    {
+      "path": "src/institutional_factor_platform/model_validation/__init__.py",
+      "baseline_git_blob_sha": "0679e0c8140af1cba95f153916188ca5d6592b49",
+      "baseline_git_bytes_sha256": "78e836643ad7ff2a80505667d6c72bed89127bbff07a16fcccbef69ff3f2d944",
+      "working_file_bytes_sha256": "7be10b1f264c20b46e5a7b91284b4efb85ad4836668c5e7075a18eb922f8241c",
+      "bytes": 180
+    },
+    {
+      "path": "src/institutional_factor_platform/model_validation/inputs.py",
+      "baseline_git_blob_sha": "61c46da64ec001e6195e228089c9db99c5eb2c90",
+      "baseline_git_bytes_sha256": "662282837d85b1a5d1690c6cb46e56a9bdb13358beaa3fbae9a2df8f96b10161",
+      "working_file_bytes_sha256": "67989ba54f1af48caadc51015cfacdb4adc62ffe741815368fca562a866a26c3",
+      "bytes": 1952
+    },
+    {
+      "path": "src/institutional_factor_platform/numeric.py",
+      "baseline_git_blob_sha": "0502cdcd1940f5ac9ccc00c50bde9395979842b6",
+      "baseline_git_bytes_sha256": "d79c4d123c7c555c2198a4054e7a3a50c93e264cf66ac2d0ce3a4c05c9433c5a",
+      "working_file_bytes_sha256": "c3133bfbb3dbbcaff5b5b598ca7e5f18ab1e44e298beba64a3e32851554b729f",
+      "bytes": 122
+    },
+    {
+      "path": "src/institutional_factor_platform/observability/__init__.py",
+      "baseline_git_blob_sha": "dea1f32858cd401035b4dadf20e136980abaeea5",
+      "baseline_git_bytes_sha256": "cf2e93f7f3814e3a265975f5c6c3482c4969bdd7a043b79220d7b8d4d812f24d",
+      "working_file_bytes_sha256": "8ddc94acb74b650858dc96f4e432c9296e9c05de775afcad32abb74903fdf42c",
+      "bytes": 191
+    },
+    {
+      "path": "src/institutional_factor_platform/observability/logging.py",
+      "baseline_git_blob_sha": "c90ece234256ebe44a42a7c9b63dbb1df2c0551a",
+      "baseline_git_bytes_sha256": "2888f5ec21627301448ac281ed14d6cd3237cad190d301cc31e4c616d110cf49",
+      "working_file_bytes_sha256": "b918ce779bd7e934a2993da3917d39d4616fb48feaff73d6cc44885a915302e5",
+      "bytes": 581
+    },
+    {
+      "path": "src/institutional_factor_platform/observability/metrics.py",
+      "baseline_git_blob_sha": "e1f9cfa2d7d2936576c0f415a7a910ffa6c7c723",
+      "baseline_git_bytes_sha256": "532eed54f4114e2ed1127647e489fa93e1002902e761fe52a7e76f77326174ac",
+      "working_file_bytes_sha256": "a64647cf82c49d56cdccebd04b2ddadb169634237c2fe7412758c6447342157e",
+      "bytes": 595
+    },
+    {
+      "path": "src/institutional_factor_platform/optimization/__init__.py",
+      "baseline_git_blob_sha": "60ce8c0a4b7d32720ebf7e16408c3b0af594f26c",
+      "baseline_git_bytes_sha256": "6ac57566b6ccedc576e056b8d7a4f58af64be46ae7aab68705bc23b719aa4b67",
+      "working_file_bytes_sha256": "e4d08828e896db31954ff4557134e9a44a339f4457a01d47099b95cf195aa781",
+      "bytes": 186
+    },
+    {
+      "path": "src/institutional_factor_platform/optimization/black_litterman.py",
+      "baseline_git_blob_sha": "0525e41f692bf0fa71083962c52207f80d1c8c82",
+      "baseline_git_bytes_sha256": "e43ba663b72f9c0764097961b240a13929f178d5327504dbc0c82d966afb11cf",
+      "working_file_bytes_sha256": "2e18698d325bf819ce8a9c387283110d2984c5b4969ac3e16c43186d30a4e005",
+      "bytes": 2126
+    },
+    {
+      "path": "src/institutional_factor_platform/optimization/covariance.py",
+      "baseline_git_blob_sha": "aeb99161225a4083695533e03454f60426dbd6e2",
+      "baseline_git_bytes_sha256": "32c5bde599549d728a6f66a6fa97bd36c7cd28e1cb86887f90b979da29bd9551",
+      "working_file_bytes_sha256": "ab71643607d80e5490a5d6a046cea88aaa7319db62161d896ac139504b1b83e1",
+      "bytes": 2628
+    },
+    {
+      "path": "src/institutional_factor_platform/optimization/engine.py",
+      "baseline_git_blob_sha": "371502ee63fe8428b42a995bdc67054fd16bacfc",
+      "baseline_git_bytes_sha256": "6383203ef92a9e15eca7f8969fdee6bce735c1ac198290cad031d19cd8cf7686",
+      "working_file_bytes_sha256": "d5ff858a6b0b6904e9f29150b8913894d1daf45528489a2f7d175761659c7ac4",
+      "bytes": 13049
+    },
+    {
+      "path": "src/institutional_factor_platform/optimization/hrp.py",
+      "baseline_git_blob_sha": "20ba67ce17896dbbe50ef7c6b17f55958516def3",
+      "baseline_git_bytes_sha256": "5265af164998c48a3cba0c10857154bd419072e65655e152cd0d5c8644186632",
+      "working_file_bytes_sha256": "bc4ad87ef16e91739ff73f63fc1a6b5379ac107ae1f66760a80a77addae9eccc",
+      "bytes": 1667
+    },
+    {
+      "path": "src/institutional_factor_platform/performance/__init__.py",
+      "baseline_git_blob_sha": "8b77fa8e33f9524e7636b6b6d8ce197ae96bcc9a",
+      "baseline_git_bytes_sha256": "aa14894251e0706a9d40a22090187a848e1c0a1ebf90c3f46150380f2c73cd1e",
+      "working_file_bytes_sha256": "574ece2f2847dd391bcdefe668a852726bce021222955b1cc521f87f7a069e43",
+      "bytes": 157
+    },
+    {
+      "path": "src/institutional_factor_platform/performance/metrics.py",
+      "baseline_git_blob_sha": "11876a18a6853323456f0596e60ec874ceb7e484",
+      "baseline_git_bytes_sha256": "e2196334e8d90297df20bd1cabef2ea80a8e2685094b6bdc6d7c547924763c1f",
+      "working_file_bytes_sha256": "d1e7fc89854012f5fd2d0939766ed2b02055e171981600492d220a227d63630f",
+      "bytes": 1670
+    },
+    {
+      "path": "src/institutional_factor_platform/portfolio/__init__.py",
+      "baseline_git_blob_sha": "0d6c3a29f31ede5ef101822b59f07da026795597",
+      "baseline_git_bytes_sha256": "c20970e5759abe2284cf3961d56cf9620a729c906ad25ecc7835bdeb89705f9c",
+      "working_file_bytes_sha256": "709f78e11405060e77f8ad9b220ea9bdab76993a387214c9aef1b339265046dc",
+      "bytes": 185
+    },
+    {
+      "path": "src/institutional_factor_platform/portfolio/allocations.py",
+      "baseline_git_blob_sha": "849f3709393c49759cf92e9eaf0a2c6917619f19",
+      "baseline_git_bytes_sha256": "82ed80054fd3d39d48744fcd7388363e6185331411c84e964814c8a97f1a2817",
+      "working_file_bytes_sha256": "1b89c71ce96ea13c04c640ff82682b6f7ee7b7c256be26ea110d85f020460365",
+      "bytes": 682
+    },
+    {
+      "path": "src/institutional_factor_platform/portfolio/config.py",
+      "baseline_git_blob_sha": "0e660d960ad1d68bf515666416beb8173bd24b4f",
+      "baseline_git_bytes_sha256": "325f8a3ad4a224a9e7cd0d220f2d8b6c9c5b1232f57c1d54496f9fbc6c638fb6",
+      "working_file_bytes_sha256": "4205262bb5b3ae4f68d5cc822fd56d57b567af0d5c9c425ea0fd01dd7db336ec",
+      "bytes": 3429
+    },
+    {
+      "path": "src/institutional_factor_platform/portfolio/service.py",
+      "baseline_git_blob_sha": "be32e0b858aa32ea7273ee6726c65c5ad73e602e",
+      "baseline_git_bytes_sha256": "bbed61ce8281c22a916eaea6a8c17bf3ab924608bcbde7baab7ff67935b83b96",
+      "working_file_bytes_sha256": "d916287cb43af8a434838eb7519f55296e74cc6c9299cbc28040b85cff49e687",
+      "bytes": 17682
+    },
+    {
+      "path": "src/institutional_factor_platform/project.py",
+      "baseline_git_blob_sha": "525d551033caf83208f28086d278ae806445a3b0",
+      "baseline_git_bytes_sha256": "4a22dd454cc2be1052a1559f7cc7ba55b3dfdf2d3d4f7196ab689e732bf63223",
+      "working_file_bytes_sha256": "4ff8da45abe344e3af04e7b386f4a0dd339dbab715a06532b519442822563ae2",
+      "bytes": 1247
+    },
+    {
+      "path": "src/institutional_factor_platform/py.typed",
+      "baseline_git_blob_sha": "8b137891791fe96927ad78e64b0aad7bded08bdc",
+      "baseline_git_bytes_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "working_file_bytes_sha256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+      "bytes": 1
+    },
+    {
+      "path": "src/institutional_factor_platform/regression/__init__.py",
+      "baseline_git_blob_sha": "7306a39c3e338f966ca0e470f3bca1d8c0f28840",
+      "baseline_git_bytes_sha256": "72c80e4a24e15913040eefaec62d8804dae749fc128f74fef0b21ccab701cdbe",
+      "working_file_bytes_sha256": "7922f41314f0ac2f29a1f8efc936deb7822b592188302b89b0bb50fa5742de7f",
+      "bytes": 185
+    },
+    {
+      "path": "src/institutional_factor_platform/regression/engine.py",
+      "baseline_git_blob_sha": "e5b8ad42dcb7d5ff12b8e99de4dd6e5c02b98ecf",
+      "baseline_git_bytes_sha256": "964b0dd7ab34d9f632fa968cb21e84a2b145c91fc6c181f153d2d774f9d9b88d",
+      "working_file_bytes_sha256": "20412b9b4ac8a7deb09ae64fb1e09c4ff758dfe20908d3dbc597570e0a31f923",
+      "bytes": 7040
+    },
+    {
+      "path": "src/institutional_factor_platform/research_outputs/__init__.py",
+      "baseline_git_blob_sha": "a4193dbb1d8fca45345c1dbeb484010a9d2cb03c",
+      "baseline_git_bytes_sha256": "3f222e2e5c6f4d0f5ff6735e8052e93cb4b946977e22889c1dc25acb4d9217f7",
+      "working_file_bytes_sha256": "a6b66b9c35d5c3b0a5d70746c705fdce489ebd4de9a5677d5e48b87b5b87ce25",
+      "bytes": 179
+    },
+    {
+      "path": "src/institutional_factor_platform/research_outputs/portfolio_storage.py",
+      "baseline_git_blob_sha": "00a658cdd60cd8ab41fbaff6e4b50814e0c39d1a",
+      "baseline_git_bytes_sha256": "cf8c94cb5815ba00d56b87e61987208531eae2328befc33034ad2924742e2272",
+      "working_file_bytes_sha256": "e290d89af174a2df8af58220d45143399edf21dba4971da5a9197ce62b3aa3e7",
+      "bytes": 5137
+    },
+    {
+      "path": "src/institutional_factor_platform/research_outputs/storage.py",
+      "baseline_git_blob_sha": "8b09eecd59642382eadb85843f0f1fbffcc9a679",
+      "baseline_git_bytes_sha256": "c31a3a8b5a2e0232a1a98eb3d1c372b7b86dca4a20cd06ccef676b024eed6288",
+      "working_file_bytes_sha256": "63a61d343b6790aaff6b55d06bc0797eca6da1c4eaca394ad925394d4fb7d8d0",
+      "bytes": 8590
+    },
+    {
+      "path": "src/institutional_factor_platform/risk/__init__.py",
+      "baseline_git_blob_sha": "a00bd77477e0006572e6b476b12210816312625c",
+      "baseline_git_bytes_sha256": "b8c537a013f5ec6dbfe67884f7e87df9a944396b28c56fd289fa0bb377533fee",
+      "working_file_bytes_sha256": "da250c37a8aa8ecc94e186b6ce269724976b40bb137e65c91429a4ae09784362",
+      "bytes": 129
+    },
+    {
+      "path": "src/institutional_factor_platform/risk/metrics.py",
+      "baseline_git_blob_sha": "b1bf90c908a186fbf5615a50c7ee6e93810de51a",
+      "baseline_git_bytes_sha256": "b4ae950988a7bfff3bd2a458465cb3b66044819b415c1f61690009f8b22c8602",
+      "working_file_bytes_sha256": "4f5674786d9c9c1ba6a9fdca5c4b62320ecb84355aa335d13983ee8fd9ff83a3",
+      "bytes": 5846
+    },
+    {
+      "path": "src/institutional_factor_platform/scenarios/__init__.py",
+      "baseline_git_blob_sha": "55aff59a24d8a76b2dd5acb356775fb5e1b3ac47",
+      "baseline_git_bytes_sha256": "5853cbdf28a30ca8c441150346fdfc837cbef26d41fe2cc23d8a4456f8091fa0",
+      "working_file_bytes_sha256": "a01f842ae04a6fd34235a4538ec759604fabd476be8384480a9e75a76b9b9c92",
+      "bytes": 168
+    },
+    {
+      "path": "src/institutional_factor_platform/scenarios/engine.py",
+      "baseline_git_blob_sha": "f78a2a43152b4591db4dc4984baeed0f3ef295b9",
+      "baseline_git_bytes_sha256": "6ce19d903d0baf2f24aa2f6b3607b1556b34f2f8dbff31ad9eead910e5984887",
+      "working_file_bytes_sha256": "6f5887eaba9886072d904b827b2be9798c788a2dd3da0afc4d6201fb5d0a3b03",
+      "bytes": 1700
+    },
+    {
+      "path": "src/institutional_factor_platform/statistical_tests/__init__.py",
+      "baseline_git_blob_sha": "1a4646fab9da1af2d86fb2db85cec7bff89822f5",
+      "baseline_git_bytes_sha256": "3a86b6eb02106ac924124fc921df949aaad7f0a4a9f40ec4915385180af06fd1",
+      "working_file_bytes_sha256": "af88fa88b98561c3a0ed4bdf4400bf539569a2acd72cee239e16aac588f2f943",
+      "bytes": 176
+    },
+    {
+      "path": "src/institutional_factor_platform/statistical_tests/tests.py",
+      "baseline_git_blob_sha": "a1b1696b9c60beefb3c746903cfc00aa77ad2a8d",
+      "baseline_git_bytes_sha256": "6f8399a867b0641286666e02f67c0da0da503084ccbaae1e1373260e8dd41279",
+      "working_file_bytes_sha256": "cb59dbfa6700f3ff34d1ab71f088bd9d48e47e2fe5a7f40b1f4cedd12e842cc5",
+      "bytes": 2841
+    },
+    {
+      "path": "tests/crash_worker.py",
+      "baseline_git_blob_sha": "eb1c4952249fa1ee6fa06811d134a44da00243c5",
+      "baseline_git_bytes_sha256": "aac002dd0f17c551c24b2a34a233ce88bc84817cb8373e7dbc1883c7d0502495",
+      "working_file_bytes_sha256": "a842ea9f6976df8d86792f5001f40cb49ee8f9282852abd26a9bedbf341fae68",
+      "bytes": 1557
+    },
+    {
+      "path": "tests/test_configuration.py",
+      "baseline_git_blob_sha": "7605b2b76dc0621ac2047243b233fe08a42cc842",
+      "baseline_git_bytes_sha256": "d3405310a0e3fbd5bf4e61aa75abb8d9fa182151817d1f4f69b023eca08b4711",
+      "working_file_bytes_sha256": "3b035f79de6791a1f5a45ae7afe5f8e09c7e5cff792f3cdeded69b91acf7ecfb",
+      "bytes": 1899
+    },
+    {
+      "path": "tests/test_full_platform_connected.py",
+      "baseline_git_blob_sha": "da3e57bc04e770dc2d2262ad7f3fbea315f3d244",
+      "baseline_git_bytes_sha256": "25538ccf53eca0541698940a1b5b72d4d69caeafece804d34920cca476130e0a",
+      "working_file_bytes_sha256": "c40f8d5ff4e5373d207917a374e3f0d4799d0b5add1d54a405e3d693d4e6cb5b",
+      "bytes": 25434
+    },
+    {
+      "path": "tests/test_integrity_controls.py",
+      "baseline_git_blob_sha": "a0c63591bb979c0fce3370e6907c083279401aee",
+      "baseline_git_bytes_sha256": "7fbb2e048125f0a0873211505dbc9386b949f122a44cbbc8ef2eca208a10d844",
+      "working_file_bytes_sha256": "6f292074aa2aa4cce791fe6a0ca6cc65be4487f715d91c69ad009e38b2d22c55",
+      "bytes": 19573
+    },
+    {
+      "path": "tests/test_logging.py",
+      "baseline_git_blob_sha": "cdf9acfc483a7226a5edd84dc59876efac175ac0",
+      "baseline_git_bytes_sha256": "9892dbfab0dfb0aa9562629f0fff189ad1be0e6e2bc6a57303a085c52eab10e8",
+      "working_file_bytes_sha256": "e282e1e0cb063728726eb40dbb2947bed8129b3891a7b4629c0689c80eccf941",
+      "bytes": 1392
+    },
+    {
+      "path": "tests/test_manifests_storage.py",
+      "baseline_git_blob_sha": "7258178625ddd5bb019c6040b05fbaef85db472d",
+      "baseline_git_bytes_sha256": "ef8b47524498e34399ecf5dbdefdb1638cb678930c73366701bd94ccb5516ea2",
+      "working_file_bytes_sha256": "056347809f968ef149e402a2ad49d54902d3e7eeeb11ddf05758ab7fe544a270",
+      "bytes": 12773
+    },
+    {
+      "path": "tests/test_package.py",
+      "baseline_git_blob_sha": "dde67ce61e48e34e9b5ad980b07d8dca837510cf",
+      "baseline_git_bytes_sha256": "e3ca54bca5fe0cd25d038c5c24fc45135fdc981addfb0628dc628ab143e6e8fa",
+      "working_file_bytes_sha256": "f944dffad68a27bed0036e95a1f1e419cfa4d59792b98494e0ea6340299157f8",
+      "bytes": 147
+    },
+    {
+      "path": "tests/test_phase1_config_domain.py",
+      "baseline_git_blob_sha": "6ea64e533231dbdc1983cd3e502452a1a9711864",
+      "baseline_git_bytes_sha256": "b66336e1c26a54bc503b0b245e2c44d5cac77638ebd0bdc154920b97139c7152",
+      "working_file_bytes_sha256": "aaf98708154e62a59b49c58373c5bd02cdec962e87ceb008ff22ed5211acbe9b",
+      "bytes": 15572
+    },
+    {
+      "path": "tests/test_phase2_factor_engine.py",
+      "baseline_git_blob_sha": "e62b84b1e67964522c831f709e81515b8fa7c839",
+      "baseline_git_bytes_sha256": "5ab66bcaf16c9ec18e273738617e33ca6c98fc6040a0381b969d74b0f7b343c8",
+      "working_file_bytes_sha256": "f96d969bbabf90c6f47f66eb375b6f880edf9a50c1229984243fd95c6d1cc128",
+      "bytes": 30559
+    },
+    {
+      "path": "tests/test_phase3_asset_pricing.py",
+      "baseline_git_blob_sha": "790e888ab8899af4ad5597f7f96ef5c2c68af557",
+      "baseline_git_bytes_sha256": "1ec7ebb5e3174fe18d05c637ad9a528c53f7a6defab316d64ec3e10dc8d92eca",
+      "working_file_bytes_sha256": "e6b563089e6df17c416e1f000286776dca838a0194ba6282c2283940171e2164",
+      "bytes": 18860
+    },
+    {
+      "path": "tests/test_phase4_portfolio_risk.py",
+      "baseline_git_blob_sha": "dfbbf57ebf4dc8ac96cc11e212f71c0a97a71ba9",
+      "baseline_git_bytes_sha256": "6b97117501e6a7b81389174d2678e024be9d9fcfd42cfc5666d27901e2743989",
+      "working_file_bytes_sha256": "069e4ab02bb509663522d32a8fc9e0778d520c029f6c6abf4423002461b839f6",
+      "bytes": 22151
+    },
+    {
+      "path": "tests/test_phase5_ml.py",
+      "baseline_git_blob_sha": "9fa1e4106ed8310ec8278f755e309debc8aee29d",
+      "baseline_git_bytes_sha256": "bfa736cab26c65a2412d9be1a11b15108c48e5aa85c6f6bd3bba299cd8f9ef24",
+      "working_file_bytes_sha256": "c523cb1efed4db89e999947df0e0a28a28b9225ed663aacf8dcdd8c2a2e06d07",
+      "bytes": 52160
+    },
+    {
+      "path": "tests/test_phase6_delivery.py",
+      "baseline_git_blob_sha": "53a1ec74cfe16da3f1e140a66b1b3a97031fb524",
+      "baseline_git_bytes_sha256": "e045fd5280231b2c83b38c401b418c90655aa196208356890de4726b36394f00",
+      "working_file_bytes_sha256": "54c8ecfde29e38dadcd9ba42b174ffe34a0f01809e96af86c8f18d1701c6f840",
+      "bytes": 34214
+    },
+    {
+      "path": "tests/test_phase6_deployment.py",
+      "baseline_git_blob_sha": "8926905762aa7dcc7743f00e01f6e849be1d7ae8",
+      "baseline_git_bytes_sha256": "9131f09a2be43bbf42f07e9c6f55cf10264fa9e966221d9f33df68930515cfae",
+      "working_file_bytes_sha256": "28bbcba9d36b149a13622d928143f7ca942f72b66295114b539e588bfc328083",
+      "bytes": 2176
+    },
+    {
+      "path": "tests/test_project.py",
+      "baseline_git_blob_sha": "deb80b94610ce3abaf99df9b610791413ede8d9c",
+      "baseline_git_bytes_sha256": "c70e7b9139391e92f18f0da26781decd7c94f2bcaedf74f6a62d9d2c50b2cdfe",
+      "working_file_bytes_sha256": "4b1dbcbbd4c8a36d780d9f98688cff2688ab53f1414280237544e0340ccf7397",
+      "bytes": 566
+    },
+    {
+      "path": "tests/test_recovery_and_lineage.py",
+      "baseline_git_blob_sha": "0b3f5bd0c8722a32ecd9f8c6e3cf914ca91e9dca",
+      "baseline_git_bytes_sha256": "3d488aff0686ad9cc707b06261506781a7c4299ba568a395c35b5dda7e75cd2d",
+      "working_file_bytes_sha256": "d5c0ede1060d0bfea632e7aa6a0b0e067d30f04769772fb0430dad5459f8926c",
+      "bytes": 28919
+    },
+    {
+      "path": "tests/test_sec_concepts.py",
+      "baseline_git_blob_sha": "c1381025e603e4d9a9224c136643884e1b59abe7",
+      "baseline_git_bytes_sha256": "62475b5d6948bc9b2dc42753a84308d2feb78543aa87bea14f8885971a0aaa72",
+      "working_file_bytes_sha256": "351d281bbd7d860eb47dbac3fafee2eda6954cade7311335c16eca08163131ea",
+      "bytes": 1442
+    },
+    {
+      "path": "tests/test_sec_inline_xbrl.py",
+      "baseline_git_blob_sha": "ef78f1188c47fb1329129e12e9fc67f6fd509189",
+      "baseline_git_bytes_sha256": "61bfd8980c481f192e37d11f269c333cca278cd8e3efd984ab683ea36effd9ee",
+      "working_file_bytes_sha256": "969f9da4ab4bf50d513af78539f6a79de025b98a115c016d9d13474b06e843d9",
+      "bytes": 6135
+    },
+    {
+      "path": "tests/test_sec_legacy_xbrl.py",
+      "baseline_git_blob_sha": "db7bb8f413f83b45344a8bacdb5030fd580e6cd9",
+      "baseline_git_bytes_sha256": "69ad6742ae492678668bc09813af27f3011ca9d8c023210ce52bceb4bba0215e",
+      "working_file_bytes_sha256": "975ed6408ed56ebc38938fc5e1ee0476c450379e1b0303d23cb6a30bfea069b1",
+      "bytes": 9059
+    },
+    {
+      "path": "tests/test_sec_listing.py",
+      "baseline_git_blob_sha": "e01fa19a893cf84c208080c687ffcb73b46e2d5f",
+      "baseline_git_bytes_sha256": "e4e21c7a77782a214206aa1654be53e449edf8236e6fafa98277c3b9914fb79d",
+      "working_file_bytes_sha256": "b13d2f3f463f642423bb141455ffa6d60e9bd33ec6f03e930e04614131be2153",
+      "bytes": 6444
+    },
+    {
+      "path": "tests/test_sec_projection.py",
+      "baseline_git_blob_sha": "14ee7dcb1e0d9939d3b87ce704a246ec6384d943",
+      "baseline_git_bytes_sha256": "58c0efd04325b73f564af397e26aa02ec254dc5702ed4fb4ea2a17e8ea954c23",
+      "working_file_bytes_sha256": "241fc7767475ba88c3f2730f20078741069c98354e0cac0dbad1fe1ffec82fdf",
+      "bytes": 11611
+    },
+    {
+      "path": "tests/test_sec_submissions.py",
+      "baseline_git_blob_sha": "ff66141a1188c3f0188b0d96f289eb152dbab435",
+      "baseline_git_bytes_sha256": "d62bc3c188dd5f8ce89b8bfb810c292f364a3a7481f3c3d96575d0281e8ece3c",
+      "working_file_bytes_sha256": "8691c04e88efce7044c7b9fb8dbfcd12a611912dcb8ecc569d923e353928326c",
+      "bytes": 4928
+    },
+    {
+      "path": "tests/test_service_cli_calendar.py",
+      "baseline_git_blob_sha": "51deb1f92b9db4d42515f35833e5aeb6ee1d80e1",
+      "baseline_git_bytes_sha256": "e16bc9ed52db07d2c0f7547023677921442e64b29ce03ea156a24729d0987b8b",
+      "working_file_bytes_sha256": "26c2d304998a19c802e21e11914bb1c016f35e9689a2446d2003dc8452d6ceea",
+      "bytes": 30375
+    },
+    {
+      "path": "tests/test_validation_adapters.py",
+      "baseline_git_blob_sha": "04f1b1b7a5568e677d7cf17653c905ec184d79d9",
+      "baseline_git_bytes_sha256": "eab2e7121a127ec0a6da96d25bc7c8639452d76594f9338c68b210e8f66c9784",
+      "working_file_bytes_sha256": "7d62180ba431812a355b4173e108013695ff8ae0a44c0549950fd65b76e7c2c1",
+      "bytes": 30935
+    },
+    {
+      "path": "uv.lock",
+      "baseline_git_blob_sha": "0d7df8128da51dbace009bb7c50120e9fbdb5310",
+      "baseline_git_bytes_sha256": "613619c4374728694d4b4ee3c9955fccb3685921e516018abf1e67dcce3ff685",
+      "working_file_bytes_sha256": "79f570b871946d0b412a5c2b6793ae9c79b74a25e0c965f7548005ad4d64af2e",
+      "bytes": 492335
+    }
+  ],
+  "historical_documents": [
+    {
+      "ref": "5a3e930665756fa7aaedeceb5f9ab90792bcf849",
+      "path": "docs/FINAL_RESEARCH_PAPER.md",
+      "sha256": "d82cfdb85c81c4df126199ceeb45510d5dbbd3132357138c66472f5f189a41f6",
+      "bytes": 7286,
+      "evidence_class": "historical documentary claims; no empirical authentication inferred"
+    },
+    {
+      "ref": "5a3e930665756fa7aaedeceb5f9ab90792bcf849",
+      "path": "docs/FINAL_REPRODUCIBILITY_GUIDE.md",
+      "sha256": "89f545f83525f6d9897d91eb2ece2247ddd74845f889a55c374fdd1f914a6f80",
+      "bytes": 2350,
+      "evidence_class": "historical documentary claims; no empirical authentication inferred"
+    },
+    {
+      "ref": "5a3e930665756fa7aaedeceb5f9ab90792bcf849",
+      "path": "docs/FINAL_PROJECT_ASSURANCE_REPORT.md",
+      "sha256": "76549ec4532a39ef6d3d65fdaae5b25df9bb1ee556f847f84c30ed44005a1280",
+      "bytes": 4474,
+      "evidence_class": "historical documentary claims; no empirical authentication inferred"
+    },
+    {
+      "ref": "5a3e930665756fa7aaedeceb5f9ab90792bcf849",
+      "path": "docs/PHASE1_AUDIT_REPORT.md",
+      "sha256": "e2340b9276bd9975814aff51b3bff3ee7cef135aab6412d75349f9b6c4511e32",
+      "bytes": 28737,
+      "evidence_class": "historical documentary claims; no empirical authentication inferred"
+    },
+    {
+      "ref": "5a3e930665756fa7aaedeceb5f9ab90792bcf849",
+      "path": "docs/PHASE1_REAUDIT_REPORT.md",
+      "sha256": "b06ec3d743f06dc1db5805d65cef9c0c10710253bd6eacac6b6ee5dccf7fdccb",
+      "bytes": 19764,
+      "evidence_class": "historical documentary claims; no empirical authentication inferred"
+    },
+    {
+      "ref": "5a3e930665756fa7aaedeceb5f9ab90792bcf849",
+      "path": "docs/PHASE1_FINAL_REAUDIT_REPORT.md",
+      "sha256": "ab416444cc701e6db762a78b7c465c4bef754c430f5d407fd3d2e40ce66f073b",
+      "bytes": 23096,
+      "evidence_class": "historical documentary claims; no empirical authentication inferred"
+    },
+    {
+      "ref": "5a3e930665756fa7aaedeceb5f9ab90792bcf849",
+      "path": "docs/EMPIRICAL_DATA_QUALITY_REPORT.md",
+      "sha256": "97daa4972363d326b3d0b30698778ff99ca09df7fc2b7b811f3075cb0ee39d0a",
+      "bytes": 1782,
+      "evidence_class": "historical documentary claims; no empirical authentication inferred"
+    },
+    {
+      "ref": "5a3e930665756fa7aaedeceb5f9ab90792bcf849",
+      "path": "docs/PHASE1_FINAL_ASSURANCE_REPORT.md",
+      "sha256": "1a634756993756a0c1a049c4735514ec555f2aa2fc359ffed42f696ed57ba1bb",
+      "bytes": 30930,
+      "evidence_class": "historical documentary claims; no empirical authentication inferred"
+    }
+  ],
+  "new_audit_test": {
+    "path": "tests/test_research_phase1_audit.py",
+    "sha256": "c4f42b3c6229fe69fd5f91f2b80c8d584bb9e73c7d9167036cf23bab4ef68a43"
+  },
+  "preservation_check": {
+    "main_ref": "4e7fbdc380b8042db72e9c628260f60077a205ef",
+    "original_tracked_paths_changed": [],
+    "live_main_rechecked_sha": "4e7fbdc380b8042db72e9c628260f60077a205ef"
+  },
+  "empirical_inventory": {
+    "raw_market_files": [],
+    "fundamental_files": [],
+    "frozen_net_paths": [],
+    "transactions": [],
+    "empirical_manifests": [],
+    "absence_scope": "fresh clone, tracked current tree and empirical tag inventory; not a claim about other owner machines/checkouts"
+  },
+  "publication_ids_documentary": [
+    "factor_market_input-89848f8e3c34d53d0432f6e0",
+    "factor_fundamental_input-962c8ada3e74e32b00568cd7",
+    "factor-5a73616f131fca2102fa2ca4141ad64f",
+    "asset-pricing-c0a72fae5349f1048e18557250da1927",
+    "portfolio-dfef8d60d8a771e61224f0b314efd86c",
+    "portfolio-2bbcdff643c1ca3e00f579e0011180fa"
+  ],
+  "provider_documentation": [
+    {
+      "url": "https://hfdatalibrary.com/pages/issues",
+      "accessed": "2026-11-01",
+      "conclusion": "Provider reports 2026-10-06 split-only rebuild of prior partly dividend-adjusted series; original study bytes still absent."
+    },
+    {
+      "url": "https://huggingface.co/datasets/elkassabgi/hfdatalibrary/commit/a8ca2499e8ed104d7d56350fff81e5d3f8627321",
+      "accessed": "2026-11-01",
+      "conclusion": "Provider documentation commit warns against mixing pre/post October6 downloads."
+    }
+  ],
+  "hash_convention": "Baseline sha256 hashes exact git show bytes, working hashes filesystem bytes (CRLF may differ). No claimed original empirical hashes.",
+  "artifact_commit_rule": "Audit files belong to the Git commit containing them; a manifest does not recursively hash itself.",
+  "test_results": {
+    "full_suite": "330 passed, 115 warnings in 1444.39s (24m04s); 90.52% branch-aware coverage; pytest exit0; separate coverage report --fail-under=90 exit0",
+    "targeted_initial_passed": 88,
+    "expanded_independent_passed": 29,
+    "final_calendar_and_reference_passed": 50,
+    "baseline_regressions_failed": 8,
+    "baseline_regressions_passed": 16,
+    "full_stdout_sha256": "631ac6611960b41d1cefa8eea1380eed9327efbc385ceac8d3f055e00cf4d982",
+    "baseline_stdout_sha256": "dd7ee9fed75ca950df8c3069b891ff799506d3ca944ed44097491469c614086b"
+  },
+  "final_audit_commit": "the Git commit containing this manifest (no recursive self-hash)",
+  "additional_publication_risk": "PDF AppendixA row-domain counts versus nonmissing observations require terminology clarification; 48*715447 equals34341456 documentary grid rows."
+}

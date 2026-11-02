@@ -66,7 +66,7 @@ class PortfolioResearchService:
         source = self.factors.read_portfolios(phase2.publication_id).to_pandas()
         returns, benchmark = _return_matrix(source)
         risk_free = _risk_free_series(
-            self.factors.read_table(phase2.publication_id).to_pandas(), returns.index
+            self.factors.read_table(phase2.publication_id).to_pandas(), returns.index, source
         )
         costs = TransactionCostModel(*self.config.costs.require_explicit())
         constraints = ConstraintSet(**self.config.constraints.model_dump())
@@ -316,7 +316,7 @@ def _return_matrix(frame: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
     return returns, benchmark
 
 
-def _risk_free_series(frame: pd.DataFrame, dates: pd.Index) -> pd.Series:
+def _risk_free_series(frame: pd.DataFrame, dates: pd.Index, periods: pd.DataFrame) -> pd.Series:
     required = {"date", "factor_id", "raw_value"}
     if required - set(frame):
         raise DataQualityError("Phase 2 factor contract lacks risk-free evidence")
@@ -326,10 +326,29 @@ def _risk_free_series(frame: pd.DataFrame, dates: pd.Index) -> pd.Series:
     grouped = selected.groupby("date")["raw_value"]
     if (grouped.nunique(dropna=False) > 1).any():
         raise DataQualityError("Risk-free values conflict across securities")
-    result = grouped.first().reindex(dates)
-    if result.isna().any():
-        raise DataQualityError("Risk-free values do not align with portfolio dates")
-    return result.astype(float)
+    daily = grouped.first()
+    daily.index = pd.to_datetime(daily.index)
+    daily = daily.sort_index().astype(float)
+    if not np.isfinite(daily).all() or (daily <= -1).any():
+        raise DataQualityError("Risk-free returns are invalid")
+    if {"formation_date", "date"} - set(periods):
+        raise DataQualityError("Cash compounding requires exact holding intervals")
+    intervals = periods[["formation_date", "date"]].drop_duplicates().copy()
+    intervals["formation_date"] = pd.to_datetime(intervals["formation_date"])
+    intervals["date"] = pd.to_datetime(intervals["date"])
+    if intervals["date"].duplicated().any():
+        raise DataQualityError("Portfolio end date has ambiguous cash intervals")
+    intervals = intervals.set_index("date")["formation_date"]
+    values = []
+    for date in pd.to_datetime(dates):
+        if date not in intervals.index:
+            raise DataQualityError("Portfolio cash interval is missing")
+        start = intervals.loc[date]
+        holding = daily.loc[(daily.index > start) & (daily.index <= date)]
+        if start >= date or holding.empty:
+            raise DataQualityError("Portfolio cash interval is empty")
+        values.append(float(np.prod(1 + holding.to_numpy()) - 1))
+    return pd.Series(values, index=dates, dtype=float)
 
 
 def _relative(path: Path, root: Path) -> str:

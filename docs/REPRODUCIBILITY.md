@@ -2,13 +2,19 @@
 
 ## Release Identity
 
+Numerical authority: [accepted correction commit f22f5cb](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit), with the [Phase 3 reconciliation](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md) and [Phase 2C matched-sample checks](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit/phase2c/PHASE2C_REGRESSION_VERIFICATION.md). The [accepted documentation and candidate manuscript](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/028dfd9cd18bcd6ef8114d829cc789d5bffacc61) preserve the interpretation of these results. Original releases are historical records.
+
+Current corrected results follow the accepted research lineage pinned above. The final-candidate PDF and cross-document claim/checksum matrices are in [outputs/audit/final_correction](../outputs/audit/final_correction/); the editable DOCX is private author delivery.
+
+### Historical original release
+
 The empirical research release is identified by:
 
 - `project-complete-public-data-v1`
 - `research-empirical-public-v1`
 - commit `5a3e930665756fa7aaedeceb5f9ab90792bcf849`
 
-These identifiers refer to the empirical state used for the reported factor, asset-pricing, portfolio and machine-learning results.
+These identifiers refer only to the historical original experiment. Current tables use the accepted corrected factor `factor-4ddee9ac6fb45cedfd62a2cc68676b58`, matched primary pricing `asset-pricing-d60bee7310b34976c80372a0f0f29e21`, separate supplementary pricing `asset-pricing-8c2396179c4b509796b2cab043ec31d2`, and the 24 portfolio/eight final ML identities enumerated in the [pinned Phase 3 manifest](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit/phase3/PHASE3_SOURCE_MANIFEST.json). Historical intermediates are not final publications. ML retains its actual raw-score/market and original fee-context parents, not corrected quantile returns it never consumes.
 
 ## Environment
 
@@ -32,7 +38,7 @@ A reproduction should follow the analytical dependency order:
 
 1. validate configuration;
 2. acquire or restore the required source evidence;
-3. build security/issuer mappings and point-in-time market/fundamental inputs;
+3. build security/issuer mappings and market/fundamental inputs under the recorded availability controls;
 4. construct factors;
 5. estimate asset-pricing models;
 6. run portfolio/cost/scenario analysis;
@@ -45,22 +51,27 @@ Later stages should not be run against a different upstream data identity while 
 
 Portfolio cost sensitivity:
 
-- LOW: 5 bps one way
-- BASE: 10 bps one way
-- HIGH: 20 bps one way
+- LOW: 5 bps per absolute-traded-weight unit
+- BASE: 10 bps per absolute-traded-weight unit
+- HIGH: 20 bps per absolute-traded-weight unit
+
+Half-L1 one-way turnover is distinct from L1. Initial deployment has L1=1 and a full switch L1=2. Fees are modeled assumptions; inner-sleeve execution is not verified.
 
 Reported ML design:
 
 - features: book-to-market and 12-minus-1 momentum;
 - target: 21-session security return minus SPY return;
 - monthly decisions;
-- 60 months training;
+- expanding training, initially 60 and finally 74 months;
 - 12 months validation;
 - 1 month test;
 - purging plus a 1-month embargo;
 - monthly retraining;
 - seed 17;
-- single-thread estimators.
+- single-thread estimators;
+- 27,632 rows / 89 common month ends / 15 dependent folds / 7,286 held-out observations per family;
+- 100 moving-block resamples / block 3 / seed 17;
+- one-session reset-to-cash economic checks, distinct from 21-session forecast labels.
 
 ## Validation Commands
 
@@ -76,10 +87,10 @@ uv run institutional-factor-platform verify-delivery-platform
 git diff --check
 ```
 
-The verified research release passed 301 tests with 90.52% branch-aware coverage.
+The accepted Phase 3 correction passed 372 tests with 90.62% coverage and 91 targeted tests. These are prior checkpoint results, not a new full-suite run for this docs-only pass. Historical original 301 tests/90.52% remains an archived assurance record. Document/link/equation/source checks are recorded separately.
 
 ## What Can Be Reproduced from Git Alone?
 
 A reviewer can inspect and run the code, tests, configuration, schemas, methodology, factor/model logic, portfolio accounting, temporal split logic and delivery software.
 
-The exact third-party empirical bytes are not contained in Git, so the complete numerical study cannot be reconstructed from the repository alone without reacquiring the required data under the relevant provider terms.
+Original vendor/normalized Parquet bytes and model bundles are not public. Exact reproduction requires lawful access to the frozen original vintage; current vendor reacquisition is not equivalent. Stored hashes and 540 cached source guards authenticate accepted identity without resolving dividend treatment, exhaustive SEC capture, modeled-close execution or historical live forecast timing. H1/H3 original approval/decision records remain missing.

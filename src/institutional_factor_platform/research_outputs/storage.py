@@ -172,6 +172,10 @@ def authenticate_asset_pricing_publication(path: Path, project_root: Path) -> As
                 value = json.loads(content)
             except (UnicodeDecodeError, json.JSONDecodeError) as exc:
                 raise EvidenceIntegrityError(f"Invalid bound JSON: {artifact.name}") from exc
+            if artifact.name == "diagnostics" and isinstance(value, dict):
+                from institutional_factor_platform.data.bound import authenticate_supplementary
+
+                authenticate_supplementary(value, root)
             if isinstance(value, dict) and value.get("publication_id") not in {
                 None,
                 manifest.publication_id,

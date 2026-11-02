@@ -1,0 +1,241 @@
+path,category,git_blob,bytes,action,basis
+.dockerignore,OPTIONAL_SUPPORTING_DOCUMENTATION,262fd2628d2487ec74fec1889dbfd112676e41d0,147,PRESERVE; no relocation,Accepted evidence/navigation retained
+.env.example,OPTIONAL_SUPPORTING_DOCUMENTATION,0dc81d667bc13be9a58fd0054e0916aaf0e17625,620,PRESERVE; no relocation,Accepted evidence/navigation retained
+.gitattributes,OPTIONAL_SUPPORTING_DOCUMENTATION,9a77a8c792997d1aa010e23b65fd7e13cbb226dc,791,PRESERVE; no relocation,Accepted evidence/navigation retained
+.github/workflows/quality.yml,SOURCE_OR_TEST,861e68ba7ceb71aaa85e9348b49c8ddb9a375477,1252,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+.gitignore,OPTIONAL_SUPPORTING_DOCUMENTATION,0c7f3246fe29f20b60255c8532af77af310d0a32,1245,PRESERVE; no relocation,Accepted evidence/navigation retained
+CITATION.cff,OPTIONAL_SUPPORTING_DOCUMENTATION,8db9ad4f37069d9523423ba896371a0144f02366,972,PRESERVE; no relocation,Accepted evidence/navigation retained
+CONTRIBUTING.md,OPTIONAL_SUPPORTING_DOCUMENTATION,8e7b71632b8a5c546b1cf6f145d34bdc9845307f,972,PRESERVE; no relocation,Accepted evidence/navigation retained
+Dockerfile,SOURCE_OR_TEST,b48e6f881889aa00ce817ebc574895fd44a40823,881,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+LICENSE,OPTIONAL_SUPPORTING_DOCUMENTATION,38f059f6ede224e357652217ba810b4925d6f0db,1072,PRESERVE; no relocation,Accepted evidence/navigation retained
+README.md,CURRENT_AUTHORITATIVE,b83e12ec2c6f545d1778c6a5d0e15da1c4622c65,12691,PRESERVE; no relocation,Accepted evidence/navigation retained
+SECURITY.md,OPTIONAL_SUPPORTING_DOCUMENTATION,dae225d51c35577aebf11e38e5ea9b8cf24df5c1,753,PRESERVE; no relocation,Accepted evidence/navigation retained
+config/asset_pricing.yaml,SOURCE_OR_TEST,1f0686e0f98301ab416e6c74647cff08c8a5e5e2,948,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+config/base.yaml,SOURCE_OR_TEST,e6efeff7449bf8c824b09fdff6bb7dbf91f031a6,2040,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+config/delivery.container.yaml,SOURCE_OR_TEST,02244097380d810e93001d694f40b3d1b380027d,786,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+config/delivery.yaml,SOURCE_OR_TEST,2c648f797e1d2b183599f22a1992909051f669d6,789,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+config/factors.yaml,SOURCE_OR_TEST,c68d0ec942ce016ec89f8c97e1ece4fb0053e1d5,673,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+config/machine_learning.yaml,SOURCE_OR_TEST,df496704a29a2581bbb9afef43c9f17e62de68ab,1937,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+config/portfolio.yaml,SOURCE_OR_TEST,0ef1b476c90894b515e63d1eb6271cf464bfcb2b,982,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+config/research_phase2b.yaml,SOURCE_OR_TEST,b960badb60861e6178053914e957e0e279f9d019,3249,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+config/research_phase2c.yaml,SOURCE_OR_TEST,95b5cec5bdb1dcf8c273122a027298bf04af5372,1878,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+config/research_phase3.yaml,SOURCE_OR_TEST,904fe5e2879feaffdcd68014f984c6ae4eb37cbe,1179,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+data/README.md,OPTIONAL_SUPPORTING_DOCUMENTATION,d969e850ba2d4d65100a70087d75618d05335fce,499,PRESERVE; no relocation,Accepted evidence/navigation retained
+docker-compose.yml,SOURCE_OR_TEST,54eeef5713124afec9f8dfd79a3b2157b63969e2,1143,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+docs/ARCHITECTURE.md,OPTIONAL_SUPPORTING_DOCUMENTATION,7c1a172698919915933e537eb4495a4d4cd50fdf,2650,PRESERVE; no relocation,Accepted evidence/navigation retained
+docs/DATA_AND_SOURCES.md,CURRENT_AUTHORITATIVE,b9ecf063d0a8d5a9f2a46776aa9b125a63dba73a,5946,PRESERVE; no relocation,Accepted evidence/navigation retained
+docs/LIMITATIONS.md,CURRENT_AUTHORITATIVE,d9a1be23a351fae8c7a0da3df42e8eeb7a3a9dfe,6084,PRESERVE; no relocation,Accepted evidence/navigation retained
+docs/METHODOLOGY.md,CURRENT_AUTHORITATIVE,c880d69c9963fb3dfde8cc037674fa9e83a9dbc8,9634,PRESERVE; no relocation,Accepted evidence/navigation retained
+docs/REPRODUCIBILITY.md,CURRENT_AUTHORITATIVE,ca57c1d8d74980bdcbad2612f733156cac724c86,5446,PRESERVE; no relocation,Accepted evidence/navigation retained
+docs/RESULTS.md,CURRENT_AUTHORITATIVE,efe6e5164706e644fa85b6099292c5d915b56b22,14589,PRESERVE; no relocation,Accepted evidence/navigation retained
+docs/SOFTWARE_USAGE.md,CURRENT_AUTHORITATIVE,6c5d6a4af8832472fa28d0e0cc7eedf50d2d98ea,2135,PRESERVE; no relocation,Accepted evidence/navigation retained
+docs/research_audit/MASTER_AUDIT_TRACKER.md,CURRENT_AUTHORITATIVE,1b305397d7f869188121d6dac6a744b44e003bf3,175464,PRESERVE; no relocation,Accepted evidence/navigation retained
+docs/technical/SEC_XBRL_MAPPING.md,OPTIONAL_SUPPORTING_DOCUMENTATION,4d1e4f4af3e94547a805a3f4f6213a3a674335fe,2548,PRESERVE; no relocation,Accepted evidence/navigation retained
+examples/templates/security_universe.csv,SOURCE_OR_TEST,50d17ccf509d96a4fcdcfb2a5a215e69f1f438d6,211,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+outputs/audit/final_correction/CROSS_DOCUMENT_CLAIM_MATRIX.csv,AUDIT_EVIDENCE,a47a8e81cb3e45dc29b05c4b5346b03bb2548866,68268,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/final_correction/DEFERRED_AUTHOR_REVIEW.md,AUDIT_EVIDENCE,3c1b9419f3087f86a724ed79872c29de1ab90e0a,702,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/final_correction/FINAL_CANDIDATE_MANUSCRIPT.pdf,CURRENT_AUTHORITATIVE,970c61797cf1393482efa6a62229be86ee45a989,720293,PRESERVE; no relocation,"Accepted final candidate, unchanged checksum; author review pending"
+outputs/audit/final_correction/FINAL_CORRECTION_REPORT.md,AUDIT_EVIDENCE,54ea747d9c89dc24aa16981aeabe69676060fa8b,19795,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/final_correction/FINAL_DOCUMENT_CHECKSUMS.json,AUDIT_EVIDENCE,3b3d9ad441178de24b1cacbb6eabce1073bb322a,5908,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/final_correction/FINAL_DOC_QA.txt,AUDIT_EVIDENCE,e4beea3ba9bcf33f9a444b3d802bea0a43667741,5028,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/final_correction/ISSUE_RESOLUTION_MATRIX.csv,AUDIT_EVIDENCE,a7733191db78e4da4ee0ccbf496a4dc19fd33163,30481,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase1/PHASE1_FACTOR_DEFINITION_INVENTORY.csv,AUDIT_EVIDENCE,a2c427e0b3b0e8f19daf358f85ef5a130454f8d5,25338,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase1/PHASE1_FINANCIAL_DATA_VALIDATION.md,AUDIT_EVIDENCE,a97540c127d9ade342241d7c1efc3e9e8b0e7447,19360,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase1/PHASE1_ISSUE_RESULTS.csv,AUDIT_EVIDENCE,26646b7aa7c561de00275ebe37735c78d380870a,16955,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase1/PHASE1_NUMERICAL_RECONCILIATION.csv,AUDIT_EVIDENCE,a22834b60d1bba723bf3fa53a00e9cdb38e1e8b0,7741,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase1/PHASE1_SOURCE_MANIFEST.json,AUDIT_EVIDENCE,44e54e1fddd8e2e0bca977606dd62fde52f56f9c,78364,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase1/PHASE1_TEST_RESULTS.txt,AUDIT_EVIDENCE,e5fb937c12a6cbb9f36b3cb2232372c1084c8f8f,37934,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase1/reproduce_numerical_evidence.py,AUDIT_EVIDENCE,2377bd5afa097c671fa00383e47ec59ca51c6e65,8751,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase2/PHASE2_ASSET_PRICING_DIAGNOSTICS.csv,AUDIT_EVIDENCE,f7b6534eafdc31bf622bb0d34a499362616732a5,1088279,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase2/PHASE2_ASSET_PRICING_VALIDATION.md,AUDIT_EVIDENCE,79b4ca870f3749dae2e8220b8412d46832f4b8e1,23875,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase2/PHASE2_ISSUE_RESULTS.csv,AUDIT_EVIDENCE,7ec41b5b03c8ddc01c46184af09530e322b74d62,14870,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase2/PHASE2_NUMERICAL_RECONCILIATION.csv,AUDIT_EVIDENCE,d72d8838b151ff8100c2a8d73eae9180ffc7fba1,45049,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase2/PHASE2_SOURCE_MANIFEST.json,AUDIT_EVIDENCE,48955b5d603bf6de256cf1e7193d6b6e2d5d7082,99227,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase2/PHASE2_TEST_RESULTS.txt,AUDIT_EVIDENCE,9f0ced8cc4c471b84483422924bed2eea830a646,25949,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase2b/PHASE2B_EMPIRICAL_CORRECTION_REPORT.md,AUDIT_EVIDENCE,1935e944ba0fe5c96bf65994d77629ddd8117e82,17036,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase2b/PHASE2B_FACTOR_HOLDING_AUDIT.csv,AUDIT_EVIDENCE,aa8ed5a556f728a8adfa6bdea2915cc41f7a4d36,11947292,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase2b/PHASE2B_FACTOR_RECONCILIATION.csv,AUDIT_EVIDENCE,317b8de4ec05226801ec128fd6a24e58b1644f2d,2217470,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase2b/PHASE2B_INDEPENDENT_VALIDATION.json,AUDIT_EVIDENCE,7765be6112056b992a6ee520f406d2f59cd5477c,16760,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase2b/PHASE2B_ISSUE_RESULTS.csv,AUDIT_EVIDENCE,2b9ea444575532ba89c4f148fc8825c86551ec19,14667,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase2b/PHASE2B_MODEL_COMPARISON.csv,AUDIT_EVIDENCE,6e178f4030f075545df2a3ae96f066d920098133,3604,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase2b/PHASE2B_MODEL_FIT_EVIDENCE.csv,AUDIT_EVIDENCE,7d872fe3dc3765838447f953887f099e22b39255,553575,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase2b/PHASE2B_PRICING_RECONCILIATION.csv,AUDIT_EVIDENCE,f5ac7150c9bc98735f21b4529c6ece4f7689f92c,185178,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase2b/PHASE2B_SOURCE_CASE_EVIDENCE.json,AUDIT_EVIDENCE,687d1b741c95e8f38f81f408a0b6c60296d3cdc8,23101,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase2b/PHASE2B_SOURCE_MANIFEST.json,AUDIT_EVIDENCE,a8329c9c36f0d2ca4b3d3d8156a8225eafea9722,153235,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase2b/PHASE2B_TEST_RESULTS.txt,AUDIT_EVIDENCE,864176ec89deac3c50537c1f8487acc1509ca20b,19976,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase2c/PHASE2C_DEPENDENCE_AND_CONDITIONING.csv,AUDIT_EVIDENCE,6741582bf8b7b3a9c34c1e53b7b8ec0dbdfc4197,668393,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase2c/PHASE2C_MODEL_LEVEL_SUMMARY.csv,AUDIT_EVIDENCE,13b86984a6ac66a15c27b92e18dfaec3ba928932,11666,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase2c/PHASE2C_NUMERICAL_DIFFERENCES.csv,AUDIT_EVIDENCE,12e55c36e4f78f770dc4cfb472ade87ce9c4dfc6,1718232,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase2c/PHASE2C_PORTFOLIO_LEVEL_CHECKS.csv,AUDIT_EVIDENCE,fdf55b0fc20e6c82ac85aebb99fd11301073edca,1111813,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase2c/PHASE2C_REGRESSION_VERIFICATION.md,AUDIT_EVIDENCE,e021c161920a905a3e061bbe7da880ba76c98ad4,21791,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase2c/PHASE2C_SOURCE_MANIFEST.json,AUDIT_EVIDENCE,5646b66ea4403bf53e625e6a3b2b32d5bb6707fa,94532,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase2c/PHASE2C_TEST_RESULTS.txt,AUDIT_EVIDENCE,914dd65515b34491f22b0ef01114e008d699bf87,20608,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md,AUDIT_EVIDENCE,52c678bd163bd9217a46b270adcfebaea4a76c8d,25040,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase3/PHASE3_ISSUE_RESULTS.csv,AUDIT_EVIDENCE,e12f047e4581d9673720a51f06a29010822c841e,16707,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase3/PHASE3_ML_FOLD_AND_LEAKAGE_AUDIT.csv,AUDIT_EVIDENCE,a2ecfe4bbaeaec48414b1c40125cfb5fb1f72234,152615,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase3/PHASE3_ML_RESULTS_RECONCILIATION.csv,AUDIT_EVIDENCE,366f454e70e69b6d9e091b55cb8d737b1dda5f32,13055,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase3/PHASE3_PORTFOLIO_RECONCILIATION.csv,AUDIT_EVIDENCE,bd9e1ac78b0ec2ae1dddba9bee4c76356f4eab78,21057,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase3/PHASE3_SOURCE_MANIFEST.json,AUDIT_EVIDENCE,120ba4dc6c9d96671f1973e6ddf9b61006696202,928476,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase3/PHASE3_TEST_RESULTS.txt,AUDIT_EVIDENCE,57fbc80e9e46a28675d0d486ead506dc55e9ca83,19802,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase3/PHASE3_TRADE_COST_AND_RISK_CHECKS.csv,AUDIT_EVIDENCE,c2f54af6a0ee8f3be4c9e7342592833367edff60,880009,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase4/FINAL_REVISED_MANUSCRIPT.pdf,HISTORICAL_IMMUTABLE,1ddb34fabb7fa4f73b2b0343634f9e3755bcd579,723534,PRESERVE; no relocation,Superseded Phase4 manuscript preserved in place
+outputs/audit/phase4/PHASE4_AUTHOR_CONFIRMATIONS.md,AUDIT_EVIDENCE,9da64d8b3993fb933a357df8734a2f64bf25ca61,2773,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase4/PHASE4_CLAIM_TRACEABILITY.csv,AUDIT_EVIDENCE,8a0d2c143e4e941f25759adbeb341d7a072c1096,923740,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase4/PHASE4_MANUSCRIPT_VALIDATION.md,AUDIT_EVIDENCE,666a3e7116155ec111421e8bd76d4921f73a55e6,15472,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase4/PHASE4_PUBLICATION_SOURCE_MANIFEST.json,AUDIT_EVIDENCE,25917fb9dbbdb53bb24d361dc3267a9bf22fdc86,527311,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase4/PHASE4_REVISION_CHANGELOG.md,AUDIT_EVIDENCE,b5d307d378b4dc0f3a5e1cc7f4ee697b86351b5f,4404,PRESERVE; no relocation,Accepted evidence/navigation retained
+outputs/audit/phase4/PHASE4_TEST_AND_FORMAT_QA.txt,AUDIT_EVIDENCE,7c8b4ac37799f59fd90183e4822f8101daaaf995,2614,PRESERVE; no relocation,Accepted evidence/navigation retained
+pyproject.toml,SOURCE_OR_TEST,5f5d21efca87cbcb6371afa2ef2472b162946116,2245,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+scripts/phase2c_reference.py,SOURCE_OR_TEST,1d1f9e8b47c155080cef5155f2fb7df8d10afd0b,3724,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+scripts/research_phase2b.py,SOURCE_OR_TEST,3c058e186ced6b7aa77012a9e9daf872c4e48187,26962,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+scripts/research_phase2c.py,SOURCE_OR_TEST,af8f3543ee7529ce51a5ffd92dfb4a04dc918dc4,36219,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+scripts/research_phase3_correct.py,SOURCE_OR_TEST,767295820749b349a83830da78e4751cc15b878c,16665,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+scripts/research_phase3_ml_metadata.py,SOURCE_OR_TEST,a29af48afb9f0ebe89614cfd5bec36153f69b922,3959,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+scripts/research_phase3_sources.py,SOURCE_OR_TEST,eb6d436c613ad4921a9ba38107abed08cb2b1919,6153,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+scripts/research_phase3_verify.py,SOURCE_OR_TEST,b80707e271b2dcefcf2b1e3c1e695e69f6b40877,39894,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/__init__.py,SOURCE_OR_TEST,82051e7015c673a629819ce8060be471812325a1,312,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/api/__init__.py,SOURCE_OR_TEST,8e1340c9aa4eced02bb6ee4d4dee471ea92e8819,132,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/api/app.py,SOURCE_OR_TEST,044c5dd6473488cb7e3e010061454b77e284002b,10623,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/api/middleware.py,SOURCE_OR_TEST,003ed158bd5cc864fd85ea601543264a56311416,4937,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/asset_pricing/__init__.py,SOURCE_OR_TEST,a255ce4e48e6fcb1691fb5628df369b25f41db64,191,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/asset_pricing/config.py,SOURCE_OR_TEST,5934f38934b682b3617c6f786eec1d97a15e1317,2974,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/asset_pricing/inputs.py,SOURCE_OR_TEST,e156c54d0c3ea42d8298b1c8069b919258aad503,7694,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/asset_pricing/models.py,SOURCE_OR_TEST,6bc5e82d93bc2fceed87433c3463621d8e771ee5,2672,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/asset_pricing/service.py,SOURCE_OR_TEST,2cf5e493ff8401c9d63a5663008c5f78ab3360bb,18289,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/backtest/__init__.py,SOURCE_OR_TEST,315f94f4f3a8f448feefcc816bc9570a3efb1014,185,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/backtest/costs.py,SOURCE_OR_TEST,919cf96852a7ea99b7e54bbf6c87b5540d25baed,1884,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/backtest/engine.py,SOURCE_OR_TEST,8ae12cd1f9b175d884f5315fe49d218c0c1aba9d,3766,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/cli.py,SOURCE_OR_TEST,c2a421d2b87a6e6401bc0c074aab6bd7951f1eee,33235,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/configuration.py,SOURCE_OR_TEST,2ccf18c630b5d19c65ea1f378e3b371828c6837c,2276,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/constraints/__init__.py,SOURCE_OR_TEST,bb2a41cdfc0dcebde23334305341bbe29cd41196,151,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/constraints/models.py,SOURCE_OR_TEST,5a4f1e4df21d27886ca1dae59ddc4178e9955af7,4620,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/dashboard/__init__.py,SOURCE_OR_TEST,c227ee4888ed7467a9deff8daca4824c7aac3b96,148,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/dashboard/app.py,SOURCE_OR_TEST,6448024f1bddffd04bdf3da0670e0e759343a05f,6169,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/dashboard/client.py,SOURCE_OR_TEST,25edc168d29315babae2f4570004f8c14c2bc8f2,3100,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/dashboard/launcher.py,SOURCE_OR_TEST,42f05905987e085384235559f7b78f22f2c12fee,1058,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/dashboard/presentation.py,SOURCE_OR_TEST,d86dbca22eaeec55b1214250528540a196dd08c8,3191,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/data/__init__.py,SOURCE_OR_TEST,9f0e72e437ca65f62872c1b22398d4bf86e7102d,41,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/data/access.py,SOURCE_OR_TEST,5ee70a456dc0b39fc70b13c94ff390599f43d2b8,9960,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/data/bound.py,SOURCE_OR_TEST,374820295e72b4c7580fcc71232f90695f3a2b86,1032,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/data/calendar.py,SOURCE_OR_TEST,91c10ec01f1be564d2173d85f64e3454ce7799e5,722,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/data/config.py,SOURCE_OR_TEST,655fa2076eea52f7d7599d116883985198bce2e8,10241,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/data/contracts.py,SOURCE_OR_TEST,6ecc0bc569cdb60512862b09a1045082f7a8e2b5,13617,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/data/domain.py,SOURCE_OR_TEST,989ae1986e953229ab5086cfa73337807cfd38f9,10776,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/data/evidence.py,SOURCE_OR_TEST,cdd3d5b2a5b9a99653e15ecaf12889c5db576950,2181,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/data/lineage.py,SOURCE_OR_TEST,80cdc4d2a6f278ed9fe3b92c3ce59188772300b3,14061,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/data/manifests.py,SOURCE_OR_TEST,4057a3dbcae826f85d3e3c6ccf58bdbb3db4724d,8292,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/data/sec_concepts.py,SOURCE_OR_TEST,f75be034a1737a095884e6843e026207240f7c76,5042,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/data/sec_listing.py,SOURCE_OR_TEST,6a3e9713aabda63fd2b65bb862cfa1fbd3076d51,8698,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/data/sec_projection.py,SOURCE_OR_TEST,52c9f5422e1f7dea0750d6f049ed53de96465fc2,16876,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/data/security_master.py,SOURCE_OR_TEST,f6565c33a1517b514e1c99441c2967b40baf7599,20095,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/data/services.py,SOURCE_OR_TEST,09d88bb0cd0a92c626489a87529537562b22110f,42181,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/data/sources/__init__.py,SOURCE_OR_TEST,c391a6570a90fa35677684a00c2a4c8fbfc030ee,37,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/data/sources/alpha_vantage.py,SOURCE_OR_TEST,268bdb83ff069db2b19136b9e0ea0a214238e4f1,4380,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/data/sources/base.py,SOURCE_OR_TEST,90d2990db7666240cb8ef1e1d2b2e2ab724011d9,4523,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/data/sources/fred.py,SOURCE_OR_TEST,a392929e8e92ac0e53575173436f85e794a4b976,3161,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/data/sources/french.py,SOURCE_OR_TEST,4d0f8e4b59121f371cbd179a1a921dcbad963e19,3613,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/data/sources/hf_data_library.py,SOURCE_OR_TEST,05afa5331b48fa45f28662d86e986f90d96f23bc,8462,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/data/sources/owner_supplied.py,SOURCE_OR_TEST,5cd95e3c1f6f73d1e0ff5bdba8049e7fc29b5fa2,8973,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/data/sources/sec_edgar.py,SOURCE_OR_TEST,ed88bfc0ca861f8a0caaa28b761ab90d74c30dfc,6427,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/data/sources/sec_inline_xbrl.py,SOURCE_OR_TEST,129d52e878512d807ef64bc5b86217d54821278e,12233,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/data/sources/sec_legacy_xbrl.py,SOURCE_OR_TEST,f2dbb86fa1f18187467ded96144432e34ca390e8,12183,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/data/sources/sec_submissions.py,SOURCE_OR_TEST,04dedd047ff3c7183b1f77fec30de52aa8d241ac,8035,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/data/sources/yahoo.py,SOURCE_OR_TEST,b4240819b282cd71306f4e826cfba67e507705d6,4956,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/data/storage.py,SOURCE_OR_TEST,371da41ffd223f08af8f59db71569759d58a1e2d,41362,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/data/validation.py,SOURCE_OR_TEST,fba815a5278eb51f48c706cb419e46e923eef2ed,15646,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/delivery/__init__.py,SOURCE_OR_TEST,a5408376185cb2fe3ffd8669dabf56f9b7f922d7,141,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/delivery/catalog.py,SOURCE_OR_TEST,e526ff8e05f957baae84929be11749fa9f21eecd,10451,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/delivery/config.py,SOURCE_OR_TEST,b41deb1c244264bb35c2d6c9e5770d1158347c9c,4575,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/delivery/provenance.py,SOURCE_OR_TEST,33776faebf55f537673f0b1ede20dc0d41003ef9,1154,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/delivery/reporting.py,SOURCE_OR_TEST,b6afde654fe0b801c2989b16db1c908b1cbfb2f3,12162,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/delivery/schemas.py,SOURCE_OR_TEST,63c8e0577f6b1e986e9d16f2ac19e230a8969b72,1454,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/delivery/service.py,SOURCE_OR_TEST,37ed81647c4de57d5c00b38c109e69dee55766ea,2085,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/diagnostics/__init__.py,SOURCE_OR_TEST,4c1ac682b0b6b058cb05486c9aecc930c0d3b7f5,164,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/diagnostics/regression.py,SOURCE_OR_TEST,da7711f2697c90ebf8a5857b12518f8f62db3f89,1815,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/exceptions.py,SOURCE_OR_TEST,202a6dba9b3baaeb9138ce1d969981fd31d5a1ee,2162,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/factors/__init__.py,SOURCE_OR_TEST,8d3408721162016e2c9867e84824deeef89a6e5c,289,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/factors/config.py,SOURCE_OR_TEST,3067c927b691467f2343c1fea9af1f55dcb2426f,4079,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/factors/contracts.py,SOURCE_OR_TEST,36dd4490844b1e5ea9545ea670800bdfca96be87,2532,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/factors/definitions.py,SOURCE_OR_TEST,0a7b6a41b576f09f82553448882f59531e14a042,18159,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/factors/diagnostics.py,SOURCE_OR_TEST,ee6b98ed9d04c9f91e6ee4b916d7a8967d12d6a8,6049,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/factors/holding.py,SOURCE_OR_TEST,58afc33d95adb56c530689e7ee5b1e124d0399f1,4996,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/factors/portfolio.py,SOURCE_OR_TEST,4cd2452520e3b9b4ce4f9d2af0451b8dccbd9c58,7333,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/factors/preprocessing.py,SOURCE_OR_TEST,552c5a38aa503751573b2d7b9070c172bfaeb2f8,3362,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/factors/service.py,SOURCE_OR_TEST,8812c1401e2c4080456351efc19136aa9089ec51,20104,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/factors/storage.py,SOURCE_OR_TEST,a840fb8ac35ffd8f09968aec67a5240912a9ac0c,12211,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/factors/temporal.py,SOURCE_OR_TEST,564bfa87e53f1beb45c6ed96b186dba048e34194,8725,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/factors/validation.py,SOURCE_OR_TEST,485511f03c3641a1872f0b58fd1aaac9cccd17d6,4868,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/logging.py,SOURCE_OR_TEST,14ca7696af340aec68aedc4db3164dbb0c02ec11,2337,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/ml/__init__.py,SOURCE_OR_TEST,2bc470e52a5bac8a2cc7794f1ccccb362b7e6cb9,206,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/ml/config.py,SOURCE_OR_TEST,ffc908cf4a24f330ddbebcd4445da578d64f755c,6246,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/ml/contracts.py,SOURCE_OR_TEST,99ccb7bd75d01f5a51c33d601651bbd0ac870ecf,4767,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/ml/economic.py,SOURCE_OR_TEST,454594603256255424bf3303fff1e7fdaae35a4a,2630,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/ml/evaluation.py,SOURCE_OR_TEST,5d50cc3557580755464549ee39e9015c106bad7c,6829,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/ml/features.py,SOURCE_OR_TEST,89a60a0780eafd0471e8cc00c60734ae8f2c7206,5837,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/ml/models.py,SOURCE_OR_TEST,0b4050c29c2ad2732f3b4ac5433937b69db88540,6195,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/ml/preprocessing.py,SOURCE_OR_TEST,f7075673927ad9f41203625fc88ea01c3f2080ec,4724,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/ml/publication.py,SOURCE_OR_TEST,d894a1609a1e7bad87faea3e89ffc1324c2948d2,11495,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/ml/service.py,SOURCE_OR_TEST,cfa247df073e60cf223af1c033587d9764e34cc7,41213,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/ml/splits.py,SOURCE_OR_TEST,46769b0e4731c480ba7f4a856037276bfa7c05aa,4134,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/ml/targets.py,SOURCE_OR_TEST,242eaeb3b9d6237177af38151c00469c75fc63bd,8930,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/ml/validation.py,SOURCE_OR_TEST,5afe35b004573548fbba5de0b24c713f360dba8c,8323,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/model_validation/__init__.py,SOURCE_OR_TEST,0679e0c8140af1cba95f153916188ca5d6592b49,180,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/model_validation/inputs.py,SOURCE_OR_TEST,61c46da64ec001e6195e228089c9db99c5eb2c90,1952,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/numeric.py,SOURCE_OR_TEST,0502cdcd1940f5ac9ccc00c50bde9395979842b6,122,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/observability/__init__.py,SOURCE_OR_TEST,dea1f32858cd401035b4dadf20e136980abaeea5,191,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/observability/logging.py,SOURCE_OR_TEST,c90ece234256ebe44a42a7c9b63dbb1df2c0551a,581,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/observability/metrics.py,SOURCE_OR_TEST,e1f9cfa2d7d2936576c0f415a7a910ffa6c7c723,595,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/optimization/__init__.py,SOURCE_OR_TEST,60ce8c0a4b7d32720ebf7e16408c3b0af594f26c,186,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/optimization/black_litterman.py,SOURCE_OR_TEST,0525e41f692bf0fa71083962c52207f80d1c8c82,2126,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/optimization/covariance.py,SOURCE_OR_TEST,aeb99161225a4083695533e03454f60426dbd6e2,2628,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/optimization/engine.py,SOURCE_OR_TEST,371502ee63fe8428b42a995bdc67054fd16bacfc,13049,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/optimization/hrp.py,SOURCE_OR_TEST,20ba67ce17896dbbe50ef7c6b17f55958516def3,1667,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/performance/__init__.py,SOURCE_OR_TEST,8b77fa8e33f9524e7636b6b6d8ce197ae96bcc9a,157,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/performance/metrics.py,SOURCE_OR_TEST,11876a18a6853323456f0596e60ec874ceb7e484,1670,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/portfolio/__init__.py,SOURCE_OR_TEST,0d6c3a29f31ede5ef101822b59f07da026795597,185,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/portfolio/allocations.py,SOURCE_OR_TEST,849f3709393c49759cf92e9eaf0a2c6917619f19,682,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/portfolio/config.py,SOURCE_OR_TEST,0e660d960ad1d68bf515666416beb8173bd24b4f,3429,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/portfolio/service.py,SOURCE_OR_TEST,25bdc0a24a6b9d5dc8902255efa5e5212f52b255,18817,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/project.py,SOURCE_OR_TEST,525d551033caf83208f28086d278ae806445a3b0,1247,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/py.typed,SOURCE_OR_TEST,8b137891791fe96927ad78e64b0aad7bded08bdc,1,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/regression/__init__.py,SOURCE_OR_TEST,7306a39c3e338f966ca0e470f3bca1d8c0f28840,185,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/regression/engine.py,SOURCE_OR_TEST,e5b8ad42dcb7d5ff12b8e99de4dd6e5c02b98ecf,7040,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/research_outputs/__init__.py,SOURCE_OR_TEST,a4193dbb1d8fca45345c1dbeb484010a9d2cb03c,179,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/research_outputs/portfolio_storage.py,SOURCE_OR_TEST,00a658cdd60cd8ab41fbaff6e4b50814e0c39d1a,5137,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/research_outputs/storage.py,SOURCE_OR_TEST,ffb6937efb24de15370a20c03377f8848ffeafb4,8818,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/risk/__init__.py,SOURCE_OR_TEST,a00bd77477e0006572e6b476b12210816312625c,129,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/risk/metrics.py,SOURCE_OR_TEST,a25935fac2581cc2d5f1c42a702f4e8f801dc8a9,5943,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/scenarios/__init__.py,SOURCE_OR_TEST,55aff59a24d8a76b2dd5acb356775fb5e1b3ac47,168,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/scenarios/engine.py,SOURCE_OR_TEST,f78a2a43152b4591db4dc4984baeed0f3ef295b9,1700,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/statistical_tests/__init__.py,SOURCE_OR_TEST,1a4646fab9da1af2d86fb2db85cec7bff89822f5,176,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+src/institutional_factor_platform/statistical_tests/tests.py,SOURCE_OR_TEST,a1b1696b9c60beefb3c746903cfc00aa77ad2a8d,2841,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+tests/crash_worker.py,SOURCE_OR_TEST,eb1c4952249fa1ee6fa06811d134a44da00243c5,1557,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+tests/test_configuration.py,SOURCE_OR_TEST,7605b2b76dc0621ac2047243b233fe08a42cc842,1899,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+tests/test_full_platform_connected.py,SOURCE_OR_TEST,da3e57bc04e770dc2d2262ad7f3fbea315f3d244,25434,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+tests/test_integrity_controls.py,SOURCE_OR_TEST,a0c63591bb979c0fce3370e6907c083279401aee,19573,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+tests/test_logging.py,SOURCE_OR_TEST,cdf9acfc483a7226a5edd84dc59876efac175ac0,1392,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+tests/test_manifests_storage.py,SOURCE_OR_TEST,7258178625ddd5bb019c6040b05fbaef85db472d,12773,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+tests/test_package.py,SOURCE_OR_TEST,dde67ce61e48e34e9b5ad980b07d8dca837510cf,147,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+tests/test_phase1_config_domain.py,SOURCE_OR_TEST,6ea64e533231dbdc1983cd3e502452a1a9711864,15572,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+tests/test_phase2_factor_engine.py,SOURCE_OR_TEST,2689806716f70dabc81bfddb51f7cc988059505e,30476,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+tests/test_phase2b_holding.py,SOURCE_OR_TEST,5efe04ce3469ac312a9f4fd47982a4e8f3601715,5995,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+tests/test_phase2c_reference.py,SOURCE_OR_TEST,77ffde4c1110bfd730957c8576960829acf7bd78,2460,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+tests/test_phase3_asset_pricing.py,SOURCE_OR_TEST,808195e0bebf6765ec44f0d1f022139096dd94ae,19600,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+tests/test_phase4_portfolio_risk.py,SOURCE_OR_TEST,d95cb09fa7d14bfe80e02ccb59796ca000833653,22447,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+tests/test_phase5_ml.py,SOURCE_OR_TEST,9fa1e4106ed8310ec8278f755e309debc8aee29d,52160,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+tests/test_phase6_delivery.py,SOURCE_OR_TEST,53a1ec74cfe16da3f1e140a66b1b3a97031fb524,34214,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+tests/test_phase6_deployment.py,SOURCE_OR_TEST,8926905762aa7dcc7743f00e01f6e849be1d7ae8,2176,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+tests/test_project.py,SOURCE_OR_TEST,deb80b94610ce3abaf99df9b610791413ede8d9c,566,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+tests/test_recovery_and_lineage.py,SOURCE_OR_TEST,0b3f5bd0c8722a32ecd9f8c6e3cf914ca91e9dca,28919,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+tests/test_research_phase1_audit.py,SOURCE_OR_TEST,a89ab16c31865176df523093eb3d5c254b773990,7328,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+tests/test_research_phase2_audit.py,SOURCE_OR_TEST,46f1b595615ff834ae92bdcc1f0fd28716d3df61,4699,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+tests/test_research_phase3_audit.py,SOURCE_OR_TEST,ab98f286cf206b6347b3f95ce7c5d42087e21086,3745,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+tests/test_sec_concepts.py,SOURCE_OR_TEST,c1381025e603e4d9a9224c136643884e1b59abe7,1442,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+tests/test_sec_inline_xbrl.py,SOURCE_OR_TEST,ef78f1188c47fb1329129e12e9fc67f6fd509189,6135,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+tests/test_sec_legacy_xbrl.py,SOURCE_OR_TEST,db7bb8f413f83b45344a8bacdb5030fd580e6cd9,9059,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+tests/test_sec_listing.py,SOURCE_OR_TEST,e01fa19a893cf84c208080c687ffcb73b46e2d5f,6444,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+tests/test_sec_projection.py,SOURCE_OR_TEST,14ee7dcb1e0d9939d3b87ce704a246ec6384d943,11611,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+tests/test_sec_submissions.py,SOURCE_OR_TEST,ff66141a1188c3f0188b0d96f289eb152dbab435,4928,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+tests/test_service_cli_calendar.py,SOURCE_OR_TEST,51deb1f92b9db4d42515f35833e5aeb6ee1d80e1,30375,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+tests/test_validation_adapters.py,SOURCE_OR_TEST,04f1b1b7a5568e677d7cf17653c905ec184d79d9,30935,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen
+uv.lock,SOURCE_OR_TEST,0d7df8128da51dbace009bb7c50120e9fbdb5310,492335,PRESERVE; no relocation,Tracked accepted lineage; source/tests frozen

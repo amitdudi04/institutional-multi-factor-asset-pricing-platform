@@ -2,6 +2,8 @@
 
 ## Overview
 
+Numerical authority: [accepted correction commit f22f5cb](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit), with the [Phase 3 reconciliation](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md) and [Phase 2C matched-sample checks](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit/phase2c/PHASE2C_REGRESSION_VERIFICATION.md). The [accepted documentation and candidate manuscript](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/028dfd9cd18bcd6ef8114d829cc789d5bffacc61) preserve the interpretation of these results. Original releases are historical records.
+
 The empirical study combines public or publicly accessible market, listing, filing, macro, factor, and benchmark evidence. The final research universe is selected by the intersection of available historical data and the project's identity and timing requirements.
 
 ## Sources
@@ -42,7 +44,7 @@ CIK identifies an SEC registrant, not automatically a unique listed share class.
 
 Fundamentals use the information-availability date associated with the filing evidence. Fiscal-period end alone is not sufficient for a point-in-time join.
 
-Later amendments remain later observations; they do not overwrite what was known at an earlier date.
+The intended rule keeps amendments as later observations rather than overwriting earlier information. Recorded UTC-day gates and representative authenticated cases do not establish exhaustive SEC acceptance/local-capture chronology, all original amendments or issuer/share-class attribution. D4 remains source-evidence blocked; see the accepted audit tracker and Phase 3 report.
 
 ## Shares and Share Classes
 
@@ -52,7 +54,7 @@ Shares outstanding are treated separately from monetary fundamentals. When SEC e
 
 The market panel retains source provenance through the HF Data Library history. The project does not treat historical volume across the PiTrading/IEX source transition as perfectly comparable.
 
-The universe is therefore described as source-availability selected rather than as a reconstruction of a commercial historical-security database.
+The universe is source-availability selected; pre-snapshot delisted names are not restored by screening. Returns are frozen provider-vintage adjusted-quote returns. Complete dividend-inclusive total-return comparability and historical adjustment vintage remain unverified (V1). Current vendor files or changed provider documentation are not substitutes for the authenticated original bytes. Modeled closes and retrospective outputs are not actual historical fills or timestamped live forecasts.
 
 ## Missing Data
 
@@ -62,7 +64,7 @@ This rule is why `equity_issuance` remains non-estimable in the final factor stu
 
 ## Data Rights and Repository Boundary
 
-The repository contains code, configuration, tests, methodology, and aggregate research results. Raw provider files, local databases, generated Parquet datasets, trained model artifacts, and detailed generated reports are not redistributed through Git.
+The repository contains code, configuration, tests, methodology, and aggregate research results. Raw provider files, local databases, generated Parquet datasets and fitted-model bundles remain private. Selected aggregate audit reports, manifests and the candidate PDF are public; the editable DOCX remains controlled local author delivery with a public checksum. Exact reproduction needs the same lawful original source bytes, not a present-day download.
 
 The MIT License applies to original repository code and documentation. It does not override the terms of third-party data providers.
 

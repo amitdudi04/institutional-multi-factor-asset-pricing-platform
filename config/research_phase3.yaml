@@ -1,0 +1,9 @@
+base_commit: 277c95bd4ba7279e6863bc3acc026d406a8ad482
+scope: P1-P12 and ML1-ML10; no additional models, features, methods or tuning
+source_gate: single-pass cached authenticators; final unchanged-size/mtime guard, rehash only changed source files
+portfolio_correction: genuine demonstrated interval/input dependencies only; original 36-cycle window, eight methods and 5/10/20bps rates unchanged
+portfolio_uncertainty: one paired CVaR-minus-equal-weight net-return comparison; descriptive mean and leave-one-cycle-out range; no superiority claim or large bootstrap
+ml_correction: common month-end decisions, complete common-calendar 21-session labels, original two frozen feature scores and same model families/grids/seeds; no replacement observations
+ml_uncertainty: original block length 3, 100 resamples and seed17; bootstrap mean per-date IC rather than pooled cross-date ranks; no new resampling grid
+economic_scope: preserve existing one-session independent-fold economic check and initial deployment fees; do not relabel it a 21-session investment backtest
+upstream_limits: preserve D4/V1 and modeled-close execution qualifications; never call missing source data repaired

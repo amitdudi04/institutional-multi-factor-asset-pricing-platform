@@ -48,12 +48,19 @@ def build_targets(
     if (frame["available_at"] < frame["date"]).any():
         raise TemporalIntegrityError("Return availability precedes its observation identity")
 
+    calendar = pd.DatetimeIndex(sorted(frame["date"].unique()))
+    calendar_positions = {date: index for index, date in enumerate(calendar)}
     rows: list[dict[str, object]] = []
     for security_id, security in frame.groupby("security_id", sort=True):
         security = security.reset_index(drop=True)
         for position in range(len(security) - horizon):
             decision = security.iloc[position]
             future = security.iloc[position + 1 : position + horizon + 1]
+            expected_end = calendar_positions[decision["date"]] + horizon
+            # A horizon counts common sessions, not the next N available quotes.
+            # Fail closed on an incomplete constituent window; never extend it.
+            if expected_end >= len(calendar) or future.iloc[-1]["date"] != calendar[expected_end]:
+                continue
             target_start = future.iloc[0]["date"]
             target_end = future.iloc[-1]["date"]
             if not decision["date"] < target_start <= target_end:
