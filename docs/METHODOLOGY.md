@@ -2,11 +2,13 @@
 
 ## 1. Research Design
 
+Numerical authority: [accepted correction commit f22f5cb](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit), with the [Phase 3 reconciliation](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md) and [Phase 2C matched-sample checks](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit/phase2c/PHASE2C_REGRESSION_VERIFICATION.md). The [final documentation candidate](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/research/institutional-final-documentation-corrections) is a research branch; corrected claims do not describe unmerged historical `main`.
+
 The project follows a one-way research sequence:
 
 ```text
 source data
-  → point-in-time security and issuer identity
+  → recorded-day security and issuer identity controls
   → universe screening
   → factor construction
   → asset-pricing estimation
@@ -15,7 +17,7 @@ source data
   → research reporting
 ```
 
-Later stages consume earlier outputs but do not change the historical data used to create them. Analytical settings that materially affect interpretation—such as transaction-cost cases and temporal ML splits—are fixed before the corresponding results are compared.
+Later stages consume earlier outputs but do not change the historical data used to create them. Reported settings, including transaction-cost cases and temporal ML splits, are bound to their publication versions. Missing original H1/H3 approval and decision records do not establish preregistration.
 
 ## 2. Universe Construction
 
@@ -32,7 +34,7 @@ The initial candidate set contains 822 HF Data Library stocks. Screening combine
 
 The accepted research universe contains 487 equities.
 
-The design does not backfill present-day identities, shares, or company names into earlier periods.
+The design rejects unsupported present-day identity/share substitutions; this control does not certify every original filing capture or issuer/share-class assignment. The supplied panel is source selected, not an exhaustive historical market.
 
 ## 3. Point-in-Time Fundamentals
 
@@ -53,9 +55,9 @@ The factor engine contains 48 definitions spanning:
 - volatility and downside risk;
 - liquidity-related characteristics.
 
-Cross-sectional preprocessing and portfolio formation use information available at the relevant date. Factor portfolios are formed from project characteristics rather than relabelled as official provider factors.
+Cross-sectional preprocessing and portfolio formation enforce recorded-day information gates; exhaustive historical capture and execution-time availability are not certified. Factor portfolios are formed from project characteristics rather than relabelled as official provider factors.
 
-Forty-seven definitions are estimable in the current study.
+Forty-seven names have nonmissing raw values: 34,341,456 physical rows contain 28,550,589 nonmissing raw values and 24,255,559 scores. Forty-one characteristics yield 123 dependent sleeve IDs and 11,352 complete quantile-cycle rows; 956 of those rows are single-stock quantiles. Named factors need not be independent exposures. Corrected cycles use month-end UTC-day signals, next-XNYS-session modeled close entry and the following monthly entry-close exit. Genuine endpoints are required; missing old endpoints are not claimed recovered. Returns use frozen provider-vintage adjusted quotes; complete dividend-inclusive comparability is unverified.
 
 ## 5. Asset Pricing
 
@@ -65,11 +67,11 @@ Five model families are compared:
 2. Fama-French 3
 3. Carhart 4
 4. Fama-French 5
-5. configured q-factor mapping
+5. study-specific q-style mapping
 
 The dependent variable is portfolio excess return. The implementation supports OLS and related diagnostic tools; the reported study uses the configured publication estimator with heteroskedasticity/autocorrelation-aware inference where specified.
 
-Model comparison emphasizes adjusted R², coefficients, uncertainty, residual diagnostics, and stability. Higher in-sample fit is not interpreted as proof of persistent alpha.
+The primary comparison uses matched 67–77 full monthly trading cycles per asset, 123 correlated portfolios and 615 OLS fits with three-lag Newey–West HAC. Alpha is decimal return per full cycle, not annualized. Factors are internal proxies; earnings yield in the q-style mapping is not accounting ROE or exact HXZ replication. Six duplicate return pairs and shared constituents limit interpretation. The joint residual matrix has 67 common dates, 123 columns and centered rank 66; its singular covariance does not support a conventional full GRS test. The accepted constituent-exclusion sensitivity retains 109 assets with 14 attrition cases. No new external-factor or joint-pricing test is implied.
 
 ## 6. Portfolio Construction
 
@@ -84,21 +86,21 @@ The portfolio study evaluates:
 - Hierarchical Risk Parity
 - CVaR
 
-Portfolios are long-only, fully invested, and unlevered for the reported comparison.
+The eight methods are long-only, fully invested and unlevered allocations to 123 constructed quantile sleeves, using 36 prior training cycles and 31 complete evaluation cycles. Excluding the evaluated future row is verified; real historical pre-close availability and executable fills are not. Inner-sleeve costs, financing and capacity remain unverified.
 
 The codebase also contains reusable covariance, Black-Litterman/Bayesian, scenario, and risk-analysis components. Black-Litterman is a supported framework in the software but is not claimed as one of the eight standalone empirical portfolio publications in the reported study.
 
 ## 7. Transaction Costs
 
-One-way cost assumptions are evaluated at:
+Modeled per-side rates per absolute L1 traded-weight unit are:
 
 - LOW: 5 bps
 - BASE: 10 bps
 - HIGH: 20 bps
 
-The reported BASE total decomposes to 5 bps spread, 2 bps slippage, and a 3 bps fixed-impact allowance. In the current engine configuration, the 2 bps slippage and 3 bps fixed-impact allowance are bundled into the configured slippage field; nonlinear market impact remains disabled because consistent liquidity evidence is not available at the required standard across the research panel.
+The BASE quoted full spread is 10 bps, of which the 5-bps half-spread is charged, plus 2 bps slippage and a 3-bps fixed allowance. In the current engine configuration, the 2 bps slippage and 3 bps fixed-impact allowance are bundled into the configured slippage field; nonlinear market impact remains disabled because consistent liquidity evidence is not available at the required standard across the research panel.
 
-Portfolio accounting reconciles holdings, trades, turnover, gross returns, costs, and net returns.
+L1 is sum(abs(target minus drifted pretrade weights)); one-way turnover is half L1. Fee = L1 × per-side rate, so BASE initial deployment costs 10 bps and a full switch costs 20 bps. Net return is gross less the fee. Interval cash is compounded on the same holding window. Annualized net return is geometric wealth^(12/31)-1; arithmetic mean excess divided by its SD times sqrt(12) defines reported Sharpe. Monthly-cycle VaR/ES are positive-loss decimals, unannualized, with two tail observations; this is descriptive rather than reliable tail calibration.
 
 ## 8. Risk and Scenario Analysis
 
@@ -127,7 +129,7 @@ The target is the next 21-trading-session security return minus SPY's return ove
 The temporal design uses:
 
 - monthly decisions;
-- 60-month training;
+- expanding training from 60 to 74 calendar months;
 - 12-month validation;
 - 1-month test windows;
 - label purging;
@@ -136,7 +138,7 @@ The temporal design uses:
 - training-only preprocessing;
 - bounded model search.
 
-Random financial train/test splitting is not used.
+The corrected panel has 27,632 rows, 89 common month ends, 15 dependent folds and 7,286 held-out observations per family. Five of 14 adjacent test-label pairs overlap despite valid partition purging and embargo. Recorded-day feature gates and training-only transforms pass; exhaustive real filing capture is not verified. Forecasts are retrospective reconstructions rather than documented historical live predictions.
 
 Eight models are compared: zero baseline, historical-mean baseline, factor composite, linear regression, Ridge, Elastic Net, Random Forest, and XGBoost.
 
@@ -144,7 +146,7 @@ Eight models are compared: zero baseline, historical-mean baseline, factor compo
 
 Predictive evaluation includes rank correlation/information coefficient, regression or classification metrics where applicable, calibration diagnostics, and bootstrap uncertainty.
 
-The economic layer applies model signals through the same portfolio accounting and transaction-cost framework rather than evaluating prediction scores alone.
+IC is date-level cross-sectional rank correlation; its exploratory bootstrap uses 100 moving-block resamples of length 3 and seed 17. Linear and factor composite share the same estimator. Constant IC is undefined. The economic check ranks held-out signals, equal weights the selected top 20%, resets to cash/unit NAV each fold and evaluates one subsequent session with initial fees; it is not the 21-session forecast horizon or a continuous investment backtest. Stable incremental after-cost value remains unestablished.
 
 Feature explanations are treated as model diagnostics. Coefficients, permutation importance, and SHAP values are not interpreted as causal effects.
 

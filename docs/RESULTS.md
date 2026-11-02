@@ -1,6 +1,6 @@
 # Research Results
 
-This document is the public numerical record for the current research repository. The values below correspond to the frozen empirical release identified in [REPRODUCIBILITY.md](REPRODUCIBILITY.md).
+This is the corrected current numerical summary. Numerical authority: [accepted correction commit f22f5cb](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit), with the [Phase 3 reconciliation](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md) and [Phase 2C matched-sample checks](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit/phase2c/PHASE2C_REGRESSION_VERIFICATION.md). The [final documentation candidate](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/research/institutional-final-documentation-corrections) is a research branch; corrected claims do not describe unmerged historical `main`. Historical original results remain preserved in [the Phase 4 baseline version](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/blob/7726cec06fc75ea0a1858842d0f6a761c162fe12/docs/RESULTS.md), explicitly separate from the current tables.
 
 ## 1. Universe and Data
 
@@ -11,7 +11,7 @@ This document is the public numerical record for the current research repository
 | Rejected securities | 335 (40.75%) |
 | Daily market observations | 715,447 |
 | Market sample | 2018-02-14 to 2026-08-04 |
-| Point-in-time fundamental observations | 37,273 |
+| SEC-derived fundamental observations | 37,273; recorded availability, exhaustive capture chronology unresolved |
 | Fundamental availability sample | 2019-02-23 to 2026-08-15 |
 
 ### Screening outcomes
@@ -33,156 +33,136 @@ The panel is selected by source availability and research eligibility. It is not
 
 ## 2. Factor Research
 
-| Measure | Result |
+| Measure | Corrected result |
 |---|---:|
-| Configured factor definitions | 48 |
-| Estimable definitions | 47 |
+| Configured names | 48 |
+| Definitions with nonmissing raw values | 47 |
 | Non-estimable definition | `equity_issuance` |
-| Long-form factor rows | 34,341,456 |
-| Factor-portfolio observations | 11,545 |
-| Factor sample | 2018-02-14 to 2026-08-04 |
+| Physical long-form rows | 34,341,456 |
+| Nonmissing raw observations | 28,550,589 |
+| Nonmissing scores | 24,255,559 |
+| Quantile characteristics | 41 |
+| Dependent portfolio IDs | 123 |
+| Complete quantile-cycle rows | 11,352 |
+| Singleton quantile-cycle observations | 956 / 11,352 |
 
-`equity_issuance` remains non-estimable because the required issuance and shareholders' equity inputs cannot be reconciled consistently from the accepted point-in-time SEC evidence without unsupported imputation.
+Counts have different denominators; 48 names are not independent exposures. Singleton rows are single-stock quantile exposures, not diversified portfolios or 956 unique securities. The corrected factor publication is `factor-4ddee9ac6fb45cedfd62a2cc68676b58`. Its delayed-close endpoint experiment replaces the historical original 11,545 rows; 195 of 265 flagged historical groups have valid interior-gap chains, while 70 lack old intended endpoints. Those unavailable observations are not claimed repaired. `equity_issuance` remains missing rather than imputed.
 
 ## 3. Asset-Pricing Results
 
-Each configured model is evaluated on 123 diagnostic portfolios. Intercept inference uses the released HAC/Newey-West covariance. The p<0.05 share below is descriptive and unadjusted; it is not a multiple-testing decision rule.
+| Model | Mean adjusted R² | Alpha (decimal return per full trading cycle) | Nominal HAC p < 0.05 |
+|---|---:|---:|---:|
+| CAPM | 0.760818 | -0.001658 | 8/123 |
+| Fama-French 3 | 0.802438 | -0.001967 | 12/123 |
+| Carhart 4 | 0.811021 | -0.001879 | 14/123 |
+| Fama-French 5 | 0.817658 | -0.002008 | 8/123 |
+| Study-specific q-style | 0.814361 | -0.002227 | 9/123 |
 
-| Model | N | Mean adj. R² | Median adj. R² | Mean monthly alpha | Median monthly alpha | Mean HAC t | p<0.05 share | Mean market beta |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| CAPM | 123 | 0.063 | 0.061 | 0.01187 | 0.01128 | 2.467 | 85.4% | 1.402 |
-| Fama-French 3 | 123 | 0.259 | 0.247 | 0.00923 | 0.00937 | 2.146 | 58.5% | 1.421 |
-| Carhart 4 | 123 | 0.277 | 0.261 | 0.00899 | 0.00910 | 2.048 | 52.8% | 1.408 |
-| Fama-French 5 | 123 | 0.301 | 0.281 | 0.01056 | 0.01026 | 2.569 | 92.7% | 1.284 |
-| Configured q mapping | 123 | 0.296 | 0.295 | 0.00875 | 0.00876 | 2.090 | 58.5% | 1.291 |
+All five models use 123 dependent portfolios with matched per-asset observations: 67–77 cycles per asset, 9,441 asset-cycle observations per model and 615 primary fits. OLS with three-lag Newey–West HAC is retained. No intercept survives supplementary Holm adjustment. Negative mean alpha and high fit can coexist; non-rejection is not proof of zero true alpha or market efficiency.
 
-Fama-French 5 exceeds CAPM by 0.238 in mean adjusted R² (0.301 - 0.063). This supports greater in-sample explanatory fit, not persistent alpha, causality, or future performance.
+Factors are internal proxies, not official FF/HXZ reproductions; earnings yield is not accounting ROE. Shared constituents, correlated residuals and six duplicate return-series pairs preclude treating 123 portfolios as independent assets. The accepted 109-asset constituent-exclusion sensitivity excludes 14 assets. On 67 all-asset common dates, the centered residual matrix has rank 66 for 123 columns; covariance is singular. A full conventional inverse-covariance GRS test is not available or claimed. No new joint test or external-factor experiment was added.
 
 ## 4. Portfolio, Cost and Risk Results
 
-Eight long-only, fully invested, unlevered methods are evaluated over the factor-portfolio window from 2024-01-31 to 2026-08-04.
+Eight methods allocate to 123 constructed long-only quantile sleeves over 31 complete monthly cycles, exit labels 2024-02-01 through 2026-08-03. The 36-cycle training history, constraints and objectives are unchanged. Prior array rows feed decisions, but actual historical pre-close information and executable fills remain unverified.
 
-### Transaction-cost assumptions
+### Modeled transaction costs
+
+Rates are bps per absolute-traded-weight unit. L1 = sum of absolute target-minus-pretrade weights; half-L1 is one-way turnover. Initial cash deployment has L1 = 1; a complete invested switch has L1 = 2.
 
 | Component | LOW | BASE | HIGH |
 |---|---:|---:|---:|
-| Commission | 0 bps | 0 bps | 0 bps |
-| Spread | 2 bps | 5 bps | 10 bps |
-| Slippage | 1 bps | 2 bps | 4 bps |
-| Fixed-impact allowance | 2 bps | 3 bps | 6 bps |
-| **Total one-way cost** | **5 bps** | **10 bps** | **20 bps** |
+| Full quoted spread (not charged in full) | 4 | 10 | 20 |
+| Charged half-spread | 2 | 5 | 10 |
+| Slippage component | 1 | 2 | 4 |
+| Fixed allowance bundled in total slippage | 2 | 3 | 6 |
+| Commission | 0 | 0 | 0 |
+| Total charged rate | 5 | 10 | 20 |
 
-These are ex-ante sensitivity assumptions, not observed broker executions. Nonlinear market impact is not independently estimated.
+These are assumptions, not order-book calibration. Outer-sleeve fees are validated; constituent execution, financing, capacity and full market impact remain omitted or unverified. Net cycle return is gross less modeled fees. Performance cash is compounded over the exact holding interval.
 
-### BASE performance
+### Corrected BASE performance
 
-| Method | Annualized net return | Volatility | Sharpe | Maximum drawdown | Net cumulative return |
+| Method | Annualized geometric net return (%) | Annualized volatility (%) | Sharpe ratio | Maximum drawdown (%) | Cumulative net return (%) |
 |---|---:|---:|---:|---:|---:|
-| Equal Weight | 16.10% | 11.14% | 1.383 | -8.57% | 48.89% |
-| Minimum Variance | 13.95% | 10.00% | 1.341 | -6.69% | 41.64% |
-| Mean Variance | 12.72% | 16.04% | 0.818 | -17.81% | 37.60% |
-| Maximum Sharpe | 20.55% | 12.30% | 1.575 | -7.51% | 64.61% |
-| Maximum Diversification | 17.31% | 10.97% | 1.499 | -5.43% | 53.08% |
-| Risk Parity | 15.76% | 10.79% | 1.397 | -8.33% | 47.72% |
-| Hierarchical Risk Parity | 15.48% | 10.56% | 1.403 | -8.13% | 46.79% |
-| CVaR | 25.48% | 14.21% | 1.667 | -8.55% | 83.17% |
+| Equal Weight | 15.8726% | 10.7432% | 1.023067 | -8.2915% | 46.3133% |
+| Minimum Variance | 15.4976% | 9.9505% | 1.065607 | -6.4993% | 45.0930% |
+| Mean Variance | 10.4507% | 14.6465% | 0.455591 | -16.1138% | 29.2761% |
+| Maximum Sharpe | 21.8340% | 12.0472% | 1.346360 | -6.1601% | 66.5591% |
+| Maximum Diversification | 19.6363% | 10.6378% | 1.334355 | -4.8279% | 58.9082% |
+| Risk Parity | 15.5997% | 10.4332% | 1.027799 | -7.9894% | 45.4247% |
+| Hierarchical Risk Parity | 15.1108% | 10.1920% | 1.008019 | -7.7200% | 43.8413% |
+| CVaR | 23.8256% | 14.4950% | 1.252327 | -7.0821% | 73.6842% |
 
-### Cumulative-return cost sensitivity
+Annualized net return is geometric, `(ending wealth)^(12/31) - 1`, not 12 times the arithmetic cycle mean. Volatility uses sample SD times sqrt(12); Sharpe uses mean interval-matched excess return divided by its SD, times sqrt(12). Cumulative net return compounds the actual 31-cycle net path from NAV = 1.
 
-| Method | Gross | LOW net | BASE net | HIGH net |
+### Corrected cumulative fee sensitivity
+
+| Method | Gross (%) | LOW net (%) | BASE net (%) | HIGH net (%) |
 |---|---:|---:|---:|---:|
-| Equal Weight | 49.12% | 49.01% | 48.89% | 48.66% |
-| Minimum Variance | 42.96% | 42.30% | 41.64% | 40.34% |
-| Mean Variance | 41.45% | 39.52% | 37.60% | 33.85% |
-| Maximum Sharpe | 66.66% | 65.63% | 64.61% | 62.59% |
-| Maximum Diversification | 54.13% | 53.60% | 53.08% | 52.03% |
-| Risk Parity | 47.98% | 47.85% | 47.72% | 47.47% |
-| Hierarchical Risk Parity | 47.42% | 47.10% | 46.79% | 46.17% |
-| CVaR | 84.30% | 83.73% | 83.17% | 82.06% |
+| Equal Weight | 46.5311% | 46.4222% | 46.3133% | 46.0958% |
+| Minimum Variance | 46.3406% | 45.7155% | 45.0930% | 43.8555% |
+| Mean Variance | 32.8133% | 31.0333% | 29.2761% | 25.8288% |
+| Maximum Sharpe | 68.7003% | 67.6265% | 66.5591% | 64.4435% |
+| Maximum Diversification | 60.1584% | 59.5321% | 58.9082% | 57.6673% |
+| Risk Parity | 45.6739% | 45.5492% | 45.4247% | 45.1758% |
+| Hierarchical Risk Parity | 44.4303% | 44.1355% | 43.8413% | 43.2544% |
+| CVaR | 74.8292% | 74.2559% | 73.6842% | 72.5457% |
 
-Higher costs reduce every cumulative result.
+All 24 scenario identities are retained in the Phase 3 source manifest. Within a method, scenario weights are identical and larger costs mechanically reduce wealth; this is not empirical execution calibration.
 
-### BASE risk metrics
+### Corrected cycle loss measures
 
-| Method | Net cum. | Gross cum. | Vol. | Sharpe | Sortino | MDD | VaR95 | CVaR95 | Tracking error | Information ratio | Beta |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| Equal Weight | 48.89% | 49.12% | 11.14% | 1.383 | 2.441 | -8.57% | 4.92% | 5.38% | 5.20% | -0.850 | 0.833 |
-| Minimum Variance | 41.64% | 42.96% | 10.00% | 1.341 | 2.136 | -6.69% | 4.55% | 6.09% | 10.03% | -0.641 | 0.498 |
-| Mean Variance | 37.60% | 41.45% | 16.04% | 0.818 | 1.153 | -17.81% | 4.53% | 10.65% | 13.55% | -0.495 | 0.753 |
-| Maximum Sharpe | 64.61% | 66.66% | 12.30% | 1.575 | 2.967 | -7.51% | 4.65% | 5.85% | 10.67% | -0.044 | 0.628 |
-| Maximum Diversification | 53.08% | 54.13% | 10.97% | 1.499 | 2.935 | -5.43% | 4.28% | 4.94% | 9.30% | -0.364 | 0.616 |
-| Risk Parity | 47.72% | 47.98% | 10.79% | 1.397 | 2.408 | -8.33% | 4.89% | 5.39% | 5.41% | -0.879 | 0.799 |
-| Hierarchical Risk Parity | 46.79% | 47.42% | 10.56% | 1.403 | 2.382 | -8.13% | 4.84% | 5.43% | 5.68% | -0.884 | 0.772 |
-| CVaR | 83.17% | 84.30% | 14.21% | 1.667 | 3.163 | -8.55% | 5.05% | 7.58% | 12.90% | 0.298 | 0.622 |
+| Method | VaR 95% (monthly-cycle positive loss, decimal) | ES 95% (monthly-cycle positive loss, decimal) | Tail observations |
+|---|---:|---:|---:|
+| Equal Weight | 0.046573 | 0.052968 | 2 |
+| Minimum Variance | 0.043372 | 0.058957 | 2 |
+| Mean Variance | 0.050949 | 0.086623 | 2 |
+| Maximum Sharpe | 0.048164 | 0.050826 | 2 |
+| Maximum Diversification | 0.039148 | 0.047911 | 2 |
+| Risk Parity | 0.046095 | 0.053231 | 2 |
+| Hierarchical Risk Parity | 0.045725 | 0.053749 | 2 |
+| CVaR | 0.049515 | 0.066329 | 2 |
 
-VaR95 and CVaR95 are positive loss magnitudes under the project loss convention. Maximum drawdown is negative peak-to-trough return.
+VaR uses the interpolated 5th return percentile; ES is the inclusive below-threshold mean converted to a positive loss. Only two observations enter either historical 32-cycle or corrected 31-cycle tail. These unannualized descriptive estimates are not precise tail-risk calibration and differ from the CVaR optimizer's fractional 36-scenario tail.
 
-### Scenario mappings
-
-| Scenario family | Instantaneous impact |
-|---|---:|
-| Market | -0.244% |
-| Rates | -0.073% |
-| Volatility | -0.122% |
-| Inflation | -0.061% |
-| Liquidity | -0.037% |
-
-A sixth project-specific custom mapping exists in the frozen empirical output, but it is not given a generic interpretation because its shock definition is not stated in this public numerical record. Scenario impacts are sensitivity mappings, not forecasts.
+**Historical original:** CVaR 83.1737% cumulative net / Sharpe 1.666657 and maximum-diversification drawdown -5.4323% reproduce on their old paths. **Current corrected:** CVaR 73.6842% / 1.252327; maximum-diversification drawdown -4.8279%. Cash alignment alone gives old-path CVaR Sharpe 1.378572. Remaining changes combine holding-input and sample changes, not an initial-NAV-only effect. Short-sample rankings are descriptive, with no established persistence. Obsolete scenario impacts and old-path-only risk cells remain in the linked historical record, not current tables.
 
 ## 5. Walk-Forward Machine Learning
 
-### Design
+The two features are book-to-market and 12-minus-1 momentum. Targets are security-minus-SPY proxy returns over 21 complete common market sessions. The panel has 27,632 rows, 89 common month ends, 15 completed dependent test folds and 7,286 held-out observations per family. Training expands from 60 to 74 months; validation has 12 months, one test month and the original one-month embargo at both boundaries. Purging partition overlaps does not eliminate test-test dependence: five of 14 adjacent corrected target pairs overlap. Tests run from 2025-04-30 to 2026-06-30.
 
-| Item | Setting |
-|---|---|
-| Features | Book-to-market; 12-minus-1 momentum |
-| Target | 21-trading-session security return minus SPY return |
-| Decision frequency | Monthly |
-| Training window | 60 months |
-| Validation window | 12 months |
-| Test window | 1 month |
-| Purging | Overlapping label horizons removed |
-| Embargo | 1 month |
-| Retraining | Monthly |
-| Decision observations | 27,640 |
-| Monthly dates | 91 |
-| Complete OOS folds | 17 |
-| OOS fold period | 2025-02-28 to 2026-06-30 |
-| Bootstrap | 1,000 resamples; 95% intervals; seed 17 |
+Training-only transformations and recorded-day gates are verified; exhaustive SEC capture and same-close availability are not. Predictions are retrospective held-out reconstructions, not timestamped historical live forecasts. Factor composite and linear are the same LinearRegression estimator, not independent confirmations.
 
-Eight rows are evaluated: zero baseline, historical mean, factor composite, linear, Ridge, Elastic Net, Random Forest, and XGBoost. Constant predictions have undefined rank correlation, so the two constant baselines report IC as N/A rather than zero.
+### Corrected forecast results
 
-### Predictive results
+| Model | Mean IC (rank correlation) | Median IC | Exploratory 95% mean-IC interval |
+|---|---:|---:|---|
+| Zero baseline | Undefined | Undefined | Undefined |
+| Historical mean | Undefined | Undefined | Undefined |
+| Factor composite | 0.034430 | 0.016341 | [0.010731, 0.084270] |
+| Linear | 0.034430 | 0.016341 | [0.010731, 0.084270] |
+| Ridge | 0.034434 | 0.016336 | [0.010735, 0.084272] |
+| Elastic Net | 0.044609 | 0.059116 | [0.016324, 0.096766] |
+| Random Forest | -0.002641 | -0.011912 | [-0.017721, 0.015985] |
+| XGBoost | -0.023285 | -0.041750 | [-0.038821, -0.005015] |
 
-| Model | Mean IC | 95% bootstrap CI | Positive IC folds | Positive rate |
-|---|---:|---:|---:|---:|
-| Zero baseline | N/A | N/A | N/A | N/A |
-| Historical mean | N/A | N/A | N/A | N/A |
-| Factor composite | 0.017412 | [-0.026401, 0.110608] | 10/17 | 58.8% |
-| Linear | 0.017412 | [-0.026401, 0.110608] | 10/17 | 58.8% |
-| Ridge | 0.017414 | [-0.026410, 0.110637] | 10/17 | 58.8% |
-| Elastic Net | 0.027535 | [-0.024701, 0.151649] | 11/17 | 64.7% |
-| Random Forest | 0.009558 | [-0.074074, 0.131357] | 10/17 | 58.8% |
-| XGBoost | -0.009069 | [-0.049268, 0.055085] | 8/17 | 47.1% |
+Intervals use 100 moving-block resamples, block length 3, seed 17. Only six named rows have finite IC intervals, including the duplicate linear/composite estimator; the two constant baselines are undefined. Linear-family intervals are nominally positive, RF crosses zero and XGBoost is nominally negative. Few dependent folds, multiple comparisons and a small resampling budget limit precision. These are exploratory intervals, not robust discoveries. Old linear predictions evaluated on the corrected test keys have IC 0.037238 versus corrected 0.034430, so the higher whole-sample IC is not isolated improvement.
 
-Every non-constant model interval includes zero; stable predictive information is not established.
+### One-session economic checks
 
-### After-cost economic fold results
+| Model | Mean net one-session return (%) | Positive economic folds |
+|---|---:|---:|
+| Zero baseline | -0.0604% | 7/15 |
+| Historical mean | -0.0604% | 7/15 |
+| Factor composite | 0.0559% | 7/15 |
+| Linear | 0.0559% | 7/15 |
+| Ridge | 0.0559% | 7/15 |
+| Elastic Net | 0.0551% | 7/15 |
+| Random Forest | 0.1410% | 8/15 |
+| XGBoost | 0.1554% | 10/15 |
 
-| Model | Mean net fold return | Median net fold return | Positive economic folds |
-|---|---:|---:|---:|
-| Zero baseline | -0.1415% | -0.1376% | 8/17 |
-| Historical mean | -0.1415% | -0.1376% | 8/17 |
-| Factor composite | -0.0973% | -0.0849% | 7/17 |
-| Linear | -0.0973% | -0.0849% | 7/17 |
-| Ridge | -0.0973% | -0.0849% | 7/17 |
-| Elastic Net | -0.1039% | -0.0333% | 7/17 |
-| Random Forest | +0.0074% | +0.0942% | 9/17 |
-| XGBoost | -0.0044% | +0.1838% | 11/17 |
-
-Random Forest has a small positive mean and 9 positive folds, while XGBoost has a positive median but a negative mean. Neither pattern establishes stable after-cost incremental value.
-
-Feature-attribution rankings also vary across methods. Coefficients, permutation importance, and SHAP summaries are model diagnostics, not causal estimates.
+Each fold starts at unit NAV, resets to cash, selects the top-ranked 20% of equities with equal weights and holds for one subsequent common session, paying a 10-bps initial L1 fee. Full liquidation costs and a continuous capital chain are absent. These means are not a 21-session investment backtest or multi-year compounded wealth. Stable incremental after-cost economic value has not been established. SHAP/permutation importance use different targets/samples and remain noncausal diagnostics.
 
 ## 6. Hypothesis Outcomes
 
@@ -191,35 +171,24 @@ Feature-attribution rankings also vary across methods. Coefficients, permutation
 | H1 | Inconclusive | Complete factor-level cost and multiplicity decision is not persisted |
 | H2 | Partially supported | Multifactor models improve in-sample adjusted R²; stable out-of-sample economic improvement is not established |
 | H3 | Inconclusive | Rolling evidence exists, but the complete original temporal-stability decision is absent |
-| H4 | Supported | Every higher cost setting reduces cumulative results |
+| H4 | Supported within the fixed simulation | Higher costs mechanically reduce cumulative results at identical weights |
 | H5 | Partially supported | Methods alter observed risk-return profiles; durable superiority is not established |
-| H6 | Not supported | All non-constant IC intervals include zero and economic gains are unstable |
+| H6 | Stable joint proposition unestablished | Some nominal positive forecast IC evidence exists, but stable incremental after-cost economic value is unestablished |
 | H7 | Not supported | Attribution rankings vary across methods and are noncausal |
 
 ## 7. Software Validation
 
-The current verified repository release records:
-
-- 301 passing tests;
-- 90.52% branch-aware coverage;
-- Ruff lint and formatting checks;
-- strict Mypy checks;
-- dependency-lock verification;
-- catalog/delivery validation;
-- Docker build verification;
-- dependency vulnerability audit.
-
-These checks support software correctness and reproducibility. They are not empirical evidence of investment performance.
+The accepted Phase 3 checkpoint recorded 372 passing full-suite tests, 90.62% coverage and 91 targeted tests. Its type, lint, format and lock checks passed. Those prior checks were not rerun for a documentation-only pass. Current document, table, equation, link and integrity checks are recorded separately in the final-correction evidence. Software assurance is not proof of complete PIT data, causality, dividend treatment or live investability. Historical original 301/90.52% assurance belongs to the archived release only.
 
 ## 8. Overall Conclusion
 
 The evidence supports a mixed conclusion:
 
-- the selected public-data panel supports broad point-in-time characteristic construction, subject to source-selection and early-breadth limitations;
+- the selected panel supports characteristic construction under recorded-day availability gates, with source selection, early breadth and unresolved historical capture/execution limitations;
 - multifactor specifications provide greater in-sample explanatory fit than CAPM on the project diagnostic portfolios;
 - portfolio methods materially alter observed risk and return characteristics;
 - higher assumed transaction costs reduce every cumulative portfolio result;
 - stable factor significance under H1 and temporal stability under H3 are not established under the original rules;
-- the current ML experiment does not establish stable predictive information or stable after-cost incremental value.
+- the ML experiment has qualified nominal forecast evidence but does not establish stable predictability or stable incremental after-cost economic value.
 
 The repository therefore reports bounded empirical evidence rather than a persistent-alpha claim.

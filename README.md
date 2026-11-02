@@ -1,6 +1,6 @@
 # Multi-Factor Asset Pricing & Portfolio Research Platform
 
-An independent US-equity research project combining point-in-time public data, factor construction, classical asset pricing, portfolio allocation, transaction-cost analysis, risk analytics, and walk-forward machine learning.
+An independent US-equity research project combining source-selected public data and point-in-time-oriented controls, factor construction, classical asset pricing, portfolio allocation, transaction-cost analysis, risk analytics, and walk-forward machine learning.
 
 ## Overview
 
@@ -10,22 +10,24 @@ The current study screens a broad public-data equity universe, constructs observ
 
 ## Main Results
 
+Numerical authority: [accepted correction commit f22f5cb](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit), with the [Phase 3 reconciliation](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md) and [Phase 2C matched-sample checks](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit/phase2c/PHASE2C_REGRESSION_VERIFICATION.md). The [final documentation candidate](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/research/institutional-final-documentation-corrections) is a research branch; corrected claims do not describe unmerged historical `main`.
+
 | Area | Current result |
 |---|---|
 | Universe | 822 securities screened; 487 accepted and 335 rejected |
 | Market data | 715,447 daily observations |
-| Point-in-time fundamentals | 37,273 observations |
-| Factors | 48 definitions; 47 estimable |
-| Asset pricing | Mean adjusted R²: CAPM 0.063; FF3 0.259; Carhart 4 0.277; FF5 0.301; configured q mapping 0.296 |
-| Portfolios | 8 long-only methods tested under 5/10/20 bps one-way cost assumptions |
-| ML design | 27,640 monthly decision observations across 91 months; 17 complete OOS folds |
-| ML conclusion | All aggregate IC confidence intervals include zero; stable after-cost incremental value is not established |
+| SEC-derived fundamentals | 37,273 observations; recorded availability controls, not exhaustive historical capture certification |
+| Factors | 48 names; 47 with nonmissing raw values; 41 quantile characteristics; 11,352 corrected quantile-cycle rows |
+| Asset pricing | Matched mean adjusted R²: CAPM 0.760818; FF3 0.802438; Carhart 4 0.811021; FF5 0.817658; q-style 0.814361 |
+| Portfolios | 8 long-only sleeve allocations; 31 complete cycles; 5/10/20 bps per absolute-traded-weight unit |
+| ML design | 27,632 rows; 89 common month ends; 15 dependent OOS folds; 7,286 held-out observations per family |
+| ML conclusion | Linear-family intervals nominally positive, RF crosses zero, XGBoost negative; stable incremental after-cost economic value remains unestablished |
 
 For the complete numerical summary and interpretation, see [docs/RESULTS.md](docs/RESULTS.md).
 
 ## Research Questions
 
-The pre-specified hypotheses evaluate whether:
+The hypotheses as worded in the supplied manuscript evaluate whether:
 
 1. at least one factor spread survives the complete pre-specified cost and multiplicity rule;
 2. multifactor models improve explanatory fit relative to CAPM and that improvement extends to stable out-of-sample economic evidence;
@@ -35,7 +37,7 @@ The pre-specified hypotheses evaluate whether:
 6. machine learning adds stable out-of-sample predictive and after-cost value; and
 7. explanation rankings remain stable across methods.
 
-Hypotheses are classified as supported, partially supported, unsupported, or inconclusive according to the pre-specified evaluation criteria.
+These are bounded historical propositions, not newly authenticated preregistration. H1/H3 remain inconclusive because original approval/direction and complete decision evidence are unavailable.
 
 ## Data and Universe
 
@@ -57,7 +59,7 @@ More detail is in [docs/DATA_AND_SOURCES.md](docs/DATA_AND_SOURCES.md).
 ```text
 Historical market data + listing/lifecycle evidence + SEC filings
                               ↓
-              point-in-time security and issuer mapping
+              recorded-day security and issuer mapping
                               ↓
                     822 candidates screened
                          487 accepted
@@ -85,15 +87,17 @@ The factor engine contains 48 configured definitions spanning market, size, valu
 
 ## Asset-Pricing Results
 
-Mean adjusted R² across 123 diagnostic portfolios per model:
+Matched per-asset comparison: 123 correlated dependent portfolios, 67–77 full trading cycles per asset and 615 primary regressions.
 
-| Model | Mean adjusted R² |
-|---|---:|
-| CAPM | 0.063 |
-| Fama-French 3 | 0.259 |
-| Carhart 4 | 0.277 |
-| Fama-French 5 | 0.301 |
-| Configured q mapping | 0.296 |
+| Model | Mean adjusted R² | Alpha (decimal return per full trading cycle) | Nominal HAC p < 0.05 |
+|---|---:|---:|---:|
+| CAPM | 0.760818 | -0.001658 | 8/123 |
+| Fama-French 3 | 0.802438 | -0.001967 | 12/123 |
+| Carhart 4 | 0.811021 | -0.001879 | 14/123 |
+| Fama-French 5 | 0.817658 | -0.002008 | 8/123 |
+| Study-specific q-style | 0.814361 | -0.002227 | 9/123 |
+
+Mean alphas are negative cycle returns, not annualized investment alpha. No primary intercept survives supplementary Holm adjustment; non-rejection does not establish exactly zero alpha. Internal proxies and six duplicate return-series pairs limit external pricing interpretation.
 
 The multifactor specifications provide greater in-sample explanatory fit than CAPM on these project portfolios. That result is not interpreted as proof of persistent alpha, causality, or future performance.
 
@@ -110,16 +114,16 @@ Eight long-only, fully invested methods are compared:
 - Hierarchical Risk Parity
 - CVaR
 
-The one-way transaction-cost assumptions are 5, 10, and 20 basis points. Over the available approximately 32-month factor-portfolio test window, higher costs reduce cumulative performance for every method.
+The modeled per-side rates are 5, 10 and 20 bps per unit of absolute L1 traded weight. Half-L1 one-way turnover is a separate quantity. Initial BASE deployment costs 10 bps; a full invested switch costs 20 bps. The evaluation spans 31 complete monthly trading cycles (exit labels 2024-02-01 to 2026-08-03), allocating to 123 constructed long-only quantile sleeves. Inner-sleeve execution and full market impact are not established.
 
 Selected 10 bps BASE results:
 
 | Method | Observed result |
 |---|---:|
-| Minimum Variance | Lowest annualized volatility: 10.00% |
-| Maximum Diversification | Smallest maximum drawdown: -5.43% |
-| Maximum Sharpe | Sharpe ratio: 1.575 |
-| CVaR | Highest cumulative return: 83.17%; Sharpe ratio: 1.667 |
+| Minimum Variance | Annualized volatility: 9.9505% |
+| Maximum Diversification | Corrected-path maximum drawdown: -4.8279% |
+| Maximum Sharpe | Sharpe ratio: 1.346360 |
+| CVaR | Cumulative net return: 73.6842%; Sharpe ratio: 1.252327 |
 
 These are descriptive results from a short factor-portfolio window. They do not establish persistent strategy superiority.
 
@@ -130,17 +134,17 @@ The ML study uses book-to-market and 12-minus-1 momentum to predict the next 21-
 The evaluation uses:
 
 - monthly decisions;
-- 60 monthly training periods;
+- expanding training starting at 60 calendar months and reaching 74;
 - 12 validation periods;
 - one test month per fold;
 - label purging;
 - a one-month embargo;
 - monthly retraining;
-- 17 complete out-of-sample folds.
+- 15 dependent complete out-of-sample folds; five of 14 adjacent test-target pairs overlap.
 
 Eight models are evaluated: zero and historical-mean baselines, factor composite, linear regression, Ridge, Elastic Net, Random Forest, and XGBoost.
 
-All aggregate bootstrap information-coefficient confidence intervals for non-constant models include zero. Random Forest has a very small positive mean after-cost fold return, but it is positive in only 9 of 17 folds. The study therefore does not establish stable incremental predictive or economic value from the ML models.
+Factor composite and linear use the same LinearRegression estimator and yield identical predictions. Their mean IC is 0.034430; Ridge 0.034434; Elastic Net 0.044609; Random Forest -0.002641; XGBoost -0.023285. Constant-baseline IC is undefined. Block-bootstrap intervals (100 resamples, block 3, seed 17) are exploratory: linear families are nominally positive, RF crosses zero and XGBoost is negative. These dependent, multiple-model comparisons do not establish stable predictability. The economic check selects 20% of equities, equal weights them and resets to cash for one subsequent session with initial fees; it is not a continuous 21-session investment strategy. Stable incremental after-cost economic value has not been established.
 
 ## Repository Structure
 
@@ -175,7 +179,7 @@ uv run mypy src
 uv lock --check
 ```
 
-The verified research release passed 301 tests with 90.52% branch-aware coverage. These software checks support reproducibility; they are not empirical evidence of investment performance.
+The accepted Phase 3 checkpoint passed 372 tests with 90.62% coverage, plus a 91-test targeted run. These are prior software assurance results; they were not rerun for this documentation pass and do not certify empirical validity, source vintage or investability.
 
 ## API and Dashboard
 
@@ -188,7 +192,7 @@ The API and Streamlit dashboard expose stored research outputs. They are researc
 
 ## Reproducibility
 
-The empirical release is identified by:
+The **historical original** empirical release is identified by:
 
 - tag: `project-complete-public-data-v1`
 - parallel research tag: `research-empirical-public-v1`
@@ -202,10 +206,12 @@ The principal limitations are:
 
 - source-availability selection and incomplete historical-universe coverage;
 - limited early cross-sectional breadth;
-- heterogeneous SEC accounting concepts and issuer reporting;
-- a roughly 32-month portfolio test window using factor portfolios rather than directly investable security portfolios;
+- incomplete exhaustive SEC capture chronology and issuer/share-class attribution;
+- frozen provider-vintage adjusted-quote returns with unverified complete dividend-inclusive comparability;
+- modeled close decisions and retrospective forecasts rather than verified historical fills or live timestamps;
+- 31 complete portfolio cycles using 123 synthetic sleeves rather than directly executable equity portfolios;
 - transaction costs modeled as sensitivity assumptions rather than measured executions;
-- two ML characteristics and 17 complete test folds;
+- two ML characteristics and 15 dependent test folds;
 - no stable after-cost ML improvement;
 - non-causal feature-importance and scenario outputs.
 
