@@ -1,24 +1,31 @@
 # Architecture
 
-## Research Flow
+## Research Dependencies
+
+The components share authenticated source inputs but **are not one linear chain of model outputs**. The asset-pricing analysis and portfolio evaluation use constructed factor/quantile portfolios; the ML experiment uses its own historical factor-score features, market labels and recorded fee context.
 
 ```text
-HF market data + Alpha Vantage lifecycle + SEC filings/XBRL + FRED/French
-                                   ↓
-                     security and issuer mapping
-                                   ↓
-                      point-in-time data panel
-                                   ↓
-                         factor construction
-                                   ↓
-                       asset-pricing models
-                                   ↓
-             portfolio construction + costs + risk
-                                   ↓
-                   purged walk-forward machine learning
-                                   ↓
-                       API / dashboard / reports
+Market bars + lifecycle evidence + SEC filings/XBRL + cash benchmark
+                              |
+                 Security/issuer mapping
+                              |
+            Recorded-availability research panels
+                              |
+               Factor scores and formations
+                    /         |          \
+                   /          |           \
+      Factor/quantile returns  |      ML features + market labels
+             |                |                 |
+      Asset-pricing tests     |       Purged walk-forward models
+             |                |                 |
+      Constructed sleeves ----+       One-session economic checks
+             |                                  |
+      Portfolio allocation and costs            |
+                    \                          /
+                     Research publications / API / dashboard
 ```
+
+The diagram depicts analytical dependencies, **not verified real-time data capture or executable orders**. In particular, ML does not consume estimated asset-pricing regression coefficients, and its accepted corrected publications retain their authenticated historical score/label and fee-context parents. The corrected portfolio experiment uses corrected quantile-return inputs. See [Methodology](METHODOLOGY.md), [Results](RESULTS.md), and [Reproducibility](REPRODUCIBILITY.md).
 
 ## Package Responsibilities
 
