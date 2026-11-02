@@ -12,7 +12,7 @@ The current study screens a broad public-data equity universe, constructs observ
 
 The [final candidate working paper](outputs/audit/final_correction/FINAL_CANDIDATE_MANUSCRIPT.pdf) is the accepted manuscript revision for author review, not a claim of journal acceptance. Its editable DOCX is controlled locally. [Author declarations remain pending](outputs/audit/final_correction/DEFERRED_AUTHOR_REVIEW.md).
 
-For review, start with the [methodology](docs/METHODOLOGY.md), [corrected results](docs/RESULTS.md), [permanent 50-issue tracker](docs/research_audit/MASTER_AUDIT_TRACKER.md), [final correction evidence](outputs/audit/final_correction/FINAL_CORRECTION_REPORT.md) and [repository release review](outputs/audit/final_release/FINAL_RELEASE_REVIEW.md).
+For review, start with the [methodology](docs/METHODOLOGY.md), [corrected results](docs/RESULTS.md), [audit evidence index](docs/research_audit/INDEX.md) and [permanent 50-issue tracker](docs/research_audit/MASTER_AUDIT_TRACKER.md), [final correction evidence](outputs/audit/final_correction/FINAL_CORRECTION_REPORT.md) and [repository release review](outputs/audit/final_release/FINAL_RELEASE_REVIEW.md).
 
 ## Main Results
 
@@ -62,28 +62,13 @@ More detail is in [docs/DATA_AND_SOURCES.md](docs/DATA_AND_SOURCES.md).
 
 ## Research Design
 
-```text
-Historical market data + listing/lifecycle evidence + SEC filings
-                              ↓
-              recorded-day security and issuer mapping
-                              ↓
-                    822 candidates screened
-                         487 accepted
-                              ↓
-                    factor construction
-                   48 defined / 47 estimable
-                              ↓
-          CAPM / FF3 / Carhart 4 / FF5 / q mapping
-                              ↓
-             8 constrained portfolio methods
-                  + 5/10/20 bps costs
-                              ↓
-              purged monthly walk-forward ML
-                              ↓
-                 results, risk and reporting
-```
+The security and factor panels support **separate, related research studies**, rather than a single pipeline where pricing coefficients feed portfolio optimization and ML.
 
-The analytical design and formulas are summarized in [docs/METHODOLOGY.md](docs/METHODOLOGY.md).
+- **Asset pricing:** constructed factor/quantile returns → matched-horizon CAPM, FF3, Carhart 4, FF5, and study-specific q-style regressions.
+- **Portfolio evaluation:** corrected quantile returns → eight constrained sleeve-allocation methods, modeled costs and risk accounting.
+- **Machine learning:** historical factor-score features and market labels → purged monthly forecasts → a separate one-session economic check.
+
+See the [research dependency diagram](docs/ARCHITECTURE.md) and [methodology](docs/METHODOLOGY.md) for the actual input lineages and timing assumptions.
 
 ## Factor Research
 
@@ -223,23 +208,19 @@ The principal limitations are:
 
 See [docs/LIMITATIONS.md](docs/LIMITATIONS.md) for the full discussion.
 
-## Finance-Professor Review: Interpretation and Boundaries
+## Interpretation and Research Limitations
 
-These points address common methodological questions about the **existing** experiment; they are not claims of new robustness tests.
+The corrected results establish internal empirical calculations—not historical universe completeness, dividend-inclusive total returns, executable close prices, independent market-wide factor pricing, or persistent strategy alpha. The test portfolios share constituents and six return-series pairs; a 109-asset self-inclusion sensitivity does not establish external independence. The q-style earnings-yield characteristic is not accounting ROE. Negative fitted alphas are compatible with high adjusted R², and Holm non-rejections do not prove zero true alpha.
 
-- **Security selection and historical data.** The 487 accepted securities are from 822 provider-supplied candidates, not the entire historical US market. Missing delisted firms, incomplete SEC capture chronology, listing/share-class mapping, and unverified complete dividend-inclusive adjustments limit generalization. The system enforces recorded-day availability checks; it does not certify same-close tradability or live fills.
-- **Pricing fit and factor independence.** FF5's mean adjusted R² of 0.817658 is a matched-sample *internal explanatory-fit* statistic on constructed test portfolios. Six return-series pairs are duplicated, constituent exposures overlap, and some quantiles contain one security. The 109-asset constituent-exclusion diagnostic helps inspect self-inclusion but does not supply an independent external validation. The study-specific q-style earnings-yield proxy is not accounting ROE or an exact Hou–Xue–Zhang factor replication. Negative mean regression intercepts are compatible with high adjusted R²; no tested intercept survives supplementary Holm adjustment, which is not proof of zero true alpha.
-- **Portfolio accounting and generalization.** Eight methods allocate to 123 constructed sleeves, rather than directly trading 487 stocks. The verified 5/10/20 bps assumptions apply per **absolute traded-weight (L1) unit**: one-way turnover is half L1, initial BASE deployment costs 10 bps, and a fully invested switch costs 20 bps. The 73.6842% CVaR cumulative net result and 31-cycle strategy rankings are descriptive; underlying constituent trading costs, capacity and actual execution remain unverified. Historical 95% VaR/expected-shortfall summaries use only two tail observations.
-- **Forecasts versus investment tests.** The statistical ML target spans 21 complete sessions, but the economic comparison selects the top-ranked 20% and holds for **one subsequent session**, resetting capital each fold. Fifteen test folds have dependent future labels; five adjacent test-target pairs overlap. Linear and factor-composite predictions coincide because they use the same estimator. XGBoost has negative mean rank IC despite a positive one-session selected-portfolio mean: these measure different outcomes and do not imply a contradiction. The 100-resample IC intervals are exploratory, not evidence of stable economic alpha.
-- **Hypotheses and reproducibility.** H1/H3 remain inconclusive because complete original decision authority is absent. Exact empirical reproduction requires lawfully held frozen input data and source manifests that cannot all be redistributed. Corrected values supersede historical numerical interpretations without retroactively changing historical evidence.
+Portfolio allocations use 123 constructed sleeves over 31 cycles; 5/10/20 bps costs are applied per absolute L1 traded-weight unit (a fully invested switch at BASE costs 20 bps), without verified inner-sleeve execution costs. The ML statistical target spans 21 sessions, while the separate investment diagnostic covers one following session with capital reset; 15 overlapping folds and 100 bootstrap replications constrain inference. H1/H3 remain inconclusive without complete original decision evidence.
 
-For derivations, sources and limitations, use [Methodology](docs/METHODOLOGY.md), [Results](docs/RESULTS.md), [Data and Sources](docs/DATA_AND_SOURCES.md), [Limitations](docs/LIMITATIONS.md), and [Research Architecture](docs/ARCHITECTURE.md).
+The detailed, non-duplicated research caveats are in [Limitations](docs/LIMITATIONS.md); definitions and derivations are in [Methodology](docs/METHODOLOGY.md), [Results](docs/RESULTS.md) and [Reproducibility](docs/REPRODUCIBILITY.md). For the historical verification trail, consult the [audit evidence index](docs/research_audit/INDEX.md).
 
 ## Release and Software Citation Context
 
 The `CITATION.cff` release date of **2026-08-27** identifies the *historical software-release metadata*; it is not the date of the November 2026 corrected working-paper candidate. The current manuscript revision and its separate content hash are documented in the [final correction manifest](outputs/audit/final_correction/FINAL_DOCUMENT_CHECKSUMS.json). No new software release or tag is implied.
 
-The last inspected PR [#9](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/pull/9) was **not merged** because the dependency security audit reported advisories for locked `certifi` and Pillow. Resolve and validate the lockfile using the existing dependency resolver and security gate before merging; do not suppress advisories or change finance results. The authoritative status is the live PR/CI, not this dated note.
+The validated corrections and documentation were merged through [PR #10](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/pull/10) and [PR #9](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/pull/9). The [2 November 2026 main-branch CI run](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/actions/runs/41489336229) passed validation and Docker checks, including the dependency security gate. This records a historical passing audit, not a guarantee of future vulnerability-free dependencies. Manuscript author declarations still require personal signoff.
 
 ## License and Citation
 
