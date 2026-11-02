@@ -15,13 +15,15 @@ constraints:
   exposure_limits: {}
   liquidity_trade_limits: {}
 costs:
-  # Fixed before comparing the reported portfolio performance results.
-  # Sensitivity totals are LOW/BASE/HIGH = 5/10/20 one-way bps.
-  # Reported BASE decomposition: 5 bps spread + 2 bps slippage
-  # + 3 bps fixed-impact allowance = 10 bps one way.
-  # The engine charges half of spread_bps; the 2 bps slippage and
-  # 3 bps fixed-impact allowance are bundled in slippage_bps.
-  # Nonlinear market impact remains disabled.
+  # Prespecified LOW/BASE/HIGH total costs: 5/10/20 bps per unit
+  # of absolute traded weight (L1 = sum(abs(target - pretrade))).
+  # One-way turnover = L1/2; it is NOT the fee multiplier in the engine.
+  # BASE: 10 bps full quoted spread (5 bps half-spread per traded
+  # weight unit) plus 5 bps in slippage_bps, comprising a modeled
+  # 2 bps slippage and 3 bps fixed impact allowance.
+  # Thus initial deployment at BASE costs 10 bps of NAV; a full
+  # switch (sell weight 1 and buy weight 1, L1=2) costs 20 bps.
+  # No empirical market-impact calibration or nonlinear impact is used.
   commission_bps: 0.0
   spread_bps: 10.0
   slippage_bps: 5.0
