@@ -8,9 +8,15 @@ This project studies how point-in-time data quality, factor construction, asset-
 
 The current study screens a broad public-data equity universe, constructs observable characteristics, compares standard asset-pricing specifications, evaluates constrained portfolio methods, and tests whether simple machine-learning models add stable out-of-sample information. The results are mixed rather than uniformly positive: multifactor models fit the project portfolios better than CAPM in-sample, transaction costs matter, portfolio methods produce different risk-return trade-offs, and the machine-learning study does not establish stable incremental value.
 
+## Research Paper and Audit Trail
+
+The [final candidate working paper](outputs/audit/final_correction/FINAL_CANDIDATE_MANUSCRIPT.pdf) is the accepted manuscript revision for author review, not a claim of journal acceptance. Its editable DOCX is controlled locally. [Author declarations remain pending](outputs/audit/final_correction/DEFERRED_AUTHOR_REVIEW.md).
+
+For review, start with the [methodology](docs/METHODOLOGY.md), [corrected results](docs/RESULTS.md), [permanent 50-issue tracker](docs/research_audit/MASTER_AUDIT_TRACKER.md), [final correction evidence](outputs/audit/final_correction/FINAL_CORRECTION_REPORT.md) and [repository release review](outputs/audit/final_release/FINAL_RELEASE_REVIEW.md).
+
 ## Main Results
 
-Numerical authority: [accepted correction commit f22f5cb](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit), with the [Phase 3 reconciliation](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md) and [Phase 2C matched-sample checks](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit/phase2c/PHASE2C_REGRESSION_VERIFICATION.md). The [final documentation candidate](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/research/institutional-final-documentation-corrections) is a research branch; corrected claims do not describe unmerged historical `main`.
+Numerical authority: [accepted correction commit f22f5cb](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit), with the [Phase 3 reconciliation](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md) and [Phase 2C matched-sample checks](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit/phase2c/PHASE2C_REGRESSION_VERIFICATION.md). The [accepted documentation and candidate manuscript](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/028dfd9cd18bcd6ef8114d829cc789d5bffacc61) preserve the interpretation of these results. Original releases are historical records.
 
 | Area | Current result |
 |---|---|
@@ -179,7 +185,7 @@ uv run mypy src
 uv lock --check
 ```
 
-The accepted Phase 3 checkpoint passed 372 tests with 90.62% coverage, plus a 91-test targeted run. These are prior software assurance results; they were not rerun for this documentation pass and do not certify empirical validity, source vintage or investability.
+Fresh release tests and CI are recorded in the [release validation record](outputs/audit/final_release/FINAL_TEST_AND_CI_RESULTS.txt). The historical Phase 3 checkpoint passed 372 tests with 90.62% coverage, plus a 91-test targeted run. Software assurance does not certify empirical validity, source vintage or investability.
 
 ## API and Dashboard
 
