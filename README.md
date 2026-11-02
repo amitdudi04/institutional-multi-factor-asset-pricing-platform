@@ -223,6 +223,24 @@ The principal limitations are:
 
 See [docs/LIMITATIONS.md](docs/LIMITATIONS.md) for the full discussion.
 
+## Finance-Professor Review: Interpretation and Boundaries
+
+These points address common methodological questions about the **existing** experiment; they are not claims of new robustness tests.
+
+- **Security selection and historical data.** The 487 accepted securities are from 822 provider-supplied candidates, not the entire historical US market. Missing delisted firms, incomplete SEC capture chronology, listing/share-class mapping, and unverified complete dividend-inclusive adjustments limit generalization. The system enforces recorded-day availability checks; it does not certify same-close tradability or live fills.
+- **Pricing fit and factor independence.** FF5's mean adjusted R² of 0.817658 is a matched-sample *internal explanatory-fit* statistic on constructed test portfolios. Six return-series pairs are duplicated, constituent exposures overlap, and some quantiles contain one security. The 109-asset constituent-exclusion diagnostic helps inspect self-inclusion but does not supply an independent external validation. The study-specific q-style earnings-yield proxy is not accounting ROE or an exact Hou–Xue–Zhang factor replication. Negative mean regression intercepts are compatible with high adjusted R²; no tested intercept survives supplementary Holm adjustment, which is not proof of zero true alpha.
+- **Portfolio accounting and generalization.** Eight methods allocate to 123 constructed sleeves, rather than directly trading 487 stocks. The verified 5/10/20 bps assumptions apply per **absolute traded-weight (L1) unit**: one-way turnover is half L1, initial BASE deployment costs 10 bps, and a fully invested switch costs 20 bps. The 73.6842% CVaR cumulative net result and 31-cycle strategy rankings are descriptive; underlying constituent trading costs, capacity and actual execution remain unverified. Historical 95% VaR/expected-shortfall summaries use only two tail observations.
+- **Forecasts versus investment tests.** The statistical ML target spans 21 complete sessions, but the economic comparison selects the top-ranked 20% and holds for **one subsequent session**, resetting capital each fold. Fifteen test folds have dependent future labels; five adjacent test-target pairs overlap. Linear and factor-composite predictions coincide because they use the same estimator. XGBoost has negative mean rank IC despite a positive one-session selected-portfolio mean: these measure different outcomes and do not imply a contradiction. The 100-resample IC intervals are exploratory, not evidence of stable economic alpha.
+- **Hypotheses and reproducibility.** H1/H3 remain inconclusive because complete original decision authority is absent. Exact empirical reproduction requires lawfully held frozen input data and source manifests that cannot all be redistributed. Corrected values supersede historical numerical interpretations without retroactively changing historical evidence.
+
+For derivations, sources and limitations, use [Methodology](docs/METHODOLOGY.md), [Results](docs/RESULTS.md), [Data and Sources](docs/DATA_AND_SOURCES.md), [Limitations](docs/LIMITATIONS.md), and [Research Architecture](docs/ARCHITECTURE.md).
+
+## Release and Software Citation Context
+
+The `CITATION.cff` release date of **2026-08-27** identifies the *historical software-release metadata*; it is not the date of the November 2026 corrected working-paper candidate. The current manuscript revision and its separate content hash are documented in the [final correction manifest](outputs/audit/final_correction/FINAL_DOCUMENT_CHECKSUMS.json). No new software release or tag is implied.
+
+The last inspected PR [#9](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/pull/9) was **not merged** because the dependency security audit reported advisories for locked `certifi` and Pillow. Resolve and validate the lockfile using the existing dependency resolver and security gate before merging; do not suppress advisories or change finance results. The authoritative status is the live PR/CI, not this dated note.
+
 ## License and Citation
 
 Original code and documentation are licensed under the [MIT License](LICENSE). Third-party datasets remain subject to their own licenses and terms.
