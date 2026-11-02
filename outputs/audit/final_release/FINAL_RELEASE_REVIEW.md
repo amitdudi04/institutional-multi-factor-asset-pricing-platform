@@ -1,3 +1,51 @@
+# Dependency-security maintenance checkpoint
+
+This entry supersedes the earlier dependency-blocked checkpoint **for the freshly tested local environment only**. PR10 and PR9 still require successful checks at their actual heads before merging. Their live merge records are the authority for eventual main integration.
+
+Exact starting maintenance branch `maintenance/final-review-explanations`, commit `a2d4bb92faea6d7e351aade4944642f2c555697b`. Existing README and architecture corrections are preserved exactly. The dependency commit is the containing commit of this entry. No financial source/configuration/model/manuscript/output change.
+
+## Resolver and compatibility
+
+Ran `uv lock --upgrade-package certifi --upgrade-package pillow`. Certifi advanced but Pillow remained12.3.0: locked Streamlit1.61.1 requires `pillow<13`. PyPI metadata for1.62/1.63/1.64/1.65 retains that cap. The1.66family permits `pillow<14`; selected latest patch1.66.1. Then ran `uv lock --upgrade-package certifi --upgrade-package pillow --upgrade-package "streamlit==1.66.1"`. No dependency overrides, manual lock hashes, pyproject edits or advisory exclusions.
+
+|Package|Old|Verified new|
+|---|---|---|
+|certifi|2026.7.22|2026.10.23|
+|Pillow|12.3.0|13.0.0|
+|Streamlit (necessary Pillow constraint update)|1.61.1|1.66.1|
+
+Resolver removed four now-unused Streamlit dependencies: blinker1.9.0,httptools0.8.0,tenacity9.1.4,toml0.10.2. No other retained package record changed. NumPy,pandas,SciPy,scikit-learn,statsmodels,XGBoost,SHAP,PyArrow and other numerical packages remain identical. The new lock has92 platform-universal package records rather than96; local installed environment has88distributions including the editable project. Removed modules have no direct imports in project source/tests.
+
+Project `requires-python >=3.11` unchanged. Certifi metadata requires>=3.7;Pillow13 andStreamlit1.66.1 require>=3.11 and supply compatible metadata/wheels. Universal uv resolution, `uv lock --check` and `uv pip check` pass. Metadata requirements accept3.11–3.15; full local runtime validation is Python3.12.13 on Windows, not a claim of full tests on every Python version. Linux/container compatibility is additionally gated by existing CI. Full source/package metadata: [certifi](https://pypi.org/pypi/certifi/2026.10.23/json), [Pillow](https://pypi.org/pypi/pillow/13.0.0/json), [old Streamlit cap](https://pypi.org/pypi/streamlit/1.61.1/json), [selected Streamlit](https://pypi.org/pypi/streamlit/1.66.1/json).
+
+## Fresh test and advisory results
+
+`uv sync --frozen --all-groups` PASS; no dependency-resolution incompatibilities. Fresh suite: **372 passed, 105 warnings in 443.06s (0:07:23)**. Coverage gate90% PASS; exact coverage is in the full output below. Ruff lint/format,mypy,configuration,delivery,imports/Pillow smoke,lock and installed dependency consistency all PASS. Full existing372-test suite executed once for this maintenance environment with an external warning recorder, which changes no warning filters or source/tests.
+
+`uvx pip-audit --path .venv/Lib/site-packages --skip-editable --format json --output ../dependency_maintenance/pip_audit.json`: exit0, **no known vulnerabilities**,87third-party distributions audited; only the editable project skipped. All selected certifi/Pillow/Streamlit entries have empty vulnerability arrays. Their version-specific PyPI advisory arrays are also empty. This closes the reported advisories at the current database snapshot, not a guarantee against future discoveries. The previous41finding rows were not41unique advisories; its duplicate certifi entry is retained in historical evidence.
+
+Lock SHA256 `ec5d9cbce46ebaf16cf1c8b4b095893c8318ef1831b355d983895cd7bf6bbd86`. Local audit JSON SHA256 `0be930b40b6d52ea7b6dbfc9865aa5aa90968b58f8cf6b975a71d537430a8ed0`; complete package/advisory receipt is embedded in the validation text. No financial experiments, original input downloads, empirical refits or publication regeneration occurred. Accepted financial outputs remain bound to their historical source/environment identities; this dependency-maintenance environment is not relabeled as their original vintage.
+
+## All105warnings reviewed
+
+|Warning|Count|Assessment|Action in this pass|
+|---|---:|---|---|
+|scipy.stats.ConstantInputWarning via pandas nanops|102|Expected undefined rank correlation for constant predictions/small synthetic test slices; 98 in ML tests and4 in the connected-platform fixture. Baseline/undefined-IC cases remain explicit; not105 statistical model failures.|Retained; no global suppression or manufactured finite IC.|
+|sklearn UserWarning: minority class has4 or3 members versus5 splits|2|Both from the existing small synthetic sigmoid-calibration test, which verifies validation-only calibration and bounded probabilities. Low-support fixture behavior, not a production sample-size assurance.|Disclose; real classification use must check class support. No change to models/config or fixture in this security-only pass.|
+|StarletteDeprecationWarning: httpx TestClient path deprecated|1|Actionable future test-client dependency migration. Pre-existing; FastAPI/Starlette/httpx records are unchanged by this update.|Record follow-up outside certifi/Pillow scope; do not add httpx2 or suppress warnings.|
+
+All105 recorded warning events were counted by category/message and test node, not dismissed as one generic category. Existing undefined-correlation behavior, tiny classification fixtures and an actionable deprecation are distinguished. No global suppression/filter change or test weakening. Existing `ml/evaluation.py::_correlation` preserves unavailable constant IC; the pandas diagnostic warning path is retained.
+
+## Scope and merge gates
+
+Changes from `a2d4bb92faea6d7e351aade4944642f2c555697b` are restricted to `uv.lock` and append-only maintenance receipts in `FINAL_RELEASE_REVIEW.md`, `FINAL_TEST_AND_CI_RESULTS.txt`, `FINAL_MERGE_READINESS.md`. README,docs/ARCHITECTURE,pyproject,source,tests,configurations,50-IDtracker,manuscript and all other prior evidence/publications are unchanged. R5 stays resolved;M1/M2/R6 pending personal author confirmation.
+
+PR10 →release branch only after final-head validate/docker and review gates pass. Then revalidate PR9 at the updated release head before normal merge to main. No forced merge, squash of phase history, branch deletion, new release/tag or SSRN submission. Actual merge SHAs and final CI are recorded on the live PRs and controlled final delivery after they exist.
+
+---
+
+## Historical release checkpoint (preserved)
+
 # Final repository release review
 
 This is the committed **pre-merge checkpoint**, not a claim that a pending PR has merged. Final branch SHA is the containing release-preparation commit. The [PR9 merge record](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/pull/9) gives the actual final outcome, merge SHA and checks; the final controlled delivery report records post-merge verification without rewriting this historical checkpoint. A commit cannot contain its own SHA or its future GitHub merge SHA.
