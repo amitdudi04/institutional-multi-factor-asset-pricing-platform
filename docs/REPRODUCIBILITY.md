@@ -33,18 +33,17 @@ Third-party raw data are not redistributed through this repository.
 
 ## Research Order
 
-A reproduction should follow the analytical dependency order:
+A reproduction first restores the common evidence and then evaluates three related research components. The asset-pricing, portfolio and machine-learning analyses do not form a single sequence of model outputs:
 
-1. validate configuration;
-2. acquire or restore the required source evidence;
-3. build security/issuer mappings and market/fundamental inputs under the recorded availability controls;
-4. construct factors;
-5. estimate asset-pricing models;
-6. run portfolio/cost/scenario analysis;
-7. run the temporal ML experiment;
-8. verify delivery/reporting outputs.
+1. Validate configuration and restore the required source evidence.
+2. Build security/issuer mappings and market/fundamental inputs under the recorded availability controls.
+3. Construct the relevant factor scores, portfolio returns and historical features.
+4. Run the asset-pricing regressions using the matched holding-period research panel.
+5. Independently evaluate portfolio allocation, transaction costs and scenarios using the documented quantile-return inputs.
+6. Independently run the temporal machine-learning study using its historical features and labels.
+7. Verify the associated outputs and research reporting.
 
-Later stages should not be run against a different upstream data identity while being described as the same empirical release.
+These analyses share documented source inputs but must retain their respective timing and publication identities. Outputs from different data vintages must not be presented as the same empirical release.
 
 ## Key Frozen Research Settings
 
