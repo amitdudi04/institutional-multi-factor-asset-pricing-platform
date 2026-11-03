@@ -8,15 +8,15 @@ This project studies how point-in-time data quality, factor construction, asset-
 
 The current study screens a broad public-data equity universe, constructs observable characteristics, compares standard asset-pricing specifications, evaluates constrained portfolio methods, and tests whether simple machine-learning models add stable out-of-sample information. The results are mixed rather than uniformly positive: multifactor models fit the project portfolios better than CAPM in-sample, transaction costs matter, portfolio methods produce different risk-return trade-offs, and the machine-learning study does not establish stable incremental value.
 
-## Research Paper and Audit Trail
+## Working Paper and Research Documentation
 
 The [final candidate working paper](outputs/audit/final_correction/FINAL_CANDIDATE_MANUSCRIPT.pdf) is the accepted manuscript revision for author review, not a claim of journal acceptance. Its editable DOCX is controlled locally. [Author declarations remain pending](outputs/audit/final_correction/DEFERRED_AUTHOR_REVIEW.md).
 
-For review, start with the [methodology](docs/METHODOLOGY.md), [corrected results](docs/RESULTS.md), [audit evidence index](docs/research_audit/INDEX.md) and [permanent 50-issue tracker](docs/research_audit/MASTER_AUDIT_TRACKER.md), [final correction evidence](outputs/audit/final_correction/FINAL_CORRECTION_REPORT.md) and [repository release review](outputs/audit/final_release/FINAL_RELEASE_REVIEW.md).
+The principal research documents are the [methodology](docs/METHODOLOGY.md), [results](docs/RESULTS.md), [limitations](docs/LIMITATIONS.md), and [reproducibility guide](docs/REPRODUCIBILITY.md). Supporting numerical verification and development history are available through the [research evidence index](docs/research_audit/INDEX.md).
 
 ## Main Results
 
-Numerical authority: [accepted correction commit f22f5cb](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit), with the [Phase 3 reconciliation](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md) and [Phase 2C matched-sample checks](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit/phase2c/PHASE2C_REGRESSION_VERIFICATION.md). The [accepted documentation and candidate manuscript](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/028dfd9cd18bcd6ef8114d829cc789d5bffacc61) preserve the interpretation of these results. Original releases are historical records.
+The table summarizes the corrected research results. Detailed definitions, matched-sample comparisons, and numerical qualifications are in [Research Results](docs/RESULTS.md). Historical releases are retained separately and should not be confused with the corrected findings.
 
 | Area | Current result |
 |---|---|
