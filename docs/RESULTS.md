@@ -46,7 +46,7 @@ The panel is selected by source availability and research eligibility. It is not
 | Complete quantile-cycle rows | 11,352 |
 | Singleton quantile-cycle observations | 956 / 11,352 |
 
-Counts have different denominators; 48 names are not independent exposures. Singleton rows are single-stock quantile exposures, not diversified portfolios or 956 unique securities. The corrected factor publication is `factor-4ddee9ac6fb45cedfd62a2cc68676b58`. Its delayed-close endpoint experiment replaces the historical original 11,545 rows; 195 of 265 flagged historical groups have valid interior-gap chains, while 70 lack old intended endpoints. Those unavailable observations are not claimed repaired. `equity_issuance` remains missing rather than imputed.
+Counts have different denominators; 48 names are not independent exposures. Singleton rows are single-stock quantile exposures, not diversified portfolios or 956 unique securities. The corresponding versioned factor-publication identifier is retained in the [research source manifest](../outputs/audit/phase3/PHASE3_SOURCE_MANIFEST.json). Its delayed-close endpoint experiment replaces the historical original 11,545 rows; 195 of 265 flagged historical groups have valid interior-gap chains, while 70 lack old intended endpoints. Those unavailable observations are not claimed repaired. `equity_issuance` remains missing rather than imputed.
 
 ## 3. Asset-Pricing Results
 
