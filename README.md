@@ -170,7 +170,7 @@ uv run mypy src
 uv lock --check
 ```
 
-Fresh release tests and CI are recorded in the [release validation record](outputs/audit/final_release/FINAL_TEST_AND_CI_RESULTS.txt). The historical Phase 3 checkpoint passed 372 tests with 90.62% coverage, plus a 91-test targeted run. Software assurance does not certify empirical validity, source vintage or investability.
+Fresh release tests and CI are recorded in the [release validation record](outputs/audit/final_release/FINAL_TEST_AND_CI_RESULTS.txt). The documented verification checkpoint passed 372 tests with 90.62% coverage, plus a 91-test targeted run. Software assurance does not certify empirical validity, source vintage or investability.
 
 ## API and Dashboard
 
@@ -187,7 +187,6 @@ The **historical original** empirical release is identified by:
 
 - tag: `project-complete-public-data-v1`
 - parallel research tag: `research-empirical-public-v1`
-- commit: `5a3e930665756fa7aaedeceb5f9ab90792bcf849`
 
 Exact empirical reproduction requires lawful access to the same third-party source data, mappings, configuration, and locked environment. See [docs/REPRODUCIBILITY.md](docs/REPRODUCIBILITY.md).
 
