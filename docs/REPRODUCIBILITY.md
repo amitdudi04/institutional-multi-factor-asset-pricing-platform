@@ -2,7 +2,7 @@
 
 ## Release Identity
 
-Numerical authority: [accepted correction commit f22f5cb](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit), with the [Phase 3 reconciliation](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md) and [Phase 2C matched-sample checks](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit/phase2c/PHASE2C_REGRESSION_VERIFICATION.md). The [accepted documentation and candidate manuscript](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/028dfd9cd18bcd6ef8114d829cc789d5bffacc61) preserve the interpretation of these results. Original releases are historical records.
+The current results are supported by the documented validation and reconciliation evidence. Exact historical identifiers remain in the research manifests linked from the [research evidence index](research_audit/INDEX.md).
 
 Current corrected results follow the accepted research lineage pinned above. The final-candidate PDF and cross-document claim/checksum matrices are in [outputs/audit/final_correction](../outputs/audit/final_correction/); the editable DOCX is private author delivery.
 
@@ -12,9 +12,8 @@ The empirical research release is identified by:
 
 - `project-complete-public-data-v1`
 - `research-empirical-public-v1`
-- commit `5a3e930665756fa7aaedeceb5f9ab90792bcf849`
 
-These identifiers refer only to the historical original experiment. Current tables use the accepted corrected factor `factor-4ddee9ac6fb45cedfd62a2cc68676b58`, matched primary pricing `asset-pricing-d60bee7310b34976c80372a0f0f29e21`, separate supplementary pricing `asset-pricing-8c2396179c4b509796b2cab043ec31d2`, and the 24 portfolio/eight final ML identities enumerated in the [pinned Phase 3 manifest](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit/phase3/PHASE3_SOURCE_MANIFEST.json). Historical intermediates are not final publications. ML retains its actual raw-score/market and original fee-context parents, not corrected quantile returns it never consumes.
+These tags refer to the historical original experiment, not the corrected results. The exact factor, asset-pricing, portfolio, and machine-learning publication identifiers are retained in the [research source manifest](../outputs/audit/phase3/PHASE3_SOURCE_MANIFEST.json) for technical verification. Historical intermediate results are not the final reported findings. The machine-learning experiment retains its actual historical feature, label and cost inputs rather than using the corrected quantile returns from the separate portfolio study.
 
 ## Environment
 
