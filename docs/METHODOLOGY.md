@@ -4,20 +4,26 @@
 
 Numerical authority: [accepted correction commit f22f5cb](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit), with the [Phase 3 reconciliation](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md) and [Phase 2C matched-sample checks](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit/phase2c/PHASE2C_REGRESSION_VERIFICATION.md). The [accepted documentation and candidate manuscript](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/028dfd9cd18bcd6ef8114d829cc789d5bffacc61) preserve the interpretation of these results. Original releases are historical records.
 
-The project follows a one-way research sequence:
+The project follows a one-way data-provenance process with three separate, related empirical analyses. Asset-pricing coefficients do not feed the portfolio-allocation or machine-learning experiments, and the machine-learning models do not consume estimated asset-pricing coefficients.
 
 ```text
-source data
-  → recorded-day security and issuer identity controls
-  → universe screening
-  → factor construction
-  → asset-pricing estimation
-  → portfolio construction and cost analysis
-  → walk-forward machine learning
-  → research reporting
+Source market, lifecycle and SEC filing evidence
+                  |
+Recorded-day security and issuer identity controls
+                  |
+       Research panels and factor scores
+            /           \
+   Quantile returns   ML features and market labels
+      /       \                    |
+Asset-pricing  Portfolio      Purged walk-forward
+regressions    allocation     model evaluation
+               and costs           |
+                            One-session economic check
+      \          |              /
+         Research reporting
 ```
 
-Later stages consume earlier outputs but do not change the historical data used to create them. Reported settings, including transaction-cost cases and temporal ML splits, are bound to their publication versions. Missing original H1/H3 approval and decision records do not establish preregistration.
+Each analysis uses its documented historical inputs and timing rules; later reporting does not retroactively alter those inputs. Reported settings, including transaction-cost cases and temporal ML splits, are bound to their publication versions. Missing original H1/H3 approval and decision records do not establish preregistration. For the dependency diagram, see [Architecture](ARCHITECTURE.md).
 
 ## 2. Universe Construction
 
