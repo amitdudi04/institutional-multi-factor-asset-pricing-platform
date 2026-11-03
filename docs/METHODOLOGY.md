@@ -2,7 +2,7 @@
 
 ## 1. Research Design
 
-Numerical authority: [accepted correction commit f22f5cb](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit), with the [Phase 3 reconciliation](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md) and [Phase 2C matched-sample checks](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit/phase2c/PHASE2C_REGRESSION_VERIFICATION.md). The [accepted documentation and candidate manuscript](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/028dfd9cd18bcd6ef8114d829cc789d5bffacc61) preserve the interpretation of these results. Original releases are historical records.
+This document describes the methodology used for the corrected empirical study. For the underlying validation records and historical specification changes, see the [research evidence index](research_audit/INDEX.md).
 
 The project follows a one-way data-provenance process with three separate, related empirical analyses. Asset-pricing coefficients do not feed the portfolio-allocation or machine-learning experiments, and the machine-learning models do not consume estimated asset-pricing coefficients.
 
