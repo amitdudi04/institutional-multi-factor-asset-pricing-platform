@@ -15,7 +15,7 @@ constraints:
   exposure_limits: {}
   liquidity_trade_limits: {}
 costs:
-  # Prespecified LOW/BASE/HIGH total costs: 5/10/20 bps per unit
+  # Configured LOW/BASE/HIGH modeled total costs: 5/10/20 bps per unit
   # of absolute traded weight (L1 = sum(abs(target - pretrade))).
   # One-way turnover = L1/2; it is NOT the fee multiplier in the engine.
   # BASE: 10 bps full quoted spread (5 bps half-spread per traded
