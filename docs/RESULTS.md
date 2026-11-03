@@ -1,6 +1,6 @@
 # Research Results
 
-This is the corrected current numerical summary. Numerical authority: [accepted correction commit f22f5cb](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit), with the [Phase 3 reconciliation](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit/phase3/PHASE3_COMPLETE_VALIDATION.md) and [Phase 2C matched-sample checks](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/f22f5cbe365e98c8d5fef6b5308ff765703df173/outputs/audit/phase2c/PHASE2C_REGRESSION_VERIFICATION.md). The [accepted documentation and candidate manuscript](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/tree/028dfd9cd18bcd6ef8114d829cc789d5bffacc61) preserve the interpretation of these results. Original releases are historical records. Historical original results remain preserved in [the Phase 4 baseline version](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/blob/7726cec06fc75ea0a1858842d0f6a761c162fe12/docs/RESULTS.md), explicitly separate from the current tables.
+This document presents the corrected empirical results. The [research evidence index](research_audit/INDEX.md) identifies the supporting numerical reconciliations and earlier historical versions; results from those versions should not be substituted for the current figures.
 
 ## 1. Universe and Data
 
