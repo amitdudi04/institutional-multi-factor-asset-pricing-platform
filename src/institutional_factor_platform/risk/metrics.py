@@ -130,9 +130,7 @@ def risk_summary(
         raise DataQualityError("Risk-free returns must be exactly aligned")
 
     cash = (
-        risk_free
-        if isinstance(risk_free, pd.Series)
-        else pd.Series(risk_free, index=returns.index)
+        risk_free if isinstance(risk_free, pd.Series) else pd.Series(risk_free, index=returns.index)
     )
     values = _values(returns)
     benchmark_values = _values(benchmark)

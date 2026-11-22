@@ -8,7 +8,7 @@ The multifactor regressions fit the study portfolios better than CAPM. The portf
 
 ## Data and research design
 
-The study screened **822 equities**, retained **487** and excluded **335**. The retained data include **715,447 daily market observations** and **37,273 SEC-derived fundamental observations**. The sample depends on source availability and screening rules. Public sources include the HF Data Library, SEC EDGAR, Alpha Vantage and FRED. The Kenneth French Data Library provides a reference for factor definitions, and SPY serves as a broad U.S. equity benchmark.
+The study screened **822 candidate securities**, retained **487** and excluded **335**. The retained data include **715,447 daily market observations** and **37,273 SEC-derived fundamental observations**. The sample depends on source availability and screening rules. Public sources include the HF Data Library, SEC EDGAR, Alpha Vantage and FRED. The Kenneth French Data Library provides a reference for factor definitions, and SPY serves as a broad U.S. equity benchmark.
 
 The factor engine defines **48 characteristics and return series**, of which **47** have usable raw observations. The available SEC evidence could not support a consistent equity-issuance measure, so it remains missing. The corrected quantile-return sample contains **11,352 complete portfolio-cycle observations** across 41 sorting characteristics and 123 portfolio series. Availability controls use recorded data dates, with incomplete evidence for the original timing of every filing capture.
 
