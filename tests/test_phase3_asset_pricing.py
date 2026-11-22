@@ -342,6 +342,17 @@ def test_phase2_alignment_and_temporal_attacks_are_rejected() -> None:
         build_research_panel(factors, portfolios, {"BAD": "not_present"})
 
 
+def test_pricing_panel_rejects_multiple_returns_per_asset_and_realization_date() -> None:
+    factors, portfolios = _phase2_tables()
+    alternative_interval = portfolios.iloc[[0]].copy()
+    alternative_interval["formation_date"] = pd.to_datetime(
+        alternative_interval["formation_date"]
+    ) - pd.Timedelta(days=1)
+    repeated = pd.concat([portfolios, alternative_interval], ignore_index=True)
+    with pytest.raises(DataQualityError, match="one realization date"):
+        build_research_panel(factors, repeated, {})
+
+
 def test_phase3_excludes_non_estimable_sparse_factor_dates() -> None:
     factors, portfolios = _phase2_tables()
     target = portfolios.loc[portfolios["factor_id"].eq("log_market_cap")]

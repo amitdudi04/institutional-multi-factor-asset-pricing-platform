@@ -640,6 +640,20 @@ def test_economic_evaluation_uses_phase4_timing_costs_and_long_only() -> None:
         .eq(0.0)
         .all()
     )
+    constant = sparse.assign(prediction=0.0)
+    neutral_result = evaluate_ranked_signal(
+        constant.iloc[::-1],
+        returns,
+        benchmark,
+        TransactionCostModel(1, 2, 1, 0),
+        selection_fraction=1 / 3,
+        window=3,
+    )
+    neutral_weights = neutral_result.allocations.pivot(
+        index="date", columns="asset_id", values="weight"
+    )
+    assert neutral_weights.loc[dates[4]].to_dict() == {"A": 0.5, "B": 0.0, "C": 0.5}
+    assert neutral_weights.loc[dates[5]].tolist() == pytest.approx([1 / 3] * 3)
     with pytest.raises(DataQualityError, match="Unauthenticated"):
         evaluate_ranked_signal(
             predictions.assign(authentication_status="FAIL"),
