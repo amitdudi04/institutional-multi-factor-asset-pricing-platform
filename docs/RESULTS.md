@@ -1,6 +1,6 @@
 # Research Results
 
-This document presents the corrected empirical results. The [research evidence index](research_audit/INDEX.md) identifies the supporting numerical reconciliations and earlier historical versions; results from those versions should not be substituted for the current figures.
+This document reports the corrected November 2026 empirical run. The [research evidence index](research_audit/INDEX.md) links the numerical reconciliations and earlier runs. Portfolio beta, Jensen alpha, Sortino and constant-score economic baselines require a new calculation before results from the updated implementation can be reported.
 
 ## 1. Universe and Data
 
@@ -162,7 +162,7 @@ Intervals use 100 moving-block resamples, block length 3, seed 17. Only six name
 | Random Forest | 0.1410% | 8/15 |
 | XGBoost | 0.1554% | 10/15 |
 
-Each fold starts at unit NAV, resets to cash, selects the top-ranked 20% of equities with equal weights and holds for one subsequent common session, paying a 10-bps initial L1 fee. Full liquidation costs and a continuous capital chain are absent. These means are not a 21-session investment backtest or multi-year compounded wealth. Stable incremental after-cost economic value has not been established. SHAP/permutation importance use different targets/samples and remain noncausal diagnostics.
+The reported run allocated equal weights to the top 20% of scores and held for one common session after each cash reset. It charged a 10-bp initial fee per L1 unit. The two constant-score rows reflect the original tie handling, which selected securities by input order. Their values are retained for traceability and should be recalculated using the updated equal-weight rule. This isolated one-session check excludes full liquidation costs and leaves stable after-cost value at the 21-session horizon unestablished. SHAP and permutation importance are descriptive and use different targets and samples.
 
 ## 6. Hypothesis Outcomes
 

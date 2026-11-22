@@ -114,6 +114,8 @@ def build_research_panel(
 
     factor_frame = _normalized_dates(factors, ("date",))
     portfolio_frame = _normalized_dates(portfolios, ("formation_date", "date"))
+    if portfolio_frame.duplicated(["factor_id", "quantile", "date"]).any():
+        raise DataQualityError("A test portfolio has multiple returns for one realization date")
     period_factors = _holding_period_market_factors(factor_frame, portfolio_frame)
 
     keys = ["formation_date", "date"]

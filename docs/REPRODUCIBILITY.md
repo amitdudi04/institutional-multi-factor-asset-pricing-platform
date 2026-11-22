@@ -2,9 +2,9 @@
 
 ## Release Identity
 
-The current results are supported by the documented validation and reconciliation evidence. Exact historical identifiers remain in the research manifests linked from the [research evidence index](research_audit/INDEX.md).
+The corrected results are tied to the [portfolio and ML source manifest](../outputs/audit/phase3/PHASE3_SOURCE_MANIFEST.json), the [regression evidence](../outputs/audit/phase2c/PHASE2C_MODEL_LEVEL_SUMMARY.csv), and the other records in the [research evidence index](research_audit/INDEX.md).
 
-Current corrected results follow the accepted research lineage pinned above. The final-candidate PDF and cross-document claim/checksum matrices are in [outputs/audit/final_correction](../outputs/audit/final_correction/); the editable DOCX is private author delivery.
+The [manuscript checksum record](../outputs/audit/final_correction/FINAL_DOCUMENT_CHECKSUMS.json) records files at the original manuscript review checkpoint, commit [`028dfd9`](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/commit/028dfd9cd18bcd6ef8114d829cc789d5bffacc61). It verifies the candidate PDF and the documentation versions from that checkpoint. Later edits to the live documentation are tracked in Git. The editable DOCX is held by the author.
 
 ### Historical original release
 

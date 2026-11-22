@@ -1,228 +1,71 @@
-# Multi-Factor Asset Pricing & Portfolio Research Platform
+# Multi-Factor Asset Pricing and Portfolio Research
 
-An independent US-equity research project combining source-selected public data and point-in-time-oriented controls, factor construction, classical asset pricing, portfolio allocation, transaction-cost analysis, risk analytics, and walk-forward machine learning.
+This project asks three questions about U.S. equities. How much do characteristics-based factors improve in-sample fit over CAPM? How do eight long-only portfolio methods compare after modeled trading costs? Do two simple characteristics add useful information in a walk-forward forecast?
 
-## Overview
+The multifactor regressions fit the study portfolios better than CAPM. The portfolio methods show different risk and return trade-offs over 31 monthly cycles. The machine-learning results give some evidence of rank predictability for linear models, while stable after-cost value remains unestablished.
 
-This project studies how point-in-time data quality, factor construction, asset-pricing models, portfolio costs, and temporal validation affect empirical U.S. equity research results.
+[Results](docs/RESULTS.md) · [Methodology](docs/METHODOLOGY.md) · [Data and sources](docs/DATA_AND_SOURCES.md) · [Reproducibility](docs/REPRODUCIBILITY.md) · [Working-paper candidate](outputs/audit/final_correction/FINAL_CANDIDATE_MANUSCRIPT.pdf)
 
-The current study screens a broad public-data equity universe, constructs observable characteristics, compares standard asset-pricing specifications, evaluates constrained portfolio methods, and tests whether simple machine-learning models add stable out-of-sample information. The results are mixed rather than uniformly positive: multifactor models fit the project portfolios better than CAPM in-sample, transaction costs matter, portfolio methods produce different risk-return trade-offs, and the machine-learning study does not establish stable incremental value.
+## Data and research design
 
-## Working Paper and Research Documentation
+The study screened **822 equities**, retained **487** and excluded **335**. The retained data include **715,447 daily market observations** and **37,273 SEC-derived fundamental observations**. The sample depends on source availability and screening rules. Public sources include the HF Data Library, SEC EDGAR, Alpha Vantage and FRED. The Kenneth French Data Library provides a reference for factor definitions, and SPY serves as a broad U.S. equity benchmark.
 
-The [final candidate working paper](outputs/audit/final_correction/FINAL_CANDIDATE_MANUSCRIPT.pdf) is the accepted manuscript revision for author review, not a claim of journal acceptance. Its editable DOCX is controlled locally. [Author declarations remain pending](outputs/audit/final_correction/DEFERRED_AUTHOR_REVIEW.md).
+The factor engine defines **48 characteristics and return series**, of which **47** have usable raw observations. The available SEC evidence could not support a consistent equity-issuance measure, so it remains missing. The corrected quantile-return sample contains **11,352 complete portfolio-cycle observations** across 41 sorting characteristics and 123 portfolio series. Availability controls use recorded data dates, with incomplete evidence for the original timing of every filing capture.
 
-The principal research documents are the [methodology](docs/METHODOLOGY.md), [results](docs/RESULTS.md), [limitations](docs/LIMITATIONS.md), and [reproducibility guide](docs/REPRODUCIBILITY.md). Supporting numerical verification and development history are available through the [research evidence index](docs/research_audit/INDEX.md).
+The regressions and allocation tests use quantile returns. The forecasting experiment uses security-level features and forward returns. Each analysis has its own sample and timing rules. [Data and sources](docs/DATA_AND_SOURCES.md) · [Research design](docs/METHODOLOGY.md)
 
-## Main Results
+## Asset-pricing results
 
-The table summarizes the corrected research results. Detailed definitions, matched-sample comparisons, and numerical qualifications are in [Research Results](docs/RESULTS.md). Historical releases are retained separately and should not be confused with the corrected findings.
+All five models use the same 67–77 monthly trading cycles per test portfolio. The study estimates 615 OLS regressions across 123 portfolios using three-lag Newey–West standard errors.
 
-| Area | Current result |
-|---|---|
-| Universe | 822 securities screened; 487 accepted and 335 rejected |
-| Market data | 715,447 daily observations |
-| SEC-derived fundamentals | 37,273 observations; recorded availability controls, not exhaustive historical capture certification |
-| Factors | 48 names; 47 with nonmissing raw values; 41 quantile characteristics; 11,352 corrected quantile-cycle rows |
-| Asset pricing | Matched mean adjusted R²: CAPM 0.760818; FF3 0.802438; Carhart 4 0.811021; FF5 0.817658; q-style 0.814361 |
-| Portfolios | 8 long-only sleeve allocations; 31 complete cycles; 5/10/20 bps per absolute-traded-weight unit |
-| ML design | 27,632 rows; 89 common month ends; 15 dependent OOS folds; 7,286 held-out observations per family |
-| ML conclusion | Linear-family intervals nominally positive, RF crosses zero, XGBoost negative; stable incremental after-cost economic value remains unestablished |
+| Model | Mean adjusted R² | Mean alpha per cycle | Nominal HAC p < 0.05 |
+| --- | ---: | ---: | ---: |
+| CAPM | 0.760818 | −0.001658 | 8/123 |
+| Fama–French 3-factor specification | 0.802438 | −0.001967 | 12/123 |
+| Carhart 4-factor specification | 0.811021 | −0.001879 | 14/123 |
+| Fama–French 5-factor specification | 0.817658 | −0.002008 | 8/123 |
+| Study-specific q-style specification | 0.814361 | −0.002227 | 9/123 |
 
-For the complete numerical summary and interpretation, see [docs/RESULTS.md](docs/RESULTS.md).
+Alpha is a decimal return per cycle. The specifications use factors constructed for this study. The q-style specification uses earnings yield as one of its inputs. The portfolios share constituents and include six pairs with identical return series. No primary intercept survives the supplementary Holm adjustment. The R² comparison describes in-sample fit on these portfolios. [Regression results](docs/RESULTS.md#3-asset-pricing-results)
 
-## Research Questions
+## Portfolio results
 
-The hypotheses as worded in the supplied manuscript evaluate whether:
+Eight methods allocate across 123 long-only quantile sleeves over **31 complete monthly cycles**. Costs are 5, 10 or 20 basis points per unit of absolute traded weight (L1). In the 10-bp case, the initial investment costs 10 bps and a full switch between portfolios costs 20 bps. Trades within the sleeves, capacity and market impact are outside this cost estimate.
 
-1. at least one factor spread survives the complete pre-specified cost and multiplicity rule;
-2. multifactor models improve explanatory fit relative to CAPM and that improvement extends to stable out-of-sample economic evidence;
-3. estimated relations remain stable through time under the original rule;
-4. higher transaction-cost assumptions reduce cumulative outcomes;
-5. constrained portfolio methods alter risk-return trade-offs and any apparent superiority is stable out of sample;
-6. machine learning adds stable out-of-sample predictive and after-cost value; and
-7. explanation rankings remain stable across methods.
+| Strategy | Selected result at 10 bps |
+| --- | --- |
+| Minimum Variance | Annualized volatility of 9.9505% |
+| Maximum Diversification | Maximum drawdown of −4.8279% |
+| Maximum Sharpe | Realized Sharpe ratio of 1.346360 |
+| CVaR | Cumulative net return of 73.6842% and Sharpe ratio of 1.252327 |
 
-These are bounded historical propositions, not newly authenticated preregistration. H1/H3 remain inconclusive because original approval/direction and complete decision evidence are unavailable.
+These results describe the observed sample from February 2024 to August 2026. The short evaluation window limits conclusions about which method will perform better in other periods. [Portfolio results](docs/RESULTS.md#4-portfolio-cost-and-risk-results)
 
-## Data and Universe
+## Walk-forward forecast
 
-| Source | Role |
-|---|---|
-| HF Data Library | Historical US-equity market observations and initial candidate universe |
-| SEC EDGAR | Filing identity, point-in-time fundamentals, shares, and XBRL evidence |
-| Alpha Vantage | Listing and lifecycle evidence used in universe screening |
-| FRED | 3-month constant-maturity Treasury yield reference (DGS3MO) |
-| Kenneth French Data Library | Reference factor datasets and methodology comparison |
-| SPY | Broad investable US-equity benchmark proxy |
+Book-to-market and 12-minus-1 momentum are used to forecast the next 21 trading sessions of security returns relative to SPY. The study covers **27,632 rows, 89 month ends and 15 test folds**, with 7,286 held-out observations per model. The design uses expanding training, label purging and a one-month embargo. Five pairs of adjacent test folds have overlapping return windows.
 
-The final panel is source-availability selected. It is not presented as a reconstruction of CRSP, Compustat, the historical S&P 500, or the Russell 1000. Raw third-party data are not redistributed through this repository.
+Elastic Net has a mean rank IC of **0.044609**, compared with **−0.002641** for Random Forest and **−0.023285** for XGBoost. The linear and factor-composite rows produce identical predictions. Constant forecasts have undefined IC. The bootstrap intervals are exploratory given the number of folds, their dependence and the number of models compared. The investment check resets to cash each month and evaluates the next session after fees. This design leaves the economic value of holding a 21-session forecast unresolved. [Forecast and economic results](docs/RESULTS.md#5-walk-forward-machine-learning)
 
-More detail is in [docs/DATA_AND_SOURCES.md](docs/DATA_AND_SOURCES.md).
+## Reproduce the public checks
 
-## Research Design
-
-The security and factor panels support **separate, related research studies**, rather than a single pipeline where pricing coefficients feed portfolio optimization and ML.
-
-- **Asset pricing:** constructed factor/quantile returns → matched-horizon CAPM, FF3, Carhart 4, FF5, and study-specific q-style regressions.
-- **Portfolio evaluation:** corrected quantile returns → eight constrained sleeve-allocation methods, modeled costs and risk accounting.
-- **Machine learning:** historical factor-score features and market labels → purged monthly forecasts → a separate one-session economic check.
-
-See the [research dependency diagram](docs/ARCHITECTURE.md) and [methodology](docs/METHODOLOGY.md) for the actual input lineages and timing assumptions.
-
-## Factor Research
-
-The factor engine contains 48 configured definitions spanning market, size, value, momentum, profitability, investment/leverage, and risk/liquidity characteristics. Forty-seven are estimable in the current empirical release.
-
-`equity_issuance` remains non-estimable because the available point-in-time SEC evidence does not support a consistent calculation without unsupported imputation. Missing evidence is therefore left missing rather than converted to zero.
-
-## Asset-Pricing Results
-
-Matched per-asset comparison: 123 correlated dependent portfolios, 67–77 full trading cycles per asset and 615 primary regressions.
-
-| Model | Mean adjusted R² | Alpha (decimal return per full trading cycle) | Nominal HAC p < 0.05 |
-|---|---:|---:|---:|
-| CAPM | 0.760818 | -0.001658 | 8/123 |
-| Fama-French 3 | 0.802438 | -0.001967 | 12/123 |
-| Carhart 4 | 0.811021 | -0.001879 | 14/123 |
-| Fama-French 5 | 0.817658 | -0.002008 | 8/123 |
-| Study-specific q-style | 0.814361 | -0.002227 | 9/123 |
-
-Mean alphas are negative cycle returns, not annualized investment alpha. No primary intercept survives supplementary Holm adjustment; non-rejection does not establish exactly zero alpha. Internal proxies and six duplicate return-series pairs limit external pricing interpretation.
-
-The multifactor specifications provide greater in-sample explanatory fit than CAPM on these project portfolios. That result is not interpreted as proof of persistent alpha, causality, or future performance.
-
-## Portfolio Research
-
-Eight long-only, fully invested methods are compared:
-
-- Equal Weight
-- Minimum Variance
-- Mean Variance
-- Maximum Sharpe
-- Maximum Diversification
-- Risk Parity
-- Hierarchical Risk Parity
-- CVaR
-
-The modeled per-side rates are 5, 10 and 20 bps per unit of absolute L1 traded weight. Half-L1 one-way turnover is a separate quantity. Initial BASE deployment costs 10 bps; a full invested switch costs 20 bps. The evaluation spans 31 complete monthly trading cycles (exit labels 2024-02-01 to 2026-08-03), allocating to 123 constructed long-only quantile sleeves. Inner-sleeve execution and full market impact are not established.
-
-Selected 10 bps BASE results:
-
-| Method | Observed result |
-|---|---:|
-| Minimum Variance | Annualized volatility: 9.9505% |
-| Maximum Diversification | Corrected-path maximum drawdown: -4.8279% |
-| Maximum Sharpe | Sharpe ratio: 1.346360 |
-| CVaR | Cumulative net return: 73.6842%; Sharpe ratio: 1.252327 |
-
-These are descriptive results from a short factor-portfolio window. They do not establish persistent strategy superiority.
-
-## Walk-Forward Machine Learning
-
-The ML study uses book-to-market and 12-minus-1 momentum to predict the next 21-trading-session security return relative to SPY.
-
-The evaluation uses:
-
-- monthly decisions;
-- expanding training starting at 60 calendar months and reaching 74;
-- 12 validation periods;
-- one test month per fold;
-- label purging;
-- a one-month embargo;
-- monthly retraining;
-- 15 dependent complete out-of-sample folds; five of 14 adjacent test-target pairs overlap.
-
-Eight models are evaluated: zero and historical-mean baselines, factor composite, linear regression, Ridge, Elastic Net, Random Forest, and XGBoost.
-
-Factor composite and linear use the same LinearRegression estimator and yield identical predictions. Their mean IC is 0.034430; Ridge 0.034434; Elastic Net 0.044609; Random Forest -0.002641; XGBoost -0.023285. Constant-baseline IC is undefined. Block-bootstrap intervals (100 resamples, block 3, seed 17) are exploratory: linear families are nominally positive, RF crosses zero and XGBoost is negative. These dependent, multiple-model comparisons do not establish stable predictability. The economic check selects 20% of equities, equal weights them and resets to cash for one subsequent session with initial fees; it is not a continuous 21-session investment strategy. Stable incremental after-cost economic value has not been established.
-
-## Repository Structure
-
-```text
-config/     Research and delivery configuration
-src/        Data, factors, asset pricing, portfolios, risk, ML, API and dashboard code
-tests/      Methodology, temporal-integrity, accounting and software tests
-docs/       Research methodology, results, limitations and reproducibility
-data/       Public data-access notes; empirical source files remain local
-examples/   Small redistributable templates
-```
-
-## Quick Start
-
-Python 3.11 or newer and `uv` are required.
+Use Python 3.11 or newer and `uv`.
 
 ```shell
-uv sync --all-groups
+uv sync --frozen --all-groups
+uv run pytest
+uv run coverage report --fail-under=90
 uv run institutional-factor-platform validate-config
-uv run institutional-factor-platform validate-delivery-config
 uv run institutional-factor-platform verify-delivery-platform
 ```
 
-Run the test suite:
+The public checkout includes the software, tests, published summaries and reconciliation records. Exact empirical reproduction requires access to the frozen vendor inputs and local research artifacts. The historical software tags and the sources for the corrected study are listed in the [reproducibility guide](docs/REPRODUCIBILITY.md). The API and dashboard display stored research outputs. See [software usage](docs/SOFTWARE_USAGE.md).
 
-```shell
-uv run pytest
-uv run coverage report --fail-under=90
-uv run ruff check .
-uv run ruff format --check .
-uv run mypy src
-uv lock --check
-```
+| Repository path | Contents |
+| --- | --- |
+| `src/`, `config/`, `tests/` | Analysis, delivery code, settings and tests |
+| `docs/` | Research design, results, limitations and reproduction instructions |
+| [Research evidence](docs/research_audit/INDEX.md) | Validation reports, underlying tables and output provenance |
+| [CITATION.cff](CITATION.cff) | Citation metadata for the historical software release |
 
-Fresh release tests and CI are recorded in the [release validation record](outputs/audit/final_release/FINAL_TEST_AND_CI_RESULTS.txt). The documented verification checkpoint passed 372 tests with 90.62% coverage, plus a 91-test targeted run. Software assurance does not certify empirical validity, source vintage or investability.
-
-## API and Dashboard
-
-```shell
-uv run institutional-factor-platform serve-api
-uv run institutional-factor-platform serve-dashboard
-```
-
-The API and Streamlit dashboard expose stored research outputs. They are research interfaces, not brokerage or live-trading infrastructure. See [docs/SOFTWARE_USAGE.md](docs/SOFTWARE_USAGE.md).
-
-## Reproducibility
-
-The **historical original** empirical release is identified by:
-
-- tag: `project-complete-public-data-v1`
-- parallel research tag: `research-empirical-public-v1`
-
-Exact empirical reproduction requires lawful access to the same third-party source data, mappings, configuration, and locked environment. See [docs/REPRODUCIBILITY.md](docs/REPRODUCIBILITY.md).
-
-## Limitations
-
-The principal limitations are:
-
-- source-availability selection and incomplete historical-universe coverage;
-- limited early cross-sectional breadth;
-- incomplete exhaustive SEC capture chronology and issuer/share-class attribution;
-- frozen provider-vintage adjusted-quote returns with unverified complete dividend-inclusive comparability;
-- modeled close decisions and retrospective forecasts rather than verified historical fills or live timestamps;
-- 31 complete portfolio cycles using 123 synthetic sleeves rather than directly executable equity portfolios;
-- transaction costs modeled as sensitivity assumptions rather than measured executions;
-- two ML characteristics and 15 dependent test folds;
-- no stable after-cost ML improvement;
-- non-causal feature-importance and scenario outputs.
-
-See [docs/LIMITATIONS.md](docs/LIMITATIONS.md) for the full discussion.
-
-## Interpretation and Research Limitations
-
-The corrected results establish internal empirical calculations—not historical universe completeness, dividend-inclusive total returns, executable close prices, independent market-wide factor pricing, or persistent strategy alpha. The test portfolios share constituents and six return-series pairs; a 109-asset self-inclusion sensitivity does not establish external independence. The q-style earnings-yield characteristic is not accounting ROE. Negative fitted alphas are compatible with high adjusted R², and Holm non-rejections do not prove zero true alpha.
-
-Portfolio allocations use 123 constructed sleeves over 31 cycles; 5/10/20 bps costs are applied per absolute L1 traded-weight unit (a fully invested switch at BASE costs 20 bps), without verified inner-sleeve execution costs. The ML statistical target spans 21 sessions, while the separate investment diagnostic covers one following session with capital reset; 15 overlapping folds and 100 bootstrap replications constrain inference. H1/H3 remain inconclusive without complete original decision evidence.
-
-The detailed, non-duplicated research caveats are in [Limitations](docs/LIMITATIONS.md); definitions and derivations are in [Methodology](docs/METHODOLOGY.md), [Results](docs/RESULTS.md) and [Reproducibility](docs/REPRODUCIBILITY.md). For the historical verification trail, consult the [audit evidence index](docs/research_audit/INDEX.md).
-
-## Release and Software Citation Context
-
-The `CITATION.cff` release date of **2026-08-27** identifies the *historical software-release metadata*; it is not the date of the November 2026 corrected working-paper candidate. The current manuscript revision and its separate content hash are documented in the [final correction manifest](outputs/audit/final_correction/FINAL_DOCUMENT_CHECKSUMS.json). No new software release or tag is implied.
-
-The validated corrections and documentation were merged through [PR #10](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/pull/10) and [PR #9](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/pull/9). The [2 November 2026 main-branch CI run](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/actions/runs/41489336229) passed validation and Docker checks, including the dependency security gate. This records a historical passing audit, not a guarantee of future vulnerability-free dependencies. Manuscript author declarations still require personal signoff.
-
-## License and Citation
-
-Original code and documentation are licensed under the [MIT License](LICENSE). Third-party datasets remain subject to their own licenses and terms.
-
-Repository citation metadata are provided in [CITATION.cff](CITATION.cff). Upstream datasets should be cited separately.
+The [working-paper candidate](outputs/audit/final_correction/FINAL_CANDIDATE_MANUSCRIPT.pdf) is under [author review](outputs/audit/final_correction/DEFERRED_AUTHOR_REVIEW.md). Code and documentation are provided under the [MIT License](LICENSE). Third-party data are subject to their providers’ terms.

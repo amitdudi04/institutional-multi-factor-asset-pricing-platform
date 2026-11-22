@@ -269,6 +269,27 @@ def test_risk_metrics_and_contribution_reconciliation() -> None:
         risk_summary(returns, benchmark.iloc[:-1])
 
 
+def test_risk_summary_pairs_dated_returns_and_uses_cash_as_the_downside_target() -> None:
+    dates = pd.date_range("2026-01-01", periods=4)
+    cash = pd.Series([0.001, 0.003, 0.004, 0.002], index=dates)
+    market = pd.Series([0.020, -0.010, 0.040, -0.030], index=dates)
+    portfolio = cash + 0.002 + 0.65 * (market - cash)
+
+    summary = risk_summary(portfolio, market, cash)
+    assert summary["beta"] == pytest.approx(0.65)
+    assert summary["alpha"] == pytest.approx(0.024)
+    negative_excess = (portfolio - cash).clip(upper=0)
+    downside = np.sqrt((negative_excess**2).mean() * 12)
+    assert summary["downside_deviation"] == pytest.approx(downside)
+    assert summary["sortino"] == pytest.approx((portfolio - cash).mean() * 12 / downside)
+    with pytest.raises(DataQualityError, match="aligned"):
+        risk_summary(portfolio, market.iloc[::-1], cash)
+    with pytest.raises(DataQualityError, match="aligned"):
+        risk_summary(portfolio, market, cash.iloc[::-1])
+    with pytest.raises(DataQualityError, match="every period"):
+        risk_summary(portfolio, market, cash.mask(cash.eq(0.004)))
+
+
 def test_scenario_framework_discloses_unmapped_shocks() -> None:
     scenario = Scenario("crash and rates", {"market": -0.2, "rates": 0.01}, "market_crash")
     result = apply_scenario(

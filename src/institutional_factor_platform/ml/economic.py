@@ -19,7 +19,7 @@ def evaluate_ranked_signal(
     window: int,
 ) -> BacktestResult:
     required = {"formation_date", "security_id", "prediction", "authentication_status"}
-    if set(authenticated_predictions.columns) < required:
+    if required - set(authenticated_predictions.columns):
         raise DataQualityError("Economic evaluation requires authenticated prediction identity")
     if set(authenticated_predictions["authentication_status"]) != {"PASS"}:
         raise DataQualityError("Unauthenticated prediction cannot enter Phase 4")
@@ -41,8 +41,13 @@ def evaluate_ranked_signal(
         ranks = available.set_index("security_id")["prediction"].reindex(history.columns).dropna()
         if ranks.empty:
             raise DataQualityError("No authenticated prediction aligns with the return universe")
-        count = max(1, int(np.ceil(len(ranks) * selection_fraction)))
-        selected = set(ranks.nlargest(count).index)
+        if ranks.nunique() == 1:
+            # Constant forecasts contain no ranking information within the eligible universe.
+            selected = set(ranks.index)
+        else:
+            count = max(1, int(np.ceil(len(ranks) * selection_fraction)))
+            selected = set(ranks.nlargest(count).index)
+        count = len(selected)
         return np.array([1 / count if asset in selected else 0.0 for asset in history.columns])
 
     return run_backtest(

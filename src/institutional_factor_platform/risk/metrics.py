@@ -27,13 +27,29 @@ def rolling_volatility(returns: pd.Series, window: int, annualization: int = 12)
 
 
 def beta_alpha(
-    returns: pd.Series, benchmark: pd.Series, annualization: int = 12
+    returns: pd.Series,
+    benchmark: pd.Series,
+    annualization: int = 12,
+    *,
+    risk_free: pd.Series | float = 0.0,
 ) -> tuple[float, float]:
-    aligned = pd.concat([returns, benchmark], axis=1).dropna()
-    if len(aligned) < 3 or aligned.iloc[:, 1].var(ddof=1) <= 0:
-        raise DataQualityError("Beta requires aligned variable benchmark observations")
-    beta = float(aligned.cov().iloc[0, 1] / aligned.iloc[:, 1].var(ddof=1))
-    alpha = float((aligned.iloc[:, 0].mean() - beta * aligned.iloc[:, 1].mean()) * annualization)
+    aligned = pd.concat([returns.rename("portfolio"), benchmark.rename("benchmark")], axis=1)
+    aligned = aligned.apply(pd.to_numeric, errors="coerce").dropna()
+    if isinstance(risk_free, pd.Series):
+        cash = risk_free.reindex(aligned.index)
+        if cash.isna().any():
+            raise DataQualityError("Risk-free and portfolio returns must be aligned")
+        cash_values = _values(cash, minimum=3)
+    else:
+        cash_values = _values(pd.Series(risk_free, index=aligned.index), minimum=3)
+
+    portfolio_excess = _values(aligned["portfolio"], minimum=3) - cash_values
+    benchmark_excess = _values(aligned["benchmark"], minimum=3) - cash_values
+    variance = float(np.var(benchmark_excess, ddof=1))
+    if variance <= 0:
+        raise DataQualityError("Beta requires variable benchmark excess returns")
+    beta = float(np.cov(portfolio_excess, benchmark_excess, ddof=1)[0, 1] / variance)
+    alpha = float((portfolio_excess.mean() - beta * benchmark_excess.mean()) * annualization)
     return beta, alpha
 
 
@@ -108,20 +124,28 @@ def risk_summary(
     risk_free: pd.Series | float = 0.0,
     annualization: int = 12,
 ) -> dict[str, float | None]:
+    if not returns.index.is_unique or not returns.index.equals(benchmark.index):
+        raise DataQualityError("Portfolio and benchmark returns must be exactly aligned")
+    if isinstance(risk_free, pd.Series) and not returns.index.equals(risk_free.index):
+        raise DataQualityError("Risk-free returns must be exactly aligned")
+
+    cash = (
+        risk_free
+        if isinstance(risk_free, pd.Series)
+        else pd.Series(risk_free, index=returns.index)
+    )
     values = _values(returns)
     benchmark_values = _values(benchmark)
-    if len(values) != len(benchmark_values):
-        raise DataQualityError("Portfolio and benchmark returns must be exactly aligned")
-    rf = np.full(len(values), risk_free) if np.isscalar(risk_free) else _values(risk_free)
-    if len(rf) != len(values):
-        raise DataQualityError("Risk-free returns must align")
+    rf = _values(cash)
+    if not len(values) == len(benchmark_values) == len(rf) == len(returns):
+        raise DataQualityError("Aligned return series must contain a value for every period")
     excess = values - rf
     active = values - benchmark_values
     vol = float(values.std(ddof=1) * np.sqrt(annualization))
-    downside = downside_deviation(pd.Series(values), annualization=annualization)
+    downside = float(np.sqrt(np.mean(np.minimum(excess, 0.0) ** 2)) * np.sqrt(annualization))
     max_dd = abs(maximum_drawdown(pd.Series(values)))
     cumulative = float(np.prod(1.0 + values) - 1.0)
-    beta, alpha = beta_alpha(pd.Series(values), pd.Series(benchmark_values), annualization)
+    beta, alpha = beta_alpha(returns, benchmark, annualization, risk_free=cash)
     gains = np.maximum(values, 0).sum()
     losses = -np.minimum(values, 0).sum()
     return {
