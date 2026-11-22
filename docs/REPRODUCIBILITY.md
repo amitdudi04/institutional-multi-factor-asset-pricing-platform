@@ -17,7 +17,7 @@ These tags refer to the historical original experiment, not the corrected result
 
 ## Environment
 
-Python 3.11 or newer and `uv` are required.
+Python 3.11.5 or newer and `uv` are required.
 
 ```shell
 uv sync --all-groups

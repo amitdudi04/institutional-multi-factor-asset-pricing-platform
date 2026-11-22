@@ -49,7 +49,7 @@ Elastic Net has a mean rank IC of **0.044609**, compared with **−0.002641** fo
 
 ## Reproduce the public checks
 
-Use Python 3.11 or newer and `uv`.
+Use Python 3.11.5 or newer and `uv`.
 
 ```shell
 uv sync --frozen --all-groups
