@@ -4,7 +4,7 @@ This project asks three questions about U.S. equities. How much do characteristi
 
 The multifactor regressions fit the study portfolios better than CAPM. The portfolio methods show different risk and return trade-offs over 31 monthly cycles. The machine-learning results give some evidence of rank predictability for linear models, while stable after-cost value remains unestablished.
 
-[Results](docs/RESULTS.md) · [Methodology](docs/METHODOLOGY.md) · [Data and sources](docs/DATA_AND_SOURCES.md) · [Reproducibility](docs/REPRODUCIBILITY.md) · [Working-paper candidate](outputs/audit/final_correction/FINAL_CANDIDATE_MANUSCRIPT.pdf)
+[Results](docs/RESULTS.md) · [Methodology](docs/METHODOLOGY.md) · [Data and sources](docs/DATA_AND_SOURCES.md) · [Reproducibility](docs/REPRODUCIBILITY.md) · [Archived working-paper draft](outputs/audit/final_correction/FINAL_CANDIDATE_MANUSCRIPT.pdf)
 
 ## Data and research design
 
@@ -68,4 +68,4 @@ The public checkout includes the software, tests, published summaries and reconc
 | [Research evidence](docs/research_audit/INDEX.md) | Validation reports, underlying tables and output provenance |
 | [CITATION.cff](CITATION.cff) | Citation metadata for the historical software release |
 
-The [working-paper candidate](outputs/audit/final_correction/FINAL_CANDIDATE_MANUSCRIPT.pdf) is under [author review](outputs/audit/final_correction/DEFERRED_AUTHOR_REVIEW.md). Code and documentation are provided under the [MIT License](LICENSE). Third-party data are subject to their providers’ terms.
+The archived draft records the November empirical checkpoint. Author declarations are described in the [author review record](outputs/audit/final_correction/DEFERRED_AUTHOR_REVIEW.md). The [MIT License](LICENSE) covers the project code and documentation. Third-party data are subject to their providers’ terms.

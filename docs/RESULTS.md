@@ -147,14 +147,14 @@ Training-only transformations and recorded-day gates are verified; exhaustive SE
 | Random Forest | -0.002641 | -0.011912 | [-0.017721, 0.015985] |
 | XGBoost | -0.023285 | -0.041750 | [-0.038821, -0.005015] |
 
-Intervals use 100 moving-block resamples, block length 3, seed 17. Only six named rows have finite IC intervals, including the duplicate linear/composite estimator; the two constant baselines are undefined. Linear-family intervals are nominally positive, RF crosses zero and XGBoost is nominally negative. Few dependent folds, multiple comparisons and a small resampling budget limit precision. These are exploratory intervals, not robust discoveries. Old linear predictions evaluated on the corrected test keys have IC 0.037238 versus corrected 0.034430, so the higher whole-sample IC is not isolated improvement.
+Intervals use 100 moving-block resamples, block length 3, seed 17. Only six named rows have finite IC intervals, including the duplicate linear/composite estimator; the two constant baselines are undefined. Linear-family intervals are nominally positive, RF crosses zero and XGBoost is nominally negative. Few dependent folds, multiple comparisons and a small resampling budget limit precision. These are exploratory intervals, not robust discoveries. Earlier linear predictions evaluated on the matched held-out observations have IC 0.037238 versus corrected 0.034430, so the higher whole-sample IC is not isolated improvement.
 
 ### One-session economic checks
 
 | Model | Mean net one-session return (%) | Positive economic folds |
 |---|---:|---:|
-| Zero baseline | -0.0604% | 7/15 |
-| Historical mean | -0.0604% | 7/15 |
+| Zero baseline (original tie rule) | -0.0604% | 7/15 |
+| Historical mean (original tie rule) | -0.0604% | 7/15 |
 | Factor composite | 0.0559% | 7/15 |
 | Linear | 0.0559% | 7/15 |
 | Ridge | 0.0559% | 7/15 |
@@ -178,7 +178,7 @@ The reported run allocated equal weights to the top 20% of scores and held for o
 
 ## 7. Software Validation
 
-The accepted Phase 3 checkpoint recorded 372 passing full-suite tests, 90.62% coverage and 91 targeted tests. Its type, lint, format and lock checks passed. Those prior checks were not rerun for a documentation-only pass. Current document, table, equation, link and integrity checks are recorded separately in the final-correction evidence. Software assurance is not proof of complete PIT data, causality, dividend treatment or live investability. Historical original 301/90.52% assurance belongs to the archived release only.
+The empirical checkpoint passed 372 full-suite tests with 90.62% coverage, and the focused portfolio and ML run passed 91 tests. The later implementation passed 374 tests with 90.06% coverage. Its [CI record](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/actions/runs/45004644451) verifies the software revision. The empirical tables report the frozen run described above.
 
 ## 8. Overall Conclusion
 
