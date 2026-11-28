@@ -85,7 +85,7 @@ uv run institutional-factor-platform verify-delivery-platform
 git diff --check
 ```
 
-The accepted Phase 3 correction passed 372 tests with 90.62% coverage and 91 targeted tests. These are prior checkpoint results, not a new full-suite run for this docs-only pass. Historical original 301 tests/90.52% remains an archived assurance record. Document/link/equation/source checks are recorded separately.
+The Phase 3 empirical checkpoint passed 372 full-suite tests with 90.62% coverage, and the focused portfolio and ML run passed 91 tests. The later software revision passed 374 tests with 90.06% coverage. Its [GitHub Actions run](https://github.com/amitdudi04/institutional-multi-factor-asset-pricing-platform/actions/runs/45004644451) records the test, coverage, and dependency checks. The original release’s 301 tests and 90.52% coverage belong to its historical record.
 
 ## What Can Be Reproduced from Git Alone?
 
